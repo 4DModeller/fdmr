@@ -175,14 +175,7 @@ mesh <- INLA::inla.mesh.2d(
 ```{r plotmesh, error=TRUE, fig.cap="Triangulated mesh used to build the SPDE model.",fig.width=5,fig.height=5, fig.align='center', eval=FALSE}
 point_data <- sp_data@data[, c("LONG", "LAT")]
 
-<<<<<<< HEAD
-```{r error=TRUE, plotmesh, fig.cap="Triangulated mesh used to build the SPDE model.",fig.width=5,fig.height=5, fig.align='center'}
-plot(mesh,main='')
-points(sp.dat@data[,c("LONG","LAT")],col="blue",cex=0.1)
-print(sp.dat)
-=======
 fdmr::plot_mesh(mesh = mesh, point_data = point_data)
->>>>>>> devel
 ```
 
 # Build the SPDE model on the mesh and set priors for the spatial parameters
