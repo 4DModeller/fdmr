@@ -1,0 +1,60 @@
+Package: fdmr
+Title: 4D Modeller project
+Version: 0.0.1
+Authors@R: 
+    c(person("Gareth", "Jones", , "g.m.jones@bristol.ac.uk", role = c("aut", "cre"),
+            comment = ""),
+        person("Sam", "Royston", , "s.royston@bristol.ac.uk", role = c("aut"),
+            comment = ""),
+        person("Xueqing", "Yin", , "de22002@bristol.ac.uk", role = c("aut"),
+            comment = ""),
+        person("John", "Aiken", , "john@xal.no", role = c("aut"),
+            comment = ""),
+        person("Jonathan", "Bamber", , "j.bamber@bristol.ac.uk", role = c("aut"),
+            comment = ""))
+Description: What the package does (one paragraph).
+URL: https://github.com/GlobalMass/processing
+BugReports: https://github.com/GlobalMass/processing/issues
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    colorspace,
+    data.table,
+    plyr,
+    dplyr,
+    fs,
+    GEOmap,
+    geosphere,
+    ggplot2,
+    igraph,
+    lubridate,
+    magrittr,
+    Matrix,
+    methods,
+    ncdf4,
+    raster,
+    reshape2,
+    rgdal,
+    rgeos,
+    sf,
+    sp,
+    spam,
+    tidyr,
+    utils,
+    inlabru,
+    config,
+    scales,
+    spdep,
+    gridExtra,
+    leaflet
+Suggests: 
+    archive,
+    knitr,
+    openssl,
+    rmarkdown,
+    stringi,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr

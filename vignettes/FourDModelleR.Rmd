@@ -1,0 +1,48 @@
+---
+title: "Getting started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Installation
+
+To get ModelleR installed first you need to make sure you have a recent version of R installed.
+The easiest way to do this is to [install RStudio](https://posit.co/downloads/).
+
+Next clone this repository and move into the directory.
+
+```{bash eval=FALSE}
+git clone https://github.com/4DModeller/fdmr.git
+cd fdmr
+```
+
+Next we need to install INLA, which won't be installed by default when you install the `FourDModellR` package.
+To do this open an R console or RStudio and in the console run
+
+```{r eval=FALSE}
+# install.packages("INLA", repos = c(getOption("repos"), INLA = "https://inla.r-inla-download.org/R/stable"), dep = TRUE)
+```
+
+Next you can install the `FourDModellR` package from the local directory.
+
+```{r eval=FALSE}
+# install.packages(".", repos = NULL, type = "source")
+```
+
+This will install the `FourDModellR` package and its dependencies.
+
+## Configuration file
+
+Once you've installed the package you need to run `fdmr::create_config()` to create a configuration file
+so fdmr knows where to store its intermediate files and caches. 
+
+```{r eval=FALSE}
+# fdmr::create_config()
+```
+
+You can run through configuration setup by just pressing enter, or change the default paths by entering your required path when prompted. Once you're finished your configuration file will be written to `~/.config/fdmr/config.conf`.
+
+You're now ready to move onto one of our tutorials.
