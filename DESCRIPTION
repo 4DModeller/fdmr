@@ -54,6 +54,7 @@ Suggests:
     bookdown,
     knitr,
     openssl,
+    pkgdown,
     rmarkdown,
     stringi,
     testthat (>= 3.0.0),
