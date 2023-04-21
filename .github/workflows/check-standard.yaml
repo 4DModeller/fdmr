@@ -29,7 +29,7 @@ jobs:
           use-public-rspm: true
       - name: Do some Ubuntu specific setup
         run: |
-          sudo apt-get install libarchive-dev gdal-bin proj-bin libgdal-dev libproj-dev
+          sudo apt-get install libarchive-dev gdal-bin proj-bin libgdal-dev libproj-dev libudunits2-dev
         if: matrix.config.os == 'ubuntu-latest'
       - uses: r-lib/actions/setup-renv@v2
       - name: Run tests

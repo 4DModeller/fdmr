@@ -26,8 +26,8 @@ jobs:
           use-public-rspm: true
       - name: Do some Ubuntu specific setup
         run: |
-          sudo apt-get install libarchive-dev gdal-bin proj-bin libgdal-dev libproj-dev
-        if: matrix.config.os == 'ubuntu-latest'
+          sudo apt-get install libarchive-dev gdal-bin proj-bin libgdal-dev libproj-dev libudunits2-dev
+        if: runner.os == 'ubuntu-latest'
       - uses: r-lib/actions/setup-renv@v2
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
