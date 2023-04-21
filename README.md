@@ -1,4 +1,4 @@
-# 4D Modeller
+# 4D Modeller - Spatio-temporal modeling tools for the 21st Century
 
 This repository contains the code for the 4DModeller project.
 
