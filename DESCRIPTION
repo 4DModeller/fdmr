@@ -51,6 +51,7 @@ Imports:
     leaflet
 Suggests: 
     archive,
+    bookdown,
     knitr,
     openssl,
     rmarkdown,

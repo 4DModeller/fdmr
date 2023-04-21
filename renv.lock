@@ -180,6 +180,23 @@
       ],
       "Hash": "543776ae6848fde2f48ff3816d0628bc"
     },
+    "bookdown": {
+      "Package": "bookdown",
+      "Version": "0.33",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "htmltools",
+        "jquerylib",
+        "knitr",
+        "rmarkdown",
+        "tinytex",
+        "xfun",
+        "yaml"
+      ],
+      "Hash": "948ba48e07aa772d3e5564ce8c0a7896"
+    },
     "boot": {
       "Package": "boot",
       "Version": "1.3-28.1",
