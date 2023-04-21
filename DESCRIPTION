@@ -55,6 +55,7 @@ Suggests:
     openssl,
     rmarkdown,
     stringi,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    rcmdcheck
 Config/testthat/edition: 3
 VignetteBuilder: knitr
