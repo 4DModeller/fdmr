@@ -47,8 +47,7 @@ We first need to retrieve the data from the fdmr example data store and unpack i
 > **_NOTE:_**  Download the tar file from the URL I sent and pass the path to this file to the function. This process will be streamlined once we know what we can host publicly.
 
 ```{r eval=FALSE}
-tarpath <- "/example/path/covid19_example.tar.bz2"
-fdmr::retrieve_tutorial_data(tarball_path = tarpath)
+fdmr::retrieve_tutorial_data(dataset = "covid")
 ```
 
 Next we'll use the `load_tutorial_data` function to load in the spatial data we want.
