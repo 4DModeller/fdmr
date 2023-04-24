@@ -11,29 +11,33 @@ vignette: >
   
 The first thing to do is to load all of the packages we need to use for this tutorial:
   
-```{r error=TRUE,message=FALSE,warning=FALSE}
+```{r}
 library(leaflet)
 library(jsonlite)
 library(ggplot2)
 library(inlabru)
 library(INLA)
-# TODO : this should not use rgdal because it is being deprecated
 library(rgdal)
 library(raster)
 library(ncdf4)
 library(data.table)
 ```
 
-If you do not have `INLA` or `inlabru` installed [please go to the following installation tutorial before continuing](link%20to%20installation%20tutorial). `COMMENT: maybe these should just all be dependencies for 4D-Modeller...`
+If you do not have `INLA` or `inlabru` installed [please go to the following installation tutorial before continuing](link%20to%20installation%20tutorial).
 
-Next we will create variables for where the data is stored.
+First we'll download the data for this tutorial from our [data repository](https://github.com/4DModeller/fdmr_data) using `retrieve_tutorial_data`.
 
-```{r error=TRUE}
-# TODO : this is probably too specific still
-norway_polygon_location <- "~/repos/processing/vignettes/data/Kvilldal_Catch_Boundary.geojson"
-streamdata_13 <- "~/repos/processing/vignettes/data/NVEobservations_s36_13.csv"
-streamdata_14 <- "~/repos/processing/vignettes/data/NVEobservations_s36_14.csv"
-era5_location <- "~/repos/processing/vignettes/data/era5_land_daily.nc"
+```{r}
+fdmr::retrieve_tutorial_data(dataset = "hydro")
+```
+
+Next we'll use `get_tutorial_datapath` to get the path to the data files.
+
+```{r}
+norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
+streamdata_13 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_13.csv")
+streamdata_14 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_14.csv")
+era5_location <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
 ```
 
 ## Kvilldal dam area
@@ -41,7 +45,7 @@ era5_location <- "~/repos/processing/vignettes/data/era5_land_daily.nc"
 First we will look at the location of the dam by making a map and plotting the stream gauges on it.
 
 ```{r error=TRUE,warning=FALSE}
-# TODO : here is a good example for the map function i recommend
+# TODO : here is a good example for the map function
 norway_polygon <- rgdal::readOGR(norway_polygon_location)
 norway_polygon <- sf::st_as_sf(norway_polygon
                                , coords=c("longitude", "latitude")
