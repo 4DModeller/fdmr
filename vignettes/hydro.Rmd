@@ -11,7 +11,7 @@ vignette: >
   
 The first thing to do is to load all of the packages we need to use for this tutorial:
   
-```{r}
+```{r error=TRUE,message=FALSE,warning=FALSE}
 library(leaflet)
 library(jsonlite)
 library(ggplot2)
@@ -27,7 +27,7 @@ If you do not have `INLA` or `inlabru` installed [please go to the following ins
 
 First we'll download the data for this tutorial from our [data repository](https://github.com/4DModeller/fdmr_data) using `retrieve_tutorial_data`.
 
-```{r}
+```{r error=TRUE,message=FALSE,warning=FALSE}
 fdmr::retrieve_tutorial_data(dataset = "hydro")
 ```
 
