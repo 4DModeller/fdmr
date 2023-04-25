@@ -12,9 +12,9 @@ Authors@R:
             comment = ""),
         person("Jonathan", "Bamber", , "j.bamber@bristol.ac.uk", role = c("aut"),
             comment = ""))
-Description: What the package does (one paragraph).
-URL: https://github.com/GlobalMass/processing
-BugReports: https://github.com/GlobalMass/processing/issues
+Description: 4DModeller statistical modelling package
+URL: https://github.com/4DModeller/fdmr
+BugReports: https://github.com//4DModeller/fdmr/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -51,10 +51,13 @@ Imports:
     leaflet
 Suggests: 
     archive,
+    bookdown,
     knitr,
     openssl,
+    pkgdown,
     rmarkdown,
     stringi,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    rcmdcheck
 Config/testthat/edition: 3
 VignetteBuilder: knitr
