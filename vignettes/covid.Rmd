@@ -46,7 +46,7 @@ We first need to retrieve the data from the fdmr example data store and unpack i
 
 > **_NOTE:_**  Download the tar file from the URL I sent and pass the path to this file to the function. This process will be streamlined once we know what we can host publicly.
 
-```{r eval=FALSE}
+```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid")
 ```
 
@@ -352,15 +352,12 @@ ggplot(margs, aes(x = x, y = y)) +
 
 ## Temporal evolution of infection rate predictions
 
-The infection rate predictions from the model can be computed using the following codes, and are saved in a data frame called "predictions".
+The infection rate predictions from the model can be computed using the following codes, and are saved in a data frame called "predictions". Note that this cell will only run if the model above has been run. Otherwise please run the cell below which loads in the saved predictions from a previous model run.
 
-```{r computepreds, error=TRUE}
-pred.mean <-
-  inlabru_model$summary.fitted.values$mean[1:nrow(covid19_data)]
-pred.25 <-
-  inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)]
-pred.975 <-
-  inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
+```{r computepreds, error=TRUE, eval=FALSE}
+pred.mean <- inlabru_model$summary.fitted.values$mean[1:nrow(covid19_data)]
+pred.25 <- inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)]
+pred.975 <- inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
 
 predictions <- cbind.data.frame(
   covid19_data$date,
