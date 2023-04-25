@@ -26,7 +26,7 @@ The COVID-19 pandemic has had a profound impact on global health and economies, 
 
 The first thing is to load all the packages used in the COVID-19 case study.
 
-```{r, message=FALSE, eval=FALSE}
+```{r, error=TRUE,message=FALSE,warning=FALSE}
 library(spdep)
 library(rgdal)
 library(gridExtra)
@@ -46,20 +46,19 @@ We first need to retrieve the data from the fdmr example data store and unpack i
 
 > **_NOTE:_**  Download the tar file from the URL I sent and pass the path to this file to the function. This process will be streamlined once we know what we can host publicly.
 
-```{r eval=FALSE}
-tarpath <- "/example/path/covid19_example.tar.bz2"
-fdmr::retrieve_tutorial_data(tarball_path = tarpath)
+```{r}
+fdmr::retrieve_tutorial_data(dataset = "covid")
 ```
 
 Next we'll use the `load_tutorial_data` function to load in the spatial data we want.
 
-```{r loadshape, error=TRUE, eval=FALSE}
+```{r loadshape, error=TRUE}
 sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
 ```
 
 Now we make a map of the study region
 
-```{r rmap, error=TRUE,fig.cap="A map of the study region.",fig.width=4,fig.height=4,fig.align='center', eval=FALSE}
+```{r rmap, error=TRUE,fig.cap="A map of the study region.",fig.width=4,fig.height=4,fig.align='center'}
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
 
@@ -68,13 +67,13 @@ fdmr::plot_map(data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fi
 
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using same process we used above.
 
-```{r loadCOVIDat, error=TRUE, eval=FALSE}
+```{r loadCOVIDat, error=TRUE}
 covid19_data <- fdmr::load_tutorial_data(filename = "covid19_data.rds")
 ```
 
 Then the first 6 rows of the data set can be viewed using the following code
 
-```{r , error=TRUE, eval=FALSE}
+```{r , error=TRUE}
 utils::head(covid19_data)
 ```
 
@@ -84,7 +83,7 @@ Each week is defined to range from Saturday to Friday. Variable `date` indicates
 
 We plot the weekly number of reported COVID-19 cases spanning the 108 weeks:
 
-```{r plotcases, error=TRUE, fig.cap="The weekly reported number of COVID cases between March 7, 2020 and March 26, 2022.",fig.width=6,fig.height=4, fig.align = "center", eval=FALSE}
+```{r plotcases, error=TRUE, fig.cap="The weekly reported number of COVID cases between March 7, 2020 and March 26, 2022.",fig.width=6,fig.height=4, fig.align = "center"}
 breaks_vec <- c(seq(as.Date("2020-03-07"),
   as.Date("2022-03-26"),
   by = "3 week"
@@ -159,7 +158,7 @@ Argument "max.edge" determines the maximum permitted length for a triangle (lowe
 
 Here we use the `INLA::inla.mesh.2d` to construct our mesh.
 
-```{r createmesh, error=TRUE, eval=FALSE}
+```{r createmesh, error=TRUE}
 initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
 
 max_edge <- initial_range / 8
@@ -172,7 +171,7 @@ mesh <- INLA::inla.mesh.2d(
 )
 ```
 
-```{r plotmesh, error=TRUE, fig.cap="Triangulated mesh used to build the SPDE model.",fig.width=5,fig.height=5, fig.align='center', eval=FALSE}
+```{r plotmesh, error=TRUE, fig.cap="Triangulated mesh used to build the SPDE model.",fig.width=5,fig.height=5, fig.align='center'}
 point_data <- sp_data@data[, c("LONG", "LAT")]
 
 fdmr::plot_mesh(mesh = mesh, point_data = point_data)
@@ -182,7 +181,7 @@ fdmr::plot_mesh(mesh = mesh, point_data = point_data)
 We use the INLA::inla.spde2.pcmatern() function to build the SPDE model and specify Penalised Complexity (PC) priors for the parameters of the Matérn field. PC priors for the parameters range and marginal standard deviation of the Matérn field are specified by setting the values $m_r$, $p_r$,  $m_\sigma$ and $p_\sigma$ in the relations that P(spatial range<$m_r$)= $p_r$, and  P($\sigma>m_\sigma$)= $p_\sigma$. The spatial range of the process is the distance at which the correlation between two values is close to 0.1. In this study we use a prior of P(spatial range<0.296)= 0.5 for the spatial range parameter based on an exploratory variogram analysis. It means that the probability that the spatial range is smaller than 0.296 degrees of latitude (which is equivalent to 32.856 kilometers) is 0.5. $\sigma$ controls the marginal standard deviation of the process, and is specified a prior of P($\sigma$ >1)= 0.01.
 
 
-```{r spde, error=TRUE, eval=FALSE}
+```{r spde, error=TRUE}
 prior_range <- initial_range
 spde <- INLA::inla.spde2.pcmatern(
   mesh = mesh,
@@ -196,20 +195,20 @@ spde <- INLA::inla.spde2.pcmatern(
 The previous step has specified that in each of the time periods the spatial locations are linked by the SPDE model. Now we assume that across time the process evolves according to a first order autoregressive (AR(1)) process. We specify a PC prior for the temporal autocorrelation parameter $\alpha \in [-1,1]$. The prior is given by `rhoprior`, which is a PC prior with P($\alpha>0$)=0.9. 
 
 
-```{r pccor, error=TRUE, eval=FALSE}
+```{r pccor, error=TRUE}
 rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
 ```
 
 In order to fit the model, we also need to define a temporal index (must be an integer starting at 1) and the number of discrete time points we want to model.
 
-```{r, error=TRUE, eval=FALSE}
+```{r, error=TRUE}
 group_index <- covid19_data$week
 n_groups <- length(unique(covid19_data$week))
 ```
 
 We will use the function `bru()` of package `inlabru` to fit the model. `bru` expects the coordinates of the data, thus we transform `covid19_data` data set to a SpatialPointsDataFrame using the function `coordinates()` of the `sp` package.
 
-```{r, error=TRUE, eval=FALSE}
+```{r, error=TRUE}
 sp::coordinates(covid19_data) <- c("LONG", "LAT")
 ```
 
@@ -218,7 +217,7 @@ sp::coordinates(covid19_data) <- c("LONG", "LAT")
 
 In order to fit the spatio-temporal model, a model formula needs to be defined, by including the response in the left-hand side and the fixed and random effects in the right-hand side.
 
-```{r formula, error=TRUE, eval=FALSE}
+```{r formula, error=TRUE}
 formula <- cases ~ 0 + Intercept + IMD +
   carebeds.ratio + AandETRUE +
   perc.chinese + perc.indian + perc.bangladeshi + perc.pakistani + perc.ba + perc.bc + perc.wb +
@@ -244,19 +243,19 @@ Finally, we fit the spatio-temporal model using spde approach and AR(1) process 
 
 
 ```{r fitmodel, error=TRUE, eval=FALSE}
-# inlabru.model<-bru(formula, data = COVID19dat,
-#                    family = "poisson",
-#                    E = COVID19dat$Population,
-#                    control.family = list(link = "log"),
-#                    control.predictor = list(link = 1),
-#                    options = list(
-#                      control.inla = list(
-#                        reordering = "metis",
-#                        int.strategy = "eb"),
-#                       verbose = TRUE,
-#                      inla.mode="experimental"
-#                    )
-# )
+inlabru_model <- bru(formula, data = COVID19dat,
+                   family = "poisson",
+                   E = COVID19dat$Population,
+                   control.family = list(link = "log"),
+                   control.predictor = list(link = 1),
+                   options = list(
+                     control.inla = list(
+                       reordering = "metis",
+                       int.strategy = "eb"),
+                      verbose = TRUE,
+                     inla.mode="experimental"
+                   )
+)
 ```
 
 # Results
@@ -277,7 +276,7 @@ The model summary is provided in the tutorial data package so we'll load that no
 
 > **_NOTE:_**  If you've run the full model above you don't need to load in the files below.
 
-```{r fixedeffects, error=TRUE, eval=FALSE}
+```{r fixedeffects, error=TRUE}
 model_summary <- fdmr::load_tutorial_data(filename = "model_summary.rds")
 model_summary_fixed <- fdmr::load_tutorial_data(filename = "model_summary_fixed.rds")
 model_hyperparams <- fdmr::load_tutorial_data(filename = "model_hyperparams.rds")
@@ -322,14 +321,14 @@ In addition, we have also found that infection rate is lower in both neighbourho
 ## Summary of the hyperparameters
 The parameter estimates of the spatial range parameter, marginal standard deviation of the latent Gaussian process and the AR(1) coefficient are 
 
-```{r hyperpar, error=TRUE, eval=FALSE}
+```{r hyperpar, error=TRUE}
 model_summary$inla$hyperpar[, 1:5]
 ```
 
 To plot the posterior distributions of the spatial range, the standard deviation and temporal dependence parameters of the spatio-temporal random effect, we create a list named list_marginals containing the posterior distributions for each parameter. From this list, we generate a data frame margs, and include an additional column named 'parameter' which specifies the name of the corresponding distribution for each parameter. Spatial range is estimated to be 0.297, and AR(1) coefficient is estimated to be 0.839, indicating a high level of temporal dependence.
 
 
-```{r posteriordis,error=TRUE,fig.cap="Posterior distributions of the spatial range, standard deviation and temporal dependence parameters.",fig.width=8,fig.height=2, fig.align = "center", eval=FALSE }
+```{r posteriordis,error=TRUE,fig.cap="Posterior distributions of the spatial range, standard deviation and temporal dependence parameters.",fig.width=8,fig.height=2, fig.align = "center" }
 list_marginals <- list(
   "Spatial range" = model_hyperparams$`Range for f`,
   "Stdev" = model_hyperparams$`Stdev for f`,
@@ -353,15 +352,14 @@ ggplot(margs, aes(x = x, y = y)) +
 
 ## Temporal evolution of infection rate predictions
 
-The infection rate predictions from the model can be computed using the following codes, and are saved in a data frame called "predictions".
+The infection rate predictions from the model can be computed using the following codes, and are saved in a data frame called "predictions". 
+
+> **_NOTE:_**  This cell will only run if the model above has been run. Otherwise please run the cell below it which loads in the saved predictions from file.
 
 ```{r computepreds, error=TRUE, eval=FALSE}
-pred.mean <-
-  inlabru_model$summary.fitted.values$mean[1:nrow(covid19_data)]
-pred.25 <-
-  inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)]
-pred.975 <-
-  inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
+pred.mean <- inlabru_model$summary.fitted.values$mean[1:nrow(covid19_data)]
+pred.25 <- inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)]
+pred.975 <- inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
 
 predictions <- cbind.data.frame(
   covid19_data$date,
@@ -374,13 +372,13 @@ predictions <- cbind.data.frame(
 
 The date frame "predictions" is provided in the tutorial data package, we'll load that in now.
 
-```{r loadpreds, error=TRUE, eval=FALSE}
+```{r loadpreds, error=TRUE}
 predictions <- fdmr::load_tutorial_data(filename = "predictions.rds")
 ```
 
 Figure \@ref(fig:boxps) displays the boxplots of the predicted infection risk for all neighbourhoods over time. It can be seen that health inequalities in COVID infection exist in England, as there are large differences between the estimated disease risks. Figure \@ref(fig:plotmeanrisk) provides the line plot for the average predicted risk with 95% credible intervals by week across England. The COVID infection risk witnessed a series of fluctuations over the study period within the range between 0.0002 and 0.05, while an overall upward temporal trend can be observed. There was an initial peak in mid-November 2020, after which the infection levels declined before rising again in mid-December 2020, which were driven by the emergence of the Alpha variant and peaked in early January 2021. In the week of 5 June 2021, the infection rate began rising again until mid-July when it was estimated at 0.5%, after which the risk fell and then remained steady by November. However, the infection reached its highest point in the week of 8 January 2022 at 2.0%, which then decreased substantially until early March 2022. 
 
-```{r boxps, fig.cap="Boxplots of the predicted infection rates across all neighbourhoods over time",fig.width=6,fig.height=4, fig.align = "center", eval=FALSE}
+```{r boxps, fig.cap="Boxplots of the predicted infection rates across all neighbourhoods over time",fig.width=6,fig.height=4, fig.align = "center"}
 breaks_vec <- c(seq(as.Date("2020-03-07"),
   max(predictions$date),
   by = "3 week"
@@ -397,7 +395,7 @@ fdmr::plot_boxplot(
 ```
 
 
-```{r plotmeanrisk,error=TRUE,fig.cap="The average predicted infection risk in weeks",fig.width=6,fig.height=4, fig.align = "center", eval=FALSE}
+```{r plotmeanrisk,error=TRUE,fig.cap="The average predicted infection risk in weeks",fig.width=6,fig.height=4, fig.align = "center"}
 mean_week <- dplyr::group_by(predictions, date) %>% dplyr::summarize(
   mean.prev = mean(pred.mean),
   lc = mean(pred.25),
@@ -419,7 +417,7 @@ fdmr::plot_line_average(
                     
 Finally, Figure \@ref(fig:mapaverisk) shows the spatial pattern of the time averaged risks of infection in England.
 
-```{r mapaverisk, error=TRUE, fig.cap="Map of the average predicted infection risks ",fig.width=6,fig.height=4, fig.align = "center", eval=FALSE}
+```{r mapaverisk, error=TRUE, fig.cap="Map of the average predicted infection risks ",fig.width=6,fig.height=4, fig.align = "center"}
 average_risk_by_nb <-
   dplyr::group_by(predictions, MSOA11CD) %>% dplyr::summarize(ave.risk = mean(pred.mean))
 
@@ -467,13 +465,13 @@ As new data comes in every week, all previous data are used for training the mod
 
 The values of $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$, $\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for week $t$ in $(97,\ldots, 108)$ are stored in the tutorial data package and we'll load the `data.frame` containing that data now.
 
-```{r performance, error=TRUE, eval=FALSE}
+```{r performance, error=TRUE}
 predmetrics <- fdmr::load_tutorial_data(filename = "predmetrics.rds")
 ```
 
 Figure \@ref(fig:performancePlots) displays the time series plots for $\text{RMSE}_t$, $\text{Bias}_t$ and $\text{CP}_t$. The plots suggest that our model performs well in predicting the rate of COVID-19 infection, because the RMSE and bias values are very low (close to 0) compared to the range of the observed risks, and the coverage probabilities are close to their nominal 0.95 level. Table 3 provides the median and mean values for $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$,$\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for $t \in (97, . . . , 108)$.
 
-```{r performancePlots,error=TRUE,fig.cap="RMSE, bias and coverage probability for the model over time.",fig.width=8,fig.height=2, fig.align = "center", eval=FALSE}
+```{r performancePlots,error=TRUE,fig.cap="RMSE, bias and coverage probability for the model over time.",fig.width=8,fig.height=2, fig.align = "center"}
 breaks_vec <- c(seq(min(predmetrics$date),
   max(predmetrics$date),
   by = "1 week"

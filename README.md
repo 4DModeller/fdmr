@@ -1,10 +1,10 @@
 # 4D Modeller - Spatio-temporal modeling tools for the 21st Century
 
-This repository contains the code for the 4DModeller project.
+4D-Modeller is a spatio-temporal modeling library that can be applied to problems from micro to mesoscale. It includes data visualization tools, finite element mesh building tools, bayesian hierarchical modeling through INLA and inlabru, and model evaluation and assessment tools.
 
 ## Quickstart
 
-To get 4D Modeller installed first you need to make sure you have a recent version of R installed.
+To get 4DModeller R package `fdmr` installed first you need to make sure you have a recent version of R installed.
 The easiest way to do this is to [install RStudio](https://posit.co/downloads/).
 
 Next start an R session and run

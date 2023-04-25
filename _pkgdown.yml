@@ -1,36 +1,20 @@
-url: ~
-template:
-  bootstrap: 5
+# url: ~
+# template:
+#   bootstrap: 5
 
 # reference:
-# - title: Process
-#   desc:  Process some raw data
-# - contents:
-#   - starts_with("process_")
-# - title: Meshing
-#   desc:  Create meshes
-# - contents:
-#   - ends_with("_mesh")
-# - title: BHM
-#   desc:  Run the BHM
-# - contents:
-#   - starts_with("run_bhm_")
-# - title: Fitting
-#   desc:  Fitting functions
-# - contents:
-#   - starts_with("fit_")
 # - title: Plotting
-#   desc:  Plotting functions
+#   desc:  Basic plotting tools
 #   contents:
 #     - starts_with("plot_")
-# - title: Utility
-#   desc:  Utility functions
-# - contents:
-#   - create_config
-#   - get_tutorial_datapath
-#   - retrieve_tutorial_data
-#   - load_tutorial_data
-
+# - title: Utility functions
+#   desc:  These help us handle paths, retrieve data etc
+#   contents:
+#     - require_package
+#     - get_tutorial_datapath
+#     - retrieve_tutorial_data
+#     - load_tutorial_data
+#     - clean_path
 
 
 
