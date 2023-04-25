@@ -1,20 +1,20 @@
-url: ~
-template:
-  bootstrap: 5
+# url: ~
+# template:
+#   bootstrap: 5
 
-reference:
-- title: Plotting
-  desc:  Basic plotting tools
-  contents:
-    - starts_with("plot_")
-- title: Utility functions
-  desc:  These help us handle paths, retrieve data etc
-- contents:
-  - require_package
-  - get_tutorial_datapath
-  - retrieve_tutorial_data
-  - load_tutorial_data
-  - clean_path
+# reference:
+# - title: Plotting
+#   desc:  Basic plotting tools
+#   contents:
+#     - starts_with("plot_")
+# - title: Utility functions
+#   desc:  These help us handle paths, retrieve data etc
+#   contents:
+#     - require_package
+#     - get_tutorial_datapath
+#     - retrieve_tutorial_data
+#     - load_tutorial_data
+#     - clean_path
 
 
 
