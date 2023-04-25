@@ -17,6 +17,7 @@ retrieve_tutorial_data <- function(dataset, data_store = NULL) {
 
   data_url <- base::paste0("https://github.com/4DModeller/fdmr_data/raw/main/", filename)
   download_path <- fs::path(base::tempdir(), filename)
+
   utils::download.file(url = data_url, destfile = download_path)
 
   extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data")

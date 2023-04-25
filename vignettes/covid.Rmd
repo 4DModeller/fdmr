@@ -352,7 +352,9 @@ ggplot(margs, aes(x = x, y = y)) +
 
 ## Temporal evolution of infection rate predictions
 
-The infection rate predictions from the model can be computed using the following codes, and are saved in a data frame called "predictions". Note that this cell will only run if the model above has been run. Otherwise please run the cell below which loads in the saved predictions from a previous model run.
+The infection rate predictions from the model can be computed using the following codes, and are saved in a data frame called "predictions". 
+
+> **_NOTE:_**  This cell will only run if the model above has been run. Otherwise please run the cell below it which loads in the saved predictions from file.
 
 ```{r computepreds, error=TRUE, eval=FALSE}
 pred.mean <- inlabru_model$summary.fitted.values$mean[1:nrow(covid19_data)]
