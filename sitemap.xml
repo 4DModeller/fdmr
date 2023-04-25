@@ -7,9 +7,6 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/articles/FourDModelleR.html</loc>
-  </url>
-  <url>
     <loc>/articles/covid.html</loc>
   </url>
   <url>
@@ -28,6 +25,39 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
+    <loc>/reference/clean_path.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_tutorial_datapath.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_tutorial_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_barchart.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_boxplot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_line_average.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_map.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_mesh.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_timeseries.html</loc>
+  </url>
+  <url>
+    <loc>/reference/require_package.html</loc>
+  </url>
+  <url>
+    <loc>/reference/retrieve_tutorial_data.html</loc>
   </url>
 </urlset>
