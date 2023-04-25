@@ -54,14 +54,7 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/GlobalMass/processing/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul>
+      <ul class="navbar-nav"></ul>
 </div>
 
     
@@ -74,7 +67,7 @@
       <img src="" class="logo" alt=""><h1>COVID-19</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/GlobalMass/processing/blob/HEAD/vignettes/covid.Rmd" class="external-link"><code>vignettes/covid.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="NA/NA/NA/blob/HEAD/vignettes/covid.Rmd"><code>vignettes/covid.Rmd</code></a></small>
       <div class="d-none name"><code>covid.Rmd</code></div>
     </div>
 
@@ -104,7 +97,7 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/" class="external-link">leaflet</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/GlobalMass/processing" class="external-link">fdmr</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/4DModeller/fdmr" class="external-link">fdmr</a></span><span class="op">)</span></span></code></pre></div>
 <p>The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The shapefile of the study region <code>shape</code> is a <code>SpatialPolygonsDataFrame</code>, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods.</p>
 <p>We first need to retrieve the data from the fdmr example data store and unpack it and we’ll use <code>retrieve_tutorial_data</code> to do this.</p>
 <blockquote>
@@ -258,13 +251,13 @@ where <span class="math inline">\(K_{\nu}(\cdot)\)</span> is the modified Bessel
 <p>To implement the SPDE approach, it is necessary to discretize the space by creating a triangulated mesh that establishes a set of artificial neighbors across the study region (i.e., mainland England). This allows for the calculation of spatial autocorrelation between observations. The construction of the mesh has an impact on the model inferences and predictions. Therefore, it is crucial to develop a good mesh to ensure that the results are not overly sensitive to the mesh. Although the construction of the mesh varies depending on the case study, there are some guidelines available to produce an optimal mesh. In this vignette we will construct a two-dimensional mesh using the INLA::inla.mesh.2d() function. The locations of all neighbourhoods are passed to the function argument “loc” as initial mesh nodes, and then other arguments in the function are tuned to adjust the shape and resolution of the mesh as necessary.</p>
 <p>Argument “max.edge” determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This argument can take either a scalar value, which controls the triangle edge lengths in the inner domain, or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect. Although there is no standard for setting a correct value for the max.edge, a value for max.edge that is too close to the spatial range (i.e., a low resolution) will complicate the process of fitting a smooth SPDE. Specifically, the Gaussian random field approximation might deviate strongly from the desired Matern structure, and the marginal variance will vary over the domain rather than being constant, which violates the assumption of a stationary Gaussian process. Conversely, if the max.edge value is too small compared to the spatial range (i.e., a high resolution), the mesh will contain an excessive number of vertices, resulting in a more computationally intensive fitting process that may not necessarily yield improved results. A number of research studies have suggested the max.edge value for the inner domain to be between 1/3 to 1/10 times smaller than the spatial range (note that the spatial range parameter in INLA GMRF is the distance at which the correlation drops to about 0.13). Since the spatial range cannot be known until the model has been fitted, an initial guess needs to be made and 1/5 of the spatial domain is often used in practice. Here, we define the argument “max.edge” such that the outer extension has a triangle density two times lower than than the inner domain (i.e., twice the triangle length for the outer extension edges), so that the original spatial domain is extended without increasing too much computational burden.</p>
 <p><span class="citation">Lindgren and Rue (<a href="#ref-lindgren2015bayesian" role="doc-biblioref">2015</a>)</span> suggested extending the domain of interest by a distance at least equal to the spatial range to avoid the boundary effect. The function argument “offset” specifies the size of the inner and outer extensions around the data locations. In this study, we expand the inner domain by 1/4 of the spatial range initially assumed, and the outer domain by the same amount as the spatial range. In addition, we also use the parameter “cutoff” to avoid building too many small triangles where we have some very close input locations. It defines the minimum allowed distance between observation points. Points with a distance less than the cutoff value will be considered as a single mesh vertex. Here we choose a cutoff value equal to 1/7 of the max.edge value of the inner domain. The mesh for our study region is displayed in Figure <a href="#fig:plotmesh"><strong>??</strong></a>, where the blue dots represent the locations of the neighbourhoods.</p>
-<p>Here we use the <code><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html" class="external-link">INLA::inla.mesh.2d</a></code> to construct our mesh.</p>
+<p>Here we use the <code>INLA::inla.mesh.2d</code> to construct our mesh.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">[</span>, <span class="st">"LONG"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span></span>
 <span></span>
 <span><span class="va">max_edge</span> <span class="op">&lt;-</span> <span class="va">initial_range</span> <span class="op">/</span> <span class="fl">8</span></span>
 <span></span>
-<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html" class="external-link">inla.mesh.2d</a></span><span class="op">(</span></span>
+<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu">inla.mesh.2d</span><span class="op">(</span></span>
 <span>  loc <span class="op">=</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LONG"</span>, <span class="st">"LAT"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  max.edge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="va">max_edge</span>,</span>
 <span>  offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">initial_range</span> <span class="op">/</span> <span class="fl">4</span>, <span class="va">initial_range</span><span class="op">)</span>,</span>
@@ -282,7 +275,7 @@ where <span class="math inline">\(K_{\nu}(\cdot)\)</span> is the modified Bessel
 <p>We use the INLA::inla.spde2.pcmatern() function to build the SPDE model and specify Penalised Complexity (PC) priors for the parameters of the Matérn field. PC priors for the parameters range and marginal standard deviation of the Matérn field are specified by setting the values <span class="math inline">\(m_r\)</span>, <span class="math inline">\(p_r\)</span>, <span class="math inline">\(m_\sigma\)</span> and <span class="math inline">\(p_\sigma\)</span> in the relations that P(spatial range&lt;<span class="math inline">\(m_r\)</span>)= <span class="math inline">\(p_r\)</span>, and P(<span class="math inline">\(\sigma&gt;m_\sigma\)</span>)= <span class="math inline">\(p_\sigma\)</span>. The spatial range of the process is the distance at which the correlation between two values is close to 0.1. In this study we use a prior of P(spatial range&lt;0.296)= 0.5 for the spatial range parameter based on an exploratory variogram analysis. It means that the probability that the spatial range is smaller than 0.296 degrees of latitude (which is equivalent to 32.856 kilometers) is 0.5. <span class="math inline">\(\sigma\)</span> controls the marginal standard deviation of the process, and is specified a prior of P(<span class="math inline">\(\sigma\)</span> &gt;1)= 0.01.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prior_range</span> <span class="op">&lt;-</span> <span class="va">initial_range</span></span>
-<span><span class="va">spde</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span></span>
+<span><span class="va">spde</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu">inla.spde2.pcmatern</span><span class="op">(</span></span>
 <span>  mesh <span class="op">=</span> <span class="va">mesh</span>,</span>
 <span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">prior_range</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span></span>
@@ -314,7 +307,7 @@ where <span class="math inline">\(K_{\nu}(\cdot)\)</span> is the modified Bessel
 <span>  <span class="va">perc.chinese</span> <span class="op">+</span> <span class="va">perc.indian</span> <span class="op">+</span> <span class="va">perc.bangladeshi</span> <span class="op">+</span> <span class="va">perc.pakistani</span> <span class="op">+</span> <span class="va">perc.ba</span> <span class="op">+</span> <span class="va">perc.bc</span> <span class="op">+</span> <span class="va">perc.wb</span> <span class="op">+</span></span>
 <span>  <span class="va">age1</span> <span class="op">+</span> <span class="va">age2</span> <span class="op">+</span> <span class="va">age3</span> <span class="op">+</span> <span class="va">age4</span> <span class="op">+</span></span>
 <span>  <span class="va">pm25</span> <span class="op">+</span> <span class="va">no2</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span></span>
+<span>  <span class="fu">f</span><span class="op">(</span></span>
 <span>    main <span class="op">=</span> <span class="va">coordinates</span>,</span>
 <span>    model <span class="op">=</span> <span class="va">spde</span>,</span>
 <span>    group <span class="op">=</span> <span class="va">group.index</span>,</span>

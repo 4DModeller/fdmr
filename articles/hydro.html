@@ -54,14 +54,7 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/GlobalMass/processing/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul>
+      <ul class="navbar-nav"></ul>
 </div>
 
     
@@ -76,7 +69,7 @@
       <img src="" class="logo" alt=""><h1>Hydrology</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/GlobalMass/processing/blob/HEAD/vignettes/hydro.Rmd" class="external-link"><code>vignettes/hydro.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="NA/NA/NA/blob/HEAD/vignettes/hydro.Rmd"><code>vignettes/hydro.Rmd</code></a></small>
       <div class="d-none name"><code>hydro.Rmd</code></div>
     </div>
 
@@ -92,8 +85,10 @@ for this tutorial:</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://arxiv.org/abs/1403.2805" class="external-link">jsonlite</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span>
-<span><span class="co"># TODO : this should not use rgdal because it is being deprecated</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error in library(INLA): there is no package called 'INLA'</span></span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># TODO : this should not use rgdal because it is being deprecated</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://rgdal.r-forge.r-project.org" class="external-link">rgdal</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://cirrus.ucsd.edu/~pierce/ncdf/" class="external-link">ncdf4</a></span><span class="op">)</span></span>
@@ -103,7 +98,7 @@ installed <a href="link%20to%20installation%20tutorial">please go to the
 following installation tutorial before continuing</a>.
 <code>COMMENT: maybe these should just all be dependencies for 4D-Modeller...</code></p>
 <p>Next we will create variables for where the data is stored.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># TODO : this is probably too specific still</span></span>
 <span><span class="va">norway_polygon_location</span> <span class="op">&lt;-</span> <span class="st">"~/repos/processing/vignettes/data/Kvilldal_Catch_Boundary.geojson"</span></span>
 <span><span class="va">streamdata_13</span> <span class="op">&lt;-</span> <span class="st">"~/repos/processing/vignettes/data/NVEobservations_s36_13.csv"</span></span>
@@ -115,24 +110,24 @@ following installation tutorial before continuing</a>.
 </h3>
 <p>First we will look at the location of the dam by making a map and
 plotting the stream gauges on it.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># TODO : here is a good example for the map function i recommend</span></span>
 <span><span class="va">norway_polygon</span> <span class="op">&lt;-</span> <span class="fu">rgdal</span><span class="fu">::</span><span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/rgdal-deprecated.html" class="external-link">readOGR</a></span><span class="op">(</span><span class="va">norway_polygon_location</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in ogrListLayers(dsn = dsn): Cannot open data source</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">norway_polygon</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">norway_polygon</span></span>
 <span>                               , coords<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span><span class="op">)</span></span>
 <span>                               , crs<span class="op">=</span><span class="st">"+proj=utm +zone=32"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in sf::st_as_sf(norway_polygon, coords = c("longitude", "latitude"), : object 'norway_polygon' not found</span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'norway_polygon' not found</span></span></code></pre>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">suldalsvatnet_dam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>longitude<span class="op">=</span><span class="fl">6.517174</span>, latitude<span class="op">=</span><span class="fl">59.490720</span>, name<span class="op">=</span><span class="st">"Suldalsvatnet Dam"</span><span class="op">)</span></span>
 <span><span class="va">stream_gauge_13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>longitude<span class="op">=</span><span class="fl">6.5395789</span>, latitude<span class="op">=</span><span class="fl">59.5815849</span>, name<span class="op">=</span><span class="st">"Stream Gauge 13"</span><span class="op">)</span></span>
 <span><span class="va">stream_gauge_14</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>longitude<span class="op">=</span><span class="fl">6.7897968</span>, latitude<span class="op">=</span><span class="fl">59.7531662</span>, name<span class="op">=</span><span class="st">"Stream Gauge 14"</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="va">sfc</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">norway_polygon</span>, crs <span class="op">=</span> <span class="st">"+proj=longlat +datum=WGS84"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84"): object 'norway_polygon' not found</span></span></code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'norway_polygon' not found</span></span></code></pre>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="va">sfc</span>, height <span class="op">=</span> <span class="fl">500</span>, width <span class="op">=</span> <span class="fl">750</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addTiles</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addPolygons</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="cn">FALSE</span>, smoothFactor <span class="op">=</span> <span class="fl">0.3</span>,</span>
@@ -143,7 +138,7 @@ plotting the stream gauges on it.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addMarkers</a></span><span class="op">(</span>lat<span class="op">=</span><span class="va">suldalsvatnet_dam</span><span class="op">$</span><span class="va">latitude</span>, lng<span class="op">=</span><span class="va">suldalsvatnet_dam</span><span class="op">$</span><span class="va">longitude</span>, popup<span class="op">=</span><span class="va">suldalsvatnet_dam</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addMarkers</a></span><span class="op">(</span>lat<span class="op">=</span><span class="va">stream_gauge_13</span><span class="op">$</span><span class="va">latitude</span>, lng<span class="op">=</span><span class="va">stream_gauge_13</span><span class="op">$</span><span class="va">longitude</span>, popup<span class="op">=</span><span class="va">stream_gauge_13</span><span class="op">$</span><span class="va">name</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addMarkers</a></span><span class="op">(</span>lat<span class="op">=</span><span class="va">stream_gauge_14</span><span class="op">$</span><span class="va">latitude</span>, lng<span class="op">=</span><span class="va">stream_gauge_14</span><span class="op">$</span><span class="va">longitude</span>, popup<span class="op">=</span><span class="va">stream_gauge_14</span><span class="op">$</span><span class="va">name</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in structure(list(options = options), leafletData = data): object 'sfc' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'sfc' not found</span></span></code></pre>
 <p>On the map you can see the dam, the resevoir, the catchment area, and
 the two stream gauges.</p>
 <p>The area inside the shape is where water accumulates, the area
@@ -156,59 +151,59 @@ important later when we are including ERA5-land precipitation data.</p>
 <p>The stream gauge data is measured as the average daily liters/second
 that pass through the area. This data goes back for many years,
 sometimes decades. See below:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">streamdata_13</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning in file(file, "rt"): cannot open file</span></span>
-<span><span class="co">## '/Users/gar/repos/processing/vignettes/data/NVEobservations_s36_13.csv': No</span></span>
+<span><span class="co">## '/home/runner/repos/processing/vignettes/data/NVEobservations_s36_13.csv': No</span></span>
 <span><span class="co">## such file or directory</span></span></code></pre>
 <pre><code><span><span class="co">## Error in file(file, "rt"): cannot open the connection</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_13</span><span class="op">$</span><span class="va">date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">data_13</span><span class="op">$</span><span class="va">time</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in as.Date(data_13$time): object 'data_13' not found</span></span></code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data_13</span><span class="op">$</span><span class="va">date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">data_13</span><span class="op">$</span><span class="va">time</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'data_13' not found</span></span></code></pre>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_13</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">data_13</span>, <span class="va">date</span> <span class="op">&gt;=</span> <span class="st">"2021-10-01"</span> <span class="op">&amp;</span> <span class="va">date</span> <span class="op">&lt;=</span> <span class="st">"2021-10-31"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'subset': object 'data_13' not found</span></span></code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">data_13</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in row.names(data_13) &lt;- NULL: object 'data_13' not found</span></span></code></pre>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_13</span><span class="op">$</span><span class="va">time_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">31</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in data_13$time_index &lt;- seq(1, 31, 1): object 'data_13' not found</span></span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">data_13</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error: object 'data_13' not found</span></span></code></pre>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data_13</span><span class="op">$</span><span class="va">time_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">31</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error: object 'data_13' not found</span></span></code></pre>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_14</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">streamdata_14</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning in file(file, "rt"): cannot open file</span></span>
-<span><span class="co">## '/Users/gar/repos/processing/vignettes/data/NVEobservations_s36_14.csv': No</span></span>
+<span><span class="co">## '/home/runner/repos/processing/vignettes/data/NVEobservations_s36_14.csv': No</span></span>
 <span><span class="co">## such file or directory</span></span></code></pre>
 <pre><code><span><span class="co">## Error in file(file, "rt"): cannot open the connection</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_14</span><span class="op">$</span><span class="va">date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">data_14</span><span class="op">$</span><span class="va">time</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in as.Date(data_14$time): object 'data_14' not found</span></span></code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data_14</span><span class="op">$</span><span class="va">date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">data_14</span><span class="op">$</span><span class="va">time</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'data_14' not found</span></span></code></pre>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_14</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">data_14</span>, <span class="va">date</span> <span class="op">&gt;=</span> <span class="st">"2021-10-01"</span> <span class="op">&amp;</span> <span class="va">date</span> <span class="op">&lt;=</span> <span class="st">"2021-10-31"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'subset': object 'data_14' not found</span></span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">data_14</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in row.names(data_14) &lt;- NULL: object 'data_14' not found</span></span></code></pre>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_14</span><span class="op">$</span><span class="va">time_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">31</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in data_14$time_index &lt;- seq(1, 31, 1): object 'data_14' not found</span></span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">data_14</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error: object 'data_14' not found</span></span></code></pre>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data_14</span><span class="op">$</span><span class="va">time_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">31</span>, <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error: object 'data_14' not found</span></span></code></pre>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a line plot using ggplot2</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data_13</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"violet"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Stream Flow : Daily Average (Liter/s)"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in ggplot(data_13, aes(x = as.Date(time), y = value)): object 'data_13' not found</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'data_13' not found</span></span></code></pre>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data_14</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"limegreen"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time"</span>, y <span class="op">=</span> <span class="st">"Stream Flow : Daily Average (Liter/s)"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in ggplot(data_14, aes(x = as.Date(time), y = value)): object 'data_14' not found</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'data_14' not found</span></span></code></pre>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># we rescale the data with the zscore since hte values are so</span></span>
 <span><span class="co"># different between the two stream gauges</span></span>
 <span><span class="va">data_13</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">data_13</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'scale': object 'data_13' not found</span></span></code></pre>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_14</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">data_14</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'scale': object 'data_14' not found</span></span></code></pre>
 <p>You can see, these two different stream gauges record a very
@@ -229,25 +224,25 @@ many variables</a>. Here we use only the daily precipitation data. <a href="http
 precipitation</a> comes from reanalysis of the climate model.</p>
 <p>ERA5-land data is gridded however we need the data to be assigned to
 catchment shapes.</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># TODO : mapping function here too</span></span>
 <span><span class="va">era5_precip</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/stack.html" class="external-link">stack</a></span><span class="op">(</span><span class="va">era5_location</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in R_nc4_open: No such file or directory</span></span></code></pre>
 <pre><code><span><span class="co">## Error in ncdf4::nc_open(filename, readunlim = FALSE, suppress_dimvals = TRUE): Error in nc_open trying to open file ~/repos/processing/vignettes/data/era5_land_daily.nc (return_on_error= FALSE )</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">era5_precip</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/values.html" class="external-link">values</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span>main<span class="op">=</span><span class="st">"Total Precipitation"</span>, col<span class="op">=</span><span class="st">"violet"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'hist': error in evaluating the argument 'x' in selecting a method for function 'values': object 'era5_precip' not found</span></span></code></pre>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sr</span> <span class="op">&lt;-</span> <span class="st">"+proj=utm +zone=32"</span></span>
 <span><span class="va">projected_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/projectRaster.html" class="external-link">projectRaster</a></span><span class="op">(</span><span class="va">era5_precip</span>, crs <span class="op">=</span> <span class="va">sr</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in methods::extends(class(x), "CRS"): object 'era5_precip' not found</span></span></code></pre>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'era5_precip' not found</span></span></code></pre>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">crop_era5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">projected_raster</span>, <span class="va">norway_polygon</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'mask': object 'projected_raster' not found</span></span></code></pre>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">crop_era5</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">crop_era5</span>, <span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="va">norway_polygon</span><span class="op">)</span>, snap<span class="op">=</span><span class="st">"near"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'crop': object 'crop_era5' not found</span></span></code></pre>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="va">sfc</span>, width<span class="op">=</span><span class="fl">750</span>, height<span class="op">=</span><span class="fl">500</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addTiles</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addRasterImage.html" class="external-link">addRasterImage</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">crop_era5</span><span class="op">$</span><span class="va">X2021.10.01</span>, </span>
@@ -255,29 +250,29 @@ catchment shapes.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addPolygons</a></span><span class="op">(</span>stroke <span class="op">=</span> <span class="cn">FALSE</span>, smoothFactor <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>              fillColor <span class="op">=</span> <span class="st">"red"</span>,</span>
 <span>              fillOpacity <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in stopifnot(inherits(x, "RasterLayer")): object 'crop_era5' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'crop_era5' not found</span></span></code></pre>
 <p>Create a data frame rsdf containing precipitation data</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rsdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">crop_era5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'nlayers': object 'crop_era5' not found</span></span></code></pre>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rsdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="va">rsdf</span><span class="op">)</span>, id.vars<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>,<span class="st">"y"</span><span class="op">)</span>, variable.name <span class="op">=</span> <span class="st">"time"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error: Cannot find symbol rsdf</span></span></code></pre>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rsdf</span><span class="op">$</span><span class="va">time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">rsdf</span><span class="op">$</span><span class="va">time</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span>, <span class="st">'\\.'</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in lapply(X = X, FUN = FUN, ...): object 'rsdf' not found</span></span></code></pre>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'rsdf' not found</span></span></code></pre>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rsdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">rsdf</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'time'</span>, <span class="st">'precip'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in setNames(rsdf, c("x", "y", "time", "precip")): object 'rsdf' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'rsdf' not found</span></span></code></pre>
 <p>We need to figure out which ERA5 precipitation pixels are closest to
 which stream gauge so we can match the data for the regression. First we
 need to calculate the distance between the pixel and each stream gauge,
 then use the minimum distance to choose the stream gauge. We first
 create a function that converts latlong to utm coordinate reference
 system</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># TODO : this needs to be moved to 4dm</span></span>
 <span><span class="va">latlong_to_utm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">lat</span>, <span class="va">lon</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  </span>
@@ -297,10 +292,10 @@ system</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Now we can match the pixel precipation data to the nearest stream
 gauge.</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pixel_coords</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">crop_era5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'unique': error in evaluating the argument 'obj' in selecting a method for function 'coordinates': object 'crop_era5' not found</span></span></code></pre>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s13_utm</span> <span class="op">&lt;-</span> <span class="fu">latlong_to_utm</span><span class="op">(</span>lat<span class="op">=</span><span class="va">stream_gauge_13</span><span class="op">$</span><span class="va">latitude</span></span>
 <span>                          ,lon<span class="op">=</span><span class="va">stream_gauge_13</span><span class="op">$</span><span class="va">longitude</span><span class="op">)</span></span>
 <span><span class="va">s14_utm</span> <span class="op">&lt;-</span> <span class="fu">latlong_to_utm</span><span class="op">(</span>lat<span class="op">=</span><span class="va">stream_gauge_14</span><span class="op">$</span><span class="va">latitude</span></span>
@@ -315,8 +310,8 @@ gauge.</p>
 <span>                             min_s<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>,<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pixel_coords</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                             streamflow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pixel_coords</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in data.frame(x = pixel_coords[, 1], y = pixel_coords[, 2], dist_s1 = rep(NA, : object 'pixel_coords' not found</span></span></code></pre>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'pixel_coords' not found</span></span></code></pre>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pixel_coords</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">pixel_dist_gauge</span><span class="op">$</span><span class="va">dist_s1</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="op">(</span><span class="va">pixel_dist_gauge</span><span class="op">$</span><span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">-</span><span class="va">s13</span><span class="op">$</span><span class="va">x</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">+</span></span>
 <span>                                      <span class="op">(</span><span class="va">pixel_dist_gauge</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">-</span><span class="va">s13</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
@@ -327,43 +322,43 @@ gauge.</p>
 <span>                                         <span class="va">pixel_dist_gauge</span><span class="op">$</span><span class="va">dist_s2</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'nrow': object 'pixel_coords' not found</span></span></code></pre>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># the dataframe pixel_dist_gauge then needs to be replicated by the number of time points </span></span>
 <span><span class="va">n.time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/nlayers.html" class="external-link">nlayers</a></span><span class="op">(</span><span class="va">era5_precip</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'nlayers': object 'era5_precip' not found</span></span></code></pre>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pixel_dist_gauge</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="va">n.time</span>, <span class="va">pixel_dist_gauge</span>, simplify<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in integer(n): object 'n.time' not found</span></span></code></pre>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pixel_dist_gauge</span><span class="op">$</span><span class="va">time</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n.time</span>,each<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pixel_coords</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">pixel_dist_gauge</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">replicate</a></span><span class="op">(</span><span class="va">n.time</span>, <span class="va">pixel_dist_gauge</span>, simplify<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'n.time' not found</span></span></code></pre>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pixel_dist_gauge</span><span class="op">$</span><span class="va">time</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n.time</span>,each<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pixel_coords</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'n.time' not found</span></span></code></pre>
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">streamdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">data_13</span>, <span class="va">data_14</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'data_13' not found</span></span></code></pre>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">get_stream_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">row</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">which_stream_data</span> <span class="op">&lt;-</span> <span class="va">streamdata</span><span class="op">[[</span><span class="va">row</span><span class="op">[</span><span class="st">'min_s'</span><span class="op">]</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="va">data_at_row_time_index</span> <span class="op">&lt;-</span> <span class="va">which_stream_data</span><span class="op">[</span><span class="va">which_stream_data</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time_index"</span><span class="op">)</span><span class="op">]</span> <span class="op">==</span> <span class="va">row</span><span class="op">[</span><span class="st">'time'</span><span class="op">]</span>,<span class="op">]</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">data_at_row_time_index</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">pixel_dist_gauge</span><span class="op">$</span><span class="va">streamflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">pixel_dist_gauge</span>,<span class="fl">1</span>,<span class="va">get_stream_data</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in apply(pixel_dist_gauge, 1, get_stream_data): object 'pixel_dist_gauge' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'pixel_dist_gauge' not found</span></span></code></pre>
 <p>Now we create a new SpatialPointDataFrame inla_data for model
 fitting. The data frame contains the response and predictor data at each
 spatial location and time point.</p>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inla_data</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">pixel_dist_gauge</span>,<span class="va">rsdf</span>,by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time"</span>,<span class="st">"x"</span>,<span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'merge': object 'pixel_dist_gauge' not found</span></span></code></pre>
-<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inla_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">inla_data</span>, select<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'streamflow'</span>, <span class="st">'precip'</span>, <span class="st">'time'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'subset': object 'inla_data' not found</span></span></code></pre>
-<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">inla_data</span><span class="op">)</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>,<span class="st">"y"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in sp::coordinates(inla_data) &lt;- c("x", "y"): object 'inla_data' not found</span></span></code></pre>
 <div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">inla_data</span><span class="op">)</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>,<span class="st">"y"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error: object 'inla_data' not found</span></span></code></pre>
+<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">inla_data</span><span class="op">@</span><span class="va">data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'head': object 'inla_data' not found</span></span></code></pre>
-<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">inla_data</span><span class="op">@</span><span class="va">coords</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'head': object 'inla_data' not found</span></span></code></pre>
 </div>
@@ -381,32 +376,32 @@ over</li>
 <h3 id="mesh-resolution">mesh resolution<a class="anchor" aria-label="anchor" href="#mesh-resolution"></a>
 </h3>
 <p>Create the triangulated mesh of the study region</p>
-<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># TODO : it would be nice to map the mesh onto the dataset using the mapmaker function i am suggesting</span></span>
 <span><span class="va">e</span> <span class="op">&lt;-</span> <span class="va">crop_era5</span><span class="op">@</span><span class="va">extent</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'crop_era5' not found</span></span></code></pre>
-<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">resolution</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">res</a></span><span class="op">(</span><span class="va">crop_era5</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'res': object 'crop_era5' not found</span></span></code></pre>
-<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xres</span> <span class="op">&lt;-</span> <span class="va">resolution</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">*</span><span class="fl">2</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in resolution[1]: object of type 'closure' is not subsettable</span></span></code></pre>
-<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">yres</span> <span class="op">&lt;-</span> <span class="va">resolution</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">*</span><span class="fl">2</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in resolution[2]: object of type 'closure' is not subsettable</span></span></code></pre>
-<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">crop_era5</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'obj' in selecting a method for function 'coordinates': object 'crop_era5' not found</span></span></code></pre>
-<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># maybe this makes the mesh smaller lol</span></span>
 <span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="va">xy</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">xy</span><span class="op">)</span>, by <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'xy' not found</span></span></code></pre>
-<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># mesh &lt;- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1000, xres*10000), cutoff=2000, crs=sr)</span></span>
 <span><span class="co"># mesh &lt;- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=2000, crs=sr)</span></span>
-<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html" class="external-link">inla.mesh.2d</a></span><span class="op">(</span>loc<span class="op">=</span><span class="va">xy</span>, max.edge<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">xres</span><span class="op">*</span><span class="fl">1</span>, <span class="va">xres</span><span class="op">*</span><span class="fl">100</span><span class="op">)</span>, cutoff<span class="op">=</span><span class="fl">75</span>, crs<span class="op">=</span><span class="va">sr</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in xres * 1: non-numeric argument to binary operator</span></span></code></pre>
-<div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
+<span><span class="va">mesh</span> <span class="op">&lt;-</span> <span class="fu">INLA</span><span class="fu">::</span><span class="fu">inla.mesh.2d</span><span class="op">(</span>loc<span class="op">=</span><span class="va">xy</span>, max.edge<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">xres</span><span class="op">*</span><span class="fl">1</span>, <span class="va">xres</span><span class="op">*</span><span class="fl">100</span><span class="op">)</span>, cutoff<span class="op">=</span><span class="fl">75</span>, crs<span class="op">=</span><span class="va">sr</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Error in loadNamespace(x): there is no package called 'INLA'</span></span></code></pre>
+<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'plot': object 'mesh' not found</span></span></code></pre>
 </div>
@@ -420,26 +415,26 @@ environment. To put it a different way, if it is raining on a hill top,
 how far from that hill must you be to not notice if it’s raining or
 not.</p>
 <p>In this case, we set the prior range to be 20km.</p>
-<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># prior.range&lt;-0.296</span></span>
 <span><span class="co"># the prior range is the distance that the process should stop effecting, so in this case it is currently 20km away from the node center</span></span>
 <span><span class="va">prior.range</span><span class="op">&lt;-</span><span class="fl">20.0</span></span>
-<span><span class="va">spde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.spde2.pcmatern.html" class="external-link">inla.spde2.pcmatern</a></span><span class="op">(</span></span>
+<span><span class="va">spde</span> <span class="op">&lt;-</span> <span class="fu">inla.spde2.pcmatern</span><span class="op">(</span></span>
 <span>  mesh <span class="op">=</span> <span class="va">mesh</span>, </span>
 <span>  prior.range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">prior.range</span>, <span class="fl">0.5</span><span class="op">)</span>, </span>
 <span>  prior.sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.01</span><span class="op">)</span> </span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in inla.spde2.pcmatern(mesh = mesh, prior.range = c(prior.range, : object 'mesh' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error in inla.spde2.pcmatern(mesh = mesh, prior.range = c(prior.range, : could not find function "inla.spde2.pcmatern"</span></span></code></pre>
 <p>the model has some time dependency.</p>
-<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rhoprior</span> <span class="op">&lt;-</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>prior <span class="op">=</span> <span class="st">'pccor1'</span>, param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>In order to fit the model, we also need to define a temporal index
 and the number of discrete time points we want to model. The INLA model
 requires that time indicies must be an integer starting at 1.</p>
-<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">group.index</span> <span class="op">&lt;-</span> <span class="va">inla_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">time</span> </span></code></pre></div>
 <pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'inla_data' not found</span></span></code></pre>
-<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_groups</span><span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">group.index</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'unique': object 'group.index' not found</span></span></code></pre>
 </div>
@@ -451,38 +446,40 @@ fixed effect and an SPDE model which assumes there is some other
 correlation structure in the streamflow data due to unobserved
 variables. Likely unobserved co-variates could be local elevation,
 temperature, soil permeability, or presence of vegetation.</p>
-<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">formula1</span> <span class="op">&lt;-</span> <span class="va">streamflow</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">precip</span></span>
 <span></span>
 <span><span class="va">formula2</span> <span class="op">&lt;-</span> <span class="va">streamflow</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">Intercept</span> <span class="op">+</span> <span class="va">precip</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span>main<span class="op">=</span><span class="va">coordinates</span>,</span>
+<span>  <span class="fu">f</span><span class="op">(</span>main<span class="op">=</span><span class="va">coordinates</span>,</span>
 <span>    model<span class="op">=</span><span class="va">spde</span>,</span>
 <span>    group<span class="op">=</span><span class="va">group.index</span>,</span>
 <span>    ngroup<span class="op">=</span><span class="va">n_groups</span>,</span>
 <span>    control.group<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>model<span class="op">=</span><span class="st">"ar1"</span>,</span>
 <span>                       hyper<span class="op">=</span><span class="va">rhoprior</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inlabru.model1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/inlabru/reference/bru.html" class="external-link">bru</a></span><span class="op">(</span><span class="va">formula1</span>, data <span class="op">=</span> <span class="va">inla_data</span>,</span>
 <span>                   family <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
 <span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>                     verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>                   <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in bru(formula1, data = inla_data, family = "gaussian", options = list(verbose = TRUE)): object 'inla_data' not found</span></span></code></pre>
-<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## INLA not loaded safely.</span></span></code></pre>
+<pre><code><span><span class="co">## Error in bru(formula1, data = inla_data, family = "gaussian", options = list(verbose = TRUE)): bru_safe_inla() is not TRUE</span></span></code></pre>
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inlabru.model2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/inlabru/reference/bru.html" class="external-link">bru</a></span><span class="op">(</span><span class="va">formula2</span>, data <span class="op">=</span> <span class="va">inla_data</span>,</span>
 <span>                   family <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
 <span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>                     verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>                   <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in bru(formula2, data = inla_data, family = "gaussian", options = list(verbose = TRUE)): object 'inla_data' not found</span></span></code></pre>
+<pre><code><span><span class="co">## INLA not loaded safely.</span></span></code></pre>
+<pre><code><span><span class="co">## Error in bru(formula2, data = inla_data, family = "gaussian", options = list(verbose = TRUE)): bru_safe_inla() is not TRUE</span></span></code></pre>
 <p>now its time to see its output</p>
-<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># TODO : this could be where the model_eval function i recommend could be used</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">inlabru.model1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'object' in selecting a method for function 'summary': object 'inlabru.model1' not found</span></span></code></pre>
-<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">inlabru.model2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'object' in selecting a method for function 'summary': object 'inlabru.model2' not found</span></span></code></pre>
 </div>
