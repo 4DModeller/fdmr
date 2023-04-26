@@ -14,7 +14,7 @@ Authors@R:
             comment = ""))
 Description: 4DModeller statistical modelling package
 URL: https://github.com/4DModeller/fdmr
-BugReports: https://github.com//4DModeller/fdmr/issues
+BugReports: https://github.com/4DModeller/fdmr/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
