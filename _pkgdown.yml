@@ -1,6 +1,6 @@
-# url: ~
-# template:
-#   bootstrap: 5
+url: https://4dmodeller.github.io/fdmr/
+template:
+  bootstrap: 5
 
 # reference:
 # - title: Plotting
