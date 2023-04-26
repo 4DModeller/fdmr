@@ -1,4 +1,4 @@
-# 4D Modeller - Spatio-temporal modeling tools for the 21st Century
+# 4D Modeller - Spatio-temporal modeling tools for Bayesian Hierarchical Models
 
 4D-Modeller is a spatio-temporal modeling library that can be applied to problems from micro to mesoscale. It includes data visualization tools, finite element mesh building tools, bayesian hierarchical modeling through INLA and inlabru, and model evaluation and assessment tools.
 
