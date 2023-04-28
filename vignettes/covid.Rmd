@@ -226,7 +226,7 @@ formula <- cases ~ 0 + Intercept + IMD +
   f(
     main = coordinates,
     model = spde,
-    group = group.index,
+    group = group_index,
     ngroup = n_groups,
     control.group = list(
       model = "ar1",
