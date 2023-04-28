@@ -243,9 +243,9 @@ Finally, we fit the spatio-temporal model using spde approach and AR(1) process 
 
 
 ```{r fitmodel, error=TRUE, eval=FALSE}
-inlabru_model <- bru(formula, data = COVID19dat,
+inlabru_model <- bru(formula, data = covid19_data,
                    family = "poisson",
-                   E = COVID19dat$Population,
+                   E = covid19_data$Population,
                    control.family = list(link = "log"),
                    control.predictor = list(link = 1),
                    options = list(
