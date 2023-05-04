@@ -2,6 +2,14 @@ url: https://4dmodeller.github.io/fdmr/
 template:
   bootstrap: 5
 
+authors:
+  Gareth Jones:
+    href: https://github.com/gareth-j/
+  Xueqing Yin:
+    href: https://github.com/XueqingYin/
+  John Aiken:
+    href: https://mnky9800n.github.io/
+  
 # reference:
 # - title: Plotting
 #   desc:  Basic plotting tools
