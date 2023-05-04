@@ -54,6 +54,7 @@ Suggests:
     bookdown,
     knitr,
     openssl,
+    INLA,
     pkgdown,
     rmarkdown,
     stringi,
