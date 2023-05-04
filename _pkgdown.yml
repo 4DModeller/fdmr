@@ -1,7 +1,10 @@
 url: https://4dmodeller.github.io/fdmr/
 template:
   bootstrap: 5
-
+  # bootswatch: lux
+  # bslib:
+  #   pkgdown-nav-height: 100px
+  
 authors:
   Gareth Jones:
     href: https://github.com/gareth-j/
