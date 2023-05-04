@@ -53,6 +53,7 @@ Suggests:
     archive,
     bookdown,
     knitr,
+    INLA,
     openssl,
     pkgdown,
     rmarkdown,
