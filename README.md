@@ -1,4 +1,4 @@
-# 4DModeller <img src="man/figures/logo.png" align="right" alt="" height="200" />
+# 4DModeller <img src="man/figures/logo.png" align="right" alt="" width="250" />
 
 # Spatio-temporal modeling tools for Bayesian Hierarchical Models
 
