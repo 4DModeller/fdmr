@@ -4,8 +4,6 @@ output:
   bookdown::html_document2:
     base_format: rmarkdown::html_vignette
     fig_caption: yes
-pkgdown:
-  as_is: true
 bibliography: "covid.bib"
 link-citations: yes
 vignette: >
