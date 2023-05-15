@@ -56,7 +56,7 @@ sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
 
 Now we make a map of the study region
 
-```{r rmap, error=TRUE,fig.cap="A map of the study region.",fig.width=4,fig.height=4,fig.align='center'}
+```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align='center'}
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
 
@@ -81,7 +81,7 @@ Each week is defined to range from Saturday to Friday. Variable `date` indicates
 
 We plot the weekly number of reported COVID-19 cases spanning the 108 weeks:
 
-```{r plotcases, error=TRUE, fig.cap="The weekly reported number of COVID cases between March 7, 2020 and March 26, 2022.",fig.width=6,fig.height=4, fig.align = "center"}
+```{r plotcases, error=TRUE, fig.cap="The weekly reported number of COVID cases between March 7, 2020 and March 26, 2022.", fig.align = "center"}
 breaks_vec <- c(seq(as.Date("2020-03-07"),
   as.Date("2022-03-26"),
   by = "3 week"
@@ -169,7 +169,7 @@ mesh <- INLA::inla.mesh.2d(
 )
 ```
 
-```{r plotmesh, error=TRUE, fig.cap="Triangulated mesh used to build the SPDE model.",fig.width=5,fig.height=5, fig.align='center'}
+```{r plotmesh, error=TRUE, fig.cap="Triangulated mesh used to build the SPDE model.", fig.width=6,fig.height=6, fig.align='center'}
 point_data <- sp_data@data[, c("LONG", "LAT")]
 
 fdmr::plot_mesh(mesh = mesh, point_data = point_data)
@@ -326,7 +326,7 @@ model_summary$inla$hyperpar[, 1:5]
 To plot the posterior distributions of the spatial range, the standard deviation and temporal dependence parameters of the spatio-temporal random effect, we create a list named list_marginals containing the posterior distributions for each parameter. From this list, we generate a data frame margs, and include an additional column named 'parameter' which specifies the name of the corresponding distribution for each parameter. Spatial range is estimated to be 0.297, and AR(1) coefficient is estimated to be 0.839, indicating a high level of temporal dependence.
 
 
-```{r posteriordis,error=TRUE,fig.cap="Posterior distributions of the spatial range, standard deviation and temporal dependence parameters.",fig.width=8,fig.height=2, fig.align = "center" }
+```{r posteriordis,error=TRUE,fig.cap="Posterior distributions of the spatial range, standard deviation and temporal dependence parameters.", fig.width=8,fig.height=4, fig.align = "center" }
 list_marginals <- list(
   "Spatial range" = model_hyperparams$`Range for f`,
   "Stdev" = model_hyperparams$`Stdev for f`,
@@ -375,9 +375,10 @@ The date frame "predictions" is provided in the tutorial data package, we'll loa
 predictions <- fdmr::load_tutorial_data(filename = "predictions.rds")
 ```
 
-Figure \@ref(fig:boxps) displays the boxplots of the predicted infection risk for all neighbourhoods over time. It can be seen that health inequalities in COVID infection exist in England, as there are large differences between the estimated disease risks. Figure \@ref(fig:plotmeanrisk) provides the line plot for the average predicted risk with 95% credible intervals by week across England. The COVID infection risk witnessed a series of fluctuations over the study period within the range between 0.0002 and 0.05, while an overall upward temporal trend can be observed. There was an initial peak in mid-November 2020, after which the infection levels declined before rising again in mid-December 2020, which were driven by the emergence of the Alpha variant and peaked in early January 2021. In the week of 5 June 2021, the infection rate began rising again until mid-July when it was estimated at 0.5%, after which the risk fell and then remained steady by November. However, the infection reached its highest point in the week of 8 January 2022 at 2.0%, which then decreased substantially until early March 2022. 
+The figure below displays the boxplots of the predicted infection risk for all neighbourhoods over time. It can be seen that health inequalities in COVID infection exist in England, as there are large differences between the estimated disease risks. 
+We then plot the average predicted risk with 95% credible intervals by week across England. The COVID infection risk witnessed a series of fluctuations over the study period within the range between 0.0002 and 0.05, while an overall upward temporal trend can be observed. There was an initial peak in mid-November 2020, after which the infection levels declined before rising again in mid-December 2020, which were driven by the emergence of the Alpha variant and peaked in early January 2021. In the week of 5 June 2021, the infection rate began rising again until mid-July when it was estimated at 0.5%, after which the risk fell and then remained steady by November. However, the infection reached its highest point in the week of 8 January 2022 at 2.0%, which then decreased substantially until early March 2022. 
 
-```{r boxps, fig.cap="Boxplots of the predicted infection rates across all neighbourhoods over time",fig.width=6,fig.height=4, fig.align = "center"}
+```{r boxps, fig.cap="Boxplots of the predicted infection rates across all neighbourhoods over time", fig.align = "center"}
 breaks_vec <- c(seq(as.Date("2020-03-07"),
   max(predictions$date),
   by = "3 week"
@@ -394,7 +395,7 @@ fdmr::plot_boxplot(
 ```
 
 
-```{r plotmeanrisk,error=TRUE,fig.cap="The average predicted infection risk in weeks",fig.width=6,fig.height=4, fig.align = "center"}
+```{r plotmeanrisk,error=TRUE,fig.cap="The average predicted infection risk in weeks", fig.align = "center"}
 mean_week <- dplyr::group_by(predictions, date) %>% dplyr::summarize(
   mean.prev = mean(pred.mean),
   lc = mean(pred.25),
@@ -414,9 +415,9 @@ fdmr::plot_line_average(
 )
 ```
                     
-Finally, Figure \@ref(fig:mapaverisk) shows the spatial pattern of the time averaged risks of infection in England.
+Finally, we create a map showing the spatial pattern of the time averaged risks of infection in England.
 
-```{r mapaverisk, error=TRUE, fig.cap="Map of the average predicted infection risks ",fig.width=6,fig.height=4, fig.align = "center"}
+```{r mapaverisk, error=TRUE, fig.cap="Map of the average predicted infection risks ",  fig.width=8, fig.height=4, fig.align = "center"}
 average_risk_by_nb <-
   dplyr::group_by(predictions, MSOA11CD) %>% dplyr::summarize(ave.risk = mean(pred.mean))
 
@@ -468,9 +469,9 @@ The values of $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$, $\text{R-RMSE}_t$
 predmetrics <- fdmr::load_tutorial_data(filename = "predmetrics.rds")
 ```
 
-Figure \@ref(fig:performancePlots) displays the time series plots for $\text{RMSE}_t$, $\text{Bias}_t$ and $\text{CP}_t$. The plots suggest that our model performs well in predicting the rate of COVID-19 infection, because the RMSE and bias values are very low (close to 0) compared to the range of the observed risks, and the coverage probabilities are close to their nominal 0.95 level. Table 3 provides the median and mean values for $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$,$\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for $t \in (97, . . . , 108)$.
+The plot below displays the time series plots for $\text{RMSE}_t$, $\text{Bias}_t$ and $\text{CP}_t$. The plots suggest that our model performs well in predicting the rate of COVID-19 infection, because the RMSE and bias values are very low (close to 0) compared to the range of the observed risks, and the coverage probabilities are close to their nominal 0.95 level. Table 3 provides the median and mean values for $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$,$\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for $t \in (97, . . . , 108)$.
 
-```{r performancePlots,error=TRUE,fig.cap="RMSE, bias and coverage probability for the model over time.",fig.width=8,fig.height=2, fig.align = "center"}
+```{r performancePlots,error=TRUE,fig.cap="RMSE, bias and coverage probability for the model over time.", fig.align = "center"}
 breaks_vec <- c(seq(min(predmetrics$date),
   max(predmetrics$date),
   by = "1 week"
