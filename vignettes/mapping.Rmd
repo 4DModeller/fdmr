@@ -33,12 +33,11 @@ leaflet::leaflet(sfc, height = 500, width = 750) %>%
               fillOpacity = 0.5)
 ```
 
-> **_NOTE:_**  The above will be converted to use the `fdmr::plot_map` function
+> **_NOTE:_**  These functions are still a work in progress and will probably be combined into a single plot_map function once we know what interface we want
 
-Maybe have to get rid of domain here if it isn't need
 
 ```{r eval=FALSE}
-plot_map(data=sfc, tiles="satellite")
+fdmr::plot_map_polygon(data=sfc, tiles="satellite")
 ```
 
 ## Rasters
@@ -90,10 +89,12 @@ leaflet::leaflet(sfc, width=750, height=500) %>%
               fillOpacity = 0.5)
 ```
 
-This will end up being something like
+> **_NOTE:_**  These functions are still a work in progress and will probably be combined into a single plot_map function once we know what interface we want
+
+We can now plot the raster data using the `plot_map_raster` function.
 
 ```{r}
-fdmr::plot_map(data=sfc, raster_image=raster_image, add_polygons=TRUE)
+fdmr::plot_map_raster(raster_data=raster_image, polygon_data=sfc)
 ```
 
 

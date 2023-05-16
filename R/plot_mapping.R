@@ -83,7 +83,7 @@ get_tile_data <- function(tiles) {
 #' @keywords internal
 add_tiles <- function(map, tiles = NULL) {
   if (is.null(tiles)) {
-    return(map)
+    return(leaflet::addTiles(map))
   }
 
   tile_data <- list(
@@ -134,7 +134,7 @@ plot_map_polygon <- function(data, tiles = NULL, fill_colour = "red") {
 #' @return leaflet map
 #' @export
 plot_map_raster <- function(raster_data, tiles = NULL, polygon_data = NULL, polygon_fill_colour = "red") {
-  m <- leaflet::leaflet()
+  m <- leaflet::leaflet(polygon_data)
   m <- add_tiles(map = m, tiles = tiles)
   m <- leaflet::addRasterImage(m,
     x = raster_data,
