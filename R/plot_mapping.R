@@ -48,6 +48,34 @@ plot_map <- function(data,
     }
 }
 
+#' Return tile data
+#'
+#' @param tiles 
+#'
+#' @return
+#' @keywords internal
+#'
+#' @examples
+get_tile_data <- function(tiles) {
+  if (is.null(tiles)) {
+    return(NULL)
+  }
+
+  tile_data <- list(
+    "satellite" = list(
+      "url" = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      "attribution" = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+    )
+  )
+
+  tiles <- tolower(tiles)
+  if (!(tiles %in% names(tile_data))) {
+    stop(paste("Invalid tile selection, please select from one of: "), names(tile_data))
+  }
+
+  return(tile_data[[tiles]])
+}
+
 #' Plot polygon data on a map
 #'
 #' @param data Polygon data
@@ -57,19 +85,14 @@ plot_map <- function(data,
 #' @return leaflet map
 #' @export
 plot_polygon <- function(data, tiles = NULL, fill_colour = "red") {
-  tile_data <- list(
-    "satellite" = list(
-      "tiles_url" = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      "attribution" = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
-    )
-  )
+  tile_data <- get_tile_data(tiles = tiles)
 
   m <- leaflet::leaflet(data = data)
-  if (!is.null(tiles)) {
-    if (!(tiles %in% names(tile_data))) {
-      stop(paste("Invalid tile selection, please select from one of: "), names(tile_data))
-    }
-    m <- leaflet::addTiles(m, tile_data[[tiles]][["tiles_url"]])
+  # TODO - could pull this out
+  if (!is.null(tile_data)) {
+    url <- tile_data[["url"]]
+    attribution <- tile_data[["attribution"]]
+    m <- leaflet::addTiles(m, url, attribution = attribution)
   } else {
     m <- leaflet::addTiles(m)
   }
@@ -81,4 +104,33 @@ plot_polygon <- function(data, tiles = NULL, fill_colour = "red") {
   )
 
   return(m)
+}
+
+
+plot_raster <- function(raster_data, tiles = NULL) {
+  tile_data <- get_tile_data(tiles = tiles)
+
+  m <- leaflet::leaflet()
+  # TODO - could pull this out
+  if (!is.null(tile_data)) {
+    url <- tile_data[["url"]]
+    attribution <- tile_data[["attribution"]]
+    m <- leaflet::addTiles(m, url, attribution = attribution)
+  } else {
+    m <- leaflet::addTiles(m)
+  }
+
+  m <- leaflet::addRasterImage(m,
+    x = raster_data,
+    opacity = 1
+  )
+
+  return(m)
+
+
+  # leaflet::addPolygons(
+  #   stroke = FALSE, smoothFactor = 0.3,
+  #   fillColor = "red",
+  #   fillOpacity = 0.5
+  # )
 }
