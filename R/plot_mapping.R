@@ -47,3 +47,38 @@ plot_map <- function(data,
       }
     }
 }
+
+#' Plot polygon data on a map
+#'
+#' @param data Polygon data
+#' @param tiles Optional, currently select satellite for ARCGIS satellite imagery
+#' @param fill_colour Fill colour of polygon
+#'
+#' @return leaflet map
+#' @export
+plot_polygon <- function(data, tiles = NULL, fill_colour = "red") {
+  tile_data <- list(
+    "satellite" = list(
+      "tiles_url" = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      "attribution" = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+    )
+  )
+
+  m <- leaflet::leaflet(data = data)
+  if (!is.null(tiles)) {
+    if (!(tiles %in% names(tile_data))) {
+      stop(paste("Invalid tile selection, please select from one of: "), names(tile_data))
+    }
+    m <- leaflet::addTiles(m, tile_data[[tiles]][["tiles_url"]])
+  } else {
+    m <- leaflet::addTiles(m)
+  }
+
+  m <- leaflet::addPolygons(m,
+    stroke = FALSE, smoothFactor = 0.3,
+    fillColor = fill_colour,
+    fillOpacity = 0.5
+  )
+
+  return(m)
+}

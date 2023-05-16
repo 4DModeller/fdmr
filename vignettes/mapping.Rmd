@@ -26,21 +26,21 @@ norway_polygon <- sf::st_as_sf(norway_polygon
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 
 leaflet::leaflet(sfc, height = 500, width = 750) %>%
-  leaflet::addTiles() %>%
+  leaflet::addTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+           attribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community') %>%
   leaflet::addPolygons(stroke = FALSE, smoothFactor = 0.3,
               fillColor = "red",
-              fillOpacity = 0.5) %>%
-  leaflet::addTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-           attribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community')
+              fillOpacity = 0.5)
 ```
 
 > **_NOTE:_**  The above will be converted to use the `fdmr::plot_map` function
 
 Maybe have to get rid of domain here if it isn't need
 
-```{r}
-plot_map(data=sfc, domain = NULL)
+```{r eval=FALSE}
+plot_map(data=sfc, tiles="satellite")
 ```
+
 ## Rasters
 
 > **_NOTE:_**  This will be converted to use the `fdmr::plot_map` function, or maybe `fdmr::plot_interactive_map` as we want to select from the stack.
@@ -102,3 +102,5 @@ fdmr::plot_map(data=sfc, raster_image=raster_image, add_polygons=TRUE)
 We can also plot the output of models on a map ...
 
 - What object do we expect back from the model?
+
+
