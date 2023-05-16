@@ -50,12 +50,10 @@ plot_map <- function(data,
 
 #' Return tile data
 #'
-#' @param tiles 
+#' @param tiles
 #'
-#' @return
+#' @return list
 #' @keywords internal
-#'
-#' @examples
 get_tile_data <- function(tiles) {
   if (is.null(tiles)) {
     return(NULL)
@@ -76,7 +74,38 @@ get_tile_data <- function(tiles) {
   return(tile_data[[tiles]])
 }
 
-#' Plot polygon data on a map
+#' Add tile data to the map
+#'
+#' @param map leaflet::map
+#' @param tiles Optional, currently select satellite for ARCGIS satellite imagery
+#'
+#' @return leaflet map
+#' @keywords internal
+add_tiles <- function(map, tiles = NULL) {
+  if (is.null(tiles)) {
+    return(map)
+  }
+
+  tile_data <- list(
+    "satellite" = list(
+      "url" = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      "attribution" = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+    )
+  )
+
+  tiles <- tolower(tiles)
+  if (!(tiles %in% names(tile_data))) {
+    stop(paste("Invalid tile selection, please select from one of: "), names(tile_data))
+  }
+
+  url <- tile_data[[tiles]][["url"]]
+  attribution <- tile_data[[tiles]][["attribution"]]
+
+  map <- leaflet::addTiles(map, url, attribution = attribution)
+  return(map)
+}
+
+#' Plot polygon data on a Leaflet map
 #'
 #' @param data Polygon data
 #' @param tiles Optional, currently select satellite for ARCGIS satellite imagery
@@ -84,19 +113,9 @@ get_tile_data <- function(tiles) {
 #'
 #' @return leaflet map
 #' @export
-plot_polygon <- function(data, tiles = NULL, fill_colour = "red") {
-  tile_data <- get_tile_data(tiles = tiles)
-
+plot_map_polygon <- function(data, tiles = NULL, fill_colour = "red") {
   m <- leaflet::leaflet(data = data)
-  # TODO - could pull this out
-  if (!is.null(tile_data)) {
-    url <- tile_data[["url"]]
-    attribution <- tile_data[["attribution"]]
-    m <- leaflet::addTiles(m, url, attribution = attribution)
-  } else {
-    m <- leaflet::addTiles(m)
-  }
-
+  m <- add_tiles(map = m, tiles = tiles)
   m <- leaflet::addPolygons(m,
     stroke = FALSE, smoothFactor = 0.3,
     fillColor = fill_colour,
@@ -107,30 +126,28 @@ plot_polygon <- function(data, tiles = NULL, fill_colour = "red") {
 }
 
 
-plot_raster <- function(raster_data, tiles = NULL) {
-  tile_data <- get_tile_data(tiles = tiles)
-
+#' Plot raster data on a Leaflet Map
+#'
+#' @param raster_data Raster data to plot
+#' @param tiles Optional, currently select satellite for ARCGIS satellite imagery
+#'
+#' @return leaflet map
+#' @export
+plot_map_raster <- function(raster_data, tiles = NULL, polygon_data = NULL, polygon_fill_colour = "red") {
   m <- leaflet::leaflet()
-  # TODO - could pull this out
-  if (!is.null(tile_data)) {
-    url <- tile_data[["url"]]
-    attribution <- tile_data[["attribution"]]
-    m <- leaflet::addTiles(m, url, attribution = attribution)
-  } else {
-    m <- leaflet::addTiles(m)
-  }
-
+  m <- add_tiles(map = m, tiles = tiles)
   m <- leaflet::addRasterImage(m,
     x = raster_data,
     opacity = 1
   )
 
+  if (!is.null(polygon_data)) {
+    m <- leaflet::addPolygons(m,
+      stroke = FALSE, smoothFactor = 0.3,
+      fillColor = polygon_fill_colour,
+      fillOpacity = 0.5
+    )
+  }
+
   return(m)
-
-
-  # leaflet::addPolygons(
-  #   stroke = FALSE, smoothFactor = 0.3,
-  #   fillColor = "red",
-  #   fillOpacity = 0.5
-  # )
 }
