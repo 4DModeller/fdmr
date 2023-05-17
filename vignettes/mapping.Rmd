@@ -97,6 +97,12 @@ We can now plot the raster data using the `plot_map_raster` function.
 fdmr::plot_map_raster(raster_data=raster_image, polygon_data=sfc)
 ```
 
+You can test out the interactive map plotting function by running the cell below, note you'll need to have run `fdmr::retrieve_tutorial_data(dataset = "hydro")`
+before.
+
+```{r}
+fdmr::plot_interactive_map()
+```
 
 ## Model output
 

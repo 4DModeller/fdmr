@@ -14,7 +14,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL) {
     library(stringr)
     library(leaflet)
 
-    norway_polygon_location <- "/Users/gar/fdmr/tutorial_data/Kvilldal_Catch_Boundary.geojson"
+    norway_polygon_location <- get_tutorial_datapath(filename="Kvilldal_Catch_Boundary.geojson")
     norway_polygon <- rgdal::readOGR(norway_polygon_location)
     norway_polygon <- sf::st_as_sf(norway_polygon,
         coords = c("longitude", "latitude"),
@@ -23,7 +23,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL) {
 
     sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 
-    era5_data_filepath <- "/Users/gar/fdmr/tutorial_data/era5_land_daily.nc"
+    era5_data_filepath <- get_tutorial_datapath(filename="era5_land_daily.nc")
     era5_precip <- raster::stack(era5_data_filepath)
     era5_precip <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
     # Create a named list so we can display the dates
