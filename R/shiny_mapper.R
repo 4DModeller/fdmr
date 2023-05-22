@@ -41,6 +41,11 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         shiny::sidebarLayout(
             position = "right",
             shiny::sidebarPanel(
+                shiny::selectInput(
+                    inputId = "colour_scheme", "Color Scheme",
+                    choices = c("viridis", "magma", "inferno", "plasma"),
+                    selected = "viridis"
+                ),
                 shiny::sliderInput(
                     inputId = "raster_opacity",
                     label = "Raster opacity",
@@ -86,6 +91,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         })
 
         # Do we need these?
+
         raster_opacity <- shiny::reactive({
             input$raster_opacity
         })
@@ -94,13 +100,20 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             input$polygon_opacity
         })
 
+        colour_scheme <- shiny::reactive({
+            input$colour_scheme
+        })
+
         output$map <- leaflet::renderLeaflet({
-            m <- leaflet::leaflet()
-            m <- leaflet::addTiles(m)
-            m <- leaflet::fitBounds(m, lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
+            leaflet::leaflet() %>%
+                leaflet::addTiles() %>%
+                leaflet::fitBounds(lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
+            # m <- leaflet::leaflet()
+            # m <- leaflet::addTiles(m)
+            # m <- leaflet::fitBounds(m, lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
 
 
-            return(m)
+            # return(m)
         })
 
         # Incremental changes to the map (in this case, replacing the
@@ -109,11 +122,11 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         # should be managed in its own observer.
         shiny::observe({
             leaflet::leafletProxy("map") %>%
-                # leaflet::clearImages() %>%
                 leaflet::addRasterImage(
                     x = raster_image(),
                     opacity = raster_opacity(),
-                    layerId = "raster"
+                    layerId = "raster",
+                    colors = colour_scheme(),
                 )
         })
 
