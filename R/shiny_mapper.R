@@ -1,4 +1,4 @@
-#' Shiny app fo plotting raster data
+#' Shiny app for plotting raster and polygon data on a leaflet map.
 #'
 #' @param raster_data Raster data in the form or a RasterStack or RasterBrick
 #' @param polygon_data Polygon data to plot on map
@@ -9,37 +9,69 @@
 #'
 #' @examples
 raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL) {
+    # TODO - can we check the projection of the data?
+    # TODO - check projection of the polygon data? Or require users to do this?
     # Remove any letters from the names of the RasterLayers
     cleaned_names <- stringr::str_replace_all(names(raster_data), pattern = "[A-Za-z]", replacement = "")
     # Create Date objects
     date_strings <- lubridate::as_date(cleaned_names, format = date_format)
     date_strings <- base::sort(date_strings)
 
-    if (any(is.na(lubridate::parse_date_time(names(raster_data), orders = date_format)))) {
-        stop("Unable to parse dates from layer names. Please ensure they are named correctly or pass the date_format argument with the correct format.")
-    }
+    # if (any(is.na(lubridate::parse_date_time(names(raster_data), orders = date_format)))) {
+    #     stop(paste(
+    #         "Unable to parse dates from layer names. Please ensure they are named correctly",
+    #         "or pass the date_format argument with the correct format."
+    #     ))
+    # }
 
     # We want to be able to lookup the RasterLayer names using the date so we create a list
     date_list <- as.list(base::sort(names(raster_data)))
     # Then we assign the date strings we'll use in the UI as the name (or key) for each element in the list
     names(date_list) <- date_strings
 
+    # Get the extent of the RasterLayer in lat/long
+    raster_extents <- raster::extent(raster::projectRaster(raster_data, crs = "+proj=longlat"))
+    lat_min <- raster_extents@ymin
+    lat_max <- raster_extents@ymax
+    long_min <- raster_extents@xmin
+    long_max <- raster_extents@xmax
+
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
-        shiny::titlePanel("4DModeller/fdmr date raster plotting"),
-        shiny::fluidRow(
-            shiny::column(
-                8,
-                leaflet::leafletOutput("raster_map"),
-                shiny::textOutput("selected_date"),
-                # Need to make sure the steps here match the data
+        shiny::sidebarLayout(
+            position = "right",
+            shiny::sidebarPanel(
                 shiny::sliderInput(
-                    inputId = "date_slider",
-                    label = "Date:",
-                    min = as.Date(min(date_strings)),
-                    max = as.Date(max(date_strings)),
-                    value = as.Date(min(date_strings[[1]])),
-                    timeFormat = "%F"
+                    inputId = "raster_opacity",
+                    label = "Raster opacity",
+                    min = 0,
+                    max = 1,
+                    value = 0.9
+                ),
+                shiny::sliderInput(
+                    inputId = "polygon_opacity",
+                    label = "Polygon opacity",
+                    min = 0,
+                    max = 1,
+                    value = 0.6
+                )
+            ),
+            shiny::mainPanel(
+                shiny::fluidRow(
+                    shiny::column(
+                        8,
+                        leaflet::leafletOutput("map"),
+                        shiny::textOutput("selected_date"),
+                        # Need to make sure the steps here match the data
+                        shiny::sliderInput(
+                            inputId = "date_slider",
+                            label = "Date:",
+                            min = as.Date(min(date_strings)),
+                            max = as.Date(max(date_strings)),
+                            value = as.Date(min(date_strings[[1]])),
+                            timeFormat = "%F"
+                        )
+                    )
                 )
             )
         )
@@ -48,22 +80,48 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
 
     # Define server logic required to draw a histogram
     server <- function(input, output) {
-        output$raster_map <- leaflet::renderLeaflet({
+        raster_image <- shiny::reactive({
             layer_name <- date_list[[as.character(input$date_slider)]]
-            raster_image <- raster_data[[layer_name]]
+            raster_data[[layer_name]]
+        })
 
+        # Do we need these?
+        raster_opacity <- shiny::reactive({
+            input$raster_opacity
+        })
+
+        polygon_opacity <- shiny::reactive({
+            input$polygon_opacity
+        })
+
+        output$map <- leaflet::renderLeaflet({
             m <- leaflet::leaflet()
             m <- leaflet::addTiles(m)
+            m <- leaflet::fitBounds(m, lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
 
-            if (!is.null(raster_data)) {
-                m <- leaflet::addRasterImage(m,
-                    x = raster_image,
-                    opacity = 1
+
+            return(m)
+        })
+
+        # Incremental changes to the map (in this case, replacing the
+        # circles when a new color is chosen) should be performed in
+        # an observer. Each independent set of things that can change
+        # should be managed in its own observer.
+        shiny::observe({
+            leaflet::leafletProxy("map") %>%
+                # leaflet::clearImages() %>%
+                leaflet::addRasterImage(
+                    x = raster_image(),
+                    opacity = raster_opacity(),
+                    layerId = "raster"
                 )
-            }
+        })
 
+        shiny::observe({
             if (!is.null(polygon_data)) {
-                m <- leaflet::addPolygons(m, data = polygon_data, weight = 2)
+                leaflet::leafletProxy("map") %>%
+                    leaflet::clearShapes() %>%
+                    leaflet::addPolygons(data = polygon_data, weight = 2, opacity = polygon_opacity(), layerId = "poly")
             }
         })
 
@@ -78,7 +136,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
 #
 
 
-#' Run the interactive plotting Shiny app
+#' Run the Shiny app for plotting raster and polygon data on a leaflet map.
 #'
 #' @param raster_data Raster data in the form or a RasterStack or RasterBrick
 #' @param polygon_data Polygon data to plot on map
