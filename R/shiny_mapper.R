@@ -36,6 +36,9 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     long_min <- raster_extents@xmin
     long_max <- raster_extents@xmax
 
+    valid_layers <- list("raster")
+    if (!is.null(polygon_data)) valid_layers <- append("polygon", valid_layers)
+
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         shiny::sidebarLayout(
@@ -59,23 +62,25 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                     min = 0,
                     max = 1,
                     value = 0.6
+                ),
+                shiny::checkboxGroupInput("layers", "Layers:",
+                    choiceNames = valid_layers,
+                    choiceValues = valid_layers,
+                    selected = valid_layers,
                 )
             ),
             shiny::mainPanel(
                 shiny::fluidRow(
-                    shiny::column(
-                        8,
-                        leaflet::leafletOutput("map"),
-                        shiny::textOutput("selected_date"),
-                        # Need to make sure the steps here match the data
-                        shiny::sliderInput(
-                            inputId = "date_slider",
-                            label = "Date:",
-                            min = as.Date(min(date_strings)),
-                            max = as.Date(max(date_strings)),
-                            value = as.Date(min(date_strings[[1]])),
-                            timeFormat = "%F"
-                        )
+                    leaflet::leafletOutput("map"),
+                    shiny::textOutput("selected_date"),
+                    # Need to make sure the steps here match the data
+                    shiny::sliderInput(
+                        inputId = "date_slider",
+                        label = "Date:",
+                        min = as.Date(min(date_strings)),
+                        max = as.Date(max(date_strings)),
+                        value = as.Date(min(date_strings[[1]])),
+                        timeFormat = "%F"
                     )
                 )
             )
@@ -91,6 +96,9 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         })
 
         # Do we need these?
+        map_layers <- shiny::reactive({
+            input$layers
+        })
 
         raster_opacity <- shiny::reactive({
             input$raster_opacity
@@ -121,19 +129,27 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         # an observer. Each independent set of things that can change
         # should be managed in its own observer.
         shiny::observe({
-            leaflet::leafletProxy("map") %>%
-                leaflet::addRasterImage(
-                    x = raster_image(),
-                    opacity = raster_opacity(),
-                    layerId = "raster",
-                    colors = colour_scheme(),
-                )
+            proxy <- leaflet::leafletProxy("map")
+            proxy %>% leaflet::clearImages()
+
+            if ("raster" %in% map_layers()) {
+                proxy %>%
+                    leaflet::addRasterImage(
+                        x = raster_image(),
+                        opacity = raster_opacity(),
+                        layerId = "raster",
+                        colors = colour_scheme(),
+                    )
+            } else {
+                leaflet::leafletProxy("map") %>% leaflet::clearImages()
+            }
         })
 
         shiny::observe({
-            if (!is.null(polygon_data)) {
+            proxy <- leaflet::leafletProxy("map")
+            proxy %>% leaflet::clearShapes()
+            if ("polygon" %in% map_layers()) {
                 leaflet::leafletProxy("map") %>%
-                    leaflet::clearShapes() %>%
                     leaflet::addPolygons(data = polygon_data, weight = 2, opacity = polygon_opacity(), layerId = "poly")
             }
         })
