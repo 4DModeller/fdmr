@@ -7,6 +7,8 @@
 plot_interative_map(raster_data = NULL, polygon_data = NULL)
 }
 \arguments{
+\item{raster_data}{Raster data in the form or a RasterStack or RasterBrick}
+
 \item{polygon_data}{}
 }
 \description{

@@ -8,40 +8,23 @@
 #'
 #' @examples
 raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL) {
-    #  WIP - quick design for a slider app using the Kvilldall Catchment area data
-    # and some ERA5 precipitation data
-    library(shiny)
-    library(stringr)
-    library(leaflet)
 
-    norway_polygon_location <- get_tutorial_datapath(filename="Kvilldal_Catch_Boundary.geojson")
-    norway_polygon <- rgdal::readOGR(norway_polygon_location)
-    norway_polygon <- sf::st_as_sf(norway_polygon,
-        coords = c("longitude", "latitude"),
-        crs = "+proj=utm +zone=32"
-    )
-
-    sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
-
-    era5_data_filepath <- get_tutorial_datapath(filename="era5_land_daily.nc")
-    era5_precip <- raster::stack(era5_data_filepath)
-    era5_precip <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
     # Create a named list so we can display the dates
     # NOTE - So RasterLayer names can't start with a number
-    date_strings <- lubridate::as_date(sub("X", "", sort(names(era5_precip))))
-    date_list <- as.list(names(era5_precip))
+    date_strings <- lubridate::as_date(sub("X", "", sort(names(raster_data))))
+    date_list <- as.list(names(raster_data))
     names(date_list) <- date_strings
 
     # Define UI for application that draws a histogram
-    ui <- fluidPage(
-        titlePanel("4DModeller/fdmr date raster plotting"),
-        fluidRow(
-            column(
+    ui <- shiny::fluidPage(
+        shiny::titlePanel("4DModeller/fdmr date raster plotting"),
+        shiny::fluidRow(
+            shiny::column(
                 8,
                 leaflet::leafletOutput("raster_map"),
-                textOutput("selected_date"),
+                shiny::textOutput("selected_date"),
                 # Need to make sure the steps here match the data
-                sliderInput(
+                shiny::sliderInput(
                     inputId = "date_slider",
                     label = "Date:",
                     min = as.Date(min(date_strings)),
@@ -58,7 +41,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL) {
     server <- function(input, output) {
         output$raster_map <- leaflet::renderLeaflet({
             layer_name <- date_list[[as.character(input$date_slider)]]
-            raster_image <- era5_precip[[layer_name]]
+            raster_image <- raster_data[[layer_name]]
 
             leaflet::leaflet() %>%
                 leaflet::addTiles() %>%
@@ -74,20 +57,20 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL) {
     }
 
     # Run the application
-    shinyApp(ui = ui, server = server)
+    shiny::shinyApp(ui = ui, server = server)
 }
 #
 
 
 #' Run the interactive plotting Shiny app
 #'
-#' @param raster_data
+#' @param raster_data Raster data in the form or a RasterStack or RasterBrick
 #' @param polygon_data
 #'
 #' @return NULL
 #' @export
 plot_interative_map <- function(raster_data = NULL, polygon_data = NULL) {
-    # require_package(name = "shinydocu")
+    require_packages(packages = c("leaflet", "shiny", "stringr"))
 
     shiny::runApp(raster_mapping_app())
 }
