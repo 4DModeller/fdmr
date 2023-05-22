@@ -45,7 +45,12 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             position = "right",
             shiny::sidebarPanel(
                 shiny::selectInput(
-                    inputId = "colour_scheme", "Color Scheme",
+                    inputId = "map_tiles", "Map tiles",
+                    choices = c("OpenStreetMap.Mapnik", "CartoDB.Positron", "Esri.WorldImagery"),
+                    selected = "OpenStreetMap.Mapnik"
+                ),
+                shiny::selectInput(
+                    inputId = "colour_scheme", "Colour scheme",
                     choices = c("viridis", "magma", "inferno", "plasma"),
                     selected = "viridis"
                 ),
@@ -71,22 +76,23 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             ),
             shiny::mainPanel(
                 shiny::fluidRow(
-                    leaflet::leafletOutput("map"),
-                    shiny::textOutput("selected_date"),
-                    # Need to make sure the steps here match the data
-                    shiny::sliderInput(
-                        inputId = "date_slider",
-                        label = "Date:",
-                        min = as.Date(min(date_strings)),
-                        max = as.Date(max(date_strings)),
-                        value = as.Date(min(date_strings[[1]])),
-                        timeFormat = "%F"
+                    shiny::column(12,
+                        align = "center",
+                        leaflet::leafletOutput("map"),
+                        # Need to make sure the steps here match the data
+                        shiny::sliderInput(
+                            inputId = "date_slider",
+                            label = "Date:",
+                            min = as.Date(min(date_strings)),
+                            max = as.Date(max(date_strings)),
+                            value = as.Date(min(date_strings[[1]])),
+                            timeFormat = "%F"
+                        )
                     )
                 )
             )
         )
     )
-
 
     # Define server logic required to draw a histogram
     server <- function(input, output) {
@@ -112,16 +118,19 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             input$colour_scheme
         })
 
+        map_tiles <- shiny::reactive({
+            input$map_tiles
+        })
+
         output$map <- leaflet::renderLeaflet({
             leaflet::leaflet() %>%
-                leaflet::addTiles() %>%
+                # leaflet::addMapPane("raster", zIndex = 410) %>%
+                # leaflet::addMapPane("polygon", zIndex = 420) %>%
                 leaflet::fitBounds(lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
-            # m <- leaflet::leaflet()
-            # m <- leaflet::addTiles(m)
-            # m <- leaflet::fitBounds(m, lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
+        })
 
-
-            # return(m)
+        shiny::observe({
+            leaflet::leafletProxy("map") %>% leaflet::addProviderTiles(map_tiles(), leaflet::providerTileOptions(zIndex = -10))
         })
 
         # Incremental changes to the map (in this case, replacing the
@@ -140,8 +149,6 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                         layerId = "raster",
                         colors = colour_scheme(),
                     )
-            } else {
-                leaflet::leafletProxy("map") %>% leaflet::clearImages()
             }
         })
 
@@ -152,10 +159,6 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                 leaflet::leafletProxy("map") %>%
                     leaflet::addPolygons(data = polygon_data, weight = 2, opacity = polygon_opacity(), layerId = "poly")
             }
-        })
-
-        output$selected_date <- shiny::renderText({
-            date_list[[as.character(input$date_slider)]]
         })
     }
 
