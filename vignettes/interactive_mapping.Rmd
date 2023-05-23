@@ -22,21 +22,21 @@ norway_polygon <- sf::st_as_sf(norway_polygon,
     crs = "+proj=utm +zone=32"
 )
 
-sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
+norway_polygon <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
 Next we read ECMWF Reanalysis v5 (ERA5) precipitation data from a NetCDF file.
 
 ```{r}
-  #  WIP - quick design for a slider app using the Kvilldall Catchment area data
-  # and some ERA5 precipitation data
 era5_data_filepath <- fdmr::get_tutorial_datapath(filename="era5_land_daily.nc")
 era5_precip <- raster::stack(era5_data_filepath)
 era5_precip <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
 ```
 
+The data is now ready to pass to our interactive plotting function.
+
 ```{r}
-fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = sfc)
+fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = norway_polygon)
 ```
 
 
