@@ -123,7 +123,7 @@ era5_precip <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
 ```
 
 ```{r}
-fdmr::plot_interactive_map(raster_data = era5_precip)
+fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = sfc)
 ```
 
 ## Model output
