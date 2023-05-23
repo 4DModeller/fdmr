@@ -55,7 +55,6 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         shiny::sidebarLayout(
             position = "right",
             shiny::sidebarPanel(
-                width = 3,
                 shiny::selectInput(
                     inputId = "colour_scheme", "Colour scheme",
                     choices = c("viridis", "magma", "inferno", "plasma"),
@@ -77,7 +76,6 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                 ),
             ),
             shiny::mainPanel(
-                width = 9,
                 shiny::column(
                     12,
                     leaflet::leafletOutput("map", height = "80vh"),
@@ -420,7 +418,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
 #'
 #' @return shinyApp
 #' @export
-plot_interative_map <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL) {
+plot_interactive_map <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL) {
     require_packages(packages = c("leaflet", "shiny", "stringr"))
 
     shiny::runApp(raster_mapping_app(raster_data = raster_data, polygon_data = polygon_data, date_format = date_format))
