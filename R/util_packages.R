@@ -2,12 +2,23 @@
 #' otherwise stop is called with a message telling the user
 #' the package is required.
 #'
-#' @param name Package name
+#' @param packages Package name
 #'
 #' @return NULL
 #' @keywords internal
-require_package <- function(pkg_name) {
-  if (!requireNamespace(pkg_name, quietly = TRUE)) {
-    stop(paste("The package", pkg_name, "is required by this function. Please install."))
+require_packages <- function(packages) {
+  if (!is.vector(packages)) {
+    packages <- as.list(packages)
+  }
+
+  missing_packages <- list()
+  for (package in packages) {
+    if (package %in% rownames(installed.packages()) == FALSE) {
+      missing_packages <- append(missing_packages, package)
+    }
+  }
+
+  if (length(missing_packages) > 0) {
+    stop(paste("Missing package(s):", paste(missing_packages, collapse = ", "), ". Please install before continuing."))
   }
 }

@@ -2,6 +2,7 @@
 
 export(get_tutorial_datapath)
 export(load_tutorial_data)
+export(mesh_builder)
 export(plot_barchart)
 export(plot_boxplot)
 export(plot_line_average)

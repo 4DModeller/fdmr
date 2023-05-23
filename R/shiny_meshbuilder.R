@@ -14,6 +14,12 @@
 #   offset = c(initial_range / 4, initial_range),
 #   cutoff = max_edge / 7
 
+#' Mesh building shiny app
+#'
+#' @param location_data SpatialPolygon(ish) data
+#'
+#' @return shiny::app
+#' @keywords internal
 meshbuilder_shiny <- function(location_data) {
     ui <- shiny::fluidPage(
         shiny::sidebarLayout(
@@ -58,4 +64,18 @@ meshbuilder_shiny <- function(location_data) {
 
     # Run the application
     shiny::shinyApp(ui = ui, server = server)
+}
+
+
+#' Mesh building shiny app. Creates and visualises a mesh from some spatial data.
+#'
+#' @param location_data Spatial data
+#'
+#' @return shiny::app
+#' @export
+mesh_builder <- function(location_data) {
+    require_packages(packages = c("INLA", "shiny", "leaflet"))
+
+    shiny::runApp(meshbuilder_shiny(location_data = location_data))
+
 }
