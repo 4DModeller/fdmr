@@ -37,6 +37,8 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     valid_layers <- list("raster")
     if (!is.null(polygon_data)) valid_layers <- append("polygon", valid_layers)
 
+
+
     # Define UI for application that draws a histogram
     ui <- shiny::fillPage(
         shiny::tags$head(
@@ -74,6 +76,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                     max = 1,
                     value = 0.6
                 ),
+                shiny::checkboxInput(inputId = "legend", label = "Show legend", value = TRUE)
             ),
             shiny::mainPanel(
                 shiny::column(
@@ -103,6 +106,11 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             raster_image <- raster_data[[layer_name]]
         })
 
+        raster_values <- shiny::reactive({
+            layer_name <- date_list[[as.character(input$date_slider)]]
+            raster::values(raster_data[[layer_name]])
+        })
+
         raster_opacity <- shiny::reactive({
             input$raster_opacity
         })
@@ -115,9 +123,14 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             input$colour_scheme
         })
 
+        colour_palette <- shiny::reactive({
+            leaflet::colorNumeric(colour_scheme(), raster_values())
+        })
+
         output$map <- leaflet::renderLeaflet({
             leaflet::leaflet() %>% leaflet::fitBounds(lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
         })
+
 
 
         shiny::observe({
@@ -142,6 +155,21 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                 overlayGroups = c("Raster", "Poly"),
                 options = leaflet::layersControlOptions(collapsed = FALSE)
             )
+        })
+
+        # Use a separate observer to recreate the legend as needed.
+        shiny::observe({
+            proxy <- leaflet::leafletProxy("map")
+            # Remove any existing legend, and only if the legend is
+            # enabled, create a new one.
+            proxy %>% leaflet::clearControls()
+            if (input$legend) {
+                proxy %>% leaflet::addLegend(
+                    position = "bottomright",
+                    bins = 5,
+                    pal = colour_palette(), values = raster_values()
+                )
+            }
         })
 
         # leaflet::addMapPane("raster", zIndex = 410) %>%
