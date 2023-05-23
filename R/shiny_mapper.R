@@ -137,6 +137,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             }
             # Layers control
             m <- leaflet::addLayersControl(m,
+                position = "topright",
                 baseGroups = c("OSM", "Satellite", "Positron"),
                 overlayGroups = c("Raster", "Poly"),
                 options = leaflet::layersControlOptions(collapsed = FALSE)
