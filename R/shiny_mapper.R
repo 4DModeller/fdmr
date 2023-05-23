@@ -4,10 +4,8 @@
 #' @param polygon_data Polygon data to plot on map
 #' @param date_format A date format that will be passed in to lubridate::as_date
 #'
-#' @return
+#' @return shinyApp
 #' @keywords internal
-#'
-#' @examples
 raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL) {
     # TODO - can we check the projection of the data?
     # TODO - check projection of the polygon data? Or require users to do this?
@@ -420,7 +418,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
 #' @param polygon_data Polygon data to plot on map
 #' @param date_format A date format that will be passed in to lubridate::as_date
 #'
-#' @return NULL
+#' @return shinyApp
 #' @export
 plot_interative_map <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL) {
     require_packages(packages = c("leaflet", "shiny", "stringr"))

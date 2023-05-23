@@ -2,15 +2,24 @@
 % Please edit documentation in R/shiny_mapper.R
 \name{plot_interative_map}
 \alias{plot_interative_map}
-\title{Run the interactive plotting Shiny app}
+\title{Run the Shiny app for plotting raster and polygon data on a leaflet map.}
 \usage{
-plot_interative_map(raster_data = NULL, polygon_data = NULL)
+plot_interative_map(
+  raster_data = NULL,
+  polygon_data = NULL,
+  date_format = NULL
+)
 }
 \arguments{
 \item{raster_data}{Raster data in the form or a RasterStack or RasterBrick}
 
-\item{polygon_data}{}
+\item{polygon_data}{Polygon data to plot on map}
+
+\item{date_format}{A date format that will be passed in to lubridate::as_date}
+}
+\value{
+shinyApp
 }
 \description{
-Run the interactive plotting Shiny app
+Run the Shiny app for plotting raster and polygon data on a leaflet map.
 }
