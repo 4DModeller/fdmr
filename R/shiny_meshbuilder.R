@@ -2,19 +2,40 @@
 # Code for that app can be found here:
 # https://github.com/hrue/r-inla/blob/Version_23.05.22/rinla/R/meshbuilder.R
 
-meshbuilder_shiny <- function() {
+# loc: the spatial locations of data points
+# max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
+# or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
+# offset: it specifies the size of the inner and outer extensions around the data locations.
+# cutoff: it defines the minimum allowed distance between data points.
+
+# mesh <- INLA::inla.mesh.2d(
+#   loc = sp_data@data[, c("LONG", "LAT")],
+#   max.edge = c(1, 2) * max_edge,
+#   offset = c(initial_range / 4, initial_range),
+#   cutoff = max_edge / 7
+
+meshbuilder_shiny <- function(location_data) {
     ui <- shiny::fluidPage(
         shiny::sidebarLayout(
             shiny::sidebarPanel(
                 shiny::sliderInput(
-                    inputId =
-                        "bins",
-                    label = "Number of bins:",
-                    min = 1, value = 30, max = 50
+                    inputId = "max_edge",
+                    label = "Max edge:",
+                    min = 0.02, value = c(0.1, 0.3), max = 10
+                ),
+                shiny::sliderInput(
+                    inputId = "offset",
+                    label = "Offset:",
+                    min = 0.02, value = c(0.2, 0.7), max = 10
+                ),
+                shiny::sliderInput(
+                    inputId = "cutoff",
+                    label = "Cutoff:",
+                    min = 0.005, value = 0.2, max = 0.9
                 )
             ),
             shiny::mainPanel(
-                leaflet::plotOutput("distPlot")
+                leaflet::plotOutput("mesh_plot")
             )
         )
     )
@@ -22,22 +43,16 @@ meshbuilder_shiny <- function() {
     # Define server logic required to draw a histogram
     server <- function(input, output) {
         mesh <- shiny::reactive({
-            out <- INLA::inla.mesh.2d(
-                loc = loc1,
-                boundary = bnd1,
-                max.edge = input$max.edge,
-                min.angle = rev(input$min.angle),
-                max.n = c(48000, 16000),
-                max.n.strict = c(128000, 128000),
+            INLA::inla.mesh.2d(
+                loc = location_data,
+                max.edge = input$max_edge,
                 cutoff = input$cutoff,
                 offset = input$offset,
-                crs = if (INLA::inla.has_PROJ6()) {
-                    INLA::inla.CRS(input$crs.mesh)
-                } else {
-                    INLA::inla.CRS(input$crs.mesh)
-                }
             )
-            out
+        })
+
+        output$mesh_plot <- shiny::reactive({
+            plot(mesh())
         })
     }
 
