@@ -14,13 +14,35 @@
 #   offset = c(initial_range / 4, initial_range),
 #   cutoff = max_edge / 7
 
+# initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
+
+# max_edge <- initial_range / 8
+
+# mesh <- INLA::inla.mesh.2d(
+#   loc = sp_data@data[, c("LONG", "LAT")],
+#   max.edge = c(1, 2) * max_edge,
+#   offset = c(initial_range / 4, initial_range),
+#   cutoff = max_edge / 7
+# )
+
 #' Mesh building shiny app
 #'
 #' @param location_data SpatialPolygon(ish) data
 #'
 #' @return shiny::app
 #' @keywords internal
-meshbuilder_shiny <- function(location_data) {
+meshbuilder_shiny <- function(
+    location_data,
+    max_edge = NULL,
+    offset = NULL,
+    cutoff = NULL) {
+
+    # TODO - add in CRS reading from data
+    # TODO - these defaults need changing,
+    max_edge_default = c(0.1, 0.3)
+    offset_default = c(0.2, 0.7)
+    cutoff_default = 0.2
+
     ui <- shiny::fluidPage(
         shiny::sidebarLayout(
             shiny::sidebarPanel(
@@ -41,7 +63,7 @@ meshbuilder_shiny <- function(location_data) {
                 )
             ),
             shiny::mainPanel(
-                leaflet::plotOutput("mesh_plot")
+                shiny::plotOutput("mesh_plot")
             )
         )
     )
@@ -49,16 +71,74 @@ meshbuilder_shiny <- function(location_data) {
     # Define server logic required to draw a histogram
     server <- function(input, output) {
         mesh <- shiny::reactive({
-            INLA::inla.mesh.2d(
-                loc = location_data,
-                max.edge = input$max_edge,
-                cutoff = input$cutoff,
-                offset = input$offset,
-            )
+            # TODO - any feedback for progress bar here?
+            shiny::withProgress(message = "Creating mesh...", value = 0, {
+                INLA::inla.mesh.2d(
+                    loc = location_data,
+                    max.edge = input$max_edge,
+                    cutoff = input$cutoff,
+                    offset = input$offset,
+                )
+            })
         })
 
-        output$mesh_plot <- shiny::reactive({
-            plot(mesh())
+        # From here to ylim taken from INLA's meshbuilder
+        mesh_proj <- shiny::reactive({
+            if (is.null(mesh())) {
+                NULL
+            } else {
+                INLA::inla.mesh.projector(mesh(), dims = c(500, 500))
+            }
+        })
+
+        xlim <- shiny::reactive({
+            lim1 <- if (is.null(mesh())) NA else range(mesh()$loc[, 1], na.rm = TRUE)
+
+            r <- c(lim1)
+            if (all(is.na(r))) {
+                r <- c(0, 1)
+            } else {
+                r <- range(r, na.rm = TRUE)
+            }
+            r
+        })
+
+        ylim <- shiny::reactive({
+            lim1 <- if (is.null(mesh())) NA else range(mesh()$loc[, 2], na.rm = TRUE)
+
+            r <- lim1
+            if (all(is.na(r))) {
+                r <- c(0, 1)
+            } else {
+                r <- range(r, na.rm = TRUE)
+            }
+            r
+        })
+
+        output$mesh_plot <- shiny::renderPlot({
+            shiny::withProgress(message = "Creating plot...", value = 0, {
+                col <- colorRampPalette(c("blue", "white", "red"))
+                n_col <- 1 + 64
+                fields::image.plot(
+                    range(mesh_proj()$x),
+                    range(mesh_proj()$y),
+                    matrix(0, 2, 2),
+                    # NOTE: this is fixed in the INLA code so I've just added it in here
+                    # zlim <- c(0.5, 1.5)
+                    zlim = c(0.5, 1.5),
+                    xlim = xlim(),
+                    ylim = ylim(),
+                    col = col(n_col),
+                    asp = 1,
+                    main = "",
+                    xlab = "Longitude", ylab = "Latitude"
+                )
+                plot(mesh(), add = TRUE)
+                # TODO - why are we getting errors from
+                # tryCatch({
+                # plot(mesh())
+                # })
+            })
         })
     }
 
@@ -73,9 +153,13 @@ meshbuilder_shiny <- function(location_data) {
 #'
 #' @return shiny::app
 #' @export
-mesh_builder <- function(location_data) {
+mesh_builder <- function(location_data, max_edge, offset, cutoff) {
     require_packages(packages = c("INLA", "shiny", "leaflet"))
 
-    shiny::runApp(meshbuilder_shiny(location_data = location_data))
-
+    shiny::runApp(meshbuilder_shiny(
+        location_data = location_data,
+        max_edge = max_edge,
+        offset = offset,
+        cutoff = cutoff
+    ))
 }
