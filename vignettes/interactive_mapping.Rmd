@@ -40,4 +40,11 @@ fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = norway_poly
 ```
 
 
+## Colours
+
+Colour palettes can be selected based on the type of data being plottied. Qualitative, sequential or diverging colour
+palettes can be used.
+
+
+
 

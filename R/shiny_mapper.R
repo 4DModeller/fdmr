@@ -38,13 +38,21 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     valid_layers <- list("raster")
     if (!is.null(polygon_data)) valid_layers <- append("polygon", valid_layers)
 
+    # So user can either
     # # Get the colour palettes from RColorBrewer2
-    # palettes = list()
-    
-    # brewer_palettes = RColorBrewer::brewer.pal.info
+    palettes <- list()
+
+
+    # brewer_palettes =
     # diverging = brewer_palettes[brewer_palettes$cat == "div",]
     # sequential = brewer_palettes[brewer_palettes$cat == "seq",]
     # qualitative = brewer_palettes[brewer_palettes$cat == "qual",]
+
+
+    #   rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
+    # ),
+
+    default_colours <- rownames(RColorBrewer::brewer.pal.info[brewer_palettes$cat == "seq", ])
 
     # Define UI for application that draws a histogram
     ui <- shiny::fillPage(
@@ -65,9 +73,16 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
             position = "right",
             shiny::sidebarPanel(
                 shiny::selectInput(
-                    inputId = "colour_scheme", "Colour scheme",
-                    choices = c("viridis", "magma", "inferno", "plasma"),
-                    selected = "viridis"
+                    inputId = "colour_category",
+                    label = "Palette type",
+                    choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
+                    selected = "seq"
+                ),
+                shiny::selectInput(
+                    inputId = "colour_scheme",
+                    label = "Color Scheme",
+                    choices = default_colours,
+                    selected = "Blues"
                 ),
                 shiny::sliderInput(
                     inputId = "raster_opacity",
@@ -111,7 +126,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     )
 
     # Define server logic required to draw a histogram
-    server <- function(input, output) {
+    server <- function(input, output, session) {
         raster_image <- shiny::reactive({
             layer_name <- date_list[[as.character(input$date_slider)]]
             raster_image <- raster_data[[layer_name]]
@@ -120,6 +135,17 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         raster_values <- shiny::reactive({
             layer_name <- date_list[[as.character(input$date_slider)]]
             raster::values(raster_data[[layer_name]])
+        })
+
+        category_colours <- shiny::reactive({
+            if (input$colour_category == "Viridis") {
+                colours <- c("viridis", "magma", "inferno", "plasma")
+            } else {
+                palettes_mapping <- list("Sequential" = "seq", "Diverging" = "div", "Qualitative" = "qual")
+                chosen_cat <- palettes_mapping[input$colour_category]
+                colours <- rownames(subset(RColorBrewer::brewer.pal.info, category %in% chosen_cat))
+            }
+            colours
         })
 
         raster_opacity <- shiny::reactive({
@@ -140,6 +166,10 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
 
         output$map <- leaflet::renderLeaflet({
             leaflet::leaflet() %>% leaflet::fitBounds(lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
+        })
+
+        shiny::observe({
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Color Scheme", choices = category_colours())
         })
 
         shiny::observe({
