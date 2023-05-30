@@ -16,12 +16,12 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     date_strings <- lubridate::as_date(cleaned_names, format = date_format)
     date_strings <- base::sort(date_strings)
 
-    # if (any(is.na(lubridate::parse_date_time(names(raster_data), orders = date_format)))) {
-    #     stop(paste(
-    #         "Unable to parse dates from layer names. Please ensure they are named correctly",
-    #         "or pass the date_format argument with the correct format."
-    #     ))
-    # }
+    if (any(is.na(date_strings))) {
+        stop(paste(
+            "Unable to parse dates from layer names. Please ensure they are named correctly",
+            "or pass the date_format argument with the correct format."
+        ))
+    }
 
     # We want to be able to lookup the RasterLayer names using the date so we create a list
     date_list <- as.list(base::sort(names(raster_data)))
