@@ -3,10 +3,11 @@
 #' @param raster_data Raster data in the form or a RasterStack or RasterBrick
 #' @param polygon_data Polygon data to plot on map
 #' @param date_format A date format that will be passed in to lubridate::as_date
+#' @param palette Colour palette to use
 #'
 #' @return shinyApp
 #' @keywords internal
-raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL) {
+raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL, palette = NULL) {
     # TODO - can we check the projection of the data?
     # TODO - check projection of the polygon data? Or require users to do this?
     # Remove any letters from the names of the RasterLayers
@@ -37,7 +38,13 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     valid_layers <- list("raster")
     if (!is.null(polygon_data)) valid_layers <- append("polygon", valid_layers)
 
-
+    # # Get the colour palettes from RColorBrewer2
+    # palettes = list()
+    
+    # brewer_palettes = RColorBrewer::brewer.pal.info
+    # diverging = brewer_palettes[brewer_palettes$cat == "div",]
+    # sequential = brewer_palettes[brewer_palettes$cat == "seq",]
+    # qualitative = brewer_palettes[brewer_palettes$cat == "qual",]
 
     # Define UI for application that draws a histogram
     ui <- shiny::fillPage(
@@ -76,7 +83,11 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                     max = 1,
                     value = 0.6
                 ),
-                shiny::checkboxInput(inputId = "legend", label = "Show legend", value = TRUE)
+                shiny::checkboxInput(
+                    inputId = "legend",
+                    label = "Show legend",
+                    value = TRUE
+                )
             ),
             shiny::mainPanel(
                 shiny::column(
@@ -124,14 +135,12 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         })
 
         colour_palette <- shiny::reactive({
-            leaflet::colorNumeric(colour_scheme(), raster_values())
+            leaflet::colorNumeric(palette = colour_scheme(), domain = raster_values())
         })
 
         output$map <- leaflet::renderLeaflet({
             leaflet::leaflet() %>% leaflet::fitBounds(lng1 = long_min, lat1 = lat_min, lng2 = long_max, lat2 = lat_max)
         })
-
-
 
         shiny::observe({
             m <- leaflet::leafletProxy("map")
