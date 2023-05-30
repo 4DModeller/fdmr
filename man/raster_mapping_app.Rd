@@ -4,7 +4,12 @@
 \alias{raster_mapping_app}
 \title{Shiny app for plotting raster and polygon data on a leaflet map.}
 \usage{
-raster_mapping_app(raster_data = NULL, polygon_data = NULL, date_format = NULL)
+raster_mapping_app(
+  raster_data = NULL,
+  polygon_data = NULL,
+  date_format = NULL,
+  palette = NULL
+)
 }
 \arguments{
 \item{raster_data}{Raster data in the form or a RasterStack or RasterBrick}
@@ -12,6 +17,8 @@ raster_mapping_app(raster_data = NULL, polygon_data = NULL, date_format = NULL)
 \item{polygon_data}{Polygon data to plot on map}
 
 \item{date_format}{A date format that will be passed in to lubridate::as_date}
+
+\item{palette}{Colour palette to use}
 }
 \value{
 shinyApp

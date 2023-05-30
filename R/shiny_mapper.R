@@ -38,20 +38,6 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     valid_layers <- list("raster")
     if (!is.null(polygon_data)) valid_layers <- append("polygon", valid_layers)
 
-    # So user can either
-    # # Get the colour palettes from RColorBrewer2
-    palettes <- list()
-
-
-    # brewer_palettes =
-    # diverging = brewer_palettes[brewer_palettes$cat == "div",]
-    # sequential = brewer_palettes[brewer_palettes$cat == "seq",]
-    # qualitative = brewer_palettes[brewer_palettes$cat == "qual",]
-
-
-    #   rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
-    # ),
-
     default_colours <- rownames(RColorBrewer::brewer.pal.info[brewer_palettes$cat == "seq", ])
 
     # Define UI for application that draws a histogram
@@ -161,7 +147,12 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
         })
 
         colour_palette <- shiny::reactive({
-            leaflet::colorNumeric(palette = colour_scheme(), domain = raster_values())
+            if (is.null(palette)) {
+                pal <- leaflet::colorNumeric(palette = colour_scheme(), domain = raster_values())
+            } else {
+                pal <- palette
+            }
+            pal
         })
 
         output$map <- leaflet::renderLeaflet({
