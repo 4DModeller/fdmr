@@ -1,7 +1,8 @@
 #' Create a simple Leaflet map from data
 #'
-#' @param data Data to plot
+#' @param data Polygon data
 #' @param domain Domain for map
+#' @param markers A vector of lists with lat/long and names for markers on the map
 #' @param palette Palette, for example YlOrRd or Reds
 #' @param legend_values Values for legend
 #' @param legend_title Title for legend
@@ -12,8 +13,9 @@
 #' @return NULL
 #' @export
 #' @importFrom magrittr %>%
-plot_map <- function(data,
-                     domain,
+plot_map <- function(data = NULL,
+                     markers = NULL,
+                     domain = NULL,
                      palette = "YlOrRd",
                      colour = "grey",
                      legend_values = NULL,
@@ -21,31 +23,38 @@ plot_map <- function(data,
                      add_scale_bar = FALSE,
                      polygon_fill_opacity = 0.75,
                      fill_colour_weight = 1.0) {
-  require_package(pkg_name = "leaflet")
+  require_packages(packages = "leaflet")
 
-  colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+  # colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
 
-  leaflet::leaflet(data = data) %>%
-    leaflet::addTiles() %>%
-    leaflet::addPolygons(
-      fillColor = ~ colours(domain), color = colour, weight = fill_colour_weight,
-      fillOpacity = polygon_fill_opacity
-    ) %>%
-    {
-      if (add_scale_bar) leaflet::addScaleBar(., position = "bottomleft") else .
-    } %>%
-    {
-      if (!is.null(legend_values)) {
-        leaflet::addLegend(.,
-          pal = colours,
-          values = legend_values,
-          opacity = 0.8,
-          title = legend_title
-        )
-      } else {
-        .
-      }
-    }
+  m <- leaflet::leaflet()
+  m <- leaflet::addTiles(m)
+
+  m <- leaflet::addPolygons(m,
+    data = data,
+    # fillColor = ~colours(domain), color = colour, weight = fill_colour_weight,
+    # fillColor = ~colours(), color = colour, weight = fill_colour_weight,
+    fillColor = "red",
+    fillOpacity = polygon_fill_opacity
+  )
+
+  if (!is.null(markers)) {
+    m <- leaflet::addMarkers(m, lng = markers$longitude, lat = markers$latitude, label = markers$label)
+  }
+
+  if (add_scale_bar) {
+    m <- leaflet::addScaleBar(m, position = "bottomleft")
+  }
+
+  # if (!is.null(legend_values)) {
+  #   m <- leaflet::addLegend(m,
+  #     pal = colours,
+  #     values = legend_values,
+  #     opacity = 0.8,
+  #     title = legend_title
+  #   )
+  # }
+  return(m)
 }
 
 #' Return tile data

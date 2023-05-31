@@ -58,6 +58,23 @@ stream_gauge_14 <- list(longitude=6.7897968, latitude=59.7531662, name="Stream G
 
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 
+```
+We want to mark the position of the dam and the stream gauges on the map so we'll create a data.frame to pass into the `plot_map`
+function with the names and positions.
+
+
+
+```{r}
+markers <- data.frame(latitude = c(59.490720, 59.5815849, 59.7531662),
+                    longitude = c(6.517174, 6.5395789, 6.7897968),
+                    label = c("Suldalsvatnet Dam", "Stream Gauge 13", "Stream Gauge"))
+```
+
+
+```{r}
+fdmr::plot_map(data=sfc, markers=markers)
+```
+```{r}
 leaflet(sfc, height = 500, width = 750) %>%
   addTiles() %>%
   addPolygons(stroke = FALSE, smoothFactor = 0.3,
