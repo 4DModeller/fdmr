@@ -30,6 +30,7 @@ plot_map <- function(polygon_data = NULL,
 
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
+  m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
 
   if (!is.null(colour_domain)) {
     colours <- leaflet::colorNumeric(palette = palette, domain = colour_domain, reverse_colours = FALSE)
@@ -62,6 +63,12 @@ plot_map <- function(polygon_data = NULL,
       title = legend_title
     )
   }
+
+  m <- leaflet::addLayersControl(m,
+    position = "topright",
+    baseGroups = c("OSM", "Satellite"),
+    options = leaflet::layersControlOptions(collapsed = FALSE)
+  )
   return(m)
 }
 
