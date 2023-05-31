@@ -161,7 +161,7 @@ pixel_dist_gauge<-data.frame(x=pixel_coords[,1],
 
 
 ```{r}
-for (i in seq_along(nrow(pixel_coords))) {
+for (i in seq_len(nrow(pixel_coords))) {
   pixel_dist_gauge$dist_s1[i]<-sqrt((pixel_dist_gauge$x[i]-s13$x)^2 + (pixel_dist_gauge$y[i]-s13$y)^2)
   
   pixel_dist_gauge$dist_s2[i]<-sqrt((pixel_dist_gauge$x[i]-s14$x)^2 + (pixel_dist_gauge$y[i]-s14$y)^2)
