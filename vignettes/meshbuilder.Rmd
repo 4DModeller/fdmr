@@ -1,0 +1,37 @@
+---
+title: "Mesh building"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Hydrology}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Here we'll cover building a mesh from some spatial data.
+We'll first load in some spatial data to create the mesh.
+
+```{r}
+sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
+```
+
+<!-- initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
+
+# max_edge <- initial_range / 8
+
+# mesh <- INLA::inla.mesh.2d(
+#   loc = sp_data@data[, c("LONG", "LAT")],
+#   max.edge = c(1, 2) * max_edge,
+#   offset = c(initial_range / 4, initial_range),
+#   cutoff = max_edge / 7
+# )
+ -->
+
+Let's start the mesh builder app and pass it the spatial data we just loaded.
+
+```{r}
+loc_data = sp_data@data[, c("LONG", "LAT")]
+```
+
+```{r}
+fdmr::mesh_builder(location_data=loc_data)
+```
