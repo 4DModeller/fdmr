@@ -5,21 +5,26 @@
 \title{Create a simple Leaflet map from data}
 \usage{
 plot_map(
-  data,
-  domain,
+  polygon_data = NULL,
+  colour_domain = NULL,
+  markers = NULL,
   palette = "YlOrRd",
-  colour = "grey",
+  line_colour = "grey",
   legend_values = NULL,
   legend_title = NULL,
   add_scale_bar = FALSE,
-  polygon_fill_opacity = 0.75,
+  reverse_colours = FALSE,
+  fill_opacity = 0.75,
+  fill_colour = "#ba2d2d",
   fill_colour_weight = 1
 )
 }
 \arguments{
-\item{data}{Data to plot}
+\item{polygon_data}{Polygon data}
 
-\item{domain}{Domain for map}
+\item{colour_domain}{Colour domain for polygon on map}
+
+\item{markers}{A data.frame containing latitude, longitude and label columns}
 
 \item{palette}{Palette, for example YlOrRd or Reds}
 
@@ -29,9 +34,11 @@ plot_map(
 
 \item{add_scale_bar}{Add scale bar if TRUE}
 
-\item{polygon_fill_opacity}{Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons}
+\item{fill_colour}{Fill colour of polygon, overriden if colour_domain is passed}
 
 \item{fill_colour_weight}{Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons}
+
+\item{polygon_fill_opacity}{Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons}
 }
 \description{
 Create a simple Leaflet map from data

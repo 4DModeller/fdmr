@@ -38,7 +38,8 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     valid_layers <- list("raster")
     if (!is.null(polygon_data)) valid_layers <- append("polygon", valid_layers)
 
-    default_colours <- rownames(RColorBrewer::brewer.pal.info[brewer_palettes$cat == "seq", ])
+    brewer_palettes <- RColorBrewer::brewer.pal.info
+    default_colours <- rownames(brewer_palettes[brewer_palettes$cat == "seq", ])
 
     # Define UI for application that draws a histogram
     ui <- shiny::fillPage(

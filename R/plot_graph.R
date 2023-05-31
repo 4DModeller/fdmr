@@ -26,11 +26,29 @@ plot_barchart <- function(data, x, y, breaks, x_label, y_label, fill = "pink", c
 }
 
 
+# #' Create a timeseries plot using ggplot2
+# #' Note that the x-axis will be converted to Date objects
+# #'
+# #' @param data Data to plot
+# #' @param x Name of datetime column
+# #' @param y Name of y column
+# #' @param x_label x-axis label
+# #' @param y_label y-axis label
+# #' @param line_colour Line colour
+# #' @param line_width Line width
+# #'
+# #' @return ggplot
+# #' @export
+# plot_timeseries <- function(data, x, y, x_label, y_label, line_colour = "red", line_width = 1) {
+#   ggplot2::ggplot(data, ggplot2::aes(x = as.Date(.data[[x]]), y = .data[[y]])) +
+#   ggplot2::geom_line(color = line_colour, size=line_width) +
+#   ggplot2::labs(x = x_label, y = y_label)
+# }
 
 #' Plot a boxplot using ggplot2
 #'
 #' @param data Data to plot
-#' @param x x-axis data
+#' @param x x-axis data 
 #' @param y y-axis data
 #' @param breaks Break points
 #' @param x_label x-axis label
@@ -65,12 +83,13 @@ plot_boxplot <- function(data, x, y, breaks, x_label, y_label) {
 #' Plot timeseries data
 #'
 #' @param data Data to plot
-#' @param x x-axis data
-#' @param y y-axis data
+#' @param x Name of column to plot on x-axis, should be datetime, will be converted to Dates using as.Date
+#' @param y Name of column to plot on y-axis
 #' @param breaks Date break points
 #' @param x_label x-axis label
 #' @param y_label y-axis label
 #' @param title Figure title
+#' @param line_width Line width
 #' @param line_colour Line colour
 #' @param horizontal_y y-intercept for horizontal line
 #' @param vertical_x x-intercept for vertical line
@@ -79,8 +98,10 @@ plot_boxplot <- function(data, x, y, breaks, x_label, y_label) {
 #'
 #' @return ggplot
 #' @export
-plot_timeseries <- function(data, x, y,
-                            breaks,
+plot_timeseries <- function(data,
+                            x,
+                            y,
+                            breaks = NULL,
                             x_label = NULL,
                             y_label = NULL,
                             title = NULL,
@@ -89,10 +110,11 @@ plot_timeseries <- function(data, x, y,
                             vertical_x = NULL,
                             x_lim = NULL,
                             y_lim = NULL) {
-  lineplot <- ggplot2::ggplot() +
+  lineplot <- ggplot2::ggplot(data) +
     ggplot2::geom_line(
-      ggplot2::aes(x = x, y = y, group = 1),
-      color = line_colour
+      ggplot2::aes(x = as.Date(.data[[x]]), y = .data[[y]], group = 1),
+      color = line_colour,
+      size = 1,
     ) +
     ggplot2::theme_bw() +
     ggplot2::theme(
@@ -102,8 +124,11 @@ plot_timeseries <- function(data, x, y,
         hjust = 1,
         size = 7
       )
-    ) +
-    ggplot2::scale_x_date(date_labels = "%Y-%m-%d", breaks = breaks)
+    )
+
+  if (!is.null(breaks)) {
+    lineplot <- lineplot + ggplot2::scale_x_date(date_labels = "%Y-%m-%d", breaks = breaks)
+  }
 
   if (!is.null(x_label)) {
     lineplot <- lineplot + ggplot2::xlab(x_label)

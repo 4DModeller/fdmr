@@ -37,7 +37,7 @@ Next we'll use `get_tutorial_datapath` to get the path to the data files.
 norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
 streamdata_13 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_13.csv")
 streamdata_14 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_14.csv")
-era5_location <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
+
 ```
 
 ## Kvilldal dam area
@@ -72,19 +72,7 @@ markers <- data.frame(latitude = c(59.490720, 59.5815849, 59.7531662),
 
 
 ```{r}
-fdmr::plot_map(data=sfc, markers=markers)
-```
-```{r}
-leaflet(sfc, height = 500, width = 750) %>%
-  addTiles() %>%
-  addPolygons(stroke = FALSE, smoothFactor = 0.3,
-              fillColor = "red",
-              fillOpacity = 0.5) %>%
-  addTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-           attribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community') %>%
-  addMarkers(lat=suldalsvatnet_dam$latitude, lng=suldalsvatnet_dam$longitude, popup=suldalsvatnet_dam$name) %>%
-  addMarkers(lat=stream_gauge_13$latitude, lng=stream_gauge_13$longitude, popup=stream_gauge_13$name) %>%
-  addMarkers(lat=stream_gauge_14$latitude, lng=stream_gauge_14$longitude, popup=stream_gauge_14$name)
+fdmr::plot_map(polygon_data=sfc, markers=markers, fill_opacity = 0.5)
 ```
 
 On the map you can see the dam, the resevoir, the catchment area, and the two stream gauges.
@@ -107,51 +95,43 @@ data_14$date <- as.Date(data_14$time)
 data_14 <- subset(data_14, date >= "2021-10-01" & date <= "2021-10-31")
 row.names(data_14) <- NULL
 data_14$time_index <- seq(1, 31, 1)
+```
 
-# Create a line plot using ggplot2
-ggplot(data_13, aes(x = as.Date(time), y = value)) +
-  geom_line(color = "violet") +
-  labs(x = "Time", y = "Stream Flow : Daily Average (Liter/s)")
-ggplot(data_14, aes(x = as.Date(time), y = value)) +
-  geom_line(color = "limegreen") +
-  labs(x = "Time", y = "Stream Flow : Daily Average (Liter/s)")
+We can plot the average stream flow using `plot_timeseries`
+```{r}
+fdmr::plot_timeseries(data=data_13, x="time", y="value", x_label="Time", y_label="Stream Flow: Daily Average (Liter/s)", line_colour="violet")
+fdmr::plot_timeseries(data=data_14, x="time", y="value", x_label="Time", y_label="Stream Flow: Daily Average (Liter/s)", line_colour="limegreen")
+```
 
-# we rescale the data with the zscore since hte values are so
-# different between the two stream gauges
+We rescale the data with the zscore since the values are so different between the two stream gauge s
+
+```{r}
 data_13$value <- scale(data_13$value)
 data_14$value <- scale(data_14$value)
 ```
 
-You can see, these two different stream gauges record a very different amount of stream flow. Therefore we should likely normalize this data using the zscore
-
-
+You can see, these two different stream gauges record a very different amount of stream flow. Therefore we should likely normalize this data using the zscore.
 The response variable in this study is the stream flow measurement. The amount of water that passes through the stream gauge is representative of the amount of water that will accumulate in the resevoir. Thus, in order to understand how this changes over time, it will be important to understand what physical processes drive water into the streams that feed the resevoir.
 
 ## ERA5-land data
 
 [ERA5-land data includes many variables](https://www.ecmwf.int/en/era5-land). Here we use only the daily precipitation data. [ERA5-land precipitation](https://codes.ecmwf.int/grib/param-db/?id=228) comes from reanalysis of the climate model.
-
-ERA5-land data is gridded however we need the data to be assigned to catchment shapes.
+ERA5-land data is gridded however we need the data to be assigned to catchment shapes. We'll first load in the data, ensure it is projected using the correct coordinate reference system (CRS) and then plot it on a map.
 
 ```{r error = TRUE,warning=FALSE}
-# TODO : mapping function here too
-
+era5_location <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
 era5_precip <- raster::stack(era5_location)
 era5_precip %>% raster::values() %>% raster::hist(main="Total Precipitation", col="violet")
 
 sr <- "+proj=utm +zone=32"
 projected_raster <- raster::projectRaster(era5_precip, crs = sr)
 
-crop_era5 <- raster::mask(projected_raster, norway_polygon)
-crop_era5 <- terra::crop(crop_era5, raster::extent(norway_polygon), snap="near")
+era5_precip_cropped <- raster::mask(projected_raster, norway_polygon)
+era5_precip_cropped <- terra::crop(era5_precip_cropped, raster::extent(norway_polygon), snap="near")
+```
 
-leaflet::leaflet(sfc, width=750, height=500) %>% 
-  leaflet::addTiles() %>%
-  leaflet::addRasterImage(x = crop_era5$X2021.10.01, 
-                 opacity = 1) %>%
-  leaflet::addPolygons(stroke = FALSE, smoothFactor = 0.3,
-              fillColor = "red",
-              fillOpacity = 0.5)
+```{r}
+fdmr::plot_interactive_map(raster_data=era5_precip_cropped, polygon_data=sfc)
 ```
 
 Create a data frame rsdf containing precipitation data

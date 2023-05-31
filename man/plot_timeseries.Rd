@@ -2,8 +2,24 @@
 % Please edit documentation in R/plot_graph.R
 \name{plot_timeseries}
 \alias{plot_timeseries}
-\title{Plot timeseries data}
+\title{Create a timeseries plot using ggplot2
+Note that the x-axis will be converted to Date objects}
 \usage{
+plot_timeseries(
+  data,
+  x,
+  y,
+  breaks,
+  x_label = NULL,
+  y_label = NULL,
+  title = NULL,
+  line_colour = "blue",
+  horizontal_y = NULL,
+  vertical_x = NULL,
+  x_lim = NULL,
+  y_lim = NULL
+)
+
 plot_timeseries(
   data,
   x,
@@ -43,10 +59,17 @@ plot_timeseries(
 \item{x_lim}{Limits for x-axis continous scale, vector passed to scale_x_continuous}
 
 \item{y_lim}{Limits for y-axis continuous scale, vector passed to scale_y_continous}
+
+\item{line_width}{Line width}
 }
 \value{
 ggplot
+
+ggplot
 }
 \description{
+Create a timeseries plot using ggplot2
+Note that the x-axis will be converted to Date objects
+
 Plot timeseries data
 }
