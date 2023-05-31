@@ -2,29 +2,13 @@
 % Please edit documentation in R/plot_graph.R
 \name{plot_timeseries}
 \alias{plot_timeseries}
-\title{Create a timeseries plot using ggplot2
-Note that the x-axis will be converted to Date objects}
+\title{Plot timeseries data}
 \usage{
 plot_timeseries(
   data,
   x,
   y,
-  breaks,
-  x_label = NULL,
-  y_label = NULL,
-  title = NULL,
-  line_colour = "blue",
-  horizontal_y = NULL,
-  vertical_x = NULL,
-  x_lim = NULL,
-  y_lim = NULL
-)
-
-plot_timeseries(
-  data,
-  x,
-  y,
-  breaks,
+  breaks = NULL,
   x_label = NULL,
   y_label = NULL,
   title = NULL,
@@ -38,9 +22,9 @@ plot_timeseries(
 \arguments{
 \item{data}{Data to plot}
 
-\item{x}{x-axis data}
+\item{x}{Name of column to plot on x-axis, should be datetime, will be converted to Dates using as.Date}
 
-\item{y}{y-axis data}
+\item{y}{Name of column to plot on y-axis}
 
 \item{breaks}{Date break points}
 
@@ -64,12 +48,7 @@ plot_timeseries(
 }
 \value{
 ggplot
-
-ggplot
 }
 \description{
-Create a timeseries plot using ggplot2
-Note that the x-axis will be converted to Date objects
-
 Plot timeseries data
 }

@@ -13,10 +13,10 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     # Remove any letters from the names of the RasterLayers
     cleaned_names <- stringr::str_replace_all(names(raster_data), pattern = "[A-Za-z]", replacement = "")
     # Create Date objects
-    date_strings <- lubridate::as_date(cleaned_names, format = date_format)
-    date_strings <- base::sort(date_strings)
+    dates <- lubridate::as_date(cleaned_names, format = date_format)
+    dates <- base::sort(dates)
 
-    if (any(is.na(date_strings))) {
+    if (any(is.na(dates))) {
         stop(paste(
             "Unable to parse dates from layer names. Please ensure they are named correctly",
             "or pass the date_format argument with the correct format."
@@ -26,7 +26,7 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
     # We want to be able to lookup the RasterLayer names using the date so we create a list
     date_list <- as.list(base::sort(names(raster_data)))
     # Then we assign the date strings we'll use in the UI as the name (or key) for each element in the list
-    names(date_list) <- date_strings
+    names(date_list) <- dates
 
     # Get the extent of the RasterLayer in lat/long
     raster_extents <- raster::extent(raster::projectRaster(raster_data, crs = "+proj=longlat"))
@@ -101,9 +101,9 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
                         shiny::sliderInput(
                             inputId = "date_slider",
                             label = "Date",
-                            min = as.Date(min(date_strings)),
-                            max = as.Date(max(date_strings)),
-                            value = as.Date(min(date_strings[[1]])),
+                            min = as.Date(min(dates)),
+                            max = as.Date(max(dates)),
+                            value = as.Date(min(dates[[1]])),
                             timeFormat = "%F"
                         )
                     )

@@ -2,6 +2,7 @@
 
 export(get_tutorial_datapath)
 export(load_tutorial_data)
+export(numbers_only)
 export(plot_barchart)
 export(plot_boxplot)
 export(plot_interactive_map)
@@ -12,4 +13,5 @@ export(plot_map_raster)
 export(plot_mesh)
 export(plot_timeseries)
 export(retrieve_tutorial_data)
+export(to_dates)
 importFrom(magrittr,"%>%")

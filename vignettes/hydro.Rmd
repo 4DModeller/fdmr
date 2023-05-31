@@ -34,10 +34,9 @@ fdmr::retrieve_tutorial_data(dataset = "hydro")
 Next we'll use `get_tutorial_datapath` to get the path to the data files.
 
 ```{r}
-norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
+poly_path <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
 streamdata_13 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_13.csv")
 streamdata_14 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_14.csv")
-
 ```
 
 ## Kvilldal dam area
@@ -46,42 +45,39 @@ First we will look at the location of the dam by making a map and plotting the s
 
 ```{r error=TRUE,warning=FALSE}
 # TODO : here is a good example for the map function
-norway_polygon <- rgdal::readOGR(norway_polygon_location)
+norway_polygon <- rgdal::readOGR(poly_path)
 norway_polygon <- sf::st_as_sf(norway_polygon
                                , coords=c("longitude", "latitude")
                                , crs="+proj=utm +zone=32")
 
-suldalsvatnet_dam <- list(longitude=6.517174, latitude=59.490720, name="Suldalsvatnet Dam")
-stream_gauge_13 <- list(longitude=6.5395789, latitude=59.5815849, name="Stream Gauge 13")
-stream_gauge_14 <- list(longitude=6.7897968, latitude=59.7531662, name="Stream Gauge 14")
 
 
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
-
 ```
 We want to mark the position of the dam and the stream gauges on the map so we'll create a data.frame to pass into the `plot_map`
 function with the names and positions.
 
-
-
 ```{r}
-markers <- data.frame(latitude = c(59.490720, 59.5815849, 59.7531662),
-                    longitude = c(6.517174, 6.5395789, 6.7897968),
-                    label = c("Suldalsvatnet Dam", "Stream Gauge 13", "Stream Gauge"))
+suldalsvatnet_dam <- list(longitude=6.517174, latitude=59.490720, name="Suldalsvatnet Dam")
+stream_gauge_13 <- list(longitude=6.5395789, latitude=59.5815849, name="Stream Gauge 13")
+stream_gauge_14 <- list(longitude=6.7897968, latitude=59.7531662, name="Stream Gauge 14")
+
+points <- list(suldalsvatnet_dam, stream_gauge_13, stream_gauge_14)
+markers <- dplyr::bind_rows(points)
 ```
 
+We're now ready to plot the map, passing in the polygon data, markers and optionally the fill opacity.
 
 ```{r}
 fdmr::plot_map(polygon_data=sfc, markers=markers, fill_opacity = 0.5)
 ```
 
 On the map you can see the dam, the resevoir, the catchment area, and the two stream gauges.
-
 The area inside the shape is where water accumulates, the area outside of the boundary has water that goes elsewhere. This will be important later when we are including ERA5-land precipitation data. 
 
 ## Stream gauge data
 
-The stream gauge data is measured as the average daily liters/second that pass through the area. This data goes back for many years, sometimes decades. See below:
+The stream gauge data is measured as the average daily liters/second that pass through the area. This data goes back for many years, sometimes decades, so we'll take a subset of the data for October 2021.
   
 ```{r error=TRUE, fig.align='center', fig.width=7}
 data_13 <- read.csv(streamdata_13)
@@ -97,13 +93,14 @@ row.names(data_14) <- NULL
 data_14$time_index <- seq(1, 31, 1)
 ```
 
-We can plot the average stream flow using `plot_timeseries`
+We can now plot the average stream flow using `plot_timeseries`
+
 ```{r}
 fdmr::plot_timeseries(data=data_13, x="time", y="value", x_label="Time", y_label="Stream Flow: Daily Average (Liter/s)", line_colour="violet")
 fdmr::plot_timeseries(data=data_14, x="time", y="value", x_label="Time", y_label="Stream Flow: Daily Average (Liter/s)", line_colour="limegreen")
 ```
 
-We rescale the data with the zscore since the values are so different between the two stream gauge s
+We rescale the data with the Z-score since the values are so different between the two stream gauges
 
 ```{r}
 data_13$value <- scale(data_13$value)
@@ -111,7 +108,8 @@ data_14$value <- scale(data_14$value)
 ```
 
 You can see, these two different stream gauges record a very different amount of stream flow. Therefore we should likely normalize this data using the zscore.
-The response variable in this study is the stream flow measurement. The amount of water that passes through the stream gauge is representative of the amount of water that will accumulate in the resevoir. Thus, in order to understand how this changes over time, it will be important to understand what physical processes drive water into the streams that feed the resevoir.
+The response variable in this study is the stream flow measurement. The amount of water that passes through the stream gauge is representative of the amount of water that will accumulate in the resevoir. 
+Thus, in order to understand how this changes over time, it will be important to understand what physical processes drive water into the streams that feed the resevoir.
 
 ## ERA5-land data
 
@@ -130,24 +128,28 @@ era5_precip_cropped <- raster::mask(projected_raster, norway_polygon)
 era5_precip_cropped <- terra::crop(era5_precip_cropped, raster::extent(norway_polygon), snap="near")
 ```
 
+Now we've ensured everything is projected correctly we can use `plot_interactive_map` to plot the `RasterBrick` and the catchment area polygon. This loads a Shiny app that allows the selection of layers
+in the `RasterBrick` using a date slider. It also allows you to update the properties of the objects plotted on the map and the map tiles.
+
 ```{r}
 fdmr::plot_interactive_map(raster_data=era5_precip_cropped, polygon_data=sfc)
 ```
 
-Create a data frame rsdf containing precipitation data
+Next we create a data.frame `raster_df` containing precipitation data. We convert the `RasterBrick` of precipitation data we just plotted into a `data.frame`. We then want to get only the day component from the date of each date. If we have a look at the
+names of each layer in the `RasterBrick` you can see that each is prepended with an X, this is due to `raster` not allowing layer names that start with numbers. First we need to remove the X, which we do with `numbers_only`. Then we convert the 
+strings to `Date` objects using `to_dates` before finally using `lubridate::day` to get just the day component of the date. Finally, we set the names of the columns in the `data.frame`.
 
 ```{r error=TRUE}
-rsdf <- data.frame(rasterToPoints(crop_era5))
-rsdf <- melt(setDT(rsdf), id.vars=c("x","y"), variable.name = "time")
-rsdf$time <- sapply(rsdf$time, function(t) {
-  as.integer(strsplit(as.character(t), '\\.')[[1]][3])
-})
-rsdf <- setNames(rsdf, c('x', 'y', 'time', 'precip'))
+raster_df <- data.frame(raster::rasterToPoints(era5_precip_cropped))
+raster_df <- data.table::melt(data.table::setDT(raster_df), id.vars=c("x","y"), variable.name = "time")
+
+raster_df$time <- lubridate::day(fdmr::to_dates(fdmr::numbers_only(raster_df$time)))
+
+raster_df <- setNames(raster_df, c('x', 'y', 'time', 'precip'))
 ```
 
-
-We need to figure out which ERA5 precipitation pixels are closest to which stream gauge so we can match the data for the regression. First we need to calculate the distance between the pixel and each stream gauge, then use the minimum distance to choose the stream gauge. We first create a function that converts latlong to utm coordinate reference system
-
+We need to figure out which ERA5 precipitation pixels are closest to which stream gauge so we can match the data for the regression. First we need to calculate the distance 
+between the pixel and each stream gauge, then use the minimum distance to choose the stream gauge. We first create a function that converts latlong to utm coordinate reference system
 
 ```{r error=TRUE, latlong2utm}
 # TODO : this needs to be moved to 4dm
@@ -173,7 +175,7 @@ latlong_to_utm <- function(lat, lon) {
 Now we can match the pixel precipation data to the nearest stream gauge.
 
 ```{r error=TRUE, matchpixel}
-pixel_coords <- unique(sp::coordinates(crop_era5))
+pixel_coords <- unique(sp::coordinates(era5_precip_cropped))
 s13_utm <- latlong_to_utm(lat=stream_gauge_13$latitude
                           ,lon=stream_gauge_13$longitude)
 s14_utm <- latlong_to_utm(lat=stream_gauge_14$latitude
@@ -241,11 +243,11 @@ Create the triangulated mesh of the study region
 
 ```{r error=TRUE,warning=FALSE, fig.width=7, fig.height=7}
 # TODO : it would be nice to map the mesh onto the dataset using the mapmaker function i am suggesting
-e <- crop_era5@extent
-resolution <- res(crop_era5)
+e <- era5_precip_cropped@extent
+resolution <- res(era5_precip_cropped)
 xres <- resolution[1]*2
 yres <- resolution[2]*2
-xy <- sp::coordinates(crop_era5)
+xy <- sp::coordinates(era5_precip_cropped)
 
 # maybe this makes the mesh smaller lol
 xy <- xy[seq(1, nrow(xy), by = 2), ]
