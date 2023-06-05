@@ -2,18 +2,17 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main, devel]
   pull_request:
-    branches: [main, master]
+    branches: [main, devel]
 
 name: R-CMD-check
 
 jobs:
   R-CMD-check:
+    if: github.event.pull_request.draft == false
     runs-on: ${{ matrix.config.os }}
-
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
     strategy:
       fail-fast: false
       matrix:
@@ -32,6 +31,7 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+          extra-repositories: https://inla.r-inla-download.org/R/stable
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
