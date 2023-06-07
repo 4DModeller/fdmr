@@ -63,7 +63,7 @@ w<-nb2mat(W.nb,style = 'B')
 ```
 
 # Model specification 
-We use a Bayesian hierarchical model to predict the spatial COVID-19 infection rate at the MSOA level in England. Let $Y_{i}$ denote the total number of reported COVID cases for neighbourhood $i=1,\ldots, n(=6789)$ during the study period, and $N_{i}$ denote the (official) estimated population living in MSOA $i$. $Y_{i}$ is assumed to have a Poisson distribution with parameters ($N_{i}$, $\theta_{i}$), where $\theta_{i}$ is the true unobserved COVID-19 infection rate in MSAO $i$. We follow a standard path in modelling $\theta_{i}$ with a log link to the Poisson and start with a model where the linear predictor decomposes additively into a set of covariates and a Gaussian Markov Random Field process characterising the infection of the disease after the covariate effects have been accounted for. A general Bayesian hierarchical model commonly specified is given by
+We use a Bayesian hierarchical model to predict the spatial COVID-19 infection rate at the MSOA level in England. Let $Y_{i}$ denote the total number of reported COVID cases for neighbourhood $i=1,\ldots, n(=6789)$ during the study period, and $N_{i}$ denote the (official) estimated population living in MSOA $i$. $Y_{i}$ is assumed to have a Poisson distribution with parameters ($N_{i}$, $\theta_{i}$), where $\theta_{i}$ is the true unobserved COVID-19 infection rate in MSAO $i$. We follow a standard path in modelling $\theta_{i}$ with a log link to the Poisson and start with a model where the linear predictor decomposes additively into a set of covariates and a Gaussian Markov Random Field process, which characterises the infection of the disease after the covariate effects have been accounted for. A general Bayesian hierarchical model commonly specified is given by
 
 \begin{align}
 \nonumber  Y_{i}\vert N_{i}, \theta_{i} &\sim \text{Poisson}(N_{i}\theta_{i}),\ \  i=1,\ldots,n,\\
@@ -164,7 +164,7 @@ inlabru.model<-bru(cmp, data = s_covid_cp,
 
 # Model comparison
 
-In terms of model selection criteria, we show the different values for each model based on DIC and WAIC. The model using the INLA-SPDE approach performs better than the other two models in terms of the lowest DIC and WAIC values.
+In terms of model selection criteria, we show the different values for each model based on DIC and WAIC. The model fitted using the INLA-SPDE approach performs better than the other two models in terms of the lowest DIC and WAIC values.
 
 
 ```{r modfit, error=TRUE, eval=TRUE}
