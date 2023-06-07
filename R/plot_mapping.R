@@ -9,7 +9,7 @@
 #' @param polygon_fill_opacity Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons
 #' @param fill_colour_weight Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons
 #'
-#' @return NULL
+#' @return map
 #' @export
 #' @importFrom magrittr %>%
 plot_map <- function(data,
@@ -25,25 +25,28 @@ plot_map <- function(data,
 
   colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
 
-  leaflet::leaflet(data = data) %>%
-    leaflet::addTiles() %>%
-    leaflet::addPolygons(
-      fillColor = ~ colours(domain), color = colour, weight = fill_colour_weight,
-      fillOpacity = polygon_fill_opacity
-    ) %>%
-    {
-      if (add_scale_bar) leaflet::addScaleBar(., position = "bottomleft") else .
-    } %>%
-    {
-      if (!is.null(legend_values)) {
-        leaflet::addLegend(.,
-          pal = colours,
-          values = legend_values,
-          opacity = 0.8,
-          title = legend_title
-        )
-      } else {
-        .
-      }
-    }
+  m <- leaflet::leaflet(data = data)
+  m <- leaflet::addTiles(m)
+
+
+  # leaflet::addPolygons(
+  #   fillColor = ~ colours(domain), color = colour, weight = fill_colour_weight,
+  #   fillOpacity = polygon_fill_opacity
+  # ) %>%
+  # {
+  #   if (add_scale_bar) leaflet::addScaleBar(., position = "bottomleft") else .
+  # } %>%
+  # {
+  #   if (!is.null(legend_values)) {
+  #     leaflet::addLegend(.,
+  #       pal = colours,
+  #       values = legend_values,
+  #       opacity = 0.8,
+  #       title = legend_title
+  #     )
+  #   } else {
+  #     .
+  #   }
+  # }
+  return(m)
 }
