@@ -4,7 +4,19 @@ template:
   # bootswatch: lux
   # bslib:
   #   pkgdown-nav-height: 100px
-  
+navbar:
+  structure:
+    left:  [home, articles, reference]
+    right: [github]
+  components:
+    articles:
+      text: Tutorials
+      menu:
+      - text: "COVID-19"
+        href: articles/covid.html
+      - text: "Hydrology"
+        href: articles/hydro.html
+
 authors:
   Gareth Jones:
     href: https://github.com/gareth-j/
