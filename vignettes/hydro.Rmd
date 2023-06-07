@@ -120,7 +120,9 @@ era5_precip_cropped <- terra::crop(era5_precip_cropped, raster::extent(norway_po
 Now we've ensured everything is projected correctly we can use `plot_interactive_map` to plot the `RasterBrick` and the catchment area polygon. This loads a Shiny app that allows the selection of layers
 in the `RasterBrick` using a date slider. It also allows you to update the properties of the objects plotted on the map and the map tiles.
 
-```{r}
+> **_NOTE:_**  The interactive map won't render on the web version of this notebook as it is a Shiny app. We will try and get this fixed as soon as possible.
+
+```{r eval=FALSE}
 fdmr::plot_interactive_map(raster_data=era5_precip_cropped, polygon_data=sfc)
 ```
 
