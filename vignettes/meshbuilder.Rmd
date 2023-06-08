@@ -7,24 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Here we'll cover building a mesh from some spatial data.
-We'll first load in some spatial data to create the mesh.
+Here we'll cover building a mesh from some spatial data, modifying its parameters and plotting it and the data on an interactive map.
+
+We'll first load in some spatial data to create the mesh. This is the same data we previously used in the COVID-19 tutorial.
 
 ```{r}
 sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
 ```
-
-<!-- initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
-
-# max_edge <- initial_range / 8
-
-# mesh <- INLA::inla.mesh.2d(
-#   loc = sp_data@data[, c("LONG", "LAT")],
-#   max.edge = c(1, 2) * max_edge,
-#   offset = c(initial_range / 4, initial_range),
-#   cutoff = max_edge / 7
-# )
- -->
 
 Let's start the mesh builder app and pass it the spatial data we just loaded.
 
@@ -35,3 +24,4 @@ loc_data = sp_data@data[, c("LONG", "LAT")]
 ```{r}
 fdmr::mesh_builder(location_data=loc_data)
 ```
+

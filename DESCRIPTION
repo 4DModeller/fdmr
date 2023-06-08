@@ -48,9 +48,9 @@ Imports:
     scales,
     spdep,
     gridExtra,
-    leaflet
+    leaflet,
+    archive
 Suggests: 
-    archive,
     bookdown,
     knitr,
     INLA,

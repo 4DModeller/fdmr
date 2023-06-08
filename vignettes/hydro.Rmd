@@ -118,17 +118,21 @@ ERA5-land data is gridded however we need the data to be assigned to catchment s
 
 ```{r error = TRUE,warning=FALSE}
 # TODO : mapping function here too
-era5_precip <- stack(era5_location)
-era5_precip %>% values() %>% hist(main="Total Precipitation", col="violet")
+
+era5_precip <- raster::stack(era5_location)
+era5_precip %>% raster::values() %>% raster::hist(main="Total Precipitation", col="violet")
+
 sr <- "+proj=utm +zone=32"
-projected_raster <- projectRaster(era5_precip, crs = sr)
-crop_era5 <- mask(projected_raster, norway_polygon)
-crop_era5 <- terra::crop(crop_era5, extent(norway_polygon), snap="near")
-leaflet(sfc, width=750, height=500) %>% 
-  addTiles() %>%
-  addRasterImage(x = crop_era5$X2021.10.01, 
+projected_raster <- raster::projectRaster(era5_precip, crs = sr)
+
+crop_era5 <- raster::mask(projected_raster, norway_polygon)
+crop_era5 <- terra::crop(crop_era5, raster::extent(norway_polygon), snap="near")
+
+leaflet::leaflet(sfc, width=750, height=500) %>% 
+  leaflet::addTiles() %>%
+  leaflet::addRasterImage(x = crop_era5$X2021.10.01, 
                  opacity = 1) %>%
-  addPolygons(stroke = FALSE, smoothFactor = 0.3,
+  leaflet::addPolygons(stroke = FALSE, smoothFactor = 0.3,
               fillColor = "red",
               fillOpacity = 0.5)
 ```
