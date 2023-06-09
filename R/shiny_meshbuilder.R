@@ -101,7 +101,9 @@ meshbuilder_shiny <- function(
         output$map <- leaflet::renderLeaflet({
             leaflet::leaflet(mesh_spatial()) %>%
                 leaflet::addTiles() %>%
-                leaflet::addPolygons(weight = 1, fillOpacity = 0.2)
+                leaflet::addPolygons(weight = 0.5, fillOpacity = 0.2, fillColor = "blue") %>%
+                leaflet::addPolygons(data = spatial_data, fillColor = "red", weight = 1)
+            # leaflet::addPolygons(data = spatial_data, lng = location_data$LONG, lat = location_data$LAT, fillColor = "red", color = "white", weight = 0.5)
 
             # leaflet::leaflet(mesh_spatial()) %>%
             #     leaflet::addTiles() %>%
