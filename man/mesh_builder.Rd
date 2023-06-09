@@ -4,7 +4,7 @@
 \alias{mesh_builder}
 \title{Mesh building shiny app. Creates and visualises a mesh from some spatial data.}
 \usage{
-mesh_builder(location_data)
+mesh_builder(location_data, max_edge, offset, cutoff)
 }
 \arguments{
 \item{location_data}{Spatial data}

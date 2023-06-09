@@ -21,7 +21,7 @@ plot_map <- function(data,
                      add_scale_bar = FALSE,
                      polygon_fill_opacity = 0.75,
                      fill_colour_weight = 1.0) {
-  require_package(pkg_name = "leaflet")
+  require_packages(packages = "leaflet")
 
   colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
 

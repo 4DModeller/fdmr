@@ -15,13 +15,57 @@ We'll first load in some spatial data to create the mesh. This is the same data 
 sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
 ```
 
-Let's start the mesh builder app and pass it the spatial data we just loaded.
+Let's start the mesh builder app and pass it a selection of the spatial data we just loaded. We'll select just the longitude and latitude data.
+This data will also get 
 
 ```{r}
-loc_data = sp_data@data[, c("LONG", "LAT")]
+# loc_data = sp_data@data[, c("LONG", "LAT")]
 ```
 
 ```{r}
-fdmr::mesh_builder(location_data=loc_data)
+fdmr::mesh_builder(spatial_data=sp_data)
 ```
 
+> **_NOTE:** This section will be moved into the mesh_builder app
+
+We first get the CRS of the spatial data.
+
+```{r}
+crs <- sf::st_crs(sp_data)
+crs
+```
+
+Now we're ready to build the mesh
+
+```{r}
+initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
+
+max_edge <- initial_range / 8
+
+mesh <- INLA::inla.mesh.2d(
+  loc = sp_data@data[, c("LONG", "LAT")],
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range / 4, initial_range),
+  cutoff = max_edge / 7,
+  crs = crs,
+)
+```
+
+Now we've built the mesh let's convert it to an object we can plot using `leaflet`. This gives us a list of vertices and points.
+
+```{r}
+polygon_data <- fdmr::mesh_to_spatial(mesh)
+```
+
+Let's just take the triangles first, this is a `SpatialPointDataFrame` that contains the mesh triangles.
+
+```{r}
+triangles <- polygon_data$triangles
+triangles
+```
+
+Now we can create a simple `leaflet` plot. As the mesh is quite large it may take a short while to create the plot.
+
+```{r}
+leaflet::leaflet(triangles) %>% leaflet::addTiles() %>% leaflet::addPolygons(weight=1, fillOpacity = 0.2)
+```
