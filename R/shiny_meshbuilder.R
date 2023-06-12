@@ -73,7 +73,8 @@ meshbuilder_shiny <- function(
                     inputId = "cutoff",
                     label = "Cutoff:",
                     min = 0.005, value = 0.2, max = 0.9
-                )
+                ),
+                shiny::actionButton("check_button", "Check mesh")
             ),
             shiny::mainPanel(
                 leaflet::leafletOutput("map", height = "80vh")
@@ -108,6 +109,15 @@ meshbuilder_shiny <- function(
                 leaflet::addTiles() %>%
                 leaflet::addPolygons(weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca") %>%
                 leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", weight = 1)
+        })
+
+        shiny::observeEvent(input$check_button, {
+            shiny::showModal(shiny::modalDialog(
+                "There is an error with the mesh: the error is ...",
+                title = "Mesh error",
+                easyClose = TRUE,
+                footer = NULL
+            ))
         })
 
 
