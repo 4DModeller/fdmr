@@ -22,25 +22,29 @@ Next we need to manipulate the data to ensure we plot the area correctly.
 
 ```{r}
 norway_polygon <- rgdal::readOGR(norway_polygon_location)
-norway_polygon <- sf::st_as_sf(norway_polygon
-                               , coords=c("longitude", "latitude")
-                               , crs="+proj=utm +zone=32")
+norway_polygon <- sf::st_as_sf(norway_polygon,
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
+)
 
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 
 leaflet::leaflet(sfc, height = 500, width = 750) %>%
   leaflet::addTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-           attribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community') %>%
-  leaflet::addPolygons(stroke = FALSE, smoothFactor = 0.3,
-              fillColor = "red",
-              fillOpacity = 0.5)
+    attribution = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+  ) %>%
+  leaflet::addPolygons(
+    stroke = FALSE, smoothFactor = 0.3,
+    fillColor = "red",
+    fillOpacity = 0.5
+  )
 ```
 
 > **_NOTE:_**  These functions are still a work in progress and will probably be combined into a single plot_map function once we know what interface we want
 
 
 ```{r eval=FALSE}
-fdmr::plot_map_polygon(data=sfc, tiles="satellite")
+fdmr::plot_map_polygon(data = sfc, tiles = "satellite")
 ```
 
 ## Rasters
@@ -70,7 +74,7 @@ As we only want to plot the data that overlaps with our rain catchment area poly
 
 ```{r}
 crop_era5 <- raster::mask(projected_raster, norway_polygon)
-crop_era5 <- terra::crop(crop_era5, raster::extent(norway_polygon), snap="near")
+crop_era5 <- terra::crop(crop_era5, raster::extent(norway_polygon), snap = "near")
 ```
 
 We're now read to plot the map. For the moment we only have the functionality to plot a single raster from the stack, but we're working on a `plot_interactive_map` function that will allow the dynamic selection of layers from the stack using a date slider.
@@ -82,49 +86,52 @@ raster_image <- crop_era5$X2021.10.01
 
 Now we're ready to plot the data, using the same `sfc` object we created above.
 
-```{r}
-leaflet::leaflet(sfc, width=750, height=500) %>% 
-  leaflet::addTiles() %>%
-  leaflet::addRasterImage(x = raster_image, 
-                 opacity = 1) %>%
-  leaflet::addPolygons(stroke = FALSE, smoothFactor = 0.3,
-              fillColor = "red",
-              fillOpacity = 0.5)
-```
-
-> **_NOTE:_**  These functions are still a work in progress and will probably be combined into a single plot_map function once we know what interface we want
-
 We can now plot the raster data using the `plot_map_raster` function.
 
 ```{r}
-fdmr::plot_map_raster(raster_data=raster_image, polygon_data=sfc)
+fdmr::plot_map_raster(raster_data = raster_image, polygon_data = sfc)
 ```
 
-You can test out the interactive map plotting function by running the cell below, note you'll need to have run `fdmr::retrieve_tutorial_data(dataset = "hydro")`
-before.
+## Interactive mapping
+
+You can plot data on an interactive [`leaflet`](https://rstudio.github.io/leaflet/) map using our `plot_interactive_map` function. This launches a [Shiny](https://shiny.posit.co/) app allowing you to customise your plot to better
+investigate your data.
+
+### Hydroelectric Power
+
+We want to create a plot on the map covering the rain catchment area around the power plant. To do this we read in a GeoJSON file containing the coordinates of the catchment area and make sure it's in the correct coordinate reference system to plot on our map.
 
 ```{r}
-norway_polygon_location <- fdmr::get_tutorial_datapath(filename="Kvilldal_Catch_Boundary.geojson")
+norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
 norway_polygon <- rgdal::readOGR(norway_polygon_location)
 norway_polygon <- sf::st_as_sf(norway_polygon,
-    coords = c("longitude", "latitude"),
-    crs = "+proj=utm +zone=32"
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
 )
 
-sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
+norway_polygon <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
+Next we read ECMWF Reanalysis v5 (ERA5) precipitation data from a NetCDF file.
+
 ```{r}
-  #  WIP - quick design for a slider app using the Kvilldall Catchment area data
-  # and some ERA5 precipitation data
-era5_data_filepath <- fdmr::get_tutorial_datapath(filename="era5_land_daily.nc")
+era5_data_filepath <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
 era5_precip <- raster::stack(era5_data_filepath)
 era5_precip <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
 ```
 
-```{r}
-fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = sfc)
+The data is now ready to pass to our interactive plotting function.
+
+```{r eval=FALSE}
+fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = norway_polygon)
 ```
+
+
+### Colours
+
+Colour palettes can be selected based on the type of data being plottied. Qualitative, sequential or diverging colour
+palettes can be selected using the interface.
+
 
 ## Model output
 
