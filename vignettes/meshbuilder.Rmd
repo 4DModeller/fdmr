@@ -34,8 +34,6 @@ fdmr::mesh_builder(spatial_data=sp_data, max_edge=max_edge_fin, offset=offset, c
 ```
 
 
-
-
 Now we can create a simple `leaflet` plot. As the mesh is quite large it may take a short while to create the plot.
 
 ```{r}
