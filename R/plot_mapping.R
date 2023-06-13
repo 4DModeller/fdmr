@@ -29,7 +29,7 @@ plot_map <- function(polygon_data = NULL,
   if (is.null(polygon_data) && is.null(raster_data)) {
     stop("Polygon or raster data must be given.")
   }
-  
+
   # if(is.null(colours) && is.null(domain)) {
   #   colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
   # }
@@ -78,4 +78,3 @@ plot_map <- function(polygon_data = NULL,
 
   return(m)
 }
-
