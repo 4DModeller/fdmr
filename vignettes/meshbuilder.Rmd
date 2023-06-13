@@ -32,10 +32,3 @@ Now we're ready to start the app.
 ```{r}
 fdmr::mesh_builder(spatial_data=sp_data, max_edge=max_edge_fin, offset=offset, cutoff=cutoff)
 ```
-
-
-Now we can create a simple `leaflet` plot. As the mesh is quite large it may take a short while to create the plot.
-
-```{r}
-leaflet::leaflet(triangles) %>% leaflet::addTiles() %>% leaflet::addPolygons(weight=1, fillOpacity = 0.2)
-```

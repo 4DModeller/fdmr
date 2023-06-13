@@ -2,28 +2,7 @@
 # Code for that app can be found here:
 # https://github.com/hrue/r-inla/blob/Version_23.05.22/rinla/R/meshbuilder.R
 
-# loc: the spatial locations of data points
-# max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
-# or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
-# offset: it specifies the size of the inner and outer extensions around the data locations.
-# cutoff: it defines the minimum allowed distance between data points.
 
-# mesh <- INLA::inla.mesh.2d(
-#   loc = sp_data@data[, c("LONG", "LAT")],
-#   max.edge = c(1, 2) * max_edge,
-#   offset = c(initial_range / 4, initial_range),
-#   cutoff = max_edge / 7
-
-# initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
-
-# max_edge <- initial_range / 8
-
-# mesh <- INLA::inla.mesh.2d(
-#   loc = sp_data@data[, c("LONG", "LAT")],
-#   max.edge = c(1, 2) * max_edge,
-#   offset = c(initial_range / 4, initial_range),
-#   cutoff = max_edge / 7
-# )
 
 #' Mesh building shiny app
 #'
@@ -38,13 +17,9 @@ meshbuilder_shiny <- function(
     offset = NULL,
     cutoff = NULL) {
     # TODO - these defaults need changing?
-    max_edge_default <- c(0.1, 0.3)
-    offset_default <- c(0.2, 0.7)
-    cutoff_default <- 0.2
-
-    if (is.null(max_edge)) max_edge <- max_edge_default
-    if (is.null(offset)) offset <- offset_default
-    if (is.null(cutoff)) cutoff <- cutoff_default
+    if (is.null(max_edge)) max_edge <- c(0.1, 0.3)
+    if (is.null(offset)) offset <- c(0.2, 0.7)
+    if (is.null(cutoff)) cutoff <- 0.2
 
     if (is.null(crs)) {
         crs <- sf::st_crs(spatial_data)
@@ -53,9 +28,18 @@ meshbuilder_shiny <- function(
         }
     }
 
+    # TODO - make this a bit more intelligent so we can handle differently named position data
+    got_lat_long <- all(c("LONG", "LAT") %in% names(spatial_data@data))
+    if (!got_lat_long) {
+        stop("Cannot read latitude and longitude data from spatial data.")
+    }
     # Let's extract the data we want to create the mesh
     location_data <- spatial_data@data[, c("LONG", "LAT")]
-
+    # loc: the spatial locations of data points
+    # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
+    # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
+    # offset: it specifies the size of the inner and outer extensions around the data locations.
+    # cutoff: it defines the minimum allowed distance between data points.
     ui <- shiny::fluidPage(
         shiny::sidebarLayout(
             shiny::sidebarPanel(
@@ -64,16 +48,19 @@ meshbuilder_shiny <- function(
                     label = "Max edge:",
                     min = 0.02, value = c(0.1, 0.3), max = 10
                 ),
+                shiny::p("Max permitted length for a triangle"),
                 shiny::sliderInput(
                     inputId = "offset",
                     label = "Offset:",
                     min = 0.02, value = c(0.2, 0.7), max = 10
                 ),
+                shiny::p("Specifies the size of the inner and outer extensions around data locations."),
                 shiny::sliderInput(
                     inputId = "cutoff",
                     label = "Cutoff:",
                     min = 0.005, value = 0.2, max = 0.9
                 ),
+                shiny::p("Minimum allowed distance between data points."),
                 shiny::actionButton("check_button", "Check mesh")
             ),
             shiny::mainPanel(
@@ -100,7 +87,11 @@ meshbuilder_shiny <- function(
 
         mesh_spatial <- shiny::reactive({
             shiny::withProgress(message = "Extracting mesh...", value = 0, {
-                fdmr::mesh_to_spatial(mesh = mesh())
+                # TODO - suppress the warnings for now until we can convert
+                # to functions that are PROJ6 acceptable
+                base::suppressWarnings(
+                    fdmr::mesh_to_spatial(mesh = mesh())
+                )
             })
         })
 
@@ -108,7 +99,7 @@ meshbuilder_shiny <- function(
             leaflet::leaflet(mesh_spatial()) %>%
                 leaflet::addTiles() %>%
                 leaflet::addPolygons(weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca") %>%
-                leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", weight = 1)
+                leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1)
         })
 
         shiny::observeEvent(input$check_button, {
@@ -119,42 +110,6 @@ meshbuilder_shiny <- function(
                 footer = NULL
             ))
         })
-
-
-
-        # shiny::observe({
-        #     m <- leaflet::leafletProxy("map")
-        #     m <- leaflet::addTiles(m, group = "OSM")
-        #     m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
-        #     m <- leaflet::addProviderTiles(m, leaflet::providers$CartoDB.Positron, group = "Positron")
-        #     m <- leaflet::addPolygons()
-        # })
-
-        # output$mesh_plot <- shiny::renderPlot({
-        #     shiny::withProgress(message = "Creating plot...", value = 0, {
-        #         col <- colorRampPalette(c("blue", "white", "red"))
-        #         n_col <- 1 + 64
-        #         fields::image.plot(
-        #             range(mesh_proj()$x),
-        #             range(mesh_proj()$y),
-        #             matrix(0, 2, 2),
-        #             # NOTE: this is fixed in the INLA code so I've just added it in here
-        #             # zlim <- c(0.5, 1.5)
-        #             zlim = c(0.5, 1.5),
-        #             xlim = xlim(),
-        #             ylim = ylim(),
-        #             col = col(n_col),
-        #             asp = 1,
-        #             main = "",
-        #             xlab = "Longitude", ylab = "Latitude"
-        #         )
-        #         plot(mesh(), add = TRUE)
-        #         # TODO - why are we getting errors from
-        #         # tryCatch({
-        #         # plot(mesh())
-        #         # })
-        #     })
-        # })
     }
 
     # Run the application

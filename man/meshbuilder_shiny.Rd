@@ -4,10 +4,16 @@
 \alias{meshbuilder_shiny}
 \title{Mesh building shiny app}
 \usage{
-meshbuilder_shiny(location_data, max_edge = NULL, offset = NULL, cutoff = NULL)
+meshbuilder_shiny(
+  spatial_data,
+  crs = NULL,
+  max_edge = NULL,
+  offset = NULL,
+  cutoff = NULL
+)
 }
 \arguments{
-\item{location_data}{SpatialPolygon(ish) data}
+\item{spatial_data}{Spatial data}
 }
 \value{
 shiny::app
