@@ -9,43 +9,81 @@
 #' @param polygon_fill_opacity Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons
 #' @param fill_colour_weight Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons
 #'
-#' @return NULL
+#' @return leaflet::leaflet
 #' @export
-#' @importFrom magrittr %>%
-plot_map <- function(data,
-                     domain,
-                     palette = "YlOrRd",
-                     colour = "grey",
+
+plot_map <- function(polygon_data = NULL,
+                     raster_data = NULL,
+                     domain = NULL,
+                     #  palette = "YlOrRd",
+                     #  colour = "grey",
                      legend_values = NULL,
                      legend_title = NULL,
                      add_scale_bar = FALSE,
+                     polygon_fill_colour = "red",
+                     polygon_line_colour = "blue",
                      polygon_fill_opacity = 0.75,
                      fill_colour_weight = 1.0) {
-  require_package(pkg_name = "leaflet")
+  require_packages(packages = "leaflet")
 
-  colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+  if (is.null(polygon_data) && is.null(raster_data)) {
+    stop("Polygon or raster data must be given.")
+  }
+  # if(is.null(colours) && is.null(domain)) {
+  #   colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+  # }
 
-  leaflet::leaflet(data = data) %>%
-    leaflet::addTiles() %>%
-    leaflet::addPolygons(
-      fillColor = ~ colours(domain), color = colour, weight = fill_colour_weight,
-      fillOpacity = polygon_fill_opacity
-    ) %>%
-    {
-      if (add_scale_bar) leaflet::addScaleBar(., position = "bottomleft") else .
-    } %>%
-    {
-      if (!is.null(legend_values)) {
-        leaflet::addLegend(.,
-          pal = colours,
-          values = legend_values,
-          opacity = 0.8,
-          title = legend_title
-        )
-      } else {
-        .
-      }
-    }
+  m <- leaflet::leaflet()
+  m <- leaflet::addTiles(m)
+  m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
+
+  layers <- c()
+
+  if (!is.null(polygon_data)) {
+    m <- leaflet::addPolygons(m, data = polygon_data, fillColor = polygon_fill_colour, color = polygon_line_colour, group = "Poly")
+    layers <- append(layers, "Poly")
+  }
+
+  if (!is.null(raster_data)) {
+    m <- leaflet::addRasterImage(m,
+      x = raster_data,
+      opacity = 0.75,
+      group = "Raster",
+      layerId = "raster",
+      colors = "viridis",
+    )
+    layers <- append(layers, "Raster")
+  }
+
+  m <- leaflet::addLayersControl(m,
+    position = "topright",
+    baseGroups = c("OSM", "Satellite"),
+    overlayGroups = layers,
+    options = leaflet::layersControlOptions(collapsed = FALSE)
+  )
+  # if (!is.null(polygon_data)) {
+
+  # }
+  # m <- leaflet::addPolygons(m, data = polygon_data,
+  #   fillColor = ~ colours(domain), color = colour, weight = fill_colour_weight,
+  #   fillOpacity = polygon_fill_opacity
+  # )
+  # {
+  #   if (add_scale_bar) leaflet::addScaleBar(., position = "bottomleft") else .
+  # } %>%
+  #   {
+  #     if (!is.null(legend_values)) {
+  #       leaflet::addLegend(.,
+  #         pal = colours,
+  #         values = legend_values,
+  #         opacity = 0.8,
+  #         title = legend_title
+  #       )
+  #     } else {
+  #       .
+  #     }
+  #   }
+  return(m)
 }
 
 #' Return tile data

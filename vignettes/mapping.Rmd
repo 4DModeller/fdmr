@@ -29,6 +29,12 @@ norway_polygon <- sf::st_as_sf(norway_polygon,
 
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 
+fdmr::plot_map(polygon_data = sfc)
+```
+
+
+
+```{r}
 leaflet::leaflet(sfc, height = 500, width = 750) %>%
   leaflet::addTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
@@ -89,7 +95,7 @@ Now we're ready to plot the data, using the same `sfc` object we created above.
 We can now plot the raster data using the `plot_map_raster` function.
 
 ```{r}
-fdmr::plot_map_raster(raster_data = raster_image, polygon_data = sfc)
+fdmr::plot_map(raster_data = raster_image, polygon_data = sfc)
 ```
 
 ## Interactive mapping
@@ -127,16 +133,5 @@ fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = norway_poly
 ```
 
 
-### Colours
-
-Colour palettes can be selected based on the type of data being plottied. Qualitative, sequential or diverging colour
-palettes can be selected using the interface.
-
-
-## Model output
-
-We can also plot the output of models on a map ...
-
-- What object do we expect back from the model?
 
 
