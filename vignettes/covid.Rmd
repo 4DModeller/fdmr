@@ -60,7 +60,11 @@ Now we make a map of the study region
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
 
-fdmr::plot_map(data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, fill_colour_weight = 0.6)
+# map = fdmr::plot_map(data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, fill_colour_weight = 0.6)
+
+m <- leaflet::leaflet(data = sp_data)
+m <- leaflet::addTiles(m)
+m
 ```
 
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using same process we used above.
@@ -241,18 +245,20 @@ Finally, we fit the spatio-temporal model using spde approach and AR(1) process 
 
 
 ```{r fitmodel, error=TRUE, eval=FALSE}
-inlabru_model <- bru(formula, data = covid19_data,
-                   family = "poisson",
-                   E = covid19_data$Population,
-                   control.family = list(link = "log"),
-                   control.predictor = list(link = 1),
-                   options = list(
-                     control.inla = list(
-                       reordering = "metis",
-                       int.strategy = "eb"),
-                      verbose = TRUE,
-                     inla.mode="experimental"
-                   )
+inlabru_model <- bru(formula,
+  data = covid19_data,
+  family = "poisson",
+  E = covid19_data$Population,
+  control.family = list(link = "log"),
+  control.predictor = list(link = 1),
+  options = list(
+    control.inla = list(
+      reordering = "metis",
+      int.strategy = "eb"
+    ),
+    verbose = TRUE,
+    inla.mode = "experimental"
+  )
 )
 ```
 
@@ -360,9 +366,9 @@ pred.25 <- inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)
 pred.975 <- inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
 
 predictions <- cbind.data.frame(
-  "date"= covid19_data$date,
-  "week"= covid19_data$week,
-  "MSOA11CD"= covid19_data$MSOA11CD, 
+  "date" = covid19_data$date,
+  "week" = covid19_data$week,
+  "MSOA11CD" = covid19_data$MSOA11CD,
   "pred.mean" = pred.mean,
   "pred.25" = pred.25,
   "pred.975" = pred.975
@@ -375,8 +381,8 @@ The date frame "predictions" is provided in the tutorial data package, we'll loa
 predictions <- fdmr::load_tutorial_data(filename = "predictions.rds")
 ```
 
-The figure below displays the boxplots of the predicted infection risk for all neighbourhoods over time. It can be seen that health inequalities in COVID infection exist in England, as there are large differences between the estimated disease risks. 
-We then plot the average predicted risk with 95% credible intervals by week across England. The COVID infection risk witnessed a series of fluctuations over the study period within the range between 0.0002 and 0.05, while an overall upward temporal trend can be observed. There was an initial peak in mid-November 2020, after which the infection levels declined before rising again in mid-December 2020, which were driven by the emergence of the Alpha variant and peaked in early January 2021. In the week of 5 June 2021, the infection rate began rising again until mid-July when it was estimated at 0.5%, after which the risk fell and then remained steady by November. However, the infection reached its highest point in the week of 8 January 2022 at 2.0%, which then decreased substantially until early March 2022. 
+The figure below displays the boxplots of the predicted infection risk for all neighbourhoods over time. It can be seen that health inequalities in 
+COVID infection exist in England, as there are large differences between the estimated disease risks. 
 
 ```{r boxps, fig.cap="Boxplots of the predicted infection rates across all neighbourhoods over time", fig.align = "center"}
 breaks_vec <- c(seq(as.Date("2020-03-07"),
@@ -394,6 +400,7 @@ fdmr::plot_boxplot(
 )
 ```
 
+The figure below provides the line plot for the average predicted risk with 95% credible intervals by week across England. The COVID infection risk witnessed a series of fluctuations over the study period within the range between 0.0002 and 0.05, while an overall upward temporal trend can be observed. There was an initial peak in mid-November 2020, after which the infection levels declined before rising again in mid-December 2020, which were driven by the emergence of the Alpha variant and peaked in early January 2021. In the week of 5 June 2021, the infection rate began rising again until mid-July when it was estimated at 0.5%, after which the risk fell and then remained steady by November. However, the infection reached its highest point in the week of 8 January 2022 at 2.0%, which then decreased substantially until early March 2022. 
 
 ```{r plotmeanrisk,error=TRUE,fig.cap="The average predicted infection risk in weeks", fig.align = "center"}
 mean_week <- dplyr::group_by(predictions, date) %>% dplyr::summarize(
@@ -469,7 +476,7 @@ The values of $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$, $\text{R-RMSE}_t$
 predmetrics <- fdmr::load_tutorial_data(filename = "predmetrics.rds")
 ```
 
-The plot below displays the time series plots for $\text{RMSE}_t$, $\text{Bias}_t$ and $\text{CP}_t$. The plots suggest that our model performs well in predicting the rate of COVID-19 infection, because the RMSE and bias values are very low (close to 0) compared to the range of the observed risks, and the coverage probabilities are close to their nominal 0.95 level. Table 3 provides the median and mean values for $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$,$\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for $t \in (97, . . . , 108)$.
+This figure displays the time series plots for $\text{RMSE}_t$, $\text{Bias}_t$ and $\text{CP}_t$. The plots suggest that our model performs well in predicting the rate of COVID-19 infection, because the RMSE and bias values are very low (close to 0) compared to the range of the observed risks, and the coverage probabilities are close to their nominal 0.95 level. Table 3 provides the median and mean values for $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$,$\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for $t \in (97, . . . , 108)$.
 
 ```{r performancePlots,error=TRUE,fig.cap="RMSE, bias and coverage probability for the model over time.", fig.align = "center"}
 breaks_vec <- c(seq(min(predmetrics$date),

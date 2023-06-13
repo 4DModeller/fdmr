@@ -13,7 +13,7 @@ require_packages <- function(packages) {
 
   missing_packages <- list()
   for (package in packages) {
-    if (package %in% rownames(installed.packages()) == FALSE) {
+    if (package %in% rownames(utils::installed.packages()) == FALSE) {
       missing_packages <- append(missing_packages, package)
     }
   }
