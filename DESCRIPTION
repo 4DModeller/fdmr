@@ -47,7 +47,8 @@ Imports:
     spdep,
     gridExtra,
     leaflet,
-    archive
+    archive,
+    shiny
 Suggests: 
     bookdown,
     knitr,

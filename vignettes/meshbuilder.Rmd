@@ -11,7 +11,7 @@ Here we'll cover building a mesh from some spatial data, modifying its parameter
 
 We'll first load in some spatial data to create the mesh. This is the same data we previously used in the COVID-19 tutorial.
 
-```{r}
+```{r eval=FALSE}
 sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
 sp_data
 ```
@@ -27,14 +27,14 @@ fdmr::mesh_builder(spatial_data = sp_data)
 
 If you want to customise the initial parameters used to build the mesh you can pass in 
 
-```{r}
+```{r eval=FALSE}
 args(fdmr::mesh_builder)
 ```
 
 Now we have the spatial data loaded we can think about some initial parameters for the mesh we're going to create. We'll calculate the initial range and max edge values from our data and
 pass them into the `mesh_builder` function. These values will then be used as values for the initial mesh that's created but can be changed within the app.
 
-```{r}
+```{r eval=FALSE}
 initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
 max_edge <- initial_range / 8
 
@@ -45,6 +45,6 @@ cutoff <- max_edge / 7
 
 Now we're ready to start the app.
 
-```{r}
+```{r eval=FALSE}
 fdmr::mesh_builder(spatial_data = sp_data, max_edge = max_edge_fin, offset = offset, cutoff = cutoff)
 ```
