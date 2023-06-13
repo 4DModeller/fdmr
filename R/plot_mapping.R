@@ -61,28 +61,20 @@ plot_map <- function(polygon_data = NULL,
     overlayGroups = layers,
     options = leaflet::layersControlOptions(collapsed = FALSE)
   )
-  # if (!is.null(polygon_data)) {
 
-  # }
-  # m <- leaflet::addPolygons(m, data = polygon_data,
-  #   fillColor = ~ colours(domain), color = colour, weight = fill_colour_weight,
-  #   fillOpacity = polygon_fill_opacity
-  # )
-  # {
-  #   if (add_scale_bar) leaflet::addScaleBar(., position = "bottomleft") else .
-  # } %>%
-  #   {
-  #     if (!is.null(legend_values)) {
-  #       leaflet::addLegend(.,
-  #         pal = colours,
-  #         values = legend_values,
-  #         opacity = 0.8,
-  #         title = legend_title
-  #       )
-  #     } else {
-  #       .
-  #     }
-  #   }
+  if (add_scale_bar) {
+    m <- leaflet::addScaleBar(m, position = "bottomleft")
+  }
+
+  if (!is.null(legend_values)) {
+    m <- leaflet::addLegend(m,
+      pal = "viridis",
+      values = legend_values,
+      opacity = 0.8,
+      title = legend_title
+    )
+  }
+
   return(m)
 }
 
