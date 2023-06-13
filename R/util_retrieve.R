@@ -11,6 +11,8 @@ retrieve_tutorial_data <- function(dataset, data_store = NULL) {
     filename <- "covid19_data.tar.bz2"
   } else if (dataset == "hydro") {
     filename <- "hydro_data.tar.bz2"
+  } else if (dataset == "covid_mcmc") {
+    filename <- "covid19_data2.tar.bz2"
   } else {
     stop("Invalid dataset name.")
   }
