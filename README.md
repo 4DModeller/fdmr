@@ -1,10 +1,10 @@
-# 4D Modeller - Spatio-temporal modeling tools for Bayesian Hierarchical Models
+# 4DModeller <img src="man/figures/logo.png" align="right" alt="" width="400" />
 
 4D-Modeller is a spatio-temporal modeling library that can be applied to problems at any scale from micro to processes that operate at a global scale. It includes data visualization tools, finite element mesh building tools, Bayesian hierarchical modeling based on Bayesian inference packages INLA and inlabru, and model evaluation and assessment tools.
 
 ## Quickstart
 
-To get 4DModeller R package `fdmr` installed first you need to make sure you have a recent version of R installed.
+To get the 4DModeller R package `fdmr` installed first you need to make sure you have a recent version of R installed.
 The easiest way to do this is to [install RStudio](https://posit.co/downloads/).
 
 Next start an R session and run

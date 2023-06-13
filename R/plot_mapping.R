@@ -11,7 +11,6 @@
 #'
 #' @return leaflet::leaflet
 #' @export
-
 plot_map <- function(polygon_data = NULL,
                      raster_data = NULL,
                      domain = NULL,
