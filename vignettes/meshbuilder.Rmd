@@ -13,6 +13,22 @@ We'll first load in some spatial data to create the mesh. This is the same data 
 
 ```{r}
 sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
+sp_data
+```
+
+The `sp_data` object is a `SpatialPolygonsDataFrame` containing 6789 features for areas of England. We can build a mesh
+by passing `sp_data` to the `mesh_builder` function.
+
+```{r eval=FALSE}
+fdmr::mesh_builder(spatial_data = sp_data)
+```
+ 
+### Customise initial parameters
+
+If you want to customise the initial parameters used to build the mesh you can pass in 
+
+```{r}
+args(fdmr::mesh_builder)
 ```
 
 Now we have the spatial data loaded we can think about some initial parameters for the mesh we're going to create. We'll calculate the initial range and max edge values from our data and
@@ -30,5 +46,5 @@ cutoff <- max_edge / 7
 Now we're ready to start the app.
 
 ```{r}
-fdmr::mesh_builder(spatial_data=sp_data, max_edge=max_edge_fin, offset=offset, cutoff=cutoff)
+fdmr::mesh_builder(spatial_data = sp_data, max_edge = max_edge_fin, offset = offset, cutoff = cutoff)
 ```

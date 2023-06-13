@@ -14,6 +14,14 @@ mesh_builder(
 }
 \arguments{
 \item{spatial_data}{Spatial data}
+
+\item{crs}{CRS as a proj4string}
+
+\item{max_edge}{The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d}
+
+\item{offset}{Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d}
+
+\item{cutoff}{The minimum allowed distance between points, passed to inla.mesh.2d}
 }
 \value{
 shiny::app

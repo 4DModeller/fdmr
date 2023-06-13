@@ -18,7 +18,9 @@ plot_map(
 )
 }
 \arguments{
-\item{domain}{Domain for map}
+\item{polygon_data}{Polygon data}
+
+\item{raster_data}{Raster datas}
 
 \item{legend_values}{Values for legend}
 
@@ -26,13 +28,13 @@ plot_map(
 
 \item{add_scale_bar}{Add scale bar if TRUE}
 
+\item{polygon_fill_colour}{}
+
+\item{polygon_line_colour}{}
+
 \item{polygon_fill_opacity}{Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons}
 
 \item{fill_colour_weight}{Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons}
-
-\item{data}{Data to plot}
-
-\item{palette}{Palette, for example YlOrRd or Reds}
 }
 \value{
 leaflet::leaflet

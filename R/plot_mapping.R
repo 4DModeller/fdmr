@@ -1,13 +1,14 @@
 #' Create a simple Leaflet map from data
 #'
-#' @param data Data to plot
-#' @param domain Domain for map
-#' @param palette Palette, for example YlOrRd or Reds
+#' @param polygon_data Polygon data
+#' @param raster_data Raster datas
 #' @param legend_values Values for legend
 #' @param legend_title Title for legend
 #' @param add_scale_bar Add scale bar if TRUE
 #' @param polygon_fill_opacity Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons
 #' @param fill_colour_weight Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons
+#' @param polygon_fill_colour 
+#' @param polygon_line_colour 
 #'
 #' @return leaflet::leaflet
 #' @export
