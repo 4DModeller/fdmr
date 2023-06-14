@@ -41,6 +41,16 @@ meshbuilder_shiny <- function(
   }
   # Let's extract the data we want to create the mesh
   location_data <- spatial_data@data[, c("LONG", "LAT")]
+
+  create_mesh <- function(location_data, max_edge, cutoff, offset, crs) {
+    INLA::inla.mesh.2d(
+      loc = location_data,
+      max.edge = max_edge,
+      cutoff = cutoff,
+      offset = offset,
+      crs = crs
+    )
+  }
   # loc: the spatial locations of data points
   # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
   # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
@@ -67,13 +77,19 @@ meshbuilder_shiny <- function(
           min = 0.005, value = 0.2, max = 0.9
         ),
         shiny::p("Minimum allowed distance between data points."),
-        shiny::actionButton("check_button", "Check mesh")
+        shiny::column(
+          shiny::actionButton("create_mesh", label = "Plot mesh"),
+          shiny::checkboxInput("auto_plot", label = "Auto render mesh"),
+          shiny::actionButton("check_button", "Check mesh", value=TRUE),
+        )
       ),
       shiny::mainPanel(
         leaflet::leafletOutput("map", height = "80vh")
       )
     )
   )
+
+
 
   # Define server logic required to draw a histogram
   server <- function(input, output) {

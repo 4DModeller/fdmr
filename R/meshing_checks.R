@@ -1,14 +1,13 @@
-mesh_checker <- function(mesh) {
-  # Suppose the number of observation data points is "n.obs", and
-  # our mesh is an object obtained using INLA::inla.mesh.2d(...)
-  mesh <- INLA::inla.mesh.2d(...)
+mesh_checker <- function(mesh, n_obs) {
+  # Suppose the number of observation data points is "n_obs", and
+  # our mesh is an object obtained using INLA::inla.mesh.2d
 
   # Warning 1: if the mesh has a very high resolution?
-  # We could check if the number of mesh nodes is equal or greater than n.obs via:
-  mesh$n >= n.obs
+  # We could check if the number of mesh nodes is equal or greater than n_obs via:
+  mesh$n >= n_obs
 
-  # We could check if the number of triangles is equal or greater than n.obs via:
-  nrow(mesh$graph$tv) >= n.obs
+  # We could check if the number of triangles is equal or greater than n_obs via:
+  nrow(mesh$graph$tv) >= n_obs
 
   # Warning 2: if there are isolated triangles in the mesh?
   # Create a dataframe that stores all edges of the mesh, and the corresponding indexed vertices V1,V2
@@ -18,12 +17,12 @@ mesh_checker <- function(mesh) {
   )
 
   # Create a dataframe that stores the number of edges that each vertex is incident with
-  v.no.e <- data.frame(table(as.numeric(edge_df)))
-  colnames(v.no.e) <- c("v", "no.e")
+  vertex_n_edges <- data.frame(table(as.numeric(edge_df)))
+  colnames(vertex_n_edges) <- c("v", "n_edges")
 
   # If a vertex has only two incident edges, and those edges form a triangle with two other vertices,
   # then there is a risk that the triangle could become isolated from the rest of the graph.
-  which(v.no.e$no.e <= 2)
+  which(vertex_n_edges$n_edges <= 2)
 
   # Note:
   # In order for the triangle to be fully isolated, none of the two incident edges
@@ -31,10 +30,9 @@ mesh_checker <- function(mesh) {
 
   # Warning 3: do the triangle shapes in a mesh look normal?
   # e.g., check if there is a right triangle in the mesh
-
   nrow(mesh$graph$tv) # the number of triangles in the mesh
 
-  v.e.length <- data.frame(
+  vertex_edge_lengths <- data.frame(
     "v1" = mesh$graph$tv[, 1],
     "v2" = mesh$graph$tv[, 2],
     "v3" = mesh$graph$tv[, 3],
@@ -51,7 +49,6 @@ mesh_checker <- function(mesh) {
       c(mesh$graph$tv[i, 1], mesh$graph$tv[i, 1], mesh$graph$tv[i, 2]),
       c(mesh$graph$tv[i, 2], mesh$graph$tv[i, 3], mesh$graph$tv[i, 3])
     )
-
     # Now create a graph from an edge list matrix
     graph_temp <- igraph::graph_from_edgelist(each.tri.edge, directed = FALSE)
 
@@ -60,10 +57,10 @@ mesh_checker <- function(mesh) {
     edge.tri.length[1] <- sqrt(sum((mesh$loc[each.tri.edge[1, 1], ] - mesh$loc[each.tri.edge[1, 2], ])^2))
     edge.tri.length[2] <- sqrt(sum((mesh$loc[each.tri.edge[2, 1], ] - mesh$loc[each.tri.edge[2, 2], ])^2))
     edge.tri.length[3] <- sqrt(sum((mesh$loc[each.tri.edge[3, 1], ] - mesh$loc[each.tri.edge[3, 2], ])^2))
-    v.e.length[i, c("v1to2", "v1to3", "v2to3")] <- edge.tri.length
+    vertex_edge_lengths[i, c("v1to2", "v1to3", "v2to3")] <- edge.tri.length
   }
 
-  # Interpret "v.e.length":
+  # Interpret "vertex_edge_lengths":
   # each row indicates a triangle
   # Column v1,v2,v3 correspond to vertices 1,2,3 respectively
   # v1to2 represents the edge length between vertices 1 and 2
