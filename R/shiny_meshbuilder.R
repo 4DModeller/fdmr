@@ -39,18 +39,18 @@ meshbuilder_shiny <- function(
   if (!got_lat_long) {
     stop("Cannot read latitude and longitude data from spatial data.")
   }
+
+  # Extract the extent from the data
+  extent <- raster::extent(sp_data)
+  # x is longitude, y is latitude
+  long_min <- extent@xmin
+  long_max <- extent@xmax
+  lat_min <- extent@ymin
+  lat_max <- extent@ymax
+
   # Let's extract the data we want to create the mesh
   location_data <- spatial_data@data[, c("LONG", "LAT")]
 
-  create_mesh <- function(location_data, max_edge, cutoff, offset, crs) {
-    INLA::inla.mesh.2d(
-      loc = location_data,
-      max.edge = max_edge,
-      cutoff = cutoff,
-      offset = offset,
-      crs = crs
-    )
-  }
   # loc: the spatial locations of data points
   # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
   # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
@@ -77,11 +77,10 @@ meshbuilder_shiny <- function(
           min = 0.005, value = 0.2, max = 0.9
         ),
         shiny::p("Minimum allowed distance between data points."),
-        shiny::column(
-          shiny::actionButton("create_mesh", label = "Plot mesh"),
-          shiny::checkboxInput("auto_plot", label = "Auto render mesh"),
-          shiny::actionButton("check_button", "Check mesh", value=TRUE),
-        )
+        shiny::actionButton("plot_mesh", label = "Plot mesh"),
+        shiny::checkboxInput("auto_plot", label = "Auto render mesh", value = TRUE),
+        shiny::actionButton("check_button", "Check mesh"),
+        shiny::verbatimTextOutput("value")
       ),
       shiny::mainPanel(
         leaflet::leafletOutput("map", height = "80vh")
@@ -94,17 +93,34 @@ meshbuilder_shiny <- function(
   # Define server logic required to draw a histogram
   server <- function(input, output) {
     mesh <- shiny::reactive({
-      # TODO - any feedback for progress bar here?
-      shiny::withProgress(message = "Creating mesh...", value = 0, {
-        mesh <- INLA::inla.mesh.2d(
-          loc = location_data,
-          max.edge = input$max_edge,
-          cutoff = input$cutoff,
-          offset = input$offset,
-          crs = crs
-        )
-      })
-      return(mesh)
+      input$plot_mesh
+      if (shiny::req(input$auto_plot)) {
+        shiny::withProgress(message = "Creating mesh...", value = 0, {
+          return(INLA::inla.mesh.2d(
+            loc = location_data,
+            max.edge = input$max_edge,
+            cutoff = input$cutoff,
+            offset = input$offset,
+            crs = crs
+          ))
+        })
+      }
+      return(
+        shiny::withProgress(message = "Creating mesh...", value = 0, {
+          return(INLA::inla.mesh.2d(
+            loc = location_data,
+            max.edge = input$max_edge,
+            cutoff = input$cutoff,
+            offset = input$offset,
+            crs = crs
+          ))
+        })
+      )
+    })
+
+    # Can use this to write out to the terminal
+    shiny::observeEvent(input$plot_mesh, {
+      print(paste0("You have chosen: ", input$plot_mesh))
     })
 
     mesh_spatial <- shiny::reactive({
@@ -118,11 +134,31 @@ meshbuilder_shiny <- function(
     })
 
     output$map <- leaflet::renderLeaflet({
-      leaflet::leaflet(mesh_spatial()) %>%
-        leaflet::addTiles() %>%
-        leaflet::addPolygons(weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca") %>%
-        leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1)
+      leaflet::leaflet() %>%
+        leaflet::addTiles(group = "OSM") %>%
+        leaflet::addPolygons(data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh") %>%
+        leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial") %>%
+        leaflet::addLayersControl(
+          position = "topright",
+          baseGroups = c("OSM"),
+          overlayGroups = c("Mesh", "Spatial"),
+          options = leaflet::layersControlOptions(collapsed = FALSE)
+        )
     })
+
+    # output$map <- leaflet::renderLeaflet({
+    #   leaflet::leaflet(mesh_spatial()) %>%
+    #     leaflet::addTiles() %>%
+    #     leaflet::addPolygons(weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca") %>%
+    #     leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1)
+    # })
+
+    # shiny::observe({
+    #   leaflet::leafletProxy("map") %>%
+
+    # })
+
+
 
     shiny::observeEvent(input$check_button, {
       shiny::showModal(shiny::modalDialog(
