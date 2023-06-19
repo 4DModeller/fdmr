@@ -32,6 +32,10 @@ meshbuilder_shiny <- function(
   if (is.null(offset)) offset <- default_offset
   if (is.null(cutoff)) cutoff <- default_cutoff
 
+  # TODO - should we enforce these?
+  max_n_mesh <- c(48000, 16000)
+  max_n_strict_mesh <- c(128000, 128000)
+
   create_mesh <- function(location_data, max_edge, cutoff, offset, crs) {
     shiny::withProgress(message = "Creating mesh...", value = 0, {
       INLA::inla.mesh.2d(
@@ -39,7 +43,9 @@ meshbuilder_shiny <- function(
         max.edge = max_edge,
         cutoff = cutoff,
         offset = offset,
-        crs = crs
+        crs = crs,
+        # max.n = c(48000, 16000),
+        # max.n.strict = c(128000, 128000)
       )
     })
   }
@@ -97,13 +103,17 @@ meshbuilder_shiny <- function(
         shiny::actionButton("plot_mesh", label = "Plot mesh"),
         shiny::actionButton("reset_mesh", label = "Reset"),
         shiny::actionButton("check_button", "Check mesh"),
-        shiny::verbatimTextOutput("value")
       ),
       shiny::mainPanel(
-        leaflet::leafletOutput("map", height = "80vh")
+        shiny::tabsetPanel(
+          type = "tabs",
+          shiny::tabPanel("Plot", leaflet::leafletOutput("map", height = "80vh")),
+          shiny::tabPanel("Code", shiny::verbatimTextOutput("mesh_code"))
+        )
       )
     )
   )
+
 
   # Define server logic required to draw a histogram
   server <- function(input, output, session) {
@@ -170,6 +180,14 @@ meshbuilder_shiny <- function(
 
     # })
 
+    output$mesh_code <- shiny::reactive(
+      paste0(
+        "mesh <- inla.mesh.2d(loc = location_data,
+          max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
+          cutoff = ", input$cutoff, ",
+          offset=c(", paste0(input$offset, collapse = ", "), "))\n"
+      )
+    )
 
 
     shiny::observeEvent(input$check_button, {

@@ -58,9 +58,16 @@ Currently these are:
 2. Check that the number of triangles isn't greater than the number of measurements
 3. Check that there are no isolated triangles
 
-To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Here we use the COVID-19 data.
+To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Here we use the COVID-19 data. Create a mesh of your design and when you're finished click the "Check mesh" button. This passes the created mesh
+to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
 
-```{r}
+```{r eval=FALSE}
 covid19_data <- fdmr::load_tutorial_data(filename = "covid19_data.rds")
 fdmr::mesh_builder(spatial_data = sp_data, data = covid19_data)
 ```
+
+## Exporting your mesh
+
+To export your mesh click on the Code tab and copy and paste the code used to created the mesh.
+
+
