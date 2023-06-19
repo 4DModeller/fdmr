@@ -7,7 +7,7 @@
 #' Mesh building shiny app
 #'
 #' @param spatial_data Spatial data
-#' @param obs_data Observations data, for use with the check_mesh functionality
+#' @param data Observations data, for use with the check_mesh functionality
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d
@@ -34,14 +34,13 @@ meshbuilder_shiny <- function(
 
   create_mesh <- function(location_data, max_edge, cutoff, offset, crs) {
     shiny::withProgress(message = "Creating mesh...", value = 0, {
-      mesh <- INLA::inla.mesh.2d(
+      INLA::inla.mesh.2d(
         loc = location_data,
         max.edge = max_edge,
         cutoff = cutoff,
         offset = offset,
         crs = crs
       )
-      fdmr::mesh_to_spatial(mesh = mesh)
     })
   }
 
@@ -59,12 +58,12 @@ meshbuilder_shiny <- function(
   }
 
   # Extract the extent from the data
-  extent <- raster::extent(sp_data)
-  # x is longitude, y is latitude
-  long_min <- extent@xmin
-  long_max <- extent@xmax
-  lat_min <- extent@ymin
-  lat_max <- extent@ymax
+  # extent <- raster::extent(spatial_data)
+  # # x is longitude, y is latitude
+  # long_min <- extent@xmin
+  # long_max <- extent@xmax
+  # lat_min <- extent@ymin
+  # lat_max <- extent@ymax
 
   # Let's extract the data we want to create the mesh
   location_data <- spatial_data@data[, c("LONG", "LAT")]
@@ -126,7 +125,7 @@ meshbuilder_shiny <- function(
       shiny::updateSliderInput(session, inputId = "cutoff", value = default_cutoff)
     })
 
-    mesh_2 <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
+    mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
       create_mesh(
         location_data,
         input$max_edge,
@@ -136,12 +135,20 @@ meshbuilder_shiny <- function(
       )
     })
 
+    mesh_spatial <- shiny::reactive(
+      suppressMessages(
+        suppressWarnings(
+          fdmr::mesh_to_spatial(mesh = mesh())
+        )
+      )
+    )
+
     output$map <- leaflet::renderLeaflet({
       # mesh <- if (input$auto_plot) mesh_1() else mesh_2()
-      mesh <- mesh_2()
+      # mesh <- mesh_2()
       leaflet::leaflet() %>%
         leaflet::addTiles(group = "OSM") %>%
-        leaflet::addPolygons(data = mesh, weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh") %>%
+        leaflet::addPolygons(data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh") %>%
         leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial") %>%
         leaflet::addLayersControl(
           position = "topright",
@@ -166,9 +173,18 @@ meshbuilder_shiny <- function(
 
 
     shiny::observeEvent(input$check_button, {
+      if (is.null(obs_data) || is.null(mesh())) {
+        errors <- "No observation data. Cannot check mesh."
+      } else {
+        errors <- fdmr::mesh_checker(mesh = mesh(), observations = obs_data)
+        if (!length(errors)) {
+          errors <- "No errors found."
+        }
+      }
+
       shiny::showModal(shiny::modalDialog(
-        "There is an error with the mesh: the error is ...",
-        title = "Mesh error",
+        stringr::str_flatten(errors, collapse = "\n"),
+        title = "Mesh check",
         easyClose = TRUE,
         footer = NULL
       ))
@@ -183,6 +199,7 @@ meshbuilder_shiny <- function(
 #' Mesh building shiny app. Creates and visualises a mesh from some spatial data.
 #'
 #' @param spatial_data Spatial data
+#' @param obs_data Measurement data
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d
@@ -190,14 +207,15 @@ meshbuilder_shiny <- function(
 #'
 #' @return shiny::app
 #' @export
-mesh_builder <- function(spatial_data, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL) {
+mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL) {
   require_packages(packages = c("INLA", "shiny", "leaflet"))
 
   shiny::runApp(meshbuilder_shiny(
     spatial_data = spatial_data,
-    crs = crs,
-    max_edge = max_edge,
-    offset = offset,
-    cutoff = cutoff
+    obs_data = obs_data,
+    # crs = crs,
+    # max_edge = max_edge,
+    # offset = offset,
+    # cutoff = cutoff
   ))
 }

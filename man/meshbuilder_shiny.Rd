@@ -16,8 +16,6 @@ meshbuilder_shiny(
 \arguments{
 \item{spatial_data}{Spatial data}
 
-\item{obs_data}{Observations data, for use with the check_mesh functionality}
-
 \item{crs}{CRS as a proj4string}
 
 \item{max_edge}{The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d}
@@ -25,6 +23,8 @@ meshbuilder_shiny(
 \item{offset}{Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d}
 
 \item{cutoff}{The minimum allowed distance between points, passed to inla.mesh.2d}
+
+\item{data}{Observations data, for use with the check_mesh functionality}
 }
 \value{
 shiny::app

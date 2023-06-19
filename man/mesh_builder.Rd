@@ -6,6 +6,7 @@
 \usage{
 mesh_builder(
   spatial_data,
+  obs_data = NULL,
   crs = NULL,
   max_edge = NULL,
   offset = NULL,
@@ -14,6 +15,8 @@ mesh_builder(
 }
 \arguments{
 \item{spatial_data}{Spatial data}
+
+\item{obs_data}{Measurement data}
 
 \item{crs}{CRS as a proj4string}
 
