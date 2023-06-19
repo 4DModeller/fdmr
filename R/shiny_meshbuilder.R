@@ -7,6 +7,7 @@
 #' Mesh building shiny app
 #'
 #' @param spatial_data Spatial data
+#' @param obs_data Observations data, for use with the check_mesh functionality
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d
@@ -18,14 +19,31 @@
 #' @keywords internal
 meshbuilder_shiny <- function(
     spatial_data,
+    obs_data = NULL,
     crs = NULL,
     max_edge = NULL,
     offset = NULL,
     cutoff = NULL) {
+  default_max_edge <- c(0.1, 0.3)
+  default_offset <- c(0.2, 0.7)
+  default_cutoff <- 0.2
   # TODO - these defaults need changing?
-  if (is.null(max_edge)) max_edge <- c(0.1, 0.3)
-  if (is.null(offset)) offset <- c(0.2, 0.7)
-  if (is.null(cutoff)) cutoff <- 0.2
+  if (is.null(max_edge)) max_edge <- default_max_edge
+  if (is.null(offset)) offset <- default_offset
+  if (is.null(cutoff)) cutoff <- default_cutoff
+
+  create_mesh <- function(location_data, max_edge, cutoff, offset, crs) {
+    shiny::withProgress(message = "Creating mesh...", value = 0, {
+      mesh <- INLA::inla.mesh.2d(
+        loc = location_data,
+        max.edge = max_edge,
+        cutoff = cutoff,
+        offset = offset,
+        crs = crs
+      )
+      fdmr::mesh_to_spatial(mesh = mesh)
+    })
+  }
 
   if (is.null(crs)) {
     crs <- sf::st_crs(spatial_data)
@@ -78,7 +96,7 @@ meshbuilder_shiny <- function(
         ),
         shiny::p("Minimum allowed distance between data points."),
         shiny::actionButton("plot_mesh", label = "Plot mesh"),
-        shiny::checkboxInput("auto_plot", label = "Auto render mesh", value = TRUE),
+        shiny::actionButton("reset_mesh", label = "Reset"),
         shiny::actionButton("check_button", "Check mesh"),
         shiny::verbatimTextOutput("value")
       ),
@@ -88,55 +106,42 @@ meshbuilder_shiny <- function(
     )
   )
 
-
-
   # Define server logic required to draw a histogram
-  server <- function(input, output) {
-    mesh <- shiny::reactive({
-      input$plot_mesh
-      if (shiny::req(input$auto_plot)) {
-        shiny::withProgress(message = "Creating mesh...", value = 0, {
-          return(INLA::inla.mesh.2d(
-            loc = location_data,
-            max.edge = input$max_edge,
-            cutoff = input$cutoff,
-            offset = input$offset,
-            crs = crs
-          ))
-        })
-      }
-      return(
-        shiny::withProgress(message = "Creating mesh...", value = 0, {
-          return(INLA::inla.mesh.2d(
-            loc = location_data,
-            max.edge = input$max_edge,
-            cutoff = input$cutoff,
-            offset = input$offset,
-            crs = crs
-          ))
-        })
+  server <- function(input, output, session) {
+    # mesh_1 <- shiny::reactive({
+    #   if (input$auto_plot) {
+    #     create_mesh(
+    #       location_data,
+    #       input$max_edge,
+    #       input$cutoff,
+    #       input$offset,
+    #       crs
+    #     )
+    #   }
+    # })
+
+    shiny::observeEvent(input$reset_mesh, {
+      shiny::updateSliderInput(session, inputId = "max_edge", value = default_max_edge)
+      shiny::updateSliderInput(session, inputId = "offset", value = default_offset)
+      shiny::updateSliderInput(session, inputId = "cutoff", value = default_cutoff)
+    })
+
+    mesh_2 <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
+      create_mesh(
+        location_data,
+        input$max_edge,
+        input$cutoff,
+        input$offset,
+        crs
       )
     })
 
-    # Can use this to write out to the terminal
-    shiny::observeEvent(input$plot_mesh, {
-      print(paste0("You have chosen: ", input$plot_mesh))
-    })
-
-    mesh_spatial <- shiny::reactive({
-      shiny::withProgress(message = "Extracting mesh...", value = 0, {
-        # TODO - suppress the warnings for now until we can convert
-        # to functions that are PROJ6 acceptable
-        base::suppressWarnings(
-          fdmr::mesh_to_spatial(mesh = mesh())
-        )
-      })
-    })
-
     output$map <- leaflet::renderLeaflet({
+      # mesh <- if (input$auto_plot) mesh_1() else mesh_2()
+      mesh <- mesh_2()
       leaflet::leaflet() %>%
         leaflet::addTiles(group = "OSM") %>%
-        leaflet::addPolygons(data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh") %>%
+        leaflet::addPolygons(data = mesh, weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh") %>%
         leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial") %>%
         leaflet::addLayersControl(
           position = "topright",

@@ -6,6 +6,7 @@
 \usage{
 meshbuilder_shiny(
   spatial_data,
+  obs_data = NULL,
   crs = NULL,
   max_edge = NULL,
   offset = NULL,
@@ -14,6 +15,8 @@ meshbuilder_shiny(
 }
 \arguments{
 \item{spatial_data}{Spatial data}
+
+\item{obs_data}{Observations data, for use with the check_mesh functionality}
 
 \item{crs}{CRS as a proj4string}
 
