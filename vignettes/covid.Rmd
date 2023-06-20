@@ -42,16 +42,18 @@ Now we make a map of the study region
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
 
-fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE,  polygon_fill_opacity = 0.5, palette="YlOrRd")
+fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, palette = "YlOrRd")
 ```
 
 ```{r}
-colours <- colorNumeric(palette = "YlOrRd", domain = sp_data@data$mapp, reverse=FALSE)
-leaflet(data=sp_data) %>%addTiles() %>%
-  addPolygons(fillColor = ~colours(mapp), color="grey", weight=0.6,
-              fillOpacity = 0.5) %>%
-  addScaleBar(position="bottomleft")
-
+colours <- colorNumeric(palette = "YlOrRd", domain = sp_data@data$mapp, reverse = FALSE)
+leaflet(data = sp_data) %>%
+  addTiles() %>%
+  addPolygons(
+    fillColor = ~ colours(mapp), color = "grey", weight = 0.6,
+    fillOpacity = 0.5
+  ) %>%
+  addScaleBar(position = "bottomleft")
 ```
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using same process we used above.
 
