@@ -2,7 +2,7 @@
 title: "Mesh building"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Hydrology}
+  %\VignetteIndexEntry{Mesh building}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

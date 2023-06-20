@@ -22,7 +22,7 @@ The COVID-19 pandemic has had a profound impact on global health and economies, 
 
 The first thing is to load all the packages used in the COVID-19 case study.
 
-The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The shapefile of the study region `shape` is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods.
+The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The shapefile of the study region `shape` is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods.load
 
 We first need to retrieve the data from the fdmr example data store and unpack it and we'll use `retrieve_tutorial_data` to do this.
 
@@ -42,7 +42,7 @@ Now we make a map of the study region
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
 
-fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, fill_colour_weight = 0.6)
+fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE,  polygon_fill_opacity = 0.5, palette="YlOrRd")
 ```
 
 ```{r}
@@ -425,26 +425,9 @@ fdmr::plot_map(
   legend_title = "Risk",
   add_scale_bar = TRUE,
   polygon_fill_opacity = 1,
-  polygon_line_colour = "transparent",
-  fill_colour_weight = 1.0
+  polygon_line_colour = "transparent"
 )
 ```
-
-```{r mapaverisk,error=TRUE,fig.cap="Map of the average predicted infection risks ",fig.width=6,fig.height=4, fig.align = "center"}
-average_risk_by_nb<- group_by(predictions,MSOA11CD) %>% summarize(
-  ave.risk = mean(pred.mean))
-
-sp_data@data$ave.risk<-average_risk_by_nb$ave.risk
-
-colours <- colorNumeric(palette = "Reds", domain = sp_data@data$ave.risk, reverse=FALSE)
-leaflet(data=sp_data) %>% 
-  addTiles() %>% 
-  addPolygons(fillColor = ~colours(sp_data@data$ave.risk),
-              color="transparent", weight=1, fillOpacity = 0.8) %>%
-  addLegend(pal = colours,values = sp_data@data$ave.risk,opacity = 0.8,
-                       title="risk")
-```
-
 
 ## Evaluate the performance of prediction
 
