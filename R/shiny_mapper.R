@@ -20,8 +20,10 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
   date_strings <- base::sort(date_strings)
 
   if (any(is.na(date_strings))) {
-    stop("Unable to parse dates from layer names. Please ensure they are named correctly",
-      "or pass the date_format argument with the correct format.")
+    stop(
+      "Unable to parse dates from layer names. Please ensure they are named correctly",
+      "or pass the date_format argument with the correct format."
+    )
   }
 
   # We want to be able to lookup the RasterLayer names using the date so we create a list

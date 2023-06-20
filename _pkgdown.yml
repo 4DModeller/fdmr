@@ -14,8 +14,14 @@ navbar:
       menu:
         - text: "COVID-19"
           href: articles/covid.html
+        - text: "COVID-19 MCMC"
+          href: articles/covid_mcmc.html
         - text: "Hydrology"
           href: articles/hydro.html
+        - text: "Mapping"
+          href: articles/mapping.html
+        - text: "Meshing"
+          href: articles/meshbuilder.html
     hackathon:
       text: Hackathon
       href: https://4dmodeller.github.io/4DM_Hackathon/

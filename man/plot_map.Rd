@@ -41,9 +41,6 @@ plot_map(
 \value{
 leaflet::leaflet
 }
-\value{
-map
-}
 \description{
 Create a simple Leaflet map from data
 }

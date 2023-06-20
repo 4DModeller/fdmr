@@ -23,8 +23,6 @@ plot_map <- function(polygon_data = NULL,
                      polygon_line_colour = "grey",
                      polygon_line_weight = 1,
                      polygon_fill_opacity = 0.6) {
-  require_packages(packages = "leaflet")
-
   if (is.null(polygon_data) && is.null(raster_data)) {
     stop("Polygon or raster data must be given.")
   }
