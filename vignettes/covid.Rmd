@@ -45,6 +45,14 @@ domain <- sp_data@data$mapp
 fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, fill_colour_weight = 0.6)
 ```
 
+```{r}
+colours <- colorNumeric(palette = "YlOrRd", domain = sp_data@data$mapp, reverse=FALSE)
+leaflet(data=sp_data) %>%addTiles() %>%
+  addPolygons(fillColor = ~colours(mapp), color="grey", weight=0.6,
+              fillOpacity = 0.5) %>%
+  addScaleBar(position="bottomleft")
+
+```
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using same process we used above.
 
 ```{r loadCOVIDat, error=TRUE}
@@ -223,7 +231,7 @@ Finally, we fit the spatio-temporal model using spde approach and AR(1) process 
 
 
 ```{r fitmodel, error=TRUE, eval=FALSE}
-inlabru_model <- bru(formula,
+inlabru_model <- inlabru::bru(formula,
   data = covid19_data,
   family = "poisson",
   E = covid19_data$Population,
@@ -409,18 +417,32 @@ average_risk_by_nb <-
 sp_data@data$ave.risk <- average_risk_by_nb$ave.risk
 
 domain <- sp_data@data$ave.risk
-legend_values <- sp_data@data$ave.risk
 
 fdmr::plot_map(
   polygon_data = sp_data,
   domain = domain,
   palette = "Reds",
-  legend_values = legend_values,
   legend_title = "Risk",
   add_scale_bar = TRUE,
-  polygon_fill_opacity = 0.8,
+  polygon_fill_opacity = 1,
+  polygon_line_colour = "transparent",
   fill_colour_weight = 1.0
 )
+```
+
+```{r mapaverisk,error=TRUE,fig.cap="Map of the average predicted infection risks ",fig.width=6,fig.height=4, fig.align = "center"}
+average_risk_by_nb<- group_by(predictions,MSOA11CD) %>% summarize(
+  ave.risk = mean(pred.mean))
+
+sp_data@data$ave.risk<-average_risk_by_nb$ave.risk
+
+colours <- colorNumeric(palette = "Reds", domain = sp_data@data$ave.risk, reverse=FALSE)
+leaflet(data=sp_data) %>% 
+  addTiles() %>% 
+  addPolygons(fillColor = ~colours(sp_data@data$ave.risk),
+              color="transparent", weight=1, fillOpacity = 0.8) %>%
+  addLegend(pal = colours,values = sp_data@data$ave.risk,opacity = 0.8,
+                       title="risk")
 ```
 
 

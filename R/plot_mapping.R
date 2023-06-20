@@ -16,7 +16,6 @@ plot_map <- function(polygon_data = NULL,
                      raster_data = NULL,
                      domain = NULL,
                      palette = "YlOrRd",
-                     legend_values = NULL,
                      legend_title = NULL,
                      add_scale_bar = FALSE,
                      polygon_fill_colour = "red",
@@ -29,20 +28,36 @@ plot_map <- function(polygon_data = NULL,
   if (is.null(polygon_data) && is.null(raster_data)) {
     stop("Polygon or raster data must be given.")
   }
-
+  library(leaflet)
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
   m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
 
   layers <- c()
 
+
+
+
+  # Original
+  # colours <- colorNumeric(palette = "Reds", domain = polygon_data@data$ave.risk, reverse = FALSE)
+  # leaflet() %>%
+  #   addTiles() %>%
+  #   addPolygons(
+  #     data = polygon_data,
+  #     fillColor = ~ colours(polygon_data@data$ave.risk),
+  #     color = "transparent", weight = 1, fillOpacity = 0.8
+  #   ) %>%
+  #   addLegend(
+  #     pal = colours, values = polygon_data@data$ave.risk, opacity = 0.8,
+  #     title = "risk"
+  #   )
+
   if (!is.null(polygon_data)) {
-    if (is.null(domain)) {
+    if (!is.null(domain)) {
       colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
       polygon_fill_colour <- ~ colours(domain)
     }
-
-    m <- leaflet::addPolygons(m, data = polygon_data, fillColor = polygon_fill_colour, color = polygon_line_colour, weight = polygon_line_weight, group = "Poly")
+    m <- leaflet::addPolygons(m, data = polygon_data, fillColor = polygon_fill_colour, color = "transparent", weight = 1, fillOpacity = 0.8, group = "Poly")
     layers <- append(layers, "Poly")
   }
 
@@ -68,10 +83,10 @@ plot_map <- function(polygon_data = NULL,
     m <- leaflet::addScaleBar(m, position = "bottomleft")
   }
 
-  # if (!is.null(legend_values)) {
+  # if (!is.null(domain)) {
   #   m <- leaflet::addLegend(m,
   #     pal = palette,
-  #     values = legend_values,
+  #     values = domain,
   #     opacity = 0.8,
   #     title = legend_title
   #   )
