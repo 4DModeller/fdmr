@@ -16,6 +16,9 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/index.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/mapping.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/authors.html</loc>
   </url>
   <url>
@@ -43,6 +46,9 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_boxplot.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_interactive_map.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_line_average.html</loc>
   </url>
   <url>
@@ -55,7 +61,10 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_timeseries.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/reference/require_package.html</loc>
+    <loc>https://4dmodeller.github.io/fdmr/reference/raster_mapping_app.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/require_packages.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/retrieve_tutorial_data.html</loc>

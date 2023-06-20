@@ -157,8 +157,8 @@ in the spatial data we want.</p>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">leaflet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addTiles</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="va">m</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-51faed06466f2f619905" style="width:768px;height:384px;"></div>
-<script type="application/json" data-for="htmlwidget-51faed06466f2f619905">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}]},"evals":[],"jsHooks":[]}</script><p class="caption">
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-61ca87e16b48e630a8db" style="width:768px;height:384px;"></div>
+<script type="application/json" data-for="htmlwidget-61ca87e16b48e630a8db">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}]},"evals":[],"jsHooks":[]}</script><p class="caption">
 A map of the study region.
 </p>
 </div>
@@ -560,18 +560,20 @@ running on a suitable high memory (HOW MUCH IS ENOUGH?) system. In our
 case it takes about 13 hours to complete.</p>
 </blockquote>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">inlabru_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/inlabru/reference/bru.html" class="external-link">bru</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">covid19_data</span>,</span>
-<span>                   family <span class="op">=</span> <span class="st">"poisson"</span>,</span>
-<span>                   E <span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">Population</span>,</span>
-<span>                   control.family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span>,</span>
-<span>                   control.predictor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>link <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>                   options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>                     control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>                       reordering <span class="op">=</span> <span class="st">"metis"</span>,</span>
-<span>                       int.strategy <span class="op">=</span> <span class="st">"eb"</span><span class="op">)</span>,</span>
-<span>                      verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                     inla.mode<span class="op">=</span><span class="st">"experimental"</span></span>
-<span>                   <span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">inlabru_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/inlabru/reference/bru.html" class="external-link">bru</a></span><span class="op">(</span><span class="va">formula</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">covid19_data</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"poisson"</span>,</span>
+<span>  E <span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">Population</span>,</span>
+<span>  control.family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span>,</span>
+<span>  control.predictor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>link <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    control.inla <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      reordering <span class="op">=</span> <span class="st">"metis"</span>,</span>
+<span>      int.strategy <span class="op">=</span> <span class="st">"eb"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    inla.mode <span class="op">=</span> <span class="st">"experimental"</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -845,9 +847,9 @@ in the saved predictions from file.</p>
 <span><span class="va">pred.975</span> <span class="op">&lt;-</span> <span class="va">inlabru_model</span><span class="op">$</span><span class="va">summary.fitted.values</span><span class="op">$</span><span class="va">`0.975quant`</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span></span>
-<span>  <span class="st">"date"</span><span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">date</span>,</span>
-<span>  <span class="st">"week"</span><span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">week</span>,</span>
-<span>  <span class="st">"MSOA11CD"</span><span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">MSOA11CD</span>, </span>
+<span>  <span class="st">"date"</span> <span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">date</span>,</span>
+<span>  <span class="st">"week"</span> <span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">week</span>,</span>
+<span>  <span class="st">"MSOA11CD"</span> <span class="op">=</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">MSOA11CD</span>,</span>
 <span>  <span class="st">"pred.mean"</span> <span class="op">=</span> <span class="va">pred.mean</span>,</span>
 <span>  <span class="st">"pred.25"</span> <span class="op">=</span> <span class="va">pred.25</span>,</span>
 <span>  <span class="st">"pred.975"</span> <span class="op">=</span> <span class="va">pred.975</span></span>
@@ -937,12 +939,7 @@ averaged risks of infection in England.</p>
 <span>  polygon_fill_opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  fill_colour_weight <span class="op">=</span> <span class="fl">1.0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-4a3a45c0c4618562e540" style="width:768px;height:384px;"></div>
-<script type="application/json" data-for="htmlwidget-4a3a45c0c4618562e540">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}]},"evals":[],"jsHooks":[]}</script><p class="caption">
-Map of the average predicted infection risks
-</p>
-</div>
+<pre><code><span><span class="co">## Error in fdmr::plot_map(data = sp_data, domain = domain, palette = "Reds", : unused arguments (data = sp_data, palette = "Reds")</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="evaluate-the-performance-of-prediction">Evaluate the performance of prediction<a class="anchor" aria-label="anchor" href="#evaluate-the-performance-of-prediction"></a>
@@ -997,7 +994,7 @@ progress of the predictive capabilities of the model over time.</p>
 <span class="math inline">\(\text{Bias}_t\)</span>, <span class="math inline">\(\text{CP}_t\)</span>, <span class="math inline">\(\text{R-RMSE}_t\)</span> and <span class="math inline">\(\text{R-Bias}_t\)</span> for week <span class="math inline">\(t\)</span> in <span class="math inline">\((97,\ldots, 108)\)</span> are stored in the
 tutorial data package and we’ll load the <code>data.frame</code>
 containing that data now.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">predmetrics</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="st">"predmetrics.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>This figure displays the time series plots for <span class="math inline">\(\text{RMSE}_t\)</span>, <span class="math inline">\(\text{Bias}_t\)</span> and <span class="math inline">\(\text{CP}_t\)</span>. The plots suggest that our
 model performs well in predicting the rate of COVID-19 infection,
@@ -1005,7 +1002,7 @@ because the RMSE and bias values are very low (close to 0) compared to
 the range of the observed risks, and the coverage probabilities are
 close to their nominal 0.95 level. Table 3 provides the median and mean
 values for <span class="math inline">\(\text{RMSE}_t\)</span>, <span class="math inline">\(\text{Bias}_t\)</span>, <span class="math inline">\(\text{CP}_t\)</span>,<span class="math inline">\(\text{R-RMSE}_t\)</span> and <span class="math inline">\(\text{R-Bias}_t\)</span> for <span class="math inline">\(t \in (97, . . . , 108)\)</span>.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">breaks_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">predmetrics</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">predmetrics</span><span class="op">$</span><span class="va">date</span><span class="op">)</span>,</span>
 <span>  by <span class="op">=</span> <span class="st">"1 week"</span></span>
