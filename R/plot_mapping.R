@@ -1,52 +1,85 @@
 #' Create a simple Leaflet map from data
 #'
-#' @param data Data to plot
-#' @param domain Domain for map
-#' @param palette Palette, for example YlOrRd or Reds
-#' @param legend_values Values for legend
+#' @param polygon_data Polygon data
+#' @param raster_data Raster datas
+#' @param domain Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend
+#' @param palette Palette to be used for colours, defaults to viridis
 #' @param legend_title Title for legend
 #' @param add_scale_bar Add scale bar if TRUE
 #' @param polygon_fill_opacity Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons
-#' @param fill_colour_weight Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons
+#' @param polygon_fill_colour Polygon fill colour
+#' @param polygon_line_colour Polygon surrounding line colour
+#' @param polygon_line_weight Polygon surrounding line weight
 #'
-#' @return map
+#' @return leaflet::leaflet
 #' @export
-#' @importFrom magrittr %>%
-plot_map <- function(data,
-                     domain,
-                     palette = "YlOrRd",
-                     colour = "grey",
-                     legend_values = NULL,
+plot_map <- function(polygon_data = NULL,
+                     raster_data = NULL,
+                     domain = NULL,
+                     palette = "viridis",
                      legend_title = NULL,
                      add_scale_bar = FALSE,
-                     polygon_fill_opacity = 0.75,
-                     fill_colour_weight = 1.0) {
-  require_package(pkg_name = "leaflet")
+                     polygon_fill_colour = "#E4572E",
+                     polygon_line_colour = "grey",
+                     polygon_line_weight = 1,
+                     polygon_fill_opacity = 0.6) {
+  require_packages(packages = "leaflet")
 
-  colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
-
-  m <- leaflet::leaflet(data = data)
+  if (is.null(polygon_data) && is.null(raster_data)) {
+    stop("Polygon or raster data must be given.")
+  }
+  library(leaflet)
+  m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
+  m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
 
+  # Store a vector of layers we add to the map,
+  # used later to create the layers control object
+  layers <- c()
 
-  # leaflet::addPolygons(
-  #   fillColor = ~ colours(domain), color = colour, weight = fill_colour_weight,
-  #   fillOpacity = polygon_fill_opacity
-  # ) %>%
-  # {
-  #   if (add_scale_bar) leaflet::addScaleBar(., position = "bottomleft") else .
-  # } %>%
-  # {
-  #   if (!is.null(legend_values)) {
-  #     leaflet::addLegend(.,
-  #       pal = colours,
-  #       values = legend_values,
-  #       opacity = 0.8,
-  #       title = legend_title
-  #     )
-  #   } else {
-  #     .
-  #   }
-  # }
+  if (!is.null(polygon_data)) {
+    if (!is.null(domain)) {
+      colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+      polygon_fill_colour <- ~ colours(domain)
+      m <- leaflet::addLegend(m,
+        pal = colours,
+        values = domain,
+        opacity = 0.8,
+        title = legend_title
+      )
+    }
+    m <- leaflet::addPolygons(m,
+      data = polygon_data,
+      fillColor = polygon_fill_colour,
+      color = polygon_line_colour,
+      weight = polygon_line_weight,
+      fillOpacity = polygon_fill_opacity,
+      group = "Poly"
+    )
+    layers <- append(layers, "Poly")
+  }
+
+  if (!is.null(raster_data)) {
+    m <- leaflet::addRasterImage(m,
+      x = raster_data,
+      opacity = 0.75,
+      group = "Raster",
+      layerId = "raster",
+      colors = palette,
+    )
+    layers <- append(layers, "Raster")
+  }
+
+  m <- leaflet::addLayersControl(m,
+    position = "topright",
+    baseGroups = c("OSM", "Satellite"),
+    overlayGroups = layers,
+    options = leaflet::layersControlOptions(collapsed = FALSE)
+  )
+
+  if (add_scale_bar) {
+    m <- leaflet::addScaleBar(m, position = "bottomleft")
+  }
+
   return(m)
 }

@@ -16,33 +16,15 @@ vignette: >
 
 In this tutorial we'll cover some of the work we did as part of our study into fitting a Bayesian spatio-temporal model to predict the COVID-19 infection rate across England.
 
-We'll cover ...
-
 # Study aim and data description
 
 The COVID-19 pandemic has had a profound impact on global health and economies, with the spread and evolution of the virus becoming a major concern for health authorities and policymakers. In this study, we aim to investigate the spread and evolution of COVID-19 occurrences across England. The aim of the study is two-fold: on the one hand, fitting a Bayesian spatio-temporal model to predict the COVID-19 infection rate across mainland England over space and time; on the other hand, investigating the impacts of socioeconomic, demographic and environmental factors on COVID-19 infection. 
 
 The first thing is to load all the packages used in the COVID-19 case study.
 
-```{r, error=TRUE,message=FALSE,warning=FALSE}
-library(spdep)
-library(rgdal)
-library(gridExtra)
-library(INLA)
-library(inlabru)
-library(dplyr)
-library(raster)
-library(leaflet)
-library(scales)
-library(ggplot2)
-library(fdmr)
-```
-
-The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The shapefile of the study region `shape` is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods.
+The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The shapefile of the study region `shape` is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods.load
 
 We first need to retrieve the data from the fdmr example data store and unpack it and we'll use `retrieve_tutorial_data` to do this.
-
-> **_NOTE:_**  Download the tar file from the URL I sent and pass the path to this file to the function. This process will be streamlined once we know what we can host publicly.
 
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid")
@@ -60,13 +42,19 @@ Now we make a map of the study region
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
 
-# map = fdmr::plot_map(data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, fill_colour_weight = 0.6)
-
-m <- leaflet::leaflet(data = sp_data)
-m <- leaflet::addTiles(m)
-m
+fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, palette = "YlOrRd")
 ```
 
+```{r}
+colours <- colorNumeric(palette = "YlOrRd", domain = sp_data@data$mapp, reverse = FALSE)
+leaflet(data = sp_data) %>%
+  addTiles() %>%
+  addPolygons(
+    fillColor = ~ colours(mapp), color = "grey", weight = 0.6,
+    fillOpacity = 0.5
+  ) %>%
+  addScaleBar(position = "bottomleft")
+```
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using same process we used above.
 
 ```{r loadCOVIDat, error=TRUE}
@@ -245,18 +233,20 @@ Finally, we fit the spatio-temporal model using spde approach and AR(1) process 
 
 
 ```{r fitmodel, error=TRUE, eval=FALSE}
-inlabru_model <- bru(formula, data = covid19_data,
-                   family = "poisson",
-                   E = covid19_data$Population,
-                   control.family = list(link = "log"),
-                   control.predictor = list(link = 1),
-                   options = list(
-                     control.inla = list(
-                       reordering = "metis",
-                       int.strategy = "eb"),
-                      verbose = TRUE,
-                     inla.mode="experimental"
-                   )
+inlabru_model <- inlabru::bru(formula,
+  data = covid19_data,
+  family = "poisson",
+  E = covid19_data$Population,
+  control.family = list(link = "log"),
+  control.predictor = list(link = 1),
+  options = list(
+    control.inla = list(
+      reordering = "metis",
+      int.strategy = "eb"
+    ),
+    verbose = TRUE,
+    inla.mode = "experimental"
+  )
 )
 ```
 
@@ -345,11 +335,11 @@ margs$parameter <- rep(names(list_marginals),
 margs$parameter <-
   factor(margs$parameter, levels = c("Spatial range", "Stdev", "AR(1)"))
 
-ggplot(margs, aes(x = x, y = y)) +
-  geom_line() +
-  facet_wrap(~parameter, scales = "free") +
-  labs(x = "", y = "Density") +
-  theme_bw()
+ggplot2::ggplot(margs, ggplot2::aes(x = x, y = y)) +
+  ggplot2::geom_line() +
+  ggplot2::facet_wrap(~parameter, scales = "free") +
+  ggplot2::labs(x = "", y = "Density") +
+  ggplot2::theme_bw()
 ```
 
 ## Temporal evolution of infection rate predictions
@@ -364,9 +354,9 @@ pred.25 <- inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)
 pred.975 <- inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
 
 predictions <- cbind.data.frame(
-  "date"= covid19_data$date,
-  "week"= covid19_data$week,
-  "MSOA11CD"= covid19_data$MSOA11CD, 
+  "date" = covid19_data$date,
+  "week" = covid19_data$week,
+  "MSOA11CD" = covid19_data$MSOA11CD,
   "pred.mean" = pred.mean,
   "pred.25" = pred.25,
   "pred.975" = pred.975
@@ -429,20 +419,17 @@ average_risk_by_nb <-
 sp_data@data$ave.risk <- average_risk_by_nb$ave.risk
 
 domain <- sp_data@data$ave.risk
-legend_values <- sp_data@data$ave.risk
 
 fdmr::plot_map(
-  data = sp_data,
+  polygon_data = sp_data,
   domain = domain,
   palette = "Reds",
-  legend_values = legend_values,
   legend_title = "Risk",
   add_scale_bar = TRUE,
-  polygon_fill_opacity = 0.8,
-  fill_colour_weight = 1.0
+  polygon_fill_opacity = 1,
+  polygon_line_colour = "transparent"
 )
 ```
-
 
 ## Evaluate the performance of prediction
 
