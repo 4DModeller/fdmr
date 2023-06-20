@@ -1,0 +1,118 @@
+---
+title: "Plotting maps"
+output: html_notebook
+---
+
+4DModeller provides some simple map plotting functions that help you create maps from many different types of data.
+
+```{r}
+library(fdmr)
+```
+## Polygons
+
+We'll first start off by plotting some polygon data on a map. To do this we'll use some of the data we use in our Hydrology tutorial, where we display a catchment area on map.
+First we need to retrieve the example data, then load in the raster data from file.
+
+```{r}
+fdmr::retrieve_tutorial_data(dataset = "hydro")
+norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
+```
+
+Next we need to manipulate the data to ensure we plot the area correctly,
+
+```{r}
+norway_polygon <- rgdal::readOGR(norway_polygon_location)
+norway_polygon <- sf::st_as_sf(norway_polygon,
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
+)
+
+sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
+```
+
+Now we can plot the polygon on a leaflet map using `plot_map`.
+
+```{r}
+fdmr::plot_map(polygon_data = sfc)
+```
+
+## Rasters
+
+We can also plot raster data onto the map. We'll now read some raster data from a [NetCDF](https://www.unidata.ucar.edu/software/netcdf/) file. We do this using the `raster::stack` function which creates a `RasterStack` object which itself contains a number of `RasterLayer` objects. These hold [ERA5](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) precipitation data for each day of the month for October 2021.
+
+```{r}
+era5_data_filepath <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
+era5_precip <- raster::stack(era5_data_filepath)
+era5_precip
+```
+We can see that we've got a stack of 31 layers, one for each day of October. To list all the dates in the stack we can do
+
+```{r}
+names(era5_precip)
+```
+
+As we want to plot this on a Leaflet map we need to ensure the coordinate reference system (CRS) is correct.
+
+```{r}
+projected_raster <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
+```
+
+As we only want to plot the data that overlaps with our rain catchment area polygon we plotted earlier, we mask the data using [`raster::mask`](https://www.rdocumentation.org/packages/raster/versions/3.6-20/topics/mask) and then crop it using [`terra::crop`](https://www.rdocumentation.org/packages/terra/versions/1.7-29/topics/crop).
+
+```{r}
+crop_era5 <- raster::mask(projected_raster, norway_polygon)
+crop_era5 <- terra::crop(crop_era5, raster::extent(norway_polygon), snap = "near")
+```
+
+We're now read to plot the raster data. Let's select a single layer from the stack, the first day of October, and plot the precipitation measurements for that day over the polygon we previously plotted.
+
+```{r}
+raster_image <- crop_era5$X2021.10.01
+```
+
+Now we're ready to plot both the polygon and raster data.
+
+```{r}
+fdmr::plot_map(raster_data = raster_image, polygon_data = sfc)
+```
+
+## Interactive mapping
+
+You can plot data on an interactive [`leaflet`](https://rstudio.github.io/leaflet/) map using our `plot_interactive_map` function. This launches a [Shiny](https://shiny.posit.co/) app allowing you to customise your plot to better
+investigate your data. Below are a couple of examples showing how to use the interactive plotting tool.
+
+### Hydroelectric Power
+
+We want to create a plot on the map covering the rain catchment area around the power plant. To do this we read in a GeoJSON file containing the coordinates of the catchment area and make sure it's in the correct coordinate reference system to plot on our map.
+
+```{r}
+norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
+norway_polygon <- rgdal::readOGR(norway_polygon_location)
+norway_polygon <- sf::st_as_sf(norway_polygon,
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
+)
+
+norway_polygon <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
+```
+
+Next we read ECMWF Reanalysis v5 (ERA5) precipitation data from a NetCDF file.
+
+```{r}
+era5_data_filepath <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
+era5_precip <- raster::stack(era5_data_filepath)
+era5_precip <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
+```
+
+The data is now ready to pass to our interactive plotting function.
+
+```{r eval=FALSE}
+fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = norway_polygon)
+```
+
+## COVID
+
+TODO - To add in COVID-19 plotting example here.
+
+
+

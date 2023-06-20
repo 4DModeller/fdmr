@@ -47,27 +47,31 @@ First we will look at the location of the dam by making a map and plotting the s
 ```{r error=TRUE,warning=FALSE}
 # TODO : here is a good example for the map function
 norway_polygon <- rgdal::readOGR(norway_polygon_location)
-norway_polygon <- sf::st_as_sf(norway_polygon
-                               , coords=c("longitude", "latitude")
-                               , crs="+proj=utm +zone=32")
+norway_polygon <- sf::st_as_sf(norway_polygon,
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
+)
 
-suldalsvatnet_dam <- list(longitude=6.517174, latitude=59.490720, name="Suldalsvatnet Dam")
-stream_gauge_13 <- list(longitude=6.5395789, latitude=59.5815849, name="Stream Gauge 13")
-stream_gauge_14 <- list(longitude=6.7897968, latitude=59.7531662, name="Stream Gauge 14")
+suldalsvatnet_dam <- list(longitude = 6.517174, latitude = 59.490720, name = "Suldalsvatnet Dam")
+stream_gauge_13 <- list(longitude = 6.5395789, latitude = 59.5815849, name = "Stream Gauge 13")
+stream_gauge_14 <- list(longitude = 6.7897968, latitude = 59.7531662, name = "Stream Gauge 14")
 
 
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 
 leaflet(sfc, height = 500, width = 750) %>%
   addTiles() %>%
-  addPolygons(stroke = FALSE, smoothFactor = 0.3,
-              fillColor = "red",
-              fillOpacity = 0.5) %>%
+  addPolygons(
+    stroke = FALSE, smoothFactor = 0.3,
+    fillColor = "red",
+    fillOpacity = 0.5
+  ) %>%
   addTiles("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-           attribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community') %>%
-  addMarkers(lat=suldalsvatnet_dam$latitude, lng=suldalsvatnet_dam$longitude, popup=suldalsvatnet_dam$name) %>%
-  addMarkers(lat=stream_gauge_13$latitude, lng=stream_gauge_13$longitude, popup=stream_gauge_13$name) %>%
-  addMarkers(lat=stream_gauge_14$latitude, lng=stream_gauge_14$longitude, popup=stream_gauge_14$name)
+    attribution = "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+  ) %>%
+  addMarkers(lat = suldalsvatnet_dam$latitude, lng = suldalsvatnet_dam$longitude, popup = suldalsvatnet_dam$name) %>%
+  addMarkers(lat = stream_gauge_13$latitude, lng = stream_gauge_13$longitude, popup = stream_gauge_13$name) %>%
+  addMarkers(lat = stream_gauge_14$latitude, lng = stream_gauge_14$longitude, popup = stream_gauge_14$name)
 ```
 
 On the map you can see the dam, the resevoir, the catchment area, and the two stream gauges.
@@ -118,30 +122,40 @@ ERA5-land data is gridded however we need the data to be assigned to catchment s
 
 ```{r error = TRUE,warning=FALSE}
 # TODO : mapping function here too
-era5_precip <- stack(era5_location)
-era5_precip %>% values() %>% hist(main="Total Precipitation", col="violet")
+
+era5_precip <- raster::stack(era5_location)
+era5_precip %>%
+  raster::values() %>%
+  raster::hist(main = "Total Precipitation", col = "violet")
+
 sr <- "+proj=utm +zone=32"
-projected_raster <- projectRaster(era5_precip, crs = sr)
-crop_era5 <- mask(projected_raster, norway_polygon)
-crop_era5 <- terra::crop(crop_era5, extent(norway_polygon), snap="near")
-leaflet(sfc, width=750, height=500) %>% 
-  addTiles() %>%
-  addRasterImage(x = crop_era5$X2021.10.01, 
-                 opacity = 1) %>%
-  addPolygons(stroke = FALSE, smoothFactor = 0.3,
-              fillColor = "red",
-              fillOpacity = 0.5)
+projected_raster <- raster::projectRaster(era5_precip, crs = sr)
+
+crop_era5 <- raster::mask(projected_raster, norway_polygon)
+crop_era5 <- terra::crop(crop_era5, raster::extent(norway_polygon), snap = "near")
+
+leaflet::leaflet(sfc, width = 750, height = 500) %>%
+  leaflet::addTiles() %>%
+  leaflet::addRasterImage(
+    x = crop_era5$X2021.10.01,
+    opacity = 1
+  ) %>%
+  leaflet::addPolygons(
+    stroke = FALSE, smoothFactor = 0.3,
+    fillColor = "red",
+    fillOpacity = 0.5
+  )
 ```
 
 Create a data frame rsdf containing precipitation data
 
 ```{r error=TRUE}
 rsdf <- data.frame(rasterToPoints(crop_era5))
-rsdf <- melt(setDT(rsdf), id.vars=c("x","y"), variable.name = "time")
+rsdf <- melt(setDT(rsdf), id.vars = c("x", "y"), variable.name = "time")
 rsdf$time <- sapply(rsdf$time, function(t) {
-  as.integer(strsplit(as.character(t), '\\.')[[1]][3])
+  as.integer(strsplit(as.character(t), "\\.")[[1]][3])
 })
-rsdf <- setNames(rsdf, c('x', 'y', 'time', 'precip'))
+rsdf <- setNames(rsdf, c("x", "y", "time", "precip"))
 ```
 
 
@@ -151,75 +165,79 @@ We need to figure out which ERA5 precipitation pixels are closest to which strea
 ```{r error=TRUE, latlong2utm}
 # TODO : this needs to be moved to 4dm
 latlong_to_utm <- function(lat, lon) {
-  
   # Create a spatial points object with input coordinates
   input_point <- SpatialPoints(matrix(c(lon, lat), ncol = 2), proj4string = CRS("+proj=longlat +datum=WGS84"))
-  
+
   # Define the UTM zone number and hemisphere for the output coordinate system
-  utm_zone <- as.character((floor((lon + 180)/6) %% 60) + 1)
+  utm_zone <- as.character((floor((lon + 180) / 6) %% 60) + 1)
   utm_hemisphere <- ifelse(lat < 0, "S", "N")
   utm_proj_string <- paste0("+proj=utm +zone=", utm_zone, " +", utm_hemisphere)
-  
+
   # Convert the input point to the output coordinate system
   output_point <- spTransform(input_point, CRS(utm_proj_string))
-  
-  # Return the UTM coordinates as a vector
-  return(c(output_point@coords[,1], output_point@coords[,2]))
-}
 
+  # Return the UTM coordinates as a vector
+  return(c(output_point@coords[, 1], output_point@coords[, 2]))
+}
 ```
 
 Now we can match the pixel precipation data to the nearest stream gauge.
 
 ```{r error=TRUE, matchpixel}
 pixel_coords <- unique(sp::coordinates(crop_era5))
-s13_utm <- latlong_to_utm(lat=stream_gauge_13$latitude
-                          ,lon=stream_gauge_13$longitude)
-s14_utm <- latlong_to_utm(lat=stream_gauge_14$latitude
-                          ,lon=stream_gauge_14$longitude)
-
-s13 <- data.frame(x=s13_utm[[1]], y=s13_utm[[2]])
-s14 <- data.frame(x=s14_utm[[1]], y=s14_utm[[2]])
-pixel_dist_gauge<-data.frame(x=pixel_coords[,1],
-                             y=pixel_coords[,2],
-                             dist_s1=rep(NA,nrow(pixel_coords)),
-                             dist_s2=rep(NA,nrow(pixel_coords)),
-                             min_s=rep(NA,nrow(pixel_coords)),
-                             streamflow=rep(NA, nrow(pixel_coords))
+s13_utm <- latlong_to_utm(
+  lat = stream_gauge_13$latitude,
+  lon = stream_gauge_13$longitude
 )
-for (i in 1:nrow(pixel_coords)){
-  pixel_dist_gauge$dist_s1[i]<-sqrt((pixel_dist_gauge$x[i]-s13$x)^2+
-                                      (pixel_dist_gauge$y[i]-s13$y)^2)
-  
-  pixel_dist_gauge$dist_s2[i]<-sqrt((pixel_dist_gauge$x[i]-s14$x)^2+
-                                      (pixel_dist_gauge$y[i]-s14$y)^2)
-  pixel_dist_gauge$min_s[i]<-which.min(c(pixel_dist_gauge$dist_s1[i],
-                                         pixel_dist_gauge$dist_s2[i]))
+s14_utm <- latlong_to_utm(
+  lat = stream_gauge_14$latitude,
+  lon = stream_gauge_14$longitude
+)
+
+s13 <- data.frame(x = s13_utm[[1]], y = s13_utm[[2]])
+s14 <- data.frame(x = s14_utm[[1]], y = s14_utm[[2]])
+pixel_dist_gauge <- data.frame(
+  x = pixel_coords[, 1],
+  y = pixel_coords[, 2],
+  dist_s1 = rep(NA, nrow(pixel_coords)),
+  dist_s2 = rep(NA, nrow(pixel_coords)),
+  min_s = rep(NA, nrow(pixel_coords)),
+  streamflow = rep(NA, nrow(pixel_coords))
+)
+for (i in 1:nrow(pixel_coords)) {
+  pixel_dist_gauge$dist_s1[i] <- sqrt((pixel_dist_gauge$x[i] - s13$x)^2 +
+    (pixel_dist_gauge$y[i] - s13$y)^2)
+
+  pixel_dist_gauge$dist_s2[i] <- sqrt((pixel_dist_gauge$x[i] - s14$x)^2 +
+    (pixel_dist_gauge$y[i] - s14$y)^2)
+  pixel_dist_gauge$min_s[i] <- which.min(c(
+    pixel_dist_gauge$dist_s1[i],
+    pixel_dist_gauge$dist_s2[i]
+  ))
 }
 
 
-# the dataframe pixel_dist_gauge then needs to be replicated by the number of time points 
+# the dataframe pixel_dist_gauge then needs to be replicated by the number of time points
 n.time <- nlayers(era5_precip)
-pixel_dist_gauge<-do.call(rbind, replicate(n.time, pixel_dist_gauge, simplify=FALSE))
-pixel_dist_gauge$time<-rep(1:n.time,each=nrow(pixel_coords))
+pixel_dist_gauge <- do.call(rbind, replicate(n.time, pixel_dist_gauge, simplify = FALSE))
+pixel_dist_gauge$time <- rep(1:n.time, each = nrow(pixel_coords))
 
 streamdata <- list(data_13, data_14)
 get_stream_data <- function(row) {
-  which_stream_data <- streamdata[[row['min_s']]]
-  data_at_row_time_index <- which_stream_data[which_stream_data[,c("time_index")] == row['time'],]
+  which_stream_data <- streamdata[[row["min_s"]]]
+  data_at_row_time_index <- which_stream_data[which_stream_data[, c("time_index")] == row["time"], ]
   return(data_at_row_time_index$value)
 }
-pixel_dist_gauge$streamflow <- apply(pixel_dist_gauge,1,get_stream_data)
-
+pixel_dist_gauge$streamflow <- apply(pixel_dist_gauge, 1, get_stream_data)
 ```
 
 
 Now we create a new SpatialPointDataFrame inla_data for model fitting. The data frame contains the response and predictor data at each spatial location and time point.
 
 ```{r error=TRUE,inladat}
-inla_data<-merge(pixel_dist_gauge,rsdf,by=c("time","x","y"))
-inla_data <- subset(inla_data, select=c('x', 'y', 'streamflow', 'precip', 'time'))
-sp::coordinates(inla_data)<- c("x","y")
+inla_data <- merge(pixel_dist_gauge, rsdf, by = c("time", "x", "y"))
+inla_data <- subset(inla_data, select = c("x", "y", "streamflow", "precip", "time"))
+sp::coordinates(inla_data) <- c("x", "y")
 
 head(inla_data@data)
 head(inla_data@coords)
@@ -242,17 +260,16 @@ Create the triangulated mesh of the study region
 # TODO : it would be nice to map the mesh onto the dataset using the mapmaker function i am suggesting
 e <- crop_era5@extent
 resolution <- res(crop_era5)
-xres <- resolution[1]*2
-yres <- resolution[2]*2
+xres <- resolution[1] * 2
+yres <- resolution[2] * 2
 xy <- sp::coordinates(crop_era5)
 
 # maybe this makes the mesh smaller lol
 xy <- xy[seq(1, nrow(xy), by = 2), ]
 # mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1000, xres*10000), cutoff=2000, crs=sr)
 # mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=2000, crs=sr)
-mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=75, crs=sr)
+mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = sr)
 plot(mesh)
-
 ```
 
 ## priors
@@ -262,30 +279,27 @@ the priors here are describing how the unobserved variannce is distributed over 
 In this case, we set the prior range to be 20km.
 
 ```{r error=TRUE, spde}
-
 # prior.range<-0.296
 # the prior range is the distance that the process should stop effecting, so in this case it is currently 20km away from the node center
-prior.range<-20.0
+prior.range <- 20.0
 spde <- inla.spde2.pcmatern(
-  mesh = mesh, 
-  prior.range = c(prior.range, 0.5), 
-  prior.sigma = c(1, 0.01) 
+  mesh = mesh,
+  prior.range = c(prior.range, 0.5),
+  prior.sigma = c(1, 0.01)
 )
-
 ```
 
 the model has some time dependency.
 
 ```{r pccor}
-rhoprior <- base::list(theta = list(prior = 'pccor1', param = c(0, 0.9)))
+rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
 ```
 
 In order to fit the model, we also need to define a temporal index and the number of discrete time points we want to model. The INLA model requires that time indicies must be an integer starting at 1.
 
 ```{r error=TRUE}
-group.index <- inla_data@data$time 
-n_groups<-length(unique(group.index))
-
+group.index <- inla_data@data$time
+n_groups <- length(unique(group.index))
 ```
 
 
@@ -297,29 +311,35 @@ The model below predicts the streamflow given the precipitation as a fixed effec
 formula1 <- streamflow ~ 0 + Intercept + precip
 
 formula2 <- streamflow ~ 0 + Intercept + precip +
-  f(main=coordinates,
-    model=spde,
-    group=group.index,
-    ngroup=n_groups,
-    control.group=list(model="ar1",
-                       hyper=rhoprior))
+  f(
+    main = coordinates,
+    model = spde,
+    group = group.index,
+    ngroup = n_groups,
+    control.group = list(
+      model = "ar1",
+      hyper = rhoprior
+    )
+  )
 ```
 
 
 
 ```{r error=TRUE, modelrun}
-inlabru.model1 <- bru(formula1, data = inla_data,
-                   family = "gaussian",
-                   options = list(
-                     verbose = TRUE
-                   )
+inlabru.model1 <- bru(formula1,
+  data = inla_data,
+  family = "gaussian",
+  options = list(
+    verbose = TRUE
+  )
 )
 
-inlabru.model2 <- bru(formula2, data = inla_data,
-                   family = "gaussian",
-                   options = list(
-                     verbose = TRUE
-                   )
+inlabru.model2 <- bru(formula2,
+  data = inla_data,
+  family = "gaussian",
+  options = list(
+    verbose = TRUE
+  )
 )
 ```
 

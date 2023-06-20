@@ -5,23 +5,20 @@
 \title{Create a simple Leaflet map from data}
 \usage{
 plot_map(
-  data,
-  domain,
-  palette = "YlOrRd",
-  colour = "grey",
+  polygon_data = NULL,
+  raster_data = NULL,
+  domain = NULL,
   legend_values = NULL,
   legend_title = NULL,
   add_scale_bar = FALSE,
+  polygon_fill_colour = "red",
+  polygon_line_colour = "blue",
   polygon_fill_opacity = 0.75,
   fill_colour_weight = 1
 )
 }
 \arguments{
-\item{data}{Data to plot}
-
 \item{domain}{Domain for map}
-
-\item{palette}{Palette, for example YlOrRd or Reds}
 
 \item{legend_values}{Values for legend}
 
@@ -32,6 +29,13 @@ plot_map(
 \item{polygon_fill_opacity}{Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons}
 
 \item{fill_colour_weight}{Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons}
+
+\item{data}{Data to plot}
+
+\item{palette}{Palette, for example YlOrRd or Reds}
+}
+\value{
+leaflet::leaflet
 }
 \description{
 Create a simple Leaflet map from data

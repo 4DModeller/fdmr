@@ -245,18 +245,20 @@ Finally, we fit the spatio-temporal model using spde approach and AR(1) process 
 
 
 ```{r fitmodel, error=TRUE, eval=FALSE}
-inlabru_model <- bru(formula, data = covid19_data,
-                   family = "poisson",
-                   E = covid19_data$Population,
-                   control.family = list(link = "log"),
-                   control.predictor = list(link = 1),
-                   options = list(
-                     control.inla = list(
-                       reordering = "metis",
-                       int.strategy = "eb"),
-                      verbose = TRUE,
-                     inla.mode="experimental"
-                   )
+inlabru_model <- bru(formula,
+  data = covid19_data,
+  family = "poisson",
+  E = covid19_data$Population,
+  control.family = list(link = "log"),
+  control.predictor = list(link = 1),
+  options = list(
+    control.inla = list(
+      reordering = "metis",
+      int.strategy = "eb"
+    ),
+    verbose = TRUE,
+    inla.mode = "experimental"
+  )
 )
 ```
 
@@ -364,9 +366,9 @@ pred.25 <- inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)
 pred.975 <- inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
 
 predictions <- cbind.data.frame(
-  "date"= covid19_data$date,
-  "week"= covid19_data$week,
-  "MSOA11CD"= covid19_data$MSOA11CD, 
+  "date" = covid19_data$date,
+  "week" = covid19_data$week,
+  "MSOA11CD" = covid19_data$MSOA11CD,
   "pred.mean" = pred.mean,
   "pred.25" = pred.25,
   "pred.975" = pred.975
