@@ -1,0 +1,73 @@
+---
+title: "Mesh building"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mesh building}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Here we'll cover building a mesh from some spatial data, modifying its parameters and plotting it and the data on an interactive map.
+
+We'll first load in some spatial data to create the mesh. This is the same data we previously used in the COVID-19 tutorial.
+
+```{r eval=FALSE}
+sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
+sp_data
+```
+
+The `sp_data` object is a `SpatialPolygonsDataFrame` containing 6789 features for areas of England. We can build a mesh
+by passing `sp_data` to the `mesh_builder` function.
+
+```{r eval=FALSE}
+fdmr::mesh_builder(spatial_data = sp_data)
+```
+ 
+## Customise initial parameters
+
+If you want to customise the initial parameters used to build the mesh you can pass in 
+
+```{r eval=FALSE}
+args(fdmr::mesh_builder)
+```
+
+Now we have the spatial data loaded we can think about some initial parameters for the mesh we're going to create. We'll calculate the initial range and max edge values from our data and
+pass them into the `mesh_builder` function. These values will then be used as values for the initial mesh that's created but can be changed within the app.
+
+```{r eval=FALSE}
+initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
+max_edge <- initial_range / 8
+
+max_edge_fin <- c(1, 2) * max_edge
+offset <- c(initial_range / 4, initial_range)
+cutoff <- max_edge / 7
+```
+
+Now we're ready to start the app.
+
+```{r eval=FALSE}
+fdmr::mesh_builder(spatial_data = sp_data, max_edge = max_edge_fin, offset = offset, cutoff = cutoff)
+```
+
+## Run checks on mesh
+
+We provide a simple function to check meshes created using the mesh builder tool. From with the user interface click "Check mesh" to run a number of tests on the mesh.
+Currently these are:
+
+1. Check that the number of mesh nodes isn't greater than the number of measurments
+2. Check that the number of triangles isn't greater than the number of measurements
+3. Check that there are no isolated triangles
+
+To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Here we use the COVID-19 data. Create a mesh of your design and when you're finished click the "Check mesh" button. This passes the created mesh
+to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
+
+```{r eval=FALSE}
+covid19_data <- fdmr::load_tutorial_data(filename = "covid19_data.rds")
+fdmr::mesh_builder(spatial_data = sp_data, data = covid19_data)
+```
+
+## Exporting your mesh
+
+To export your mesh click on the Code tab and copy and paste the code used to created the mesh.
+
+

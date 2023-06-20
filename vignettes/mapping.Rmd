@@ -1,6 +1,10 @@
 ---
-title: "Plotting maps"
-output: html_notebook
+title: "Map Plotting"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Map Plotting}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 4DModeller provides some simple map plotting functions that help you create maps from many different types of data.
@@ -73,7 +77,7 @@ raster_image <- crop_era5$X2021.10.01
 Now we're ready to plot both the polygon and raster data.
 
 ```{r}
-fdmr::plot_map(raster_data = raster_image, polygon_data = sfc)
+fdmr::plot_map(raster_data = raster_image, polygon_data = sfc, palette = "viridis")
 ```
 
 ## Interactive mapping
@@ -109,10 +113,3 @@ The data is now ready to pass to our interactive plotting function.
 ```{r eval=FALSE}
 fdmr::plot_interactive_map(raster_data = era5_precip, polygon_data = norway_polygon)
 ```
-
-## COVID
-
-TODO - To add in COVID-19 plotting example here.
-
-
-
