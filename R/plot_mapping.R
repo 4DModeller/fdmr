@@ -7,21 +7,21 @@
 #' @param add_scale_bar Add scale bar if TRUE
 #' @param polygon_fill_opacity Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons
 #' @param fill_colour_weight Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons
-#' @param polygon_fill_colour 
-#' @param polygon_line_colour 
+#' @param polygon_fill_colour
+#' @param polygon_line_colour
 #'
 #' @return leaflet::leaflet
 #' @export
 plot_map <- function(polygon_data = NULL,
                      raster_data = NULL,
                      domain = NULL,
-                     #  palette = "YlOrRd",
-                     #  colour = "grey",
+                     palette = "YlOrRd",
                      legend_values = NULL,
                      legend_title = NULL,
                      add_scale_bar = FALSE,
                      polygon_fill_colour = "red",
-                     polygon_line_colour = "blue",
+                     polygon_line_colour = "grey",
+                     polygon_line_weight = 1,
                      polygon_fill_opacity = 0.75,
                      fill_colour_weight = 1.0) {
   require_packages(packages = "leaflet")
@@ -30,9 +30,9 @@ plot_map <- function(polygon_data = NULL,
     stop("Polygon or raster data must be given.")
   }
 
-  # if(is.null(colours) && is.null(domain)) {
-  #   colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
-  # }
+  if (is.null(domain)) {
+    colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+  }
 
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
@@ -41,7 +41,11 @@ plot_map <- function(polygon_data = NULL,
   layers <- c()
 
   if (!is.null(polygon_data)) {
-    m <- leaflet::addPolygons(m, data = polygon_data, fillColor = polygon_fill_colour, color = polygon_line_colour, group = "Poly")
+    if (is.null(domain)) {
+      colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+    }
+    
+    m <- leaflet::addPolygons(m, data = polygon_data, fillColor = polygon_fill_colour, color = polygon_line_colour, weight = polygon_line_weight, group = "Poly")
     layers <- append(layers, "Poly")
   }
 

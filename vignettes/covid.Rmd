@@ -42,8 +42,6 @@ The study region is mainland England, which is partitioned into 6789 neighbourho
 
 We first need to retrieve the data from the fdmr example data store and unpack it and we'll use `retrieve_tutorial_data` to do this.
 
-> **_NOTE:_**  Download the tar file from the URL I sent and pass the path to this file to the function. This process will be streamlined once we know what we can host publicly.
-
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid")
 ```
@@ -60,11 +58,7 @@ Now we make a map of the study region
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
 
-# map = fdmr::plot_map(data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, fill_colour_weight = 0.6)
-
-m <- leaflet::leaflet(data = sp_data)
-m <- leaflet::addTiles(m)
-m
+fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, fill_colour_weight = 0.6)
 ```
 
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using same process we used above.
