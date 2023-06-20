@@ -19,6 +19,9 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/mapping.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/meshbuilder.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/authors.html</loc>
   </url>
   <url>
@@ -37,7 +40,22 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/latlong_to_utm.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/load_tutorial_data.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/mesh_builder.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/mesh_checker.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/mesh_to_spatial.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/meshbuilder_shiny.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_barchart.html</loc>

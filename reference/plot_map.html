@@ -62,24 +62,32 @@
 <span>  polygon_data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  raster_data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  legend_values <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  palette <span class="op">=</span> <span class="st">"viridis"</span>,</span>
 <span>  legend_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_scale_bar <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  polygon_fill_colour <span class="op">=</span> <span class="st">"red"</span>,</span>
-<span>  polygon_line_colour <span class="op">=</span> <span class="st">"blue"</span>,</span>
-<span>  polygon_fill_opacity <span class="op">=</span> <span class="fl">0.75</span>,</span>
-<span>  fill_colour_weight <span class="op">=</span> <span class="fl">1</span></span>
+<span>  polygon_fill_colour <span class="op">=</span> <span class="st">"#E4572E"</span>,</span>
+<span>  polygon_line_colour <span class="op">=</span> <span class="st">"grey"</span>,</span>
+<span>  polygon_line_weight <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  polygon_fill_opacity <span class="op">=</span> <span class="fl">0.6</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>domain</dt>
-<dd><p>Domain for map</p></dd>
+    <dl><dt>polygon_data</dt>
+<dd><p>Polygon data</p></dd>
 
 
-<dt>legend_values</dt>
-<dd><p>Values for legend</p></dd>
+<dt>raster_data</dt>
+<dd><p>Raster datas</p></dd>
+
+
+<dt>domain</dt>
+<dd><p>Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend</p></dd>
+
+
+<dt>palette</dt>
+<dd><p>Palette to be used for colours, defaults to viridis</p></dd>
 
 
 <dt>legend_title</dt>
@@ -90,20 +98,20 @@
 <dd><p>Add scale bar if TRUE</p></dd>
 
 
+<dt>polygon_fill_colour</dt>
+<dd><p>Polygon fill colour</p></dd>
+
+
+<dt>polygon_line_colour</dt>
+<dd><p>Polygon surrounding line colour</p></dd>
+
+
+<dt>polygon_line_weight</dt>
+<dd><p>Polygon surrounding line weight</p></dd>
+
+
 <dt>polygon_fill_opacity</dt>
 <dd><p>Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons</p></dd>
-
-
-<dt>fill_colour_weight</dt>
-<dd><p>Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons</p></dd>
-
-
-<dt>data</dt>
-<dd><p>Data to plot</p></dd>
-
-
-<dt>palette</dt>
-<dd><p>Palette, for example YlOrRd or Reds</p></dd>
 
 </dl></div>
     <div class="section level2">
