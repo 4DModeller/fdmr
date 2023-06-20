@@ -52,7 +52,7 @@ plot_map <- function(polygon_data = NULL,
       opacity = 0.75,
       group = "Raster",
       layerId = "raster",
-      colors = "viridis",
+      colors = palette,
     )
     layers <- append(layers, "Raster")
   }
@@ -68,14 +68,14 @@ plot_map <- function(polygon_data = NULL,
     m <- leaflet::addScaleBar(m, position = "bottomleft")
   }
 
-  if (!is.null(legend_values)) {
-    m <- leaflet::addLegend(m,
-      pal = "viridis",
-      values = legend_values,
-      opacity = 0.8,
-      title = legend_title
-    )
-  }
+  # if (!is.null(legend_values)) {
+  #   m <- leaflet::addLegend(m,
+  #     pal = palette,
+  #     values = legend_values,
+  #     opacity = 0.8,
+  #     title = legend_title
+  #   )
+  # }
 
   return(m)
 }
