@@ -44,13 +44,13 @@ fdmr::retrieve_tutorial_data(dataset = "covid_mcmc")
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using the `load_tutorial_data` function.
 
 ```{r loadCOVIDat, error=TRUE}
-s_covid <- fdmr::load_tutorial_data(filename = "s_covid.rds")
+s_covid <- fdmr::load_tutorial_data(dataset = "covid_mcmc", filename = "s_covid.rds")
 ```
 
 Next we'll use the `load_tutorial_data` function to load in the spatial data we want.
 
 ```{r loadshape, error=TRUE}
-sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
+sp_data <- fdmr::load_tutorial_data(dataset = "covid_mcmc", filename = "spatial_data.rds")
 ```
 
 In this study, we use the areal unit modelling approach to fit the BHM and then make model inference using MCMC method. To do this, we need to construct a non-negative symmetric $n \times n$ neighbourhood or adjacency matrix $\boldsymbol{W}$ that accounts for the spatio-temporal autocorrelation structure, where $n=6789$ is the number of areal units. The neighbourhood matrix specifies the spatial closeness between pairs of areal units. The elements $\{w_{ij}\}$ in $\boldsymbol{W}$ can be either continuous or binary, and a larger value of $w_{ij}$ represents that MSOAs $(i,j)$ are spatially closer to each other. Here we use the border sharing specification, so that $w_{ij}=1$ if MSOAs $(i,j)$ share a common geographical border, and $w_{ij}=0$ otherwise.
@@ -109,7 +109,6 @@ For comparison purpose, we fit a separate BHM to the same dataset using the INLA
 
 
 ```{r fitinlamodel, error=TRUE, eval=TRUE}
-
 s_covid$ID<- seq(1,nrow(s_covid))
 formula <- total.cases ~ 1 + f(ID, model="bym",
                                graph=w

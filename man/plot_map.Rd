@@ -33,6 +33,9 @@ plot_map(
 
 \item{fill_colour_weight}{Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons}
 }
+\value{
+map
+}
 \description{
 Create a simple Leaflet map from data
 }
