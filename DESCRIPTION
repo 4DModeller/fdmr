@@ -46,9 +46,11 @@ Imports:
     scales,
     spdep,
     gridExtra,
-    leaflet
-Suggests: 
+    leaflet,
     archive,
+    shiny,
+    stringr
+Suggests: 
     bookdown,
     knitr,
     INLA,
