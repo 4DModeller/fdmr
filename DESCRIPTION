@@ -48,7 +48,8 @@ Imports:
     gridExtra,
     leaflet,
     archive,
-    shiny
+    shiny,
+    stringr
 Suggests: 
     bookdown,
     knitr,

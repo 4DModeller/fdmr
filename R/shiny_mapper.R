@@ -20,10 +20,8 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
   date_strings <- base::sort(date_strings)
 
   if (any(is.na(date_strings))) {
-    stop(paste(
-      "Unable to parse dates from layer names. Please ensure they are named correctly",
-      "or pass the date_format argument with the correct format."
-    ))
+    stop("Unable to parse dates from layer names. Please ensure they are named correctly",
+      "or pass the date_format argument with the correct format.")
   }
 
   # We want to be able to lookup the RasterLayer names using the date so we create a list
@@ -219,7 +217,5 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
 #' @return shinyApp
 #' @export
 plot_interactive_map <- function(raster_data = NULL, polygon_data = NULL, date_format = NULL) {
-  require_packages(packages = c("leaflet", "shiny", "stringr"))
-
   shiny::runApp(raster_mapping_app(raster_data = raster_data, polygon_data = polygon_data, date_format = date_format))
 }
