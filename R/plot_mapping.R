@@ -30,10 +30,6 @@ plot_map <- function(polygon_data = NULL,
     stop("Polygon or raster data must be given.")
   }
 
-  if (is.null(domain)) {
-    colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
-  }
-
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
   m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
@@ -43,8 +39,9 @@ plot_map <- function(polygon_data = NULL,
   if (!is.null(polygon_data)) {
     if (is.null(domain)) {
       colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+      polygon_fill_colour <- ~ colours(domain)
     }
-    
+
     m <- leaflet::addPolygons(m, data = polygon_data, fillColor = polygon_fill_colour, color = polygon_line_colour, weight = polygon_line_weight, group = "Poly")
     layers <- append(layers, "Poly")
   }
