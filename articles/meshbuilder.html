@@ -42,11 +42,14 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-tutorials">Tutorials</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-tutorials">
     <a class="dropdown-item" href="../articles/covid.html">COVID-19</a>
+    <a class="dropdown-item" href="../articles/covid_mcmc.html">COVID-19 MCMC</a>
     <a class="dropdown-item" href="../articles/hydro.html">Hydrology</a>
+    <a class="dropdown-item" href="../articles/mapping.html">Mapping</a>
+    <a class="dropdown-item" href="../articles/meshbuilder.html">Meshing</a>
   </div>
 </li>
 <li class="nav-item">
@@ -93,7 +96,7 @@ its parameters and plotting it and the data on an interactive map.</p>
 <p>We’ll first load in some spatial data to create the mesh. This is the
 same data we previously used in the COVID-19 tutorial.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span>  <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span>
 <span><span class="va">sp_data</span></span></code></pre></div>
 <p>The <code>sp_data</code> object is a
 <code>SpatialPolygonsDataFrame</code> containing 6789 features for areas
@@ -145,7 +148,7 @@ click the “Check mesh” button. This passes the created mesh to the
 <code><a href="../reference/mesh_checker.html">fdmr::mesh_checker</a></code> function and returns a list containing
 any errors found with the mesh.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="st">"covid19_data.rds"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"covid19_data.rds"</span><span class="op">)</span></span>
 <span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, data <span class="op">=</span> <span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">

@@ -10,6 +10,9 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/covid.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/covid_mcmc.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/hydro.html</loc>
   </url>
   <url>
@@ -32,6 +35,12 @@
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/clean_path.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/get_archive_cache_datapath.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/get_tutorial_cache_datapath.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/get_tutorial_datapath.html</loc>
