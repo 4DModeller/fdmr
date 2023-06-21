@@ -6,39 +6,40 @@
 \usage{
 plot_map(
   polygon_data = NULL,
-  colour_domain = NULL,
-  markers = NULL,
-  palette = "YlOrRd",
-  line_colour = "grey",
-  legend_values = NULL,
+  raster_data = NULL,
+  domain = NULL,
+  palette = "viridis",
   legend_title = NULL,
   add_scale_bar = FALSE,
-  reverse_colours = FALSE,
-  fill_opacity = 0.75,
-  fill_colour = "#ba2d2d",
-  fill_colour_weight = 1
+  polygon_fill_colour = "#E4572E",
+  polygon_line_colour = "grey",
+  polygon_line_weight = 1,
+  polygon_fill_opacity = 0.6
 )
 }
 \arguments{
 \item{polygon_data}{Polygon data}
 
-\item{colour_domain}{Colour domain for polygon on map}
+\item{raster_data}{Raster datas}
 
-\item{markers}{A data.frame containing latitude, longitude and label columns}
+\item{domain}{Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend}
 
-\item{palette}{Palette, for example YlOrRd or Reds}
-
-\item{legend_values}{Values for legend}
+\item{palette}{Palette to be used for colours, defaults to viridis}
 
 \item{legend_title}{Title for legend}
 
 \item{add_scale_bar}{Add scale bar if TRUE}
 
-\item{fill_colour}{Fill colour of polygon, overriden if colour_domain is passed}
+\item{polygon_fill_colour}{Polygon fill colour}
 
-\item{fill_colour_weight}{Polygon colour weight, float from 0 to 1.0, Passed to the weight argument of addPolygons}
+\item{polygon_line_colour}{Polygon surrounding line colour}
+
+\item{polygon_line_weight}{Polygon surrounding line weight}
 
 \item{polygon_fill_opacity}{Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons}
+}
+\value{
+leaflet::leaflet
 }
 \description{
 Create a simple Leaflet map from data

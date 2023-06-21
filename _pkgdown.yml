@@ -1,7 +1,31 @@
 url: https://4dmodeller.github.io/fdmr/
 template:
   bootstrap: 5
-
+  # bootswatch: lux
+  # bslib:
+  #   pkgdown-nav-height: 100px
+navbar:
+  structure:
+    left: [home, articles, reference, hackathon]
+    right: [github]
+  components:
+    articles:
+      text: Tutorials
+      menu:
+        - text: "COVID-19"
+          href: articles/covid.html
+        - text: "Hydrology"
+          href: articles/hydro.html
+    hackathon:
+      text: Hackathon
+      href: https://4dmodeller.github.io/4DM_Hackathon/
+authors:
+  Gareth Jones:
+    href: https://github.com/gareth-j/
+  Xueqing Yin:
+    href: https://www.researchgate.net/profile/Xueqing_Yin
+  John Aiken:
+    href: https://mnky9800n.github.io/
 # reference:
 # - title: Plotting
 #   desc:  Basic plotting tools
@@ -15,7 +39,4 @@ template:
 #     - retrieve_tutorial_data
 #     - load_tutorial_data
 #     - clean_path
-
-
-
 

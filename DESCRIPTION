@@ -4,8 +4,6 @@ Version: 0.0.1
 Authors@R: 
     c(person("Gareth", "Jones", , "g.m.jones@bristol.ac.uk", role = c("aut", "cre"),
             comment = ""),
-        person("Sam", "Royston", , "s.royston@bristol.ac.uk", role = c("aut"),
-            comment = ""),
         person("Xueqing", "Yin", , "de22002@bristol.ac.uk", role = c("aut"),
             comment = ""),
         person("John", "Aiken", , "john@xal.no", role = c("aut"),
@@ -49,7 +47,9 @@ Imports:
     spdep,
     gridExtra,
     leaflet,
-    archive
+    archive,
+    shiny,
+    stringr
 Suggests: 
     bookdown,
     knitr,
