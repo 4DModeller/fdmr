@@ -240,15 +240,6 @@ mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff 
 plot(mesh)
 ```
 
-We can have a look at the spatial data and the mesh using the `plot_interactive_map` Shiny app.
-```{r}
-max_edge = c(xres * 1, xres * 100)
-cutoff = 75
-sr <- "+proj=utm +zone=32"
-
-fdmr::mesh_builder(spatial_data=xy, max_edge = max_edge, cutoff = 65, crs = sr)
-```
-
 ## Priors
 
 The priors here are describing how the unobserved variannce is distributed over the region. That is, how far away from the center of the process should it cease
