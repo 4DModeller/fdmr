@@ -283,7 +283,7 @@ Likely unobserved co-variates could be local elevation, temperature, soil permea
 formula1 <- streamflow ~ 0 + Intercept + precip
 
 formula2 <- streamflow ~ 0 + Intercept + precip +
-  INLA::f(
+INLA::f(
     main = coordinates,
     model = spde,
     group = group_index,
@@ -298,7 +298,7 @@ formula2 <- streamflow ~ 0 + Intercept + precip +
 
 
 ```{r error=TRUE, modelrun}
-inlabru.model1 <- inlabru::bru(formula1,
+inlabru_model1 <- inlabru::bru(formula1,
   data = inla_data,
   family = "gaussian",
   options = list(
@@ -306,7 +306,7 @@ inlabru.model1 <- inlabru::bru(formula1,
   )
 )
 
-inlabru.model2 <- inlabru::bru(formula2,
+inlabru_model2 <- inlabru::bru(formula2,
   data = inla_data,
   family = "gaussian",
   options = list(
@@ -315,12 +315,12 @@ inlabru.model2 <- inlabru::bru(formula2,
 )
 ```
 
-now its time to see its output
+Now it's time to see its output
 
 ```{r error=TRUE}
-# TODO : this could be where the model_eval function i recommend could be used
-summary(inlabru.model1)
+# TODO : this could be where the model_eval function I recommend could be used
+summary(inlabru_model1)
 ```
 ```{r error=TRUE}
-summary(inlabru.model2)
+summary(inlabru_model2)
 ```
