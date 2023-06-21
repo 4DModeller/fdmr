@@ -4,9 +4,11 @@
 \alias{get_tutorial_datapath}
 \title{Return the filepath for a tutorial data file.}
 \usage{
-get_tutorial_datapath(filename)
+get_tutorial_datapath(dataset, filename)
 }
 \arguments{
+\item{dataset}{Name of dataset}
+
 \item{filename}{Name of file}
 }
 \value{

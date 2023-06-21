@@ -33,7 +33,7 @@ fdmr::retrieve_tutorial_data(dataset = "covid")
 Next we'll use the `load_tutorial_data` function to load in the spatial data we want.
 
 ```{r loadshape, error=TRUE}
-sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
+sp_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "spatial_data.rds")
 ```
 
 Now we make a map of the study region
@@ -45,20 +45,10 @@ domain <- sp_data@data$mapp
 fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, palette = "YlOrRd")
 ```
 
-```{r}
-colours <- colorNumeric(palette = "YlOrRd", domain = sp_data@data$mapp, reverse = FALSE)
-leaflet(data = sp_data) %>%
-  addTiles() %>%
-  addPolygons(
-    fillColor = ~ colours(mapp), color = "grey", weight = 0.6,
-    fillOpacity = 0.5
-  ) %>%
-  addScaleBar(position = "bottomleft")
-```
 The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using same process we used above.
 
 ```{r loadCOVIDat, error=TRUE}
-covid19_data <- fdmr::load_tutorial_data(filename = "covid19_data.rds")
+covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_data.rds")
 ```
 
 Then the first 6 rows of the data set can be viewed using the following code
@@ -269,9 +259,9 @@ The model summary is provided in the tutorial data package so we'll load that no
 > **_NOTE:_**  If you've run the full model above you don't need to load in the files below.
 
 ```{r fixedeffects, error=TRUE}
-model_summary <- fdmr::load_tutorial_data(filename = "model_summary.rds")
-model_summary_fixed <- fdmr::load_tutorial_data(filename = "model_summary_fixed.rds")
-model_hyperparams <- fdmr::load_tutorial_data(filename = "model_hyperparams.rds")
+model_summary <- fdmr::load_tutorial_data(dataset = "covid", filename = "model_summary.rds")
+model_summary_fixed <- fdmr::load_tutorial_data(dataset = "covid", filename = "model_summary_fixed.rds")
+model_hyperparams <- fdmr::load_tutorial_data(dataset = "covid", filename = "model_hyperparams.rds")
 
 print(model_summary_fixed[2:nrow(model_summary_fixed), 1:5])
 ```
@@ -366,7 +356,7 @@ predictions <- cbind.data.frame(
 The date frame "predictions" is provided in the tutorial data package, we'll load that in now.
 
 ```{r loadpreds, error=TRUE}
-predictions <- fdmr::load_tutorial_data(filename = "predictions.rds")
+predictions <- fdmr::load_tutorial_data(dataset = "covid", filename = "predictions.rds")
 ```
 
 The figure below displays the boxplots of the predicted infection risk for all neighbourhoods over time. It can be seen that health inequalities in 
@@ -458,7 +448,7 @@ As new data comes in every week, all previous data are used for training the mod
 The values of $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$, $\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for week $t$ in $(97,\ldots, 108)$ are stored in the tutorial data package and we'll load the `data.frame` containing that data now.
 
 ```{r performance, error=TRUE}
-predmetrics <- fdmr::load_tutorial_data(filename = "predmetrics.rds")
+predmetrics <- fdmr::load_tutorial_data(dataset = "covid", filename = "predmetrics.rds")
 ```
 
 This figure displays the time series plots for $\text{RMSE}_t$, $\text{Bias}_t$ and $\text{CP}_t$. The plots suggest that our model performs well in predicting the rate of COVID-19 infection, because the RMSE and bias values are very low (close to 0) compared to the range of the observed risks, and the coverage probabilities are close to their nominal 0.95 level. Table 3 provides the median and mean values for $\text{RMSE}_t$, $\text{Bias}_t$, $\text{CP}_t$,$\text{R-RMSE}_t$ and $\text{R-Bias}_t$ for $t \in (97, . . . , 108)$.

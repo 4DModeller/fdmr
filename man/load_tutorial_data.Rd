@@ -4,9 +4,11 @@
 \alias{load_tutorial_data}
 \title{Load data from the tutorial data store}
 \usage{
-load_tutorial_data(filename)
+load_tutorial_data(dataset, filename)
 }
 \arguments{
+\item{dataset}{Name of dataset}
+
 \item{filename}{Name of file}
 }
 \value{

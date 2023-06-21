@@ -34,10 +34,10 @@ fdmr::retrieve_tutorial_data(dataset = "hydro")
 Next we'll use `get_tutorial_datapath` to get the path to the data files.
 
 ```{r}
-norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
-streamdata_13 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_13.csv")
-streamdata_14 <- fdmr::get_tutorial_datapath(filename = "NVEobservations_s36_14.csv")
-era5_location <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
+norway_polygon_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
+streamdata_13 <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "NVEobservations_s36_13.csv")
+streamdata_14 <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "NVEobservations_s36_14.csv")
+era5_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "era5_land_daily.nc")
 ```
 
 ## Kvilldal dam area
