@@ -8,6 +8,7 @@ plot_map(
   polygon_data = NULL,
   raster_data = NULL,
   domain = NULL,
+  markers = NULL,
   palette = "viridis",
   legend_title = NULL,
   add_scale_bar = FALSE,
@@ -23,6 +24,8 @@ plot_map(
 \item{raster_data}{Raster datas}
 
 \item{domain}{Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend}
+
+\item{markers}{Markers to display on map. A named list with latitude, longitude and label names must be given.}
 
 \item{palette}{Palette to be used for colours, defaults to viridis}
 

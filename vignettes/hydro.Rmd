@@ -32,10 +32,11 @@ First we will look at the location of the dam by making a map and plotting the s
 
 ```{r error=TRUE,warning=FALSE}
 # TODO : here is a good example for the map function
-norway_polygon <- rgdal::readOGR(poly_path)
-norway_polygon <- sf::st_as_sf(norway_polygon
-                               , coords=c("longitude", "latitude")
-                               , crs="+proj=utm +zone=32")
+norway_polygon <- rgdal::readOGR(norway_polygon_location)
+norway_polygon <- sf::st_as_sf(norway_polygon,
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
+)
 
 
 
@@ -46,9 +47,9 @@ function with the names and positions. We'll create a list for each of the point
 `data.frame` from these.
 
 ```{r}
-suldalsvatnet_dam <- list(longitude=6.517174, latitude=59.490720, name="Suldalsvatnet Dam")
-stream_gauge_13 <- list(longitude=6.5395789, latitude=59.5815849, name="Stream Gauge 13")
-stream_gauge_14 <- list(longitude=6.7897968, latitude=59.7531662, name="Stream Gauge 14")
+suldalsvatnet_dam <- list(longitude = 6.517174, latitude = 59.490720, label = "Suldalsvatnet Dam")
+stream_gauge_13 <- list(longitude = 6.5395789, latitude = 59.5815849, label = "Stream Gauge 13")
+stream_gauge_14 <- list(longitude = 6.7897968, latitude = 59.7531662, label = "Stream Gauge 14")
 
 points <- list(suldalsvatnet_dam, stream_gauge_13, stream_gauge_14)
 markers <- dplyr::bind_rows(points)
@@ -57,7 +58,7 @@ markers <- dplyr::bind_rows(points)
 We're now ready to plot the map, passing in the polygon data, markers and optionally the fill opacity.
 
 ```{r}
-fdmr::plot_map(polygon_data=sfc, markers=markers, fill_opacity = 0.5)
+fdmr::plot_map(polygon_data = sfc, markers = markers, polygon_fill_opacity = 0.5)
 ```
 
 On the map you can see the dam, the resevoir, the catchment area, and the two stream gauges.
@@ -86,8 +87,8 @@ data_14$time_index <- seq(1, 31, 1)
 We can now plot the average stream flow using `plot_timeseries`
 
 ```{r}
-fdmr::plot_timeseries(data=data_13, x="time", y="value", x_label="Time", y_label="Stream Flow: Daily Average (Liter/s)", line_colour="violet")
-fdmr::plot_timeseries(data=data_14, x="time", y="value", x_label="Time", y_label="Stream Flow: Daily Average (Liter/s)", line_colour="limegreen")
+fdmr::plot_timeseries(data = data_13, x = "time", y = "value", x_label = "Time", y_label = "Stream Flow: Daily Average (Liter/s)", line_colour = "violet")
+fdmr::plot_timeseries(data = data_14, x = "time", y = "value", x_label = "Time", y_label = "Stream Flow: Daily Average (Liter/s)", line_colour = "limegreen")
 ```
 
 We rescale the data with the Z-score since the values are so different between the two stream gauges
@@ -107,7 +108,7 @@ Thus, in order to understand how this changes over time, it will be important to
 ERA5-land data is gridded however we need the data to be assigned to catchment shapes. We'll first load in the data, ensure it is projected using the correct coordinate reference system (CRS) and then plot it on a map.
 
 ```{r error = TRUE,warning=FALSE}
-era5_location <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
+era5_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "era5_land_daily.nc")
 era5_precip <- raster::stack(era5_location)
 era5_precip %>%
   raster::values() %>%
@@ -117,7 +118,7 @@ sr <- "+proj=utm +zone=32"
 projected_raster <- raster::projectRaster(era5_precip, crs = sr)
 
 era5_precip_cropped <- raster::mask(projected_raster, norway_polygon)
-era5_precip_cropped <- terra::crop(era5_precip_cropped, raster::extent(norway_polygon), snap="near")
+era5_precip_cropped <- terra::crop(era5_precip_cropped, raster::extent(norway_polygon), snap = "near")
 ```
 
 Now we've ensured everything is projected correctly we can use `plot_interactive_map` to plot the `RasterBrick` and the catchment area polygon. This loads a Shiny app that allows the selection of layers
@@ -126,7 +127,7 @@ in the `RasterBrick` using a date slider. It also allows you to update the prope
 > **_NOTE:_**  The interactive map won't render on the web version of this notebook as it is a Shiny app. We will try and get this fixed as soon as possible.
 
 ```{r eval=FALSE}
-fdmr::plot_interactive_map(raster_data=era5_precip_cropped, polygon_data=sfc)
+fdmr::plot_interactive_map(raster_data = era5_precip_cropped, polygon_data = sfc)
 ```
 
 Next we create a data.frame `raster_df` containing precipitation data. We convert the `RasterBrick` of precipitation data we just plotted into a `data.frame`. We then want to get only the day component from the date of each date. If we have a look at the
@@ -135,11 +136,11 @@ strings to `Date` objects using `to_dates` before finally using `lubridate::day`
 
 ```{r error=TRUE}
 raster_df <- data.frame(raster::rasterToPoints(era5_precip_cropped))
-raster_df <- data.table::melt(data.table::setDT(raster_df), id.vars=c("x","y"), variable.name = "time")
+raster_df <- data.table::melt(data.table::setDT(raster_df), id.vars = c("x", "y"), variable.name = "time")
 
 raster_df$time <- lubridate::day(fdmr::to_dates(fdmr::numbers_only(raster_df$time)))
 
-raster_df <- setNames(raster_df, c('x', 'y', 'time', 'precip'))
+raster_df <- setNames(raster_df, c("x", "y", "time", "precip"))
 ```
 
 We need to figure out which ERA5 precipitation pixels are closest to which stream gauge so we can match the data for the regression. First we need to calculate the distance 
@@ -147,29 +148,34 @@ between the pixel and each stream gauge, then use the minimum distance to choose
 
 ```{r error=TRUE, matchpixel}
 pixel_coords <- unique(sp::coordinates(era5_precip_cropped))
-s13_utm <- fdmr::latlong_to_utm(lat=stream_gauge_13$latitude
-                          ,lon=stream_gauge_13$longitude)
-s14_utm <- fdmr::latlong_to_utm(lat=stream_gauge_14$latitude
-                          ,lon=stream_gauge_14$longitude)
+s13_utm <- fdmr::latlong_to_utm(
+  lat = stream_gauge_13$latitude,
+  lon = stream_gauge_13$longitude
+)
+s14_utm <- fdmr::latlong_to_utm(
+  lat = stream_gauge_14$latitude,
+  lon = stream_gauge_14$longitude
+)
 
-s13 <- data.frame(x=s13_utm[[1]], y=s13_utm[[2]])
-s14 <- data.frame(x=s14_utm[[1]], y=s14_utm[[2]])
+s13 <- data.frame(x = s13_utm[[1]], y = s13_utm[[2]])
+s14 <- data.frame(x = s14_utm[[1]], y = s14_utm[[2]])
 
-pixel_dist_gauge<-data.frame(x=pixel_coords[,1],
-                             y=pixel_coords[,2],
-                             dist_s1=rep(NA,nrow(pixel_coords)),
-                             dist_s2=rep(NA,nrow(pixel_coords)),
-                             min_s=rep(NA,nrow(pixel_coords)),
-                             streamflow=rep(NA, nrow(pixel_coords))
+pixel_dist_gauge <- data.frame(
+  x = pixel_coords[, 1],
+  y = pixel_coords[, 2],
+  dist_s1 = rep(NA, nrow(pixel_coords)),
+  dist_s2 = rep(NA, nrow(pixel_coords)),
+  min_s = rep(NA, nrow(pixel_coords)),
+  streamflow = rep(NA, nrow(pixel_coords))
 )
 ```
 
 
 ```{r}
 for (i in seq_len(nrow(pixel_coords))) {
-  pixel_dist_gauge$dist_s1[i]<-sqrt((pixel_dist_gauge$x[i]-s13$x)^2 + (pixel_dist_gauge$y[i]-s13$y)^2)
-  
-  pixel_dist_gauge$dist_s2[i]<-sqrt((pixel_dist_gauge$x[i]-s14$x)^2 + (pixel_dist_gauge$y[i]-s14$y)^2)
+  pixel_dist_gauge$dist_s1[i] <- sqrt((pixel_dist_gauge$x[i] - s13$x)^2 + (pixel_dist_gauge$y[i] - s13$y)^2)
+
+  pixel_dist_gauge$dist_s2[i] <- sqrt((pixel_dist_gauge$x[i] - s14$x)^2 + (pixel_dist_gauge$y[i] - s14$y)^2)
 
   pixel_dist_gauge$min_s[i] <- which.min(c(pixel_dist_gauge$dist_s1[i], pixel_dist_gauge$dist_s2[i]))
 }
@@ -180,8 +186,8 @@ The `data.frame` `pixel_dist_gauge` then needs to be replicated by the number of
 ```{r}
 n_time <- raster::nlayers(era5_precip)
 
-pixel_dist_gauge <- do.call(rbind, replicate(n_time, pixel_dist_gauge, simplify=FALSE))
-pixel_dist_gauge$time <- rep(1:n_time, each=nrow(pixel_coords))
+pixel_dist_gauge <- do.call(rbind, replicate(n_time, pixel_dist_gauge, simplify = FALSE))
+pixel_dist_gauge$time <- rep(1:n_time, each = nrow(pixel_coords))
 
 streamdata <- list(data_13, data_14)
 
@@ -196,10 +202,10 @@ pixel_dist_gauge$streamflow <- apply(pixel_dist_gauge, 1, get_stream_data)
 Now we create a new `SpatialPointDataFrame` called `inla_data` for model fitting. The data frame contains the response and predictor data at each spatial location and time point.
 
 ```{r error=TRUE,inladat}
-inla_data <- merge(pixel_dist_gauge,raster_df,by=c("time","x","y"))
-inla_data <- subset(inla_data, select=c('x', 'y', 'streamflow', 'precip', 'time'))
+inla_data <- merge(pixel_dist_gauge, raster_df, by = c("time", "x", "y"))
+inla_data <- subset(inla_data, select = c("x", "y", "streamflow", "precip", "time"))
 
-sp::coordinates(inla_data)<- c("x","y")
+sp::coordinates(inla_data) <- c("x", "y")
 
 head(inla_data@data)
 head(inla_data@coords)
@@ -222,8 +228,8 @@ Create the triangulated mesh of the study region and have a quick look at it.
 e <- era5_precip_cropped@extent
 resolution <- raster::res(era5_precip_cropped)
 
-xres <- resolution[1]*2
-yres <- resolution[2]*2
+xres <- resolution[1] * 2
+yres <- resolution[2] * 2
 
 xy <- sp::coordinates(era5_precip_cropped)
 
@@ -232,7 +238,7 @@ xy <- xy[seq(1, nrow(xy), by = 2), ]
 # mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1000, xres*10000), cutoff=2000, crs=sr)
 # mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=2000, crs=sr)
 
-mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=75, crs=sr)
+mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = sr)
 
 plot(mesh)
 ```
@@ -266,7 +272,6 @@ In order to fit the model, we also need to define a temporal index and the numbe
 ```{r error=TRUE}
 group_index <- inla_data@data$time
 n_groups <- length(unique(group_index))
-
 ```
 
 ## Model Inference
@@ -278,29 +283,35 @@ Likely unobserved co-variates could be local elevation, temperature, soil permea
 formula1 <- streamflow ~ 0 + Intercept + precip
 
 formula2 <- streamflow ~ 0 + Intercept + precip +
-  INLA::f(main=coordinates,
-    model=spde,
-    group=group_index,
-    ngroup=n_groups,
-    control.group=list(model="ar1",
-                       hyper=rhoprior))
+  INLA::f(
+    main = coordinates,
+    model = spde,
+    group = group_index,
+    ngroup = n_groups,
+    control.group = list(
+      model = "ar1",
+      hyper = rhoprior
+    )
+  )
 ```
 
 
 
 ```{r error=TRUE, modelrun}
-inlabru.model1 <- inlabru::bru(formula1, data = inla_data,
-                   family = "gaussian",
-                   options = list(
-                     verbose = TRUE
-                   )
+inlabru.model1 <- inlabru::bru(formula1,
+  data = inla_data,
+  family = "gaussian",
+  options = list(
+    verbose = TRUE
+  )
 )
 
-inlabru.model2 <- inlabru::bru(formula2, data = inla_data,
-                   family = "gaussian",
-                   options = list(
-                     verbose = TRUE
-                   )
+inlabru.model2 <- inlabru::bru(formula2,
+  data = inla_data,
+  family = "gaussian",
+  options = list(
+    verbose = TRUE
+  )
 )
 ```
 

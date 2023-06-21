@@ -48,7 +48,7 @@ plot_barchart <- function(data, x, y, breaks, x_label, y_label, fill = "pink", c
 #' Plot a boxplot using ggplot2
 #'
 #' @param data Data to plot
-#' @param x x-axis data 
+#' @param x x-axis data
 #' @param y y-axis data
 #' @param breaks Break points
 #' @param x_label x-axis label
