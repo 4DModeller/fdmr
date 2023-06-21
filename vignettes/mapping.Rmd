@@ -19,7 +19,7 @@ First we need to retrieve the example data, then load in the raster data from fi
 
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "hydro")
-norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
+norway_polygon_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
 ```
 
 Next we need to manipulate the data to ensure we plot the area correctly,
@@ -45,7 +45,7 @@ fdmr::plot_map(polygon_data = sfc)
 We can also plot raster data onto the map. We'll now read some raster data from a [NetCDF](https://www.unidata.ucar.edu/software/netcdf/) file. We do this using the `raster::stack` function which creates a `RasterStack` object which itself contains a number of `RasterLayer` objects. These hold [ERA5](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) precipitation data for each day of the month for October 2021.
 
 ```{r}
-era5_data_filepath <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
+era5_data_filepath <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "era5_land_daily.nc")
 era5_precip <- raster::stack(era5_data_filepath)
 era5_precip
 ```
@@ -90,7 +90,7 @@ investigate your data. Below are a couple of examples showing how to use the int
 We want to create a plot on the map covering the rain catchment area around the power plant. To do this we read in a GeoJSON file containing the coordinates of the catchment area and make sure it's in the correct coordinate reference system to plot on our map.
 
 ```{r}
-norway_polygon_location <- fdmr::get_tutorial_datapath(filename = "Kvilldal_Catch_Boundary.geojson")
+norway_polygon_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
 norway_polygon <- rgdal::readOGR(norway_polygon_location)
 norway_polygon <- sf::st_as_sf(norway_polygon,
   coords = c("longitude", "latitude"),
@@ -103,7 +103,7 @@ norway_polygon <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=W
 Next we read ECMWF Reanalysis v5 (ERA5) precipitation data from a NetCDF file.
 
 ```{r}
-era5_data_filepath <- fdmr::get_tutorial_datapath(filename = "era5_land_daily.nc")
+era5_data_filepath <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "era5_land_daily.nc")
 era5_precip <- raster::stack(era5_data_filepath)
 era5_precip <- raster::projectRaster(era5_precip, crs = "+proj=utm +zone=32")
 ```

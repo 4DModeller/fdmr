@@ -1,14 +1,15 @@
 #' Return the filepath for a tutorial data file.
 #'
+#' @param dataset Name of dataset
 #' @param filename Name of file
 #'
 #' @return fs::path Full filepath
 #' @export
-get_tutorial_datapath <- function(filename) {
-  tutorial_datapath <- fs::path(fs::path_home(), "fdmr", "tutorial_data")
+get_tutorial_datapath <- function(dataset, filename) {
+  tutorial_datapath <- fs::path(get_tutorial_cache_datapath(), dataset)
 
   if (!fs::dir_exists(tutorial_datapath)) {
-    fs::dir_create(tutorial_datapath, recurse = TRUE)
+    stop("Invalid dataset, the folder ", toString(tutorial_datapath), " does not exist.")
   }
 
   glob_str <- paste0("*/", toString(filename))
@@ -23,16 +24,17 @@ get_tutorial_datapath <- function(filename) {
 
 #' Load data from the tutorial data store
 #'
+#' @param dataset Name of dataset
 #' @param filename Name of file
 #'
 #' @return loaded object
 #' @export
-load_tutorial_data <- function(filename) {
+load_tutorial_data <- function(dataset, filename) {
   if (!tolower(fs::path_ext(filename)) == "rds") {
     stop("We can only load rds files.")
   }
 
-  fpath <- get_tutorial_datapath(filename = filename)
+  fpath <- get_tutorial_datapath(dataset = dataset, filename = filename)
   return(readRDS(fpath))
 }
 
@@ -58,4 +60,33 @@ clean_path <- function(path, check_exists = FALSE) {
   }
 
   return(fpath)
+}
+
+#' Get path to tutorial data cache folder
+#'
+#' @return fs::path
+#' @keywords internal
+get_tutorial_cache_datapath <- function() {
+  fs::path(fs::path_home(), "fdmr", "tutorial_data")
+}
+
+#' Get path to downloaded archive cache folder
+#'
+#' @return fs::path
+#' @keywords internal
+get_archive_cache_datapath <- function() {
+  fs::path(fs::path_home(), "fdmr", "download_cache")
+}
+
+
+#' Clear both tutorial data and downloaded archive caches
+#'
+#' @return NULL
+#' @export
+clear_caches <- function() {
+  tut_path <- get_tutorial_cache_datapath()
+  cache_path <- get_archive_cache_datapath()
+  print(paste("Deleting ", tut_path, cache_path))
+  fs::dir_delete(tut_path)
+  fs::dir_delete(cache_path)
 }
