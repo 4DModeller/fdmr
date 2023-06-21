@@ -6,7 +6,7 @@
 to a folder in th user's home directory or a folder
 specified in their use config file.}
 \usage{
-retrieve_tutorial_data(dataset, data_store = NULL)
+retrieve_tutorial_data(dataset, filename)
 }
 \arguments{
 \item{dataset}{Name of dataset to retrieve, either covid or hydro}
