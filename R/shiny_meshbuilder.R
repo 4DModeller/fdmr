@@ -74,6 +74,25 @@ meshbuilder_shiny <- function(
   # Let's extract the data we want to create the mesh
   location_data <- spatial_data@data[, c("LONG", "LAT")]
 
+  # tryCatch(
+  #   {
+  #     location_data <- spatial_data@data[, c("LONG", "LAT")]
+  #   },
+  #   error = function(err) {
+  #     location_data <- NULL
+  #   }
+  # )
+
+  # if (is.null(location_data)) {
+  #   tryCatch(
+  #     {
+  #       location_data <- spatial_data[, c("LONG", "LAT")]
+  #     },
+  #     error = function(err) {
+  #       stop("Cannot read location data from spatial data. Please make sure it has LONG and LAT columns.")
+  #     }
+  #   )
+  # }
   # loc: the spatial locations of data points
   # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
   # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
@@ -226,14 +245,12 @@ meshbuilder_shiny <- function(
 #' @return shiny::app
 #' @export
 mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL) {
-  require_packages(packages = c("INLA", "shiny", "leaflet"))
-
   shiny::runApp(meshbuilder_shiny(
     spatial_data = spatial_data,
     obs_data = obs_data,
-    # crs = crs,
-    # max_edge = max_edge,
-    # offset = offset,
-    # cutoff = cutoff
+    crs = crs,
+    max_edge = max_edge,
+    offset = offset,
+    cutoff = cutoff
   ))
 }

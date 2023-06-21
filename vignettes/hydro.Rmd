@@ -17,27 +17,18 @@ First we'll download the data for this tutorial from our [data repository](https
 fdmr::retrieve_tutorial_data(dataset = "hydro")
 ```
 
-Next we'll use `get_tutorial_datapath` to get the path to the data files.
-
-```{r}
-norway_polygon_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-streamdata_13 <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "NVEobservations_s36_13.csv")
-streamdata_14 <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "NVEobservations_s36_14.csv")
-era5_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "era5_land_daily.nc")
-```
-
 ## Kvilldal dam area
 
 First we will look at the location of the dam by making a map and plotting the stream gauges on it.
 
 ```{r error=TRUE,warning=FALSE}
 # TODO : here is a good example for the map function
-norway_polygon <- rgdal::readOGR(norway_polygon_location)
+norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
+norway_polygon <- rgdal::readOGR(norway_polygon_path)
 norway_polygon <- sf::st_as_sf(norway_polygon,
   coords = c("longitude", "latitude"),
   crs = "+proj=utm +zone=32"
 )
-
 
 
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
@@ -69,6 +60,9 @@ The area inside the shape is where water accumulates, the area outside of the bo
 The stream gauge data is measured as the average daily liters/second that pass through the area. This data goes back for many years, sometimes decades, so we'll take a subset of the data for October 2021.
   
 ```{r error=TRUE, fig.align='center', fig.width=7}
+streamdata_13 <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "NVEobservations_s36_13.csv")
+streamdata_14 <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "NVEobservations_s36_14.csv")
+
 data_13 <- read.csv(streamdata_13)
 data_13$date <- as.Date(data_13$time)
 data_13 <-
@@ -196,6 +190,7 @@ get_stream_data <- function(row) {
   data_at_row_time_index <- which_stream_data[which_stream_data[, c("time_index")] == row["time"], ]
   return(data_at_row_time_index$value)
 }
+
 pixel_dist_gauge$streamflow <- apply(pixel_dist_gauge, 1, get_stream_data)
 ```
 
@@ -227,6 +222,7 @@ Create the triangulated mesh of the study region and have a quick look at it.
 # TODO: it would be nice to map the mesh onto the dataset using the mapmaker function i am suggesting
 e <- era5_precip_cropped@extent
 resolution <- raster::res(era5_precip_cropped)
+sr <- "+proj=utm +zone=32"
 
 xres <- resolution[1] * 2
 yres <- resolution[2] * 2
@@ -235,12 +231,22 @@ xy <- sp::coordinates(era5_precip_cropped)
 
 # Maybe this makes the mesh smaller
 xy <- xy[seq(1, nrow(xy), by = 2), ]
+colnames(xy) <- c("LONG", "LAT")
 # mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1000, xres*10000), cutoff=2000, crs=sr)
 # mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=2000, crs=sr)
 
 mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = sr)
 
 plot(mesh)
+```
+
+We can have a look at the spatial data and the mesh using the `plot_interactive_map` Shiny app.
+```{r}
+max_edge = c(xres * 1, xres * 100)
+cutoff = 75
+sr <- "+proj=utm +zone=32"
+
+fdmr::mesh_builder(spatial_data=xy, max_edge = max_edge, cutoff = 65, crs = sr)
 ```
 
 ## Priors
@@ -283,10 +289,10 @@ Likely unobserved co-variates could be local elevation, temperature, soil permea
 formula1 <- streamflow ~ 0 + Intercept + precip
 
 formula2 <- streamflow ~ 0 + Intercept + precip +
-INLA::f(
+  f(
     main = coordinates,
     model = spde,
-    group = group_index,
+    group = group.index,
     ngroup = n_groups,
     control.group = list(
       model = "ar1",
