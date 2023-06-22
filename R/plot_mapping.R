@@ -3,6 +3,7 @@
 #' @param polygon_data Polygon data
 #' @param raster_data Raster datas
 #' @param domain Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend
+#' @param markers Markers to display on map. A named list with latitude, longitude and label names must be given.
 #' @param palette Palette to be used for colours, defaults to viridis
 #' @param legend_title Title for legend
 #' @param add_scale_bar Add scale bar if TRUE
@@ -16,6 +17,7 @@
 plot_map <- function(polygon_data = NULL,
                      raster_data = NULL,
                      domain = NULL,
+                     markers = NULL,
                      palette = "viridis",
                      legend_title = NULL,
                      add_scale_bar = FALSE,
@@ -66,6 +68,11 @@ plot_map <- function(polygon_data = NULL,
       colors = palette,
     )
     layers <- append(layers, "Raster")
+  }
+
+  if (!is.null(markers)) {
+    m <- leaflet::addMarkers(m, lng = markers$longitude, lat = markers$latitude, label = markers$label)
+    layers <- append(layers, "Markers")
   }
 
   m <- leaflet::addLayersControl(m,

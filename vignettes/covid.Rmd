@@ -466,6 +466,7 @@ CPt <- predmetrics[, c("date", "CPt")]
 g1 <-
   fdmr::plot_timeseries(
     data = RMSEt,
+    # TODO - update these to just accept a string
     x = RMSEt$date,
     y = RMSEt$RMSEt,
     breaks = breaks_vec,

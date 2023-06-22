@@ -8,7 +8,7 @@ plot_timeseries(
   data,
   x,
   y,
-  breaks,
+  breaks = NULL,
   x_label = NULL,
   y_label = NULL,
   title = NULL,
@@ -22,9 +22,9 @@ plot_timeseries(
 \arguments{
 \item{data}{Data to plot}
 
-\item{x}{x-axis data}
+\item{x}{Name of column to plot on x-axis, should be datetime, will be converted to Dates using as.Date}
 
-\item{y}{y-axis data}
+\item{y}{Name of column to plot on y-axis}
 
 \item{breaks}{Date break points}
 
@@ -43,6 +43,8 @@ plot_timeseries(
 \item{x_lim}{Limits for x-axis continous scale, vector passed to scale_x_continuous}
 
 \item{y_lim}{Limits for y-axis continuous scale, vector passed to scale_y_continous}
+
+\item{line_width}{Line width}
 }
 \value{
 ggplot
