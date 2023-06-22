@@ -65,6 +65,7 @@
 <span>  polygon_data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  raster_data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  markers <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  palette <span class="op">=</span> <span class="st">"viridis"</span>,</span>
 <span>  legend_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  add_scale_bar <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -87,6 +88,10 @@
 
 <dt>domain</dt>
 <dd><p>Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend</p></dd>
+
+
+<dt>markers</dt>
+<dd><p>Markers to display on map. A named list with latitude, longitude and label names must be given.</p></dd>
 
 
 <dt>palette</dt>

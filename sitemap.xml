@@ -37,6 +37,9 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/clean_path.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/clear_caches.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/get_archive_cache_datapath.html</loc>
   </url>
   <url>
@@ -67,6 +70,9 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/meshbuilder_shiny.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/numbers_only.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_barchart.html</loc>
   </url>
   <url>
@@ -95,5 +101,8 @@
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/retrieve_tutorial_data.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/to_dates.html</loc>
   </url>
 </urlset>

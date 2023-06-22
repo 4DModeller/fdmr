@@ -65,7 +65,7 @@
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
-<span>  <span class="va">breaks</span>,</span>
+<span>  breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x_label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -84,11 +84,11 @@
 
 
 <dt>x</dt>
-<dd><p>x-axis data</p></dd>
+<dd><p>Name of column to plot on x-axis, should be datetime, will be converted to Dates using as.Date</p></dd>
 
 
 <dt>y</dt>
-<dd><p>y-axis data</p></dd>
+<dd><p>Name of column to plot on y-axis</p></dd>
 
 
 <dt>breaks</dt>
@@ -125,6 +125,10 @@
 
 <dt>y_lim</dt>
 <dd><p>Limits for y-axis continuous scale, vector passed to scale_y_continous</p></dd>
+
+
+<dt>line_width</dt>
+<dd><p>Line width</p></dd>
 
 </dl></div>
     <div class="section level2">
