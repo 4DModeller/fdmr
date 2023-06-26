@@ -103,7 +103,7 @@ For comparison purpose, we fit a separate BHM to the same dataset using the INLA
 
 ```{r fitinlamodel, error=TRUE, eval=TRUE}
 s_covid$ID <- seq(1, nrow(s_covid))
-formula <- total.cases ~ 1 + INLA::f(ID,
+formula <- total.cases ~ 1 + f(ID,
   model = "bym",
   graph = w
 )
