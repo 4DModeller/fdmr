@@ -15,15 +15,13 @@ vignette: >
 # Modelling COVID-19 infection across England
 In this tutorial we’ll cover some work on fitting a purely spatial Bayesian model to predict the COVID-19 infection rate across England.
 
-# Getting setup
-
-This tutorial makes use of the [CARBayes package](https://cran.r-project.org/web/packages/CARBayes/index.html) which is not a dependency of 4DModeller, to follow through the tutorial you will need to install it.
-```{r, error=TRUE,message=FALSE,warning=FALSE}
-install.packages("CARBayes")
-```
-
 # Study aim and data description
 This study describes how to fit a purely spatial Bayesian hierarchical model (BHM) based on Markov Chain Monte Carlo (MCMC) simulation method to estimate the spatial pattern of COVID-19 infection rate in England. The first thing is to load all the packages used in the COVID-19 case study.
+
+```{r, error=TRUE,message=FALSE,warning=FALSE}
+library(INLA)
+library(inlabru)
+```
 
 The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The infections data are the total reported number of COVID-19 cases in each MSOA from Jan 8, 2022 to March 26, 2022. The shapefile of the study region is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods. 
 
@@ -48,8 +46,8 @@ sp_data <- fdmr::load_tutorial_data(dataset = "covid_mcmc", filename = "spatial_
 In this study, we use the areal unit modelling approach to fit the BHM and then make model inference using MCMC method. To do this, we need to construct a non-negative symmetric $n \times n$ neighbourhood or adjacency matrix $\boldsymbol{W}$ that accounts for the spatio-temporal autocorrelation structure, where $n=6789$ is the number of areal units. The neighbourhood matrix specifies the spatial closeness between pairs of areal units. The elements $\{w_{ij}\}$ in $\boldsymbol{W}$ can be either continuous or binary, and a larger value of $w_{ij}$ represents that MSOAs $(i,j)$ are spatially closer to each other. Here we use the border sharing specification, so that $w_{ij}=1$ if MSOAs $(i,j)$ share a common geographical border, and $w_{ij}=0$ otherwise.
 
 ```{r constructW, error=TRUE}
-W_nb <- spdep::poly2nb(sp_data, row.names = rownames(sp_data@data))
-w <- spdep::nb2mat(W_nb, style = "B")
+W.nb <- spdep::poly2nb(sp_data, row.names = rownames(sp_data@data))
+w <- spdep::nb2mat(W.nb, style = "B")
 ```
 
 # Model specification 
@@ -94,7 +92,7 @@ MCMC_model <- CARBayes::S.CARbym(
   burnin = 10000,
   n.sample = 30000,
   thin = 10,
-  verbose = FALSE
+  verbose = F
 )
 ```
 
@@ -135,7 +133,7 @@ mesh <- INLA::inla.mesh.2d(
 )
 
 prior_range <- initial_range
-spde <- INLA::inla.spde2.pcmatern(
+spde <- inla.spde2.pcmatern(
   mesh = mesh,
   prior.range = c(prior_range, 0.5),
   prior.sigma = c(1, 0.01)
@@ -168,9 +166,7 @@ modfit <- data.frame(
   DIC = c(MCMC_model$modelfit[1], INLA_model$dic$dic, inlabru.model$dic$dic),
   WAIC = c(MCMC_model$modelfit[3], INLA_model$waic$waic, inlabru.model$waic$waic)
 )
-
 rownames(modfit) <- c("MCMC", "INLA_BYM", "INLA_SPDE")
-
 modfit
 ```
 
@@ -178,12 +174,11 @@ modfit
 We compare the posterior COVID-19 infection rate estimates between the models. In general, all models provide similar posterior COVID-19 infection rate estimates. 
 
 ```{r comparerisks, error=TRUE, eval=TRUE}
-mcmc_fitted_prev <- exp(mean(MCMC_model$samples$beta) + apply(MCMC_model$samples$psi, 2, mean))
-
-mcmc_lc <- exp(quantile(MCMC_model$samples$beta, 0.025) +
+mcmc.fitted.prev <- exp(mean(MCMC_model$samples$beta) + apply(MCMC_model$samples$psi, 2, mean))
+mcmc.lc <- exp(quantile(MCMC_model$samples$beta, 0.025) +
   apply(MCMC_model$samples$psi, 2, quantile, 0.025))
 
-mcmc_uc <- exp(quantile(MCMC_model$samples$beta, 0.975) +
+mcmc.uc <- exp(quantile(MCMC_model$samples$beta, 0.975) +
   apply(MCMC_model$samples$psi, 2, quantile, 0.975))
 
 comb <- data.frame(
@@ -193,9 +188,9 @@ comb <- data.frame(
   "INLA_SPDE" = inlabru.model$summary.fitted.values$mean[1:nrow(s_covid)],
   "INLA_SPDE_lc" = inlabru.model$summary.fitted.values$`0.025quant`[1:nrow(s_covid)],
   "INLA_SPDE_uc" = inlabru.model$summary.fitted.values$`0.975quant`[1:nrow(s_covid)],
-  "MCMC" = mcmc_fitted_prev,
-  "MCMC_lc" = mcmc_lc,
-  "MCMC_uc" = mcmc_uc
+  "MCMC" = mcmc.fitted.prev,
+  "MCMC_lc" = mcmc.lc,
+  "MCMC_uc" = mcmc.uc
 )
 ```
 
@@ -205,7 +200,6 @@ comb <- data.frame(
 pairs(comb[, c("MCMC", "INLA_SPDE", "INLA_BYM")],
   pch = 19, cex = 0.3, col = "orange", lower.panel = panel.smooth
 )
-
 boxplot(comb[, c("MCMC", "INLA_SPDE", "INLA_BYM")])
 ```
 
@@ -214,9 +208,10 @@ The spatial patterns of the infection rate estimates for each model are displaye
 
 
 ```{r map1, error=TRUE, fig.cap="Map of the predicted infection rates for using MCMC.",  fig.width=8, fig.height=4, fig.align = "center"}
-sp_data@data$est.rate.mcmc <- mcmc_fitted_prev
+sp_data@data$est.rate.mcmc <- mcmc.fitted.prev
 
 domain <- sp_data@data$est.rate.mcmc
+legend_values <- sp_data@data$est.rate.mcmc
 
 fdmr::plot_map(
   polygon_data = sp_data,
@@ -234,6 +229,7 @@ fdmr::plot_map(
 sp_data@data$est.rate.inlabym <- INLA_model$summary.fitted.values$mean
 
 domain <- sp_data@data$est.rate.inlabym
+legend_values <- sp_data@data$est.rate.inlabym
 
 fdmr::plot_map(
   polygon_data = sp_data,
@@ -251,6 +247,7 @@ fdmr::plot_map(
 sp_data@data$est.rate.inlaspde <- inlabru.model$summary.fitted.values$mean[1:nrow(s_covid)]
 
 domain <- sp_data@data$est.rate.inlaspde
+legend_values <- sp_data@data$est.rate.inlaspde
 
 fdmr::plot_map(
   polygon_data = sp_data,
@@ -310,7 +307,7 @@ Next we fit the BHM using the INLA-SPDE approach.
 cmp <- total.cases ~ 0 + Intercept + f(main = coordinates, model = spde) +
   IMD + perc.wb + perc.ba + age1 + pm25
 
-inlabru_model2 <- bru(cmp,
+inlabru.model2 <- inlabru::bru(cmp,
   data = s_covid_cp,
   family = "poisson",
   E = s_covid_cp$population,
@@ -328,8 +325,7 @@ The regression coefficients of the selected covariates for all models are compar
 regr_est <- cbind.data.frame(
   "MCMC" = MCMC_model2$summary.results[1:(nrow(MCMC_model2$summary.results) - 2), 1],
   "INLA_BYM" = INLA_model2$summary.fixed[, 1],
-  "INLA_SPDE" = inlabru_model2$summary.fixed[, 1]
+  "INLA_SPDE" = inlabru.model2$summary.fixed[, 1]
 )
-
 regr_est
 ```
