@@ -76,7 +76,7 @@ priors_shiny <- function(data, coordinates = NULL, spde = NULL) {
 
         model_out <- shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
             formula <- eval(parse(text = final_equation_str))
-            
+
             inlabru::bru(formula,
                 data = data,
                 family = "poisson",

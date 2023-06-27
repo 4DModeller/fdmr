@@ -1,0 +1,116 @@
+# Load in the data
+
+```{r}
+fdmr::retrieve_tutorial_data(dataset = "covid")
+sp_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "spatial_data.rds")
+covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_data.rds")
+```
+
+# Subset data
+
+## Reduce extent of spatial data
+
+Here we trim the spatial data to a bounding box around Bristol.
+
+```{r}
+long_min <- -2.695726
+long_max <- -2.400219
+lat_min <- 51.390799
+lat_max <- 51.521310
+```
+
+```{r}
+bounding_vals <- c(long_min, long_max, lat_min, lat_max)
+sp_data_bristol <- raster::crop(sp_data, raster::extent(bounding_vals))
+```
+
+## Trim the COVID-19 observation data
+
+Now we filter the COVID-19 data so we only have data from within our bounding box.
+
+```{r}
+covid19_data_bris <- dplyr::filter(covid19_data, LONG >= long_min, LONG <= long_max, LAT >= lat_min, LAT <= lat_max)
+```
+
+# Create the mesh
+
+```{r createmesh, error=TRUE}
+initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
+
+max_edge <- initial_range / 8
+
+mesh <- INLA::inla.mesh.2d(
+  loc = sp_data@data[, c("LONG", "LAT")],
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range / 4, initial_range),
+  cutoff = max_edge / 7
+)
+```
+
+# Build the SPDE model on the mesh and set priors for the spatial parameters
+
+```{r spde, error=TRUE}
+prior_range <- initial_range
+spde <- INLA::inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(prior_range, 0.5),
+  prior.sigma = c(1, 0.01)
+)
+```
+
+# Define how the process evolves over time and set prior for the temporal parameter
+
+```{r pccor, error=TRUE}
+rhoprior <- list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+```
+
+# Define the model formula
+
+In order to fit the spatio-temporal model, a model formula needs to be defined, by including the response in the left-hand side and the fixed and random effects in the right-hand side.
+
+```{r formula, error=TRUE}
+formula <- cases ~ 0 + Intercept + IMD +
+  carebeds.ratio + AandETRUE +
+  perc.chinese + perc.indian + perc.bangladeshi + perc.pakistani + perc.ba + perc.bc + perc.wb +
+  age1 + age2 + age3 + age4 +
+  pm25 + no2 +
+  f(§
+    main = coordinates,
+    model = spde,
+    group = group_index,
+    ngroup = n_groups,
+    control.group = list(
+      model = "ar1",
+      hyper = rhoprior
+    )
+  )
+```
+
+# Run the model
+
+```{r fitmodel, error=TRUE, eval=FALSE}
+inlabru_model <- inlabru::bru(formula,
+  data = covid19_data,
+  family = "poisson",
+  E = covid19_data$Population,
+  control.family = list(link = "log"),
+  control.predictor = list(link = 1),
+  options = list(
+    control.inla = list(
+      reordering = "metis",
+      int.strategy = "eb"
+    ),
+    verbose = TRUE,
+    inla.mode = "experimental"
+  )
+)
+```
+
+# Check the results
+
+```{r summarymodel, error=TRUE, eval=FALSE}
+model_summary <- summary(inlabru_model)
+
+model_summary_fixed <- inlabru_model$summary.fixed
+model_hyperparams <- inlabru_model$marginals.hyperpar
+```
