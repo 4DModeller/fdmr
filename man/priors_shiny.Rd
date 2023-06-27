@@ -2,14 +2,14 @@
 % Please edit documentation in R/shiny_priors.R
 \name{priors_shiny}
 \alias{priors_shiny}
-\title{Title}
+\title{Interactively set and see the result of different priors}
 \usage{
-priors_shiny(data, coordinates = NULL, spde = NULL)
+priors_shiny(spatial_data, measurement_data)
 }
 \arguments{
-\item{model}{}
+\item{measurement_data}{}
 }
 \description{
-Title
+Interactively set and see the result of different priors
 }
 \keyword{internal}

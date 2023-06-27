@@ -1,30 +1,22 @@
-#' Title
+#' Interactively set and see the result of different priors
 #'
-#' @param data
-#' @param model
+#' @param spatial_data
+#' @param measurement_data
+#'
+#' @importFrom INLA f
 #'
 #' @return
 #' @keywords internal
-priors_shiny <- function(data, coordinates = NULL, spde = NULL) {
+priors_shiny <- function(spatial_data, measurement_data) {
     # TODO - make this a bit more intelligent / add it to the data schema
-    features <- colnames(data)
-    inital_equation_val <- "formula <- cases ~ 0 + Intercept"
-    f_section <- "f(
-                main = coordinates,
-                model = spde,
-                group = group_index,
-                ngroup = n_groups,
-                control.group = list(
-                model = 'ar1',
-                hyper = rhoprior
-                )
-            )"
+    features <- colnames(spatial_data)
+    inital_equation_val <- "formula <- model_var ~ 0 + Intercept"
 
     # We'll only create the mesh once
-    initial_range <- diff(range(data@data[, "LONG"])) / 5
+    initial_range <- diff(range(spatial_data@data[, "LONG"])) / 5
     max_edge <- initial_range / 8
     mesh <- INLA::inla.mesh.2d(
-        loc = data@data[, c("LONG", "LAT")],
+        loc = spatial_data@data[, c("LONG", "LAT")],
         max.edge = c(1, 2) * max_edge,
         offset = c(initial_range / 4, initial_range),
         cutoff = max_edge / 7
@@ -48,7 +40,7 @@ priors_shiny <- function(data, coordinates = NULL, spde = NULL) {
             shiny::mainPanel(
                 shiny::column(
                     12,
-                    shiny::plotOutput(outputId = "comparison"),
+                    shiny::plotOutput(outputId = "comparison_output"),
                     shiny::textOutput(outputId = "final_equation")
                 )
             )
@@ -58,7 +50,7 @@ priors_shiny <- function(data, coordinates = NULL, spde = NULL) {
     server <- function(input, output, session) {
         final_equation_str <- shiny::reactive({
             chosen <- stringr::str_c(input$features, collapse = " + ")
-            stringr::str_c(c(input$initial_equation, chosen, f_section), collapse = " + ")
+            stringr::str_c(c(input$initial_equation, chosen), collapse = " + ")
         })
 
         spde <- shiny::reactive({
@@ -71,40 +63,70 @@ priors_shiny <- function(data, coordinates = NULL, spde = NULL) {
 
         output$final_equation <- shiny::renderText({
             chosen <- stringr::str_c(input$features, collapse = " + ")
-            stringr::str_c(c(input$initial_equation, chosen, f_section), collapse = " + ")
+            stringr::str_c(c(input$initial_equation, chosen), collapse = " + ")
         })
 
         model_out <- shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
-            formula <- eval(parse(text = final_equation_str))
+            rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+            group_index <- measurement_data$week
+            n_groups <- length(unique(measurement_data$week))
 
-            inlabru::bru(formula,
-                data = data,
-                family = "poisson",
-                E = data$Population,
-                control.family = list(link = "log"),
-                control.predictor = list(link = 1),
-                options = list(
-                    control.inla = list(
-                        reordering = "metis",
-                        int.strategy = "eb"
-                    ),
-                    verbose = TRUE,
-                    inla.mode = "experimental"
-                )
+            # formula <- eval(parse(text = final_equation_str)) +
+            formula <- cases ~ 0 + Intercept
+            # + IMD +
+            #     carebeds.ratio + AandETRUE +
+            #     perc.chinese +
+            #     f(
+            #         main = coordinates,
+            #         model = spde(),
+            #         group = group_index,
+            #         ngroup = n_groups,
+            #         control.group = list(
+            #             model = "ar1",
+            #             hyper = rhoprior
+            #         )
+            #     )
+
+            tryCatch(
+                expr = {
+                    inlabru::bru(formula,
+                        data = measurement_data,
+                        family = "poisson",
+                        E = measurement_data$Population,
+                        control.family = list(link = "log"),
+                        # control.predictor = list(link = 1),
+                        options = list(
+                            control.inla = list(
+                                reordering = "metis",
+                                int.strategy = "eb"
+                            ),
+                            verbose = TRUE,
+                            inla.mode = "experimental"
+                        )
+                    )
+                },
+                error = function(e) {
+                    return("INLA crashed.")
+                }
             )
+        })
+
+
+        output$comparison_output <- shiny::renderText({
+            summary(model_out())
         })
     }
 
     shiny::shinyApp(ui = ui, server = server)
 }
 
-#' Title
+#' Interactively set and see the result of different priors
 #'
-#' @param data
-#' @param model
+#' @param spatial_data
+#' @param measurement_data
 #'
 #' @return
 #' @export
-interactive_priors <- function(data) {
-    shiny::runApp(priors_shiny(data = data))
+interactive_priors <- function(spatial_data, measurement_data) {
+    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data))
 }
