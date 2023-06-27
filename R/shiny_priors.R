@@ -9,9 +9,8 @@
 #' @keywords internal
 priors_shiny <- function(spatial_data, measurement_data) {
     # TODO - make this a bit more intelligent / add it to the data schema
-    features <- colnames(spatial_data)
-    inital_equation_val <- "formula <- model_var ~ 0 + Intercept"
-
+    initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
+    features <- names(measurement_data)
     # We'll only create the mesh once
     initial_range <- diff(range(spatial_data@data[, "LONG"])) / 5
     max_edge <- initial_range / 8
@@ -29,28 +28,62 @@ priors_shiny <- function(spatial_data, measurement_data) {
                 shiny::sliderInput(
                     inputId = "wavelength",
                     label = "Prior: wavelength:",
-                    min = 0.1, value = 0.2, max = 10
+                    min = 1, value = 1.5, max = 10
                 ),
                 shiny::p("Change the spatial wavelength prior"),
-                shiny::textInput(inputId = "initial_equation", label = "Initial equation", value = inital_equation_val),
+                shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
                 shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
-                shiny::actionButton(inputId = "clear_equation", label = "Clear"),
-                shiny::actionButton(inputId = "run_model", label = "Run")
+                shiny::actionButton(inputId = "clear", label = "Clear"),
+                shiny::actionButton(inputId = "run_model", label = "Run"),
+                shiny::textOutput(outputId = "status")
             ),
             shiny::mainPanel(
                 shiny::column(
                     12,
-                    shiny::plotOutput(outputId = "comparison_output"),
-                    shiny::textOutput(outputId = "final_equation")
+                    shiny::textOutput(outputId = "comparison_output"),
+                    shiny::textOutput(outputId = "final_equation"),
+                    shiny::verbatimTextOutput("value")
                 )
             )
         )
     )
 
     server <- function(input, output, session) {
+        status_values <- shiny::reactiveValues("status" = "OK")
+
+        output$status <- shiny::renderText({
+            paste("Status : ", status_values$status)
+        })
+
+        initial_equation <- shiny::reactive({
+            stringr::str_replace(initial_equation_val, "model_var", input$model_var)
+        })
+
+
         final_equation_str <- shiny::reactive({
-            chosen <- stringr::str_c(input$features, collapse = " + ")
-            stringr::str_c(c(input$initial_equation, chosen), collapse = " + ")
+            if (length(input$features) == 0) {
+                return(initial_equation())
+            } else {
+                # features_copy <- input$features
+                # features_copy <- features_copy[features_copy != input$model_var]
+                # if (length(features_copy == 0)) {
+                #     return(initial_equation())
+                # }
+                chosen <- stringr::str_c(input$features, collapse = " + ")
+                stringr::str_c(c(initial_equation(), chosen), collapse = " + ")
+            }
+        })
+
+        shiny::observeEvent(input$features, {
+            print(paste0("You have chosen: ", input$features))
+        })
+
+        shiny::observeEvent(input$clear, {
+            shiny::updateCheckboxGroupInput(session = session, inputId = "features", choices = features, selected = NULL)
+        })
+
+        shiny::observeEvent(input$model_var, {
+            shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
 
         spde <- shiny::reactive({
@@ -62,8 +95,7 @@ priors_shiny <- function(spatial_data, measurement_data) {
         })
 
         output$final_equation <- shiny::renderText({
-            chosen <- stringr::str_c(input$features, collapse = " + ")
-            stringr::str_c(c(input$initial_equation, chosen), collapse = " + ")
+            final_equation_str()
         })
 
         model_out <- shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
@@ -71,21 +103,21 @@ priors_shiny <- function(spatial_data, measurement_data) {
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
-            # formula <- eval(parse(text = final_equation_str)) +
-            formula <- cases ~ 0 + Intercept
+            formula <- eval(parse(text = final_equation_str()))
+            # formula <- cases ~ 0 + Intercept + perc.chinese
             # + IMD +
             #     carebeds.ratio + AandETRUE +
             #     perc.chinese +
-            #     f(
-            #         main = coordinates,
-            #         model = spde(),
-            #         group = group_index,
-            #         ngroup = n_groups,
-            #         control.group = list(
-            #             model = "ar1",
-            #             hyper = rhoprior
-            #         )
+            # f(
+            #     main = coordinates,
+            #     model = spde(),
+            #     group = group_index,
+            #     ngroup = n_groups,
+            #     control.group = list(
+            #         model = "ar1",
+            #         hyper = rhoprior
             #     )
+            # )
 
             tryCatch(
                 expr = {
@@ -106,14 +138,17 @@ priors_shiny <- function(spatial_data, measurement_data) {
                     )
                 },
                 error = function(e) {
-                    return("INLA crashed.")
+                    list("INLA_crashed" = TRUE, err = toString(e))
                 }
             )
         })
 
-
-        output$comparison_output <- shiny::renderText({
+        model_summary <- shiny::reactive({
             summary(model_out())
+        })
+
+        output$comparison_output <- shiny::renderPrint({
+            model_summary()
         })
     }
 

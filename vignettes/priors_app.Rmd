@@ -34,9 +34,11 @@ covid19_data_bris <- dplyr::filter(covid19_data, LONG >= long_min, LONG <= long_
 
 # Create the mesh
 
+> **_NOTE:_**  Should we let the user pass in a mesh here? At the moment the app just creates one for them using the params from the COVID-19 tutorial.
+
 ## COVID-19 tutorial mesh
 
-This is the mesh used in the COVID-19 tutoral.
+This is the mesh used in the COVID-19 tutorial.
 
 ```{r createmesh, error=TRUE}
 initial_range <- diff(range(sp_data_bristol@data[, "LONG"])) / 5
@@ -69,6 +71,8 @@ In order to fit the model, we also need to define a temporal index (must be an i
 group_index <- covid19_data_bris$week
 n_groups <- length(unique(covid19_data_bris$week))
 ```
+
+# Set coordinates on data
 
 We will use the function `bru()` of package `inlabru` to fit the model. `bru` expects the coordinates of the data, thus we transform `covid19_data_bris` data set to a SpatialPointsDataFrame using the function `coordinates()` of the `sp` package.
 
