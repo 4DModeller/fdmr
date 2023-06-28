@@ -4,10 +4,17 @@
 \alias{priors_shiny}
 \title{Interactively set and see the result of different priors}
 \usage{
-priors_shiny(spatial_data, measurement_data)
+priors_shiny(spatial_data, measurement_data, mesh = NULL)
 }
 \arguments{
-\item{measurement_data}{}
+\item{spatial_data}{Spatial data}
+
+\item{measurement_data}{Measurement data}
+
+\item{mesh}{INLA mesh}
+}
+\value{
+shiny::app
 }
 \description{
 Interactively set and see the result of different priors

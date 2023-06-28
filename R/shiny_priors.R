@@ -2,30 +2,41 @@
 #'
 #' @param spatial_data Spatial data
 #' @param measurement_data Measurement data
+#' @param mesh INLA mesh
 #'
 #' @importFrom INLA f
 #'
 #' @return shiny::app
 #' @keywords internal
-priors_shiny <- function(spatial_data, measurement_data) {
+priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
     # TODO - make this a bit more intelligent / add it to the data schema
     initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
     features <- names(measurement_data)
-    # We'll only create the mesh once
-    initial_range <- diff(range(spatial_data@data[, "LONG"])) / 5
-    max_edge <- initial_range / 8
-    mesh <- INLA::inla.mesh.2d(
-        loc = spatial_data@data[, c("LONG", "LAT")],
-        max.edge = c(1, 2) * max_edge,
-        offset = c(initial_range / 4, initial_range),
-        cutoff = max_edge / 7
-    )
+
+    if (is.null(mesh)) {
+        # We'll only create the mesh once
+        # initial_range <- diff(range(spatial_data@data[, "LONG"])) / 5
+        # max_edge <- initial_range / 8
+        # mesh <- INLA::inla.mesh.2d(
+        #     loc = spatial_data@data[, c("LONG", "LAT")],
+        #     max.edge = c(1, 2) * max_edge,
+        #     offset = c(initial_range / 4, initial_range),
+        #     cutoff = max_edge / 7
+        # )
+
+        mesh <- INLA::inla.mesh.2d(
+            loc = spatial_data@data[, c("LONG", "LAT")],
+            max.edge = c(0.02, 0.1),
+            cutoff = 0.005,
+            offset = c(0.1, 0.3)
+        )
+    }
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
         shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
-        shiny::headerPanel("Investigating priors"),
+        shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
                 shiny::sliderInput(
@@ -42,8 +53,14 @@ priors_shiny <- function(spatial_data, measurement_data) {
                 shiny::textOutput(outputId = "status")
             ),
             shiny::mainPanel(
-                shiny::fluidRow(shiny::textOutput(outputId = "comparison_output"), style = "height:80vh;"),
-                shiny::fluidRow(shiny::textOutput(outputId = "final_equation"), style = "height:20vh;")
+                shiny::fluidRow(
+                    shiny::h2("Model output"),
+                    shiny::textOutput(outputId = "comparison_output"), style = "height:80vh;"),
+                shiny::fluidRow(
+                    shiny::h2("Formula"),
+                    shiny::textOutput(outputId = "final_equation"),
+                    style = "height:20vh;"
+                )
             ),
         )
     )
@@ -159,9 +176,10 @@ priors_shiny <- function(spatial_data, measurement_data) {
 #'
 #' @param spatial_data Spatial data
 #' @param measurement_data Measurement data
+#' @param mesh INLA mesh
 #'
 #' @return shiny::app
 #' @export
-interactive_priors <- function(spatial_data, measurement_data) {
-    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data))
+interactive_priors <- function(spatial_data, measurement_data, mesh = NULL) {
+    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, mesh = mesh))
 }

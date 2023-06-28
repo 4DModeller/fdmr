@@ -12,11 +12,21 @@ covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_
 
 Here we trim the spatial data to within a bounding box around Bristol.
 
+A bigger box
 ```{r}
 long_min <- -2.695726
 long_max <- -2.400219
 lat_min <- 51.390799
 lat_max <- 51.521310
+```
+
+A smaller box
+
+```{r}
+lat_min <- 51.442511
+lat_max <- 51.471274
+long_min <- -2.620198
+long_max <- -2.550427
 ```
 
 ```{r}
@@ -45,12 +55,12 @@ initial_range <- diff(range(sp_data_bristol@data[, "LONG"])) / 5
 
 max_edge <- initial_range / 8
 
-mesh <- INLA::inla.mesh.2d(
-  loc = sp_data_bristol@data[, c("LONG", "LAT")],
-  max.edge = c(1, 2) * max_edge,
-  offset = c(initial_range / 4, initial_range),
-  cutoff = max_edge / 7
-)
+# mesh <- INLA::inla.mesh.2d(
+#   loc = sp_data_bristol@data[, c("LONG", "LAT")],
+#   max.edge = c(1, 2) * max_edge,
+#   offset = c(initial_range / 4, initial_range),
+#   cutoff = max_edge / 7
+# )
 ```
 
 ## Mesh created using `mesh_builder`
@@ -59,10 +69,10 @@ We can have a look at the mesh and change it interactively using the `mesh_build
 and pass it into the Setting Priors Shiny app below.
 
 ```{r}
-mesh <- inla.mesh.2d(loc = sp_data_bristol,
-          max.edge = c(0.02, 0.1),
-          cutoff = 0.005,
-          offset = c(0.1, 0.3))
+mesh <- INLA::inla.mesh.2d(loc = sp_data_bristol@data[, c("LONG", "LAT")],
+          max.edge = c(0.1, 0.4),
+          offset = c(0.0042915, 0.0171660),
+          cutoff = c(0.01428571, 0.05714286))
 ```
 
 In order to fit the model, we also need to define a temporal index (must be an integer starting at 1) and the number of discrete time points we want to model.
@@ -90,26 +100,12 @@ rhoprior <- list(theta = list(prior = "pccor1", param = c(0, 0.9)))
 
 Now we have the filtered data we are ready to pass in the spatial 
 
-# TODO
-
-- Pass in spatial data, pass in measurement data
-
-- Add mesh building function
-- Add SPDE building function
-- 
-
-# Define the model formula
-
-In order to fit the spatio-temporal model, a model formula needs to be defined, by including the response in the left-hand side and the fixed and random effects in the right-hand side.
-In the Shiny app you can dynamically control the formula used by selecting variables using the checkboxes.
-
-First start by entering the initial part of the formula, which in this example defaults to `cases ~ 0 + Intercept`. Click on the checkboxes to select your formula and then click the `Run Model` button to
-run the model see it's output plot on the right of the window.
+First start by selecting the variable to model. In this example we'll select `cases`, then select the features to add to the formula. At the bottom of the window you'll see the formula being constructed.
+Click on the checkboxes to select your formula and then click the `Run Model` button to run the model see it's output plot on the right of the window.
 
 ```{r}
-fdmr::interactive_priors(spatial_data = sp_data_bristol, measurement_data = covid19_data_bris)
+fdmr::interactive_priors(spatial_data = sp_data_bristol, measurement_data = covid19_data_bris, mesh=mesh)
 ```
-
 
 
 # Check the results
