@@ -1,3 +1,22 @@
+call_bru <- function(formula, measurement_data) {
+    message("Running sweet function.")
+    inlabru::bru(formula,
+        data = measurement_data,
+        family = "poisson",
+        E = measurement_data$Population,
+        control.family = list(link = "log"),
+        # control.predictor = list(link = 1),
+        options = list(
+            control.inla = list(
+                reordering = "metis",
+                int.strategy = "eb"
+            ),
+            verbose = TRUE,
+            inla.mode = "experimental"
+        )
+    )
+}
+
 #' Interactively set and see the result of different priors
 #'
 #' @param spatial_data Spatial data
@@ -34,6 +53,7 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
+
         # Use this function somewhere in UI
         shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
         shiny::headerPanel(title = "Investigating priors"),
@@ -55,7 +75,14 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
             shiny::mainPanel(
                 shiny::fluidRow(
                     shiny::h2("Model output"),
-                    shiny::textOutput(outputId = "comparison_output"), style = "height:80vh;"),
+                    shiny::textOutput(outputId = "comparison_output"),
+                    style = "height:40vh;"
+                ),
+                shiny::fluidRow(
+                    shiny::h2("Live output"),
+                    shiny::textOutput(outputId = "text"),
+                    style = "height:40vh;"
+                ),
                 shiny::fluidRow(
                     shiny::h2("Formula"),
                     shiny::textOutput(outputId = "final_equation"),
@@ -96,6 +123,8 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
             )
         })
 
+
+
         formula_str <- shiny::reactive({
             eval_str <- initial_equation()
 
@@ -129,39 +158,31 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
             formula_str()
         })
 
-        model_out <- shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
+        # model_out <-
+        shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
             rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
             formula <- eval(parse(text = formula_str()))
 
-            tryCatch(
-                expr = {
-                    inlabru::bru(formula,
-                        data = measurement_data,
-                        family = "poisson",
-                        E = measurement_data$Population,
-                        control.family = list(link = "log"),
-                        # control.predictor = list(link = 1),
-                        options = list(
-                            control.inla = list(
-                                reordering = "metis",
-                                int.strategy = "eb"
-                            ),
-                            verbose = TRUE,
-                            inla.mode = "experimental"
-                        )
-                    )
+            withCallingHandlers(
+                {
+                    shinyjs::html("text", "")
+                    call_bru(formula, measurement_data)
                 },
-                error = function(e) {
-                    list("INLA_crashed" = TRUE, err = toString(e))
+                message = function(m) {
+                    shinyjs::html(id = "text", html = m$message, add = TRUE)
+                },
+                warning = function(w) {
+                    shinyjs::html(id = "text", html = w$message, add = TRUE)
                 }
             )
         })
 
         model_summary <- shiny::reactive({
-            summary(model_out())
+            # summary(model_out())
+            return(list())
         })
 
         output$comparison_output <- shiny::renderPrint({
