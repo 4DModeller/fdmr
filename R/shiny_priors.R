@@ -1,11 +1,11 @@
 #' Interactively set and see the result of different priors
 #'
-#' @param spatial_data
-#' @param measurement_data
+#' @param spatial_data Spatial data
+#' @param measurement_data Measurement data
 #'
 #' @importFrom INLA f
 #'
-#' @return
+#' @return shiny::app
 #' @keywords internal
 priors_shiny <- function(spatial_data, measurement_data) {
     # TODO - make this a bit more intelligent / add it to the data schema
@@ -23,6 +23,9 @@ priors_shiny <- function(spatial_data, measurement_data) {
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
+        # Use this function somewhere in UI
+        shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
+        shiny::headerPanel("Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
                 shiny::sliderInput(
@@ -33,18 +36,15 @@ priors_shiny <- function(spatial_data, measurement_data) {
                 shiny::p("Change the spatial wavelength prior"),
                 shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
                 shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
+                shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
                 shiny::actionButton(inputId = "clear", label = "Clear"),
                 shiny::actionButton(inputId = "run_model", label = "Run"),
                 shiny::textOutput(outputId = "status")
             ),
             shiny::mainPanel(
-                shiny::column(
-                    12,
-                    shiny::textOutput(outputId = "comparison_output"),
-                    shiny::textOutput(outputId = "final_equation"),
-                    shiny::verbatimTextOutput("value")
-                )
-            )
+                shiny::fluidRow(shiny::textOutput(outputId = "comparison_output"), style = "height:80vh;"),
+                shiny::fluidRow(shiny::textOutput(outputId = "final_equation"), style = "height:20vh;")
+            ),
         )
     )
 
@@ -57,21 +57,6 @@ priors_shiny <- function(spatial_data, measurement_data) {
 
         initial_equation <- shiny::reactive({
             stringr::str_replace(initial_equation_val, "model_var", input$model_var)
-        })
-
-
-        final_equation_str <- shiny::reactive({
-            if (length(input$features) == 0) {
-                return(initial_equation())
-            } else {
-                # features_copy <- input$features
-                # features_copy <- features_copy[features_copy != input$model_var]
-                # if (length(features_copy == 0)) {
-                #     return(initial_equation())
-                # }
-                chosen <- stringr::str_c(input$features, collapse = " + ")
-                stringr::str_c(c(initial_equation(), chosen), collapse = " + ")
-            }
         })
 
         shiny::observeEvent(input$features, {
@@ -94,8 +79,37 @@ priors_shiny <- function(spatial_data, measurement_data) {
             )
         })
 
+        formula_str <- shiny::reactive({
+            eval_str <- initial_equation()
+
+            if (length(input$features > 0)) {
+                # features_copy <- input$features
+                # features_copy <- features_copy[features_copy != input$model_var]
+                # if (length(features_copy == 0)) {
+                #     return(initial_equation())
+                # }
+                chosen <- stringr::str_c(input$features, collapse = " + ")
+                eval_str <- paste(eval_str, " + ", chosen)
+            }
+
+            f_func <- "f(
+                main = coordinates,
+                model = spde(),
+                group = group_index,
+                ngroup = n_groups,
+                control.group = list(
+                    model = 'ar1',
+                    hyper = rhoprior)
+                )"
+
+            if (input$f_func) {
+                eval_str <- paste(eval_str, " + ", f_func)
+            }
+            return(eval_str)
+        })
+
         output$final_equation <- shiny::renderText({
-            final_equation_str()
+            formula_str()
         })
 
         model_out <- shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
@@ -103,21 +117,7 @@ priors_shiny <- function(spatial_data, measurement_data) {
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
-            formula <- eval(parse(text = final_equation_str()))
-            # formula <- cases ~ 0 + Intercept + perc.chinese
-            # + IMD +
-            #     carebeds.ratio + AandETRUE +
-            #     perc.chinese +
-            # f(
-            #     main = coordinates,
-            #     model = spde(),
-            #     group = group_index,
-            #     ngroup = n_groups,
-            #     control.group = list(
-            #         model = "ar1",
-            #         hyper = rhoprior
-            #     )
-            # )
+            formula <- eval(parse(text = formula_str()))
 
             tryCatch(
                 expr = {
@@ -157,10 +157,10 @@ priors_shiny <- function(spatial_data, measurement_data) {
 
 #' Interactively set and see the result of different priors
 #'
-#' @param spatial_data
-#' @param measurement_data
+#' @param spatial_data Spatial data
+#' @param measurement_data Measurement data
 #'
-#' @return
+#' @return shiny::app
 #' @export
 interactive_priors <- function(spatial_data, measurement_data) {
     shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data))
