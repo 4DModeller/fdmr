@@ -6,10 +6,12 @@
 to a folder in th user's home directory or a folder
 specified in their use config file.}
 \usage{
-retrieve_tutorial_data(dataset, filename)
+retrieve_tutorial_data(dataset, force_update = FALSE)
 }
 \arguments{
-\item{dataset}{Name of dataset to retrieve, either covid or hydro}
+\item{dataset}{Name of dataset to retrieve}
+
+\item{force_retrieval}{Force update of dataset information}
 }
 \description{
 Retrieve the tutorial datasets and unpack them
