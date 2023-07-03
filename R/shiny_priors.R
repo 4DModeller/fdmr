@@ -3,27 +3,29 @@
 #' @param spatial_data Spatial data
 #' @param measurement_data Measurement data
 #' @param mesh INLA mesh
+#' @param inla_exposure_param Exposure parameter for family = 'poisson' passed to inlabru::bru and then to INLA::inla. Must be column in measurement data.
 #'
 #' @importFrom INLA f
 #'
 #' @return shiny::app
 #' @keywords internal
-priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
-    # TODO - make this a bit more intelligent / add it to the data schema
+priors_shiny <- function(spatial_data,
+                         measurement_data,
+                         mesh = NULL,
+                         inla_exposure_param = "Population",
+                         prior_spatial_range = NULL,
+                         prior_range_probability = NULL,
+                         prior_std_dev = NULL,
+                         prior_std_dev_prob = NULL,
+                         prior_alpha = NULL,
+                         prior_pg_alpha = NULL) {
     initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
     features <- names(measurement_data)
+    if (is.null(features)) {
+        stop("We require the columns of measurement_data to have the names of the features to use in the model.")
+    }
 
     if (is.null(mesh)) {
-        # We'll only create the mesh once
-        # initial_range <- diff(range(spatial_data@data[, "LONG"])) / 5
-        # max_edge <- initial_range / 8
-        # mesh <- INLA::inla.mesh.2d(
-        #     loc = spatial_data@data[, c("LONG", "LAT")],
-        #     max.edge = c(1, 2) * max_edge,
-        #     offset = c(initial_range / 4, initial_range),
-        #     cutoff = max_edge / 7
-        # )
-
         mesh <- INLA::inla.mesh.2d(
             loc = spatial_data@data[, c("LONG", "LAT")],
             max.edge = c(0.02, 0.1),
@@ -43,52 +45,61 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
                 shiny::sliderInput(
                     inputId = "prior_spatial_range",
                     label = "Spatial range:",
-                    min = 1, value = 1.5, max = 10
+                    min = 1, value = 1.5, max = 5
                 ),
                 shiny::sliderInput(
                     inputId = "prior_range_probability",
                     label = "Range probabilty:",
-                    min = 1, value = 1.5, max = 10
+                    min = 0.1, value = 0.5, max = 5
                 ),
                 shiny::sliderInput(
                     inputId = "prior_std_dev",
                     label = "Standard deviation:",
-                    min = 1, value = 1.5, max = 10
+                    min = 1, value = 1, max = 5
                 ),
                 shiny::sliderInput(
                     inputId = "prior_std_dev_prob",
                     label = "Standard dev. probability:",
-                    min = 1, value = 1.5, max = 10
+                    min = 0.01, value = 0.01, max = 1
                 ),
                 shiny::h3("Temporal priors"),
                 shiny::sliderInput(
                     inputId = "prior_alpha",
                     label = "Alpha:",
-                    min = 1, value = 1.5, max = 10
+                    min = 0, value = 0.01, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "prior_pg_alpha",
                     label = "PG Alpha:",
-                    min = 1, value = 1.5, max = 10
+                    min = 0, value = 0.9, max = 1
                 ),
-                shiny::p("Change the spatial range prior"),
-                shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
-                shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
-                shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
-                shiny::actionButton(inputId = "clear", label = "Clear"),
-                shiny::actionButton(inputId = "run_model", label = "Run"),
                 shiny::textOutput(outputId = "status")
             ),
             shiny::mainPanel(
-                shiny::fluidRow(
-                    shiny::h2("Model output"),
-                    shiny::textOutput(outputId = "comparison_output"),
-                    style = "height:80vh;"
-                ),
-                shiny::fluidRow(
-                    shiny::h2("Formula"),
-                    shiny::textOutput(outputId = "final_equation"),
-                    style = "height:20vh;"
+                shiny::tabsetPanel(
+                    type = "tabs",
+                    shiny::tabPanel(
+                        "Features",
+                        shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
+                        shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
+                        shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
+                        shiny::actionButton(inputId = "clear", label = "Clear"),
+                        shiny::fluidRow(
+                            shiny::h2("Formula"),
+                            shiny::textOutput(outputId = "final_equation"),
+                            style = "height:20vh;"
+                        )
+                    ),
+                    shiny::tabPanel(
+                        "Model",
+                        shiny::fluidRow(
+                            shiny::h2("Model output"),
+                            shiny::textOutput(outputId = "comparison_output"),
+                            style = "height:80vh;"
+                        ),
+                        shiny::actionButton(inputId = "run_model", label = "Run"),
+                    ),
+                    shiny::tabPanel("Plot", shiny::verbatimTextOutput("Plot here"))
                 )
             ),
         )
@@ -175,7 +186,7 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
                     inlabru::bru(formula,
                         data = measurement_data,
                         family = "poisson",
-                        E = measurement_data$Population,
+                        E = measurement_data[[inla_exposure_param]],
                         control.family = list(link = "log"),
                         # control.predictor = list(link = 1),
                         options = list(
