@@ -46,25 +46,6 @@ covid19_data_bris <- dplyr::filter(covid19_data, LONG >= long_min, LONG <= long_
 
 > **_NOTE:_**  Should we let the user pass in a mesh here? At the moment the app just creates one for them using the params from the COVID-19 tutorial.
 
-## COVID-19 tutorial mesh
-
-This is the mesh used in the COVID-19 tutorial.
-
-```{r createmesh, error=TRUE}
-initial_range <- diff(range(sp_data_bristol@data[, "LONG"])) / 5
-
-max_edge <- initial_range / 8
-
-# mesh <- INLA::inla.mesh.2d(
-#   loc = sp_data_bristol@data[, c("LONG", "LAT")],
-#   max.edge = c(1, 2) * max_edge,
-#   offset = c(initial_range / 4, initial_range),
-#   cutoff = max_edge / 7
-# )
-```
-
-## Mesh created using `mesh_builder`
-
 We can have a look at the mesh and change it interactively using the `mesh_builder` Shiny app. Using the app I came up with a mesh with the following parameters, we'll use this
 and pass it into the Setting Priors Shiny app below.
 

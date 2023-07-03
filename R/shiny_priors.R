@@ -39,12 +39,39 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
+                shiny::h3("Priors"),
                 shiny::sliderInput(
-                    inputId = "wavelength",
-                    label = "Prior: wavelength:",
+                    inputId = "prior_spatial_range",
+                    label = "Spatial range:",
                     min = 1, value = 1.5, max = 10
                 ),
-                shiny::p("Change the spatial wavelength prior"),
+                shiny::sliderInput(
+                    inputId = "prior_range_probability",
+                    label = "Range probabilty:",
+                    min = 1, value = 1.5, max = 10
+                ),
+                shiny::sliderInput(
+                    inputId = "prior_std_dev",
+                    label = "Standard deviation:",
+                    min = 1, value = 1.5, max = 10
+                ),
+                shiny::sliderInput(
+                    inputId = "prior_std_dev_prob",
+                    label = "Standard dev. probability:",
+                    min = 1, value = 1.5, max = 10
+                ),
+                shiny::h3("Temporal priors"),
+                shiny::sliderInput(
+                    inputId = "prior_alpha",
+                    label = "Alpha:",
+                    min = 1, value = 1.5, max = 10
+                ),
+                shiny::sliderInput(
+                    inputId = "prior_pg_alpha",
+                    label = "PG Alpha:",
+                    min = 1, value = 1.5, max = 10
+                ),
+                shiny::p("Change the spatial range prior"),
                 shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
                 shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
                 shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
@@ -55,7 +82,9 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
             shiny::mainPanel(
                 shiny::fluidRow(
                     shiny::h2("Model output"),
-                    shiny::textOutput(outputId = "comparison_output"), style = "height:80vh;"),
+                    shiny::textOutput(outputId = "comparison_output"),
+                    style = "height:80vh;"
+                ),
                 shiny::fluidRow(
                     shiny::h2("Formula"),
                     shiny::textOutput(outputId = "final_equation"),
@@ -91,10 +120,15 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
         spde <- shiny::reactive({
             INLA::inla.spde2.pcmatern(
                 mesh = mesh,
-                prior.range = c(input$wavelength, 0.5),
-                prior.sigma = c(1, 0.01)
+                prior.range = c(input$prior_spatial_range, input$prior_range_probability),
+                prior.sigma = c(input$prior_std_dev, input$prior_std_dev_prob)
             )
         })
+
+        rhoprior <- shiny::reactive({
+            list(theta = list(prior = "pccor1", param = c(input$prior_alpha, input$prior_pg_alpha)))
+        })
+
 
         formula_str <- shiny::reactive({
             eval_str <- initial_equation()
@@ -116,7 +150,7 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
                 ngroup = n_groups,
                 control.group = list(
                     model = 'ar1',
-                    hyper = rhoprior)
+                    hyper = rhoprior())
                 )"
 
             if (input$f_func) {
@@ -130,10 +164,10 @@ priors_shiny <- function(spatial_data, measurement_data, mesh = NULL) {
         })
 
         model_out <- shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
-            rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
+            # TODO - add regex to check this for sensible values
             formula <- eval(parse(text = formula_str()))
 
             tryCatch(
