@@ -28,7 +28,7 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
     retrieval_period <- lubridate::period(6, units = "hours")
     retrieve <- lubridate::interval(lubridate::now(), last_retrieved) > retrieval_period
 
-    if (retrieve) {
+    if (retrieve || force_update) {
       # Retrieve the list of known datasets
       utils::download.file(url = "https://github.com/4DModeller/fdmr_data/raw/main/datasets.json", dataset_info_file)
       # Set the current time of retrieval and write out the JSON
@@ -48,8 +48,6 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
     fs::dir_create(extract_path, recurse = TRUE)
   }
 
-
-
   dataset_info <- jsonlite::read_json(dataset_info_file)
   available_datasets <- dataset_info$datasets
 
@@ -66,7 +64,7 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
       needs_updating <- TRUE
     }
 
-    if (!fs::file_exists(download_path) || needs_updating) {
+    if (force_update || !fs::file_exists(download_path) || needs_updating) {
       data_url <- base::paste0("https://github.com/4DModeller/fdmr_data/raw/main/", filename)
       utils::download.file(url = data_url, destfile = download_path)
     }
