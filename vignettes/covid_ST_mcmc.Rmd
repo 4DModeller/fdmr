@@ -59,8 +59,8 @@ sp_data <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "spatia
 In this study, we use the areal unit modelling approach to fit the BHM and then make model inference using MCMC method. To do this, we need to construct a non-negative symmetric $n \times n$ neighbourhood or adjacency matrix $\boldsymbol{W}$ that accounts for the spatio-temporal autocorrelation structure, where $n=6789$ is the number of areal units. The neighbourhood matrix specifies the spatial closeness between pairs of areal units. The elements $\{w_{ij}\}$ in $\boldsymbol{W}$ can be either continuous or binary, and a larger value of $w_{ij}$ represents that MSOAs $(i,j)$ are spatially closer to each other. Here we use the border sharing specification, so that $w_{ij}=1$ if MSOAs $(i,j)$ share a common geographical border, and $w_{ij}=0$ otherwise.
 
 ```{r constructW, error=TRUE}
-W.nb <- spdep::poly2nb(sp_data,row.names = rownames(sp_data@data))
-w <- spdep::nb2mat(W.nb,style = 'B')
+W.nb <- spdep::poly2nb(sp_data, row.names = rownames(sp_data@data))
+w <- spdep::nb2mat(W.nb, style = "B")
 ```
 
 
@@ -89,8 +89,7 @@ In order to fit the model, a model formula needs to be defined, by including the
 
 
 ```{r formula, error=TRUE}
-form<-cases ~ 1+ offset(log(Population))+ IMD+ perc.wb+ perc.ba + age1+pm25
-
+form <- cases ~ 1 + offset(log(Population)) + IMD + perc.wb + perc.ba + age1 + pm25
 ```
 
 # Fit the model
@@ -98,75 +97,85 @@ form<-cases ~ 1+ offset(log(Population))+ IMD+ perc.wb+ perc.ba + age1+pm25
 Finally, we fit the spatio-temporal model using the function `ST.CARar()` of the package `CARBayesST` developed by Lee (2018) @lee2018spatio. We first need to organize the COVID-19 infection and covariate data into a specific format expected by the `ST.CARar()` function. More details can be found in the help file of 'ST.CARar()'. Any MSOAs without reported cases will be stored as missing (NA) values in the data frame.
 
 ```{r datformat, eval=TRUE}
-time.points<-length(unique(st_covid$date))
-n<-nrow(sp_data@data)
-dat<-data.frame(MSOA11CD=rep(sp_data$MSOA11CD,time.points),
-                date=rep(sort(unique(st_covid$date)),each=n),
-                time=rep(1:time.points,each=n))
-dat$rowid<-1:nrow(dat)
-out<-merge(dat,st_covid[,c("MSOA11CD",
-                           "date",
-                           "MSOA11NM",
-                           "cases",
-                           "Population")], 
-           all.x=TRUE, 
-           by=c("MSOA11CD","date"))
-dat<-out[order(out$rowid), ]
+time.points <- length(unique(st_covid$date))
+n <- nrow(sp_data@data)
+dat <- data.frame(
+  MSOA11CD = rep(sp_data$MSOA11CD, time.points),
+  date = rep(sort(unique(st_covid$date)), each = n),
+  time = rep(1:time.points, each = n)
+)
+dat$rowid <- 1:nrow(dat)
+out <- merge(dat, st_covid[, c(
+  "MSOA11CD",
+  "date",
+  "MSOA11NM",
+  "cases",
+  "Population"
+)],
+all.x = TRUE,
+by = c("MSOA11CD", "date")
+)
+dat <- out[order(out$rowid), ]
 
-covars<-unique(st_covid[,c("MSOA11CD",
-                  "IMD",
-                  "age1",
-                  "perc.chinese",
-                  "perc.indian",
-                  "perc.wb",
-                  "perc.bc",
-                  "perc.ba",
-                  "pm25",
-                  "no2")])
+covars <- unique(st_covid[, c(
+  "MSOA11CD",
+  "IMD",
+  "age1",
+  "perc.chinese",
+  "perc.indian",
+  "perc.wb",
+  "perc.bc",
+  "perc.ba",
+  "pm25",
+  "no2"
+)])
 
-out<-merge(dat,covars,
-                 all.x=TRUE, 
-                 by=c("MSOA11CD"))
-dat<-out[order(out$rowid), ]
+out <- merge(dat, covars,
+  all.x = TRUE,
+  by = c("MSOA11CD")
+)
+dat <- out[order(out$rowid), ]
 
-dat$pre<-dat$cases/dat$Population
-dat$logpre<-log(dat$pre)
-nbhoods<-unique(st_covid[,c("MSOA11CD","Population")])
-for (i in 1:nrow(dat)){         #  this will take a few minutes
-  if(is.na(dat$Population[i])){
-    
-    dat$Population[i]<-nbhoods[match(dat[i,"MSOA11CD"],
-                                     nbhoods$MSOA11CD),
-                               "Population"]
-    
+dat$pre <- dat$cases / dat$Population
+dat$logpre <- log(dat$pre)
+nbhoods <- unique(st_covid[, c("MSOA11CD", "Population")])
+for (i in 1:nrow(dat)) { #  this will take a few minutes
+  if (is.na(dat$Population[i])) {
+    dat$Population[i] <- nbhoods[
+      match(
+        dat[i, "MSOA11CD"],
+        nbhoods$MSOA11CD
+      ),
+      "Population"
+    ]
   }
 }
-st_covid<-dat
-rm(dat,nbhoods,out,covars) # remove non-necessary objects
+st_covid <- dat
+rm(dat, nbhoods, out, covars) # remove non-necessary objects
 ```
 
 Now the data frame 'st_covid' has the expected format. Then run the model.
 
 ```{r fitmcmcmodel, error=TRUE, eval=FALSE}
-MCMC_model <-ST.CARar(formula=form, 
-                      data=st_covid, 
-                      family="poisson", 
-                      W=w,
-                      burnin=10000, 
-                      n.sample=30000, 
-                      thin=10, AR=1)
-
+MCMC_model <- ST.CARar(
+  formula = form,
+  data = st_covid,
+  family = "poisson",
+  W = w,
+  burnin = 10000,
+  n.sample = 30000,
+  thin = 10, AR = 1
+)
 ```
 
 Now we summarise the modelling results. "fitted_vals" stores the predicted COVID-19 infection rate at each MSOA and time point. "modfits" stores the DIC and WAIC values, which measure the goodness of model fit. "mod_sum" provides the values for parameters $\tau^2$, $\rho$ and $\alpha$.
 
 ```{r modsum, error=TRUE, eval=FALSE}
-fitted_vals<-exp(sum(apply(MCMC_model$samples$beta,2,mean))+
-                   apply(MCMC_model$samples$phi,2,mean))
-fitted_vals<-cbind.data.frame(st_covid[,c("MSOA11CD","date")], fitted_vals)
-modfits<-MCMC_model$modelfit
-mod_sum<-MCMC_model$summary.results
-
+fitted_vals <- exp(sum(apply(MCMC_model$samples$beta, 2, mean)) +
+  apply(MCMC_model$samples$phi, 2, mean))
+fitted_vals <- cbind.data.frame(st_covid[, c("MSOA11CD", "date")], fitted_vals)
+modfits <- MCMC_model$modelfit
+mod_sum <- MCMC_model$summary.results
 ```
 
 
@@ -190,10 +199,10 @@ inla_preds <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "inl
 Then the predictions from the two models are merged into one data frame named "mergedat".
 
 ```{r mergepreds,error=TRUE}
-mergedat<-merge(inla_preds,
-                fitted_vals,
-                by=c("MSOA11CD","date"))
-
+mergedat <- merge(inla_preds,
+  fitted_vals,
+  by = c("MSOA11CD", "date")
+)
 ```
 
 # Model comparison
@@ -201,28 +210,33 @@ We show the DIC and WAIC values for each model. The model using the MCMC approac
 
 
 ```{r modfit, error=TRUE, eval=TRUE}
-inla_sum<- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "INLAmodsum.rds")
-modfit<-data.frame(DIC=c(modfits[1],inla_sum[1]),
-                   WAIC=c(modfits[2],inla_sum[2]))
-rownames(modfit)<-c("MCMC","INLA_SPDE")
+inla_sum <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "INLAmodsum.rds")
+modfit <- data.frame(
+  DIC = c(modfits[1], inla_sum[1]),
+  WAIC = c(modfits[2], inla_sum[2])
+)
+rownames(modfit) <- c("MCMC", "INLA_SPDE")
 modfit
 ```
 
 Now we compare the posterior COVID-19 infection rate estimates between the two models. In general, the two models provide similar posterior COVID-19 infection rate estimates. 
 
 ```{r compareplot, error=TRUE, eval=TRUE,fig.width=6,fig.height=6, fig.align='center'}
-plot(mergedat$mcmc.fitted.prev,mergedat$inla.fitted.prev,xlab="MCMC",ylab="INLA_SPDE",xlim=c(0,0.06),ylim=c(0,0.06),cex=0.01)
-boxplot(mergedat$mcmc.fitted.prev,mergedat$inla.fitted.prev,
-        names=c("MCMC","INLA_SPDE"))
+plot(mergedat$mcmc.fitted.prev, mergedat$inla.fitted.prev, xlab = "MCMC", ylab = "INLA_SPDE", xlim = c(0, 0.06), ylim = c(0, 0.06), cex = 0.01)
+boxplot(mergedat$mcmc.fitted.prev, mergedat$inla.fitted.prev,
+  names = c("MCMC", "INLA_SPDE")
+)
 ```
 
 
 The regression coefficients estimates of the selected covariates for both models are compared. 
 
 ```{r comparefixed,error=TRUE, eval=TRUE}
-summary_fixed<- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "INLAfixed_sum.rds")
-regr_est<-cbind.data.frame("MCMC"=mod_sum[1:6,1],
-                 "INLA_SPDE"=summary_fixed$mean)
+summary_fixed <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "INLAfixed_sum.rds")
+regr_est <- cbind.data.frame(
+  "MCMC" = mod_sum[1:6, 1],
+  "INLA_SPDE" = summary_fixed$mean
+)
 regr_est
 ```
 
@@ -230,9 +244,10 @@ regr_est
 Finally, the spatial patterns of the average infection rate estimates over time for each model are displayed below.
 
 ```{r map1, error=TRUE, fig.cap="Map of the predicted average infection rates for using MCMC.",  fig.width=8, fig.height=4, fig.align = "center"}
-mcmc.mean.rate<- group_by(mergedat,MSOA11CD) %>% summarize(
-  mean.rate = mean(mcmc.fitted.prev))
-sp_data@data$mcmc.mean.rate<-mcmc.mean.rate$mean.rate
+mcmc.mean.rate <- group_by(mergedat, MSOA11CD) %>% summarize(
+  mean.rate = mean(mcmc.fitted.prev)
+)
+sp_data@data$mcmc.mean.rate <- mcmc.mean.rate$mean.rate
 domain <- sp_data@data$mcmc.mean.rate
 fdmr::plot_map(
   polygon_data = sp_data,
@@ -246,10 +261,10 @@ fdmr::plot_map(
 ```
 
 ```{r map2, error=TRUE, fig.cap="Map of the predicted average infection rates for using INLA-SPDE.",  fig.width=8, fig.height=4, fig.align = "center"}
-
-INLA.mean.rate<- group_by(mergedat,MSOA11CD) %>% summarize(
-  mean.rate = mean(inla.fitted.prev))
-sp_data@data$INLA.mean.rate<-INLA.mean.rate$mean.rate
+INLA.mean.rate <- group_by(mergedat, MSOA11CD) %>% summarize(
+  mean.rate = mean(inla.fitted.prev)
+)
+sp_data@data$INLA.mean.rate <- INLA.mean.rate$mean.rate
 domain <- sp_data@data$INLA.mean.rate
 fdmr::plot_map(
   polygon_data = sp_data,
@@ -260,5 +275,4 @@ fdmr::plot_map(
   polygon_fill_opacity = 0.8,
   polygon_line_colour = "transparent"
 )
-
 ```
