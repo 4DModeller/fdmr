@@ -1,9 +1,7 @@
-#' Retrieve the tutorial datasets and unpack them
-#' to a folder in th user's home directory or a folder
-#' specified in their use config file.
+#' Retrieve a tutorial dataset and unpacks it to ~/fdmr/tutorial_data
 #'
 #' @param dataset Name of dataset to retrieve
-#' @param force_retrieval Force update of dataset information
+#' @param force_update Force retrieval of metadata and dataset
 #'
 #' @return NULL
 #' @export
