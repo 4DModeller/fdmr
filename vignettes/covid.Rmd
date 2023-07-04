@@ -467,8 +467,8 @@ g1 <-
   fdmr::plot_timeseries(
     data = RMSEt,
     # TODO - update these to just accept a string
-    x = RMSEt$date,
-    y = RMSEt$RMSEt,
+    x = "date",
+    y = "RMSEt",
     breaks = breaks_vec,
     x_label = "Date",
     y_label = "RMSE",
@@ -479,8 +479,8 @@ g1 <-
 g2 <-
   fdmr::plot_timeseries(
     data = Biast,
-    x = Biast$date,
-    y = Biast$Biast,
+    x = "date",
+    y = "Biast",
     breaks = breaks_vec,
     x_label = "Date",
     y_label = "Bias",
@@ -491,8 +491,8 @@ g2 <-
 g3 <-
   fdmr::plot_timeseries(
     data = CPt,
-    x = CPt$date,
-    y = CPt$CPt,
+    x = "date",
+    y = "CPt",
     breaks = breaks_vec,
     x_label = "Date",
     y_label = "Coverage probability",
