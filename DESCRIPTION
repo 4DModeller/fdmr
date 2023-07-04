@@ -52,6 +52,8 @@ Imports:
     stringr
 Suggests: 
     bookdown,
+    CARBayes
+    CARBayesST,
     knitr,
     INLA,
     openssl,
