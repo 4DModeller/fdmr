@@ -85,19 +85,19 @@ meshbuilder_shiny <- function(
         shiny::sliderInput(
           inputId = "max_edge",
           label = "Max edge:",
-          min = 0.02, value = c(0.1, 0.3), max = 10
+          value = c(0.05, 0.5), min = 0.01, max = 2
         ),
         shiny::p("Max permitted edge length for a triangle"),
         shiny::sliderInput(
           inputId = "offset",
           label = "Offset:",
-          min = 0.02, value = c(0.2, 0.7), max = 10
+          value = c(0.1, 0.3), min = 0.05, max = 2
         ),
         shiny::p("Specifies the size of the inner and outer extensions around data locations."),
         shiny::sliderInput(
           inputId = "cutoff",
           label = "Cutoff:",
-          min = 0.005, value = 0.2, max = 0.9
+          value = 0.01, min = 0, max = 0.2
         ),
         shiny::p("Minimum allowed distance between data points."),
         shiny::actionButton("plot_mesh", label = "Plot mesh"),
@@ -189,6 +189,184 @@ meshbuilder_shiny <- function(
       )
     )
 
+    # Code below here is from INLA::meshbuilder()
+    axis_infos <- shiny::reactiveValues(offset = NULL, max_edge = NULL, cutoff = NULL)
+    axis_update <- shiny::reactiveValues(offset = FALSE, max_edge = FALSE, cutoff = FALSE)
+
+    limits <- shiny::reactiveValues(
+      input_xlim = c(0, 1),
+      input_ylim = c(0, 1),
+      inputplot.xlim = c(0, 1),
+      inputplot.ylim = c(0, 1)
+    )
+
+    shiny::observeEvent(c(input$offset, limits$input_xlim, limits$input$ylim), {
+      val <- input$offset
+      new_info <- pretty_axis_info(
+        lim = range(c(
+          val,
+          diff(limits$input_xlim) / 5,
+          diff(limits$input_ylim) / 5
+        )),
+        value = val,
+      )
+
+      axis_update$offset <- !identical(axis_infos$offset, new_info)
+
+      if (axis_update$offset) {
+        axis_infos$offset <- new_info
+      }
+    })
+
+    shiny::observeEvent(c(input$max_edge, limits$input_xlim, limits$input_ylim), {
+      val <- input$max_edge
+      new_info <- pretty_axis_info(
+        lim =
+          range(c(
+            val,
+            diff(limits$input_xlim) / 5,
+            diff(limits$input_ylim) / 5
+          )),
+        value = val,
+      )
+
+      axis_update$max_edge <- !identical(axis_infos$max_edge, new_info)
+
+      if (axis_update$max_edge) {
+        axis_infos$max_edge <- new_info
+      }
+    })
+
+    shiny::observeEvent(c(input$cutoff, input$max_edge), {
+      val <- min(input$cutoff, input$max_edge[1])
+      new_info <- pretty_axis_info(
+        lim =
+          range(c(val, input$max_edge[1])),
+        value = val,
+      )
+
+      new_info$lim[2] <- min(new_info$lim[2], input$max_edge[1])
+      axis_update$cutoff <- !identical(axis_infos$cutoff, new_info)
+
+      if (axis_update$cutoff) {
+        axis_infos$cutoff <- new_info
+      }
+    })
+
+    shiny::observeEvent(axis_update$offset,
+      {
+        if (axis_update$offset) {
+          axis_update$offset <- FALSE
+          info <- axis_infos$offset
+          new_val <- pretty_axis_value(info, input$offset)
+          shiny::updateSliderInput(
+            session, "offset",
+            min = info$lim[1], max = info$lim[2],
+            step = info$step, value = new_val
+          )
+        }
+      },
+      priority = 10
+    )
+
+    shiny::observeEvent(axis_update$max_edge,
+      {
+        if (axis_update$max_edge) {
+          axis_update$max_edge <- FALSE
+          info <- axis_infos$max_edge
+          new_val <- pretty_axis_value(info, input$max_edge)
+
+          shiny::updateSliderInput(
+            session,
+            "max_edge",
+            min = info$lim[1],
+            max = info$lim[2],
+            step = info$step,
+            value = new_val
+          )
+        }
+      },
+      priority = 9
+    )
+
+    shiny::observeEvent(c(axis_update$cutoff, input$cutoff, input$max_edge),
+      {
+        if (axis_update$cutoff || (input$cutoff > input$max_edge[1])) {
+          axis_update$cutoff <- FALSE
+          info <- axis_infos$cutoff
+
+          new_val <- pretty_axis_value(info, min(input$cutoff, input$max_edge[1]))
+
+          shiny::updateSliderInput(
+            session,
+            inputId = "cutoff",
+            min = info$lim[1],
+            max = info$lim[2],
+            step = info$step,
+            value = new_val
+          )
+        }
+      },
+      priority = 8
+    )
+
+    pretty_axis_info <- function(lim, value = NA, verbose = FALSE) {
+      if (verbose) {
+        message(paste(
+          "pretty_axis_info <-",
+          "lim =", paste(lim, collapse = ", "),
+          "val = ", paste(value, collapse = ", ")
+        ))
+      }
+
+      limits <- range(c(lim, value), na.rm = TRUE)
+
+      maxi <- c(1.5, 2, 3, 4, 6, 8, 10)
+      cutoff <- maxi * 9 / 10
+      step <- c(1e-2, 1e-2, 1e-2, 2e-2, 2e-2, 5e-2, 5e-2)
+      mini <- step
+
+      maxi <- c(maxi, maxi * 10)
+      step <- c(step, step * 10)
+      mini <- c(mini, mini * 10)
+      cutoff <- c(cutoff, cutoff * 10)
+      level <- floor(log10(limits[2]))
+
+      maxi <- maxi * 10^level
+      mini <- mini * 10^level
+      step <- step * 10^level
+      cutoff <- cutoff * 10^level
+
+      # Find smallest k such that limits[2] < maxi[k]
+      k <- min(which(limits[2] < maxi))
+
+      # Move to next k if limits[2] > cutoff[k]
+      values <- mini[k] + round((value - mini[k]) / step[k]) * step[k]
+      limits <- range(c(lim, value, values), na.rm = TRUE)
+
+      while (limits[2] > cutoff[k]) {
+        k <- k + 1
+        values <- mini[k] + round((value - mini[k]) / step[k]) * step[k]
+        limits <- range(c(lim, value, value), na.rm = TRUE)
+      }
+
+      if (verbose) {
+        message(paste(
+          "pretty_axis_info ->",
+          "lim =", paste(c(mini[k], maxi[k]), collapse = ", ")
+        ))
+      }
+      list(lim = c(mini[k], maxi[k]), step = step[k])
+    }
+
+    pretty_axis_value <- function(axis_info, value) {
+      pmax(axis_info$lim[1], pmin(
+        axis_info$lim[2],
+        axis_info$lim[1] + round((value - axis_info$lim[1]) /
+          axis_info$step) * axis_info$step
+      ))
+    }
+
 
     shiny::observeEvent(input$check_button, {
       if (is.null(obs_data) || is.null(mesh())) {
@@ -208,6 +386,9 @@ meshbuilder_shiny <- function(
       ))
     })
   }
+
+
+
 
   # Run the application
   shiny::shinyApp(ui = ui, server = server)

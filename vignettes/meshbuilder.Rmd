@@ -12,8 +12,7 @@ Here we'll cover building a mesh from some spatial data, modifying its parameter
 We'll first load in some spatial data to create the mesh. This is the same data we previously used in the COVID-19 tutorial.
 
 ```{r eval=FALSE}
-sp_data <- fdmr::load_tutorial_data(filename = "spatial_data.rds")
-sp_data
+sp_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "spatial_data.rds")
 ```
 
 The `sp_data` object is a `SpatialPolygonsDataFrame` containing 6789 features for areas of England. We can build a mesh
