@@ -63,7 +63,7 @@ to the `fdmr::mesh_checker` function and returns a list containing any errors fo
 
 ```{r eval=FALSE}
 covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_data.rds")
-fdmr::mesh_builder(spatial_data = sp_data, data = covid19_data)
+fdmr::mesh_builder(spatial_data = sp_data, obs_data = covid19_data)
 ```
 
 ## Exporting your mesh

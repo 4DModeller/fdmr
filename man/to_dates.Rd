@@ -13,6 +13,9 @@ to_dates(time_data, sort = FALSE, date_format = NULL)
 
 \item{date_format}{Date format to pass to lubridate::as_date}
 }
+\value{
+vector
+}
 \description{
 Convert vector of date strings to Date objects
 }

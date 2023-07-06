@@ -2,6 +2,7 @@
 
 export(clear_caches)
 export(get_tutorial_datapath)
+export(interactive_priors)
 export(latlong_to_utm)
 export(load_tutorial_data)
 export(mesh_builder)
@@ -17,4 +18,5 @@ export(plot_mesh)
 export(plot_timeseries)
 export(retrieve_tutorial_data)
 export(to_dates)
+importFrom(INLA,f)
 importFrom(magrittr,"%>%")
