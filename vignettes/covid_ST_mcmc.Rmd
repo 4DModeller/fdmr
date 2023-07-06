@@ -1,0 +1,287 @@
+---
+title: "COVID-19 MCMC (Space-time)"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{COVID-19 MCMC (Space-time)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Modelling COVID-19 infection across England
+In this tutorial we'll cover some work on fitting a spatio-temporal Bayesian hierarchical model (BHM) to predict the COVID-19 infection rate across England.
+
+# Study aim and data description
+This study describes how to fit a spatio-temporal BHM to areal data using Markov Chain Monte Carlo (MCMC) simulation method. The first thing is to load all the packages used in the COVID-19 case study.
+
+```{r, error=TRUE,message=FALSE,warning=FALSE}
+library(INLA)
+library(inlabru)
+```
+
+The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The infections data are the total reported number of COVID-19 cases in each MSOA from Jan 8, 2022 to March 26, 2022. The shapefile of the study region is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods. 
+
+## Installing CARBayesST
+
+This tutorial requires the [`CARBayesST`](https://cran.r-project.org/web/packages/CARBayesST/index.html) package. To install it run
+
+```{r eval=FALSE}
+install.packages("CARBayesST")
+```
+
+We first need to retrieve the infections data from the fdmr example data store and unpack it and we'll use retrieve_tutorial_data to do this.
+
+
+```{r}
+fdmr::retrieve_tutorial_data(dataset = "covidST_mcmc")
+```
+
+The COVID-19 data and the related covariate information are included in our tutorial data package. We'll load in the data using the `load_tutorial_data` function.
+
+```{r loadCOVIDat, error=TRUE}
+st_covid <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "st_covid.rds")
+```
+
+Next we'll use the `load_tutorial_data` function to load in the spatial data we want.
+
+```{r loadshape, error=TRUE}
+sp_data <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "spatial_data.rds")
+```
+
+
+In this study, we use the areal unit modelling approach to fit the BHM and then make model inference using MCMC method. To do this, we need to construct a non-negative symmetric $n \times n$ neighbourhood or adjacency matrix $\boldsymbol{W}$ that accounts for the spatio-temporal autocorrelation structure, where $n=6789$ is the number of areal units. The neighbourhood matrix specifies the spatial closeness between pairs of areal units. The elements $\{w_{ij}\}$ in $\boldsymbol{W}$ can be either continuous or binary, and a larger value of $w_{ij}$ represents that MSOAs $(i,j)$ are spatially closer to each other. Here we use the border sharing specification, so that $w_{ij}=1$ if MSOAs $(i,j)$ share a common geographical border, and $w_{ij}=0$ otherwise.
+
+```{r constructW, error=TRUE}
+W.nb <- spdep::poly2nb(sp_data, row.names = rownames(sp_data@data))
+w <- spdep::nb2mat(W.nb, style = "B")
+```
+
+
+# Model specification 
+We use a Bayesian hierarchical model to predict the spatio-temporal COVID-19 infection rate at the neighbourhood level in England. Let $Y_{it}$ denotes the weekly number of reported COVID cases for neighbourhood $i=1,\ldots, n(=6789)$ and week $t=1,\ldots, T(=108)$ and $N_{it}$ denotes the (official) estimated population living in neighbourhood $i$ and week $t$. $Y_{it}$ is assumed to have a Poisson distribution with parameters ($N_{it}$, $\theta_{it}$), where $\theta_{it}$ is the true unobserved COVID-19 infection rate in MSOA $i$ and week $t$. We follow a standard path in modelling $\theta_{it}$ with a log link to the Poisson and start with a model where the linear predictor decomposes additively into a set of covariates and a Gaussian Markov Random Field process, which characterises the infection of the disease after the covariate effects have been accounted for. A general Bayesian hierarchical model commonly specified is given by
+
+
+\begin{align}
+\nonumber  Y_{it}\vert N_{it}, \theta_{it} &\sim \text{Poisson}(N_{it}\theta_{it}),\ \  i=1,\ldots,n, t=1,\ldots,T,\\
+ log(\theta_{it} )&=\boldsymbol{x_{it}^{\top}}\boldsymbol{\beta}+\phi_{it}. 
+\end{align}
+
+The spatial random effects $\{\phi_{it}\}$ are included in the model to account for any residual spatio-temporal autocorrelation after adjusting for covariates $\boldsymbol{x_{it}}$. Here we utilise the spatio-temporal modelling structure proposed by Rushworth, Lee, and Mitchell (2014) to model $\{\phi_{it}\}$. It is given by
+
+\begin{align}
+\nonumber \boldsymbol{\phi_1}&\sim \text{N}\left(\boldsymbol{0}, \tau^2\boldsymbol{ Q}(\boldsymbol{W})^{-1}\right),\\
+ \boldsymbol{\phi_t}\vert\boldsymbol{\phi_{t-1}}&\sim \text{N}\left(\alpha\boldsymbol{\phi_{t-1}},\tau^2\boldsymbol{Q}(\boldsymbol{W},\rho)^{-1}\right), \ \ t=2,\ldots, T,\\
+\end{align}
+where the precision matrix $\boldsymbol{Q}(\boldsymbol{W},\rho)$ is proposed by Leroux et al.(2000). The algebraic form of this matrix is given by
+$$ \boldsymbol{Q}(\boldsymbol{W},\rho)=\rho[diag(\boldsymbol{W1})-\boldsymbol{W}]+(1-\rho)\boldsymbol{I},$$
+where $\boldsymbol{1}$ is the $n\times 1$ vector of ones, and \boldsymbol{I} is the $n\times n$ identity matrix. $\rho$ and $\alpha$ are the spatial and temporal dependence parameters, respectively, while $\tau^2$ is the variance parameter.
+
+# Define the model formula
+In order to fit the model, a model formula needs to be defined, by including the response in the left-hand side and the fixed and random effects in the right-hand side. We select a few risk factors used in our [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html).
+
+
+
+```{r formula, error=TRUE}
+form <- cases ~ 1 + offset(log(Population)) + IMD + perc.wb + perc.ba + age1 + pm25
+```
+
+# Fit the model
+
+Finally, we fit the spatio-temporal model using the function `ST.CARar()` of the package `CARBayesST` developed by Lee (2018) @lee2018spatio. We first need to organize the COVID-19 infection and covariate data into a specific format expected by the `ST.CARar()` function. More details can be found in the help file of 'ST.CARar()'. Any MSOAs without reported cases will be stored as missing (NA) values in the data frame.
+
+```{r datformat, eval=TRUE}
+time.points <- length(unique(st_covid$date))
+n <- nrow(sp_data@data)
+dat <- data.frame(
+  MSOA11CD = rep(sp_data$MSOA11CD, time.points),
+  date = rep(sort(unique(st_covid$date)), each = n),
+  time = rep(1:time.points, each = n)
+)
+
+dat$rowid <- 1:nrow(dat)
+out <- merge(dat, st_covid[, c(
+  "MSOA11CD",
+  "date",
+  "MSOA11NM",
+  "cases",
+  "Population"
+)],
+all.x = TRUE,
+by = c("MSOA11CD", "date")
+)
+
+dat <- out[order(out$rowid), ]
+
+covars <- unique(st_covid[, c(
+  "MSOA11CD",
+  "IMD",
+  "age1",
+  "perc.chinese",
+  "perc.indian",
+  "perc.wb",
+  "perc.bc",
+  "perc.ba",
+  "pm25",
+  "no2"
+)])
+
+out <- merge(dat, covars,
+  all.x = TRUE,
+  by = c("MSOA11CD")
+)
+dat <- out[order(out$rowid), ]
+
+dat$pre <- dat$cases / dat$Population
+dat$logpre <- log(dat$pre)
+nbhoods <- unique(st_covid[, c("MSOA11CD", "Population")])
+
+for (i in 1:nrow(dat)) { #  this will take a few minutes
+  if (is.na(dat$Population[i])) {
+    dat$Population[i] <- nbhoods[
+      match(
+        dat[i, "MSOA11CD"],
+        nbhoods$MSOA11CD
+      ),
+      "Population"
+    ]
+  }
+}
+
+st_covid <- dat
+rm(dat, nbhoods, out, covars) # remove non-necessary objects
+```
+
+> :warning: **Memory requirements**: Running the model requires a large amount of memory and may fail if run on a normal laptop / desktop.
+
+Now the data frame 'st_covid' has the expected format. Then run the model.
+
+
+```{r fitmcmcmodel, error=TRUE, eval=FALSE}
+MCMC_model <- CARBayesST::ST.CARar(
+  formula = form,
+  data = st_covid,
+  family = "poisson",
+  W = w,
+  burnin = 10000,
+  n.sample = 30000,
+  thin = 10, AR = 1
+)
+```
+
+Now we summarise the modelling results. "fitted_vals" stores the predicted COVID-19 infection rate at each MSOA and time point. "modfits" stores the DIC and WAIC values, which measure the goodness of model fit. "mod_sum" provides the values for parameters $\tau^2$, $\rho$ and $\alpha$.
+
+```{r modsum, error=TRUE, eval=FALSE}
+fitted_vals <- exp(sum(apply(MCMC_model$samples$beta, 2, mean)) +
+  apply(MCMC_model$samples$phi, 2, mean))
+fitted_vals <- cbind.data.frame(st_covid[, c("MSOA11CD", "date")], fitted_vals)
+modfits <- MCMC_model$modelfit
+mod_sum <- MCMC_model$summary.results
+```
+
+
+The above modelling results are provided in the tutorial data package so we'll load them now.
+
+> **_NOTE:_**  If you've run the full model above you don't need to load in the files below.
+
+
+```{r loadmodsum, error=TRUE,eval=TRUE}
+fitted_vals <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "fitted_vals.rds")
+modfits <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "modfits.rds")
+mod_sum <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "mod_sum.rds")
+```
+
+For comparison purpose, we also fit a separate BHM to the same dataset using the INLA-SPDE approach. The infection rates predicted by the INLA-SPDE approach is saved in the date frame named "inla_preds" and is provided in the tutorial data package. We'll load that in now.
+
+```{r loadpreds, error=TRUE}
+inla_preds <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "inla_preds.rds")
+```
+
+Then the predictions from the two models are merged into one data frame named "mergedat".
+
+```{r mergepreds, error=TRUE}
+mergedat <- merge(inla_preds,
+  fitted_vals,
+  by = c("MSOA11CD", "date")
+)
+```
+
+# Model comparison
+We show the DIC and WAIC values for each model. The model using the MCMC approach performs better than the model using the INLA-SPDE approach in terms of the lower DIC and WAIC values.
+
+
+```{r modfit, error=TRUE, eval=TRUE}
+inla_sum <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "INLAmodsum.rds")
+
+modfit <- data.frame(
+  DIC = c(modfits[1], inla_sum[1]),
+  WAIC = c(modfits[2], inla_sum[2])
+)
+rownames(modfit) <- c("MCMC", "INLA_SPDE")
+modfit
+```
+
+Now we compare the posterior COVID-19 infection rate estimates between the two models. In general, the two models provide similar posterior COVID-19 infection rate estimates. 
+
+```{r compareplot, error=TRUE, eval=TRUE,fig.width=6,fig.height=6, fig.align='center'}
+plot(mergedat$mcmc.fitted.prev, mergedat$inla.fitted.prev, xlab = "MCMC", ylab = "INLA_SPDE", xlim = c(0, 0.06), ylim = c(0, 0.06), cex = 0.01)
+boxplot(mergedat$mcmc.fitted.prev, mergedat$inla.fitted.prev,
+  names = c("MCMC", "INLA_SPDE")
+)
+```
+
+
+The regression coefficients estimates of the selected covariates for both models are compared. 
+
+```{r comparefixed,error=TRUE, eval=TRUE}
+summary_fixed <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "INLAfixed_sum.rds")
+regr_est <- cbind.data.frame(
+  "MCMC" = mod_sum[1:6, 1],
+  "INLA_SPDE" = summary_fixed$mean
+)
+regr_est
+```
+
+
+Finally, the spatial patterns of the average infection rate estimates over time for each model are displayed below.
+
+```{r map1, error=TRUE, fig.cap="Map of the predicted average infection rates for using MCMC.",  fig.width=8, fig.height=4, fig.align = "center"}
+mcmc.mean.rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
+  mean.rate = mean(mcmc.fitted.prev)
+)
+
+sp_data@data$mcmc.mean.rate <- mcmc.mean.rate$mean.rate
+domain <- sp_data@data$mcmc.mean.rate
+
+fdmr::plot_map(
+  polygon_data = sp_data,
+  domain = domain,
+  palette = "Reds",
+  legend_title = "Rate",
+  add_scale_bar = TRUE,
+  polygon_fill_opacity = 0.8,
+  polygon_line_colour = "transparent"
+)
+```
+
+```{r map2, error=TRUE, fig.cap="Map of the predicted average infection rates for using INLA-SPDE.",  fig.width=8, fig.height=4, fig.align = "center"}
+INLA.mean.rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
+  mean.rate = mean(inla.fitted.prev)
+)
+
+sp_data@data$INLA.mean.rate <- INLA.mean.rate$mean.rate
+domain <- sp_data@data$INLA.mean.rate
+
+fdmr::plot_map(
+  polygon_data = sp_data,
+  domain = domain,
+  palette = "Reds",
+  legend_title = "Rate",
+  add_scale_bar = TRUE,
+  polygon_fill_opacity = 0.8,
+  polygon_line_colour = "transparent"
+)
+```
