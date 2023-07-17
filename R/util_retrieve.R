@@ -37,7 +37,7 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
     # Retrieve the list of known datasets
   utils::download.file(url = "https://github.com/4DModeller/fdmr_data/raw/main/datasets.json", dataset_info_file)
   retrieval_info <- list("datasets" = list("retrieved" = lubridate::format_ISO8601(lubridate::now())))
-  jsonlite::write_json(retrieval_info, path = file_metadata_file)
+  # jsonlite::write_json(retrieval_info, path = file_metadata_file)
   # }
 
   extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
@@ -66,6 +66,9 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
     data_url <- base::paste0("https://github.com/4DModeller/fdmr_data/raw/main/", filename)
     utils::download.file(url = data_url, destfile = download_path)
     # }
+    if(!fs::file_exists(download_path)) {
+      stop("We can't download to this path.")
+    }
 
     archive::archive_extract(download_path, dir = extract_path)
     base::cat("\nTutorial data extracted to ", extract_path, "\n")
