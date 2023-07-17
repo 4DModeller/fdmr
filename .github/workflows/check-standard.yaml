@@ -32,7 +32,10 @@ jobs:
           extra-repositories: https://inla.r-inla-download.org/R/stable
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            any::CARBayes
+            any::CARBayesST
           needs: check
       - uses: r-lib/actions/check-r-package@v2
         with:
