@@ -27,14 +27,8 @@ The study region is mainland England, which is partitioned into 6789 neighbourho
 
 ## Installing CARBayesST
 
-This tutorial requires the [`CARBayesST`](https://cran.r-project.org/web/packages/CARBayesST/index.html) package. To install it run
-
-```{r eval=FALSE}
-install.packages("CARBayesST")
-```
-
+This tutorial requires the [`CARBayesST`](https://cran.r-project.org/web/packages/CARBayesST/index.html) package. Please install it before continuing.
 We first need to retrieve the infections data from the fdmr example data store and unpack it and we'll use retrieve_tutorial_data to do this.
-
 
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covidST_mcmc")
@@ -101,6 +95,9 @@ dat <- data.frame(
   date = rep(sort(unique(st_covid$date)), each = n),
   time = rep(1:time.points, each = n)
 )
+```
+
+```{r}
 
 dat$rowid <- 1:nrow(dat)
 out <- merge(dat, st_covid[, c(
