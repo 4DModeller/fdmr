@@ -445,3 +445,68 @@ ggplot2::ggplot(infocri, ggplot2::aes(x = priors, y = DIC)) +
 ```
 
 
+# Influence of inappropriate priors on model inference 
+
+Bayesian inference is influenced by both priors and data. Therefore, choosing an appropriate prior is crucial for making sensible inferences for parameters. Now we will demonstrate how inappropriate priors can impact the model inference. In the four models mentioned above, the priors for $\rho$, $\sigma$ and $\alpha$ are specified using probabilistic statements. Now we will consider an extreme scenario where the priors are set in such a way that the parameters $\rho$ and $\sigma$ take fixed values. This is achieved by setting `ps_range` and `pg_sigma` as NA, while `prior_range` and `prior_sigma` are used to enforce fixed parameter values.
+
+```{r m5,eval=TRUE}
+prior_range <- 0.1
+ps_range<-NA
+prior_sigma <- 0.01
+pg_sigma<-NA
+m5 <- INLA_infer(mesh=mesh,
+                 prior_range=prior_range,
+                 ps_range=ps_range,
+                 prior_sigma=prior_sigma,
+                 pg_sigma=pg_sigma,
+                 prior_ar1=priors_dat$prior_alpha[4],
+                 pg_ar1=priors_dat$pg_alpha[4],
+                 data=covid19_data)
+```
+
+
+
+Now we compare the distribution of the predicted rates from models m1, m2, m3, m4 and m5.
+
+```{r comdist, eval=TRUE, fig.width=8, fig.height=4, fig.align='center'}
+post_rate<-base::cbind.data.frame("model"= base::rep(c("m1","m2","m3","m4","m5","obs"),
+                                                  each=base::nrow(covid19_data)),
+                            'Infection rate'=c(m1$fitted.mean.post,m2$fitted.mean.post,
+                                               m3$fitted.mean.post,m4$fitted.mean.post,
+                                               m5$fitted.mean.post,
+                                               covid19_data$prevalence)
+)
+ggplot2::ggplot(post_rate, aes(x=`Infection rate`, color=`model`))+
+  geom_density()+
+  theme(legend.title = element_blank())
+
+
+```
+
+The figure indicates that models m1, m2, m3, and m4 demonstrate a high degree of agreement with the observed infection rates (denoted by obs) in their predictions. Conversely, model m5 exhibits significant discrepancies, with its predictions deviating substantially from the observed data. Then we compare their DIC values and find that model m5 produces the highest DIC value, indicating that it exhibits a poorer model fit compared to the other models.
+
+
+```{r comDIC, eval=TRUE, fig.width=8, fig.height=4, fig.align='center'}
+infocri<-base::cbind.data.frame(priors=c("m1","m2", "m3","m4","m5"),
+                          DIC=c(m1$dic,m2$dic,m3$dic,m4$dic,m5$dic)
+)
+infocri$priors<-base::as.factor(infocri$priors)
+ggplot2::ggplot(infocri, aes(x=priors, y=DIC)) + geom_point()
+
+```
+
+
+The use of inappropriate priors not only leads to inaccurate predictions but can also cause INLA to crash during model fitting. For instance, if we assign a prior of P($\alpha$ > 0) = 0.3 for $\alpha$, which suggests that the probability of $\alpha$ greater than 0 is 0.3, and assign the set4 priors to other parameters, INLA program will encounter errors when trying to fit the model.
+
+```{r m6,eval=TRUE}
+m6 <- INLA_infer(mesh=mesh,
+                prior_range=priors_dat$prior_range[4],
+                ps_range=priors_dat$ps_range[4],
+                prior_sigma=priors_dat$prior_sigma[4],
+                pg_sigma=priors_dat$pg_sigma[4],
+                prior_ar1=0,
+                pg_ar1=0.3,
+                data=covid19_data)
+```
+
+Model m6 encounters errors during execution: "*** inla.core.safe: inla.program has crashed.*** Fail to get good enough initial values." This highlights the importance of specifying appropriate priors for model parameters, as it directly impacts the model performance. Choosing suitable priors can help avoid issues like convergence problems and ensure the stability and accuracy of the model fitting process.
