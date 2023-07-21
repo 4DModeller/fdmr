@@ -10,7 +10,13 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/covid.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/covid_ST_mcmc.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/covid_mcmc.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/data_preprocessing.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/hydro.html</loc>
