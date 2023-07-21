@@ -11,6 +11,10 @@ vignette: >
   
 If you do not have `INLA` or `inlabru` installed [please go to the following installation tutorial before continuing](link%20to%20installation%20tutorial).
 
+```{r}
+library(INLA)
+```
+
 First we'll download the data for this tutorial from our [data repository](https://github.com/4DModeller/fdmr_data) using `retrieve_tutorial_data`.
 
 ```{r error=TRUE,message=FALSE,warning=FALSE}
@@ -292,9 +296,9 @@ formula2 <- streamflow ~ 0 + Intercept + precip +
   )
 ```
 
+> **_NOTE:_** Due to the long runtime of the model run cells these will not be displayed in the online documentation.
 
-
-```{r error=TRUE, modelrun}
+```{r error=TRUE, modelrun, eval=FALSE}
 inlabru_model1 <- inlabru::bru(formula1,
   data = inla_data,
   family = "gaussian",
@@ -314,7 +318,7 @@ inlabru_model2 <- inlabru::bru(formula2,
 
 Now it's time to see its output
 
-```{r error=TRUE}
+```{r error=TRUE, eval=FALSE}
 # TODO : this could be where the model_eval function I recommend could be used
 summary(inlabru_model1)
 ```
