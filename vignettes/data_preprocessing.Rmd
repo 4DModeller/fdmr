@@ -22,7 +22,8 @@ In the [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html
 First we load in the shapefile into R, and store it in an object named `sp_data`.
 
 ```{r shapefile, warning=FALSE,error=FALSE}
-sp_data <- rgdal::readOGR(dsn = "MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp")
+shapefilepath <- fdmr::get_tutorial_datapath(dataset = "preprocessing", filename = "MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp")
+sp_data <- rgdal::readOGR(dsn = shapefilepath)
 ```
 
 The type of the object `sp_data` is a SpatialPolygonsDataFrame. 
@@ -42,7 +43,7 @@ In the COVID-19 tutorial, the raw COVID-19 infections data and the related covar
 
 
 ```{r loadCOVIDat}
-covid19_data_filepath <- fdmr::get_tutorial_datapath(dataset = "covid", filename = "covid19_data.csv")
+covid19_data_filepath <- fdmr::get_tutorial_datapath(dataset = "preprocessing", filename = "covid19_data.csv")
 
 covid19_data <- utils::read.csv(file = "covid19_data.csv")
 ```
@@ -59,7 +60,6 @@ The first 6 rows of the data set can be viewed using the following code
 ```{r checkdat}
 utils::head(covid19_data)
 ```
-
 
 The data frame contains 23 columns. `MSOA11CD` represents the spatial identifier for each data observation. Variable `cases` is the response variable, which is the weekly reported number of COVID-19 cases in each of the 6789 MSOAs in main England over the period from 2022-01-01 to 2022-03-26. Variable `date` indicates the start date of each observation week when the COVID-19 infections data for each MSOA were reported. Variable `week` indicates the week index number that each data observation was collected from. Columns `LONG` and `LAT` indicate the longitude and latitude for each MSOA. Variable `Population` indicates the population size for each MSOA. The remaining columns store the data for each covariate in each MSOA and week. 
 
