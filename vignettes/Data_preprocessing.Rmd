@@ -22,7 +22,7 @@ In the [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html
 First we load in the shapefile into R, and store it in an object named `sp_data`.
 
 ```{r shapefile, warning=FALSE,error=FALSE}
-sp_data<-rgdal::readOGR(dsn='MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp')
+sp_data <- rgdal::readOGR(dsn = "MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp")
 ```
 
 The type of the object `sp_data` is a SpatialPolygonsDataFrame. 
@@ -35,8 +35,7 @@ Then we retrieve the projection attributes of the shapefile, i.e., `sp_data`, an
 
 ```{r transCRS}
 proj4string(sp_data)
-sp_data<-sp::spTransform(sp_data,CRS("+proj=longlat +datum=WGS84 +no_defs"))
-
+sp_data <- sp::spTransform(sp_data, CRS("+proj=longlat +datum=WGS84 +no_defs"))
 ```
 
 In the COVID-19 tutorial, the raw COVID-19 infections data and the related covariate data were obtained from the official UK Government COVID-19 dashboard and the Office for National Statistics (ONS). The data were initially downloaded, organised and saved in a CSV file format. The CSV file can be imported into R using the `utils::read.csv()` function. 
@@ -45,8 +44,7 @@ In the COVID-19 tutorial, the raw COVID-19 infections data and the related covar
 ```{r loadCOVIDat}
 covid19_data_filepath <- fdmr::get_tutorial_datapath(dataset = "covid", filename = "covid19_data.csv")
 
-covid19_data<-utils::read.csv(file='covid19_data.csv')
-
+covid19_data <- utils::read.csv(file = "covid19_data.csv")
 ```
 
 The type of the object `covid19_data` is a data.frame. 
