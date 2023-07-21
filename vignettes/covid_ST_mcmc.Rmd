@@ -18,23 +18,21 @@ In this tutorial we'll cover some work on fitting a spatio-temporal Bayesian hie
 # Study aim and data description
 This study describes how to fit a spatio-temporal BHM to areal data using Markov Chain Monte Carlo (MCMC) simulation method. The first thing is to load all the packages used in the COVID-19 case study.
 
-```{r, error=TRUE,message=FALSE,warning=FALSE}
+```{r, error=TRUE, message=FALSE, warning=FALSE}
 library(INLA)
 library(inlabru)
+library(magrittr)
 ```
 
 The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The infections data are the total reported number of COVID-19 cases in each MSOA from Jan 8, 2022 to March 26, 2022. The shapefile of the study region is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods. 
 
 ## Installing CARBayesST
 
-This tutorial requires the [`CARBayesST`](https://cran.r-project.org/web/packages/CARBayesST/index.html) package. To install it run
+This tutorial requires the [`CARBayesST`](https://cran.r-project.org/web/packages/CARBayesST/index.html) package which you may need to install before working through this tutorial.
 
-```{r eval=FALSE}
-install.packages("CARBayesST")
-```
+## Retrieving and loading data
 
 We first need to retrieve the infections data from the fdmr example data store and unpack it and we'll use retrieve_tutorial_data to do this.
-
 
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covidST_mcmc")
@@ -52,12 +50,11 @@ Next we'll use the `load_tutorial_data` function to load in the spatial data we 
 sp_data <- fdmr::load_tutorial_data(dataset = "covidST_mcmc", filename = "spatial_data.rds")
 ```
 
-
 In this study, we use the areal unit modelling approach to fit the BHM and then make model inference using MCMC method. To do this, we need to construct a non-negative symmetric $n \times n$ neighbourhood or adjacency matrix $\boldsymbol{W}$ that accounts for the spatio-temporal autocorrelation structure, where $n=6789$ is the number of areal units. The neighbourhood matrix specifies the spatial closeness between pairs of areal units. The elements $\{w_{ij}\}$ in $\boldsymbol{W}$ can be either continuous or binary, and a larger value of $w_{ij}$ represents that MSOAs $(i,j)$ are spatially closer to each other. Here we use the border sharing specification, so that $w_{ij}=1$ if MSOAs $(i,j)$ share a common geographical border, and $w_{ij}=0$ otherwise.
 
 ```{r constructW, error=TRUE}
-W.nb <- spdep::poly2nb(sp_data, row.names = rownames(sp_data@data))
-w <- spdep::nb2mat(W.nb, style = "B")
+W_nb <- spdep::poly2nb(sp_data, row.names = rownames(sp_data@data))
+w <- spdep::nb2mat(W_nb, style = "B")
 ```
 
 
@@ -83,8 +80,6 @@ where $\boldsymbol{1}$ is the $n\times 1$ vector of ones, and \boldsymbol{I} is 
 # Define the model formula
 In order to fit the model, a model formula needs to be defined, by including the response in the left-hand side and the fixed and random effects in the right-hand side. We select a few risk factors used in our [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html).
 
-
-
 ```{r formula, error=TRUE}
 form <- cases ~ 1 + offset(log(Population)) + IMD + perc.wb + perc.ba + age1 + pm25
 ```
@@ -93,7 +88,7 @@ form <- cases ~ 1 + offset(log(Population)) + IMD + perc.wb + perc.ba + age1 + p
 
 Finally, we fit the spatio-temporal model using the function `ST.CARar()` of the package `CARBayesST` developed by Lee (2018) @lee2018spatio. We first need to organize the COVID-19 infection and covariate data into a specific format expected by the `ST.CARar()` function. More details can be found in the help file of 'ST.CARar()'. Any MSOAs without reported cases will be stored as missing (NA) values in the data frame.
 
-```{r datformat, eval=TRUE}
+```{r datformat, eval=FALSE}
 time.points <- length(unique(st_covid$date))
 n <- nrow(sp_data@data)
 dat <- data.frame(
@@ -249,12 +244,12 @@ regr_est
 Finally, the spatial patterns of the average infection rate estimates over time for each model are displayed below.
 
 ```{r map1, error=TRUE, fig.cap="Map of the predicted average infection rates for using MCMC.",  fig.width=8, fig.height=4, fig.align = "center"}
-mcmc.mean.rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
+mcmc_mean_rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
   mean.rate = mean(mcmc.fitted.prev)
 )
 
-sp_data@data$mcmc.mean.rate <- mcmc.mean.rate$mean.rate
-domain <- sp_data@data$mcmc.mean.rate
+sp_data@data$mcmc_mean_rate <- mcmc_mean_rate$mean.rate
+domain <- sp_data@data$mcmc_mean_rate
 
 fdmr::plot_map(
   polygon_data = sp_data,
@@ -268,12 +263,12 @@ fdmr::plot_map(
 ```
 
 ```{r map2, error=TRUE, fig.cap="Map of the predicted average infection rates for using INLA-SPDE.",  fig.width=8, fig.height=4, fig.align = "center"}
-INLA.mean.rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
+INLA_mean_rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
   mean.rate = mean(inla.fitted.prev)
 )
 
-sp_data@data$INLA.mean.rate <- INLA.mean.rate$mean.rate
-domain <- sp_data@data$INLA.mean.rate
+sp_data@data$INLA_mean_rate <- INLA_mean_rate$mean.rate
+domain <- sp_data@data$INLA_mean_rate
 
 fdmr::plot_map(
   polygon_data = sp_data,
