@@ -11,7 +11,7 @@
 #' @keywords internal
 priors_shiny <- function(spatial_data,
                          measurement_data,
-                         mesh = NULL,
+                         mesh,
                          inla_exposure_param = "Population",
                          prior_spatial_range = NULL,
                          prior_range_probability = NULL,
@@ -25,15 +25,6 @@ priors_shiny <- function(spatial_data,
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
     }
 
-    if (is.null(mesh)) {
-        mesh <- INLA::inla.mesh.2d(
-            loc = spatial_data@data[, c("LONG", "LAT")],
-            max.edge = c(0.02, 0.1),
-            cutoff = 0.005,
-            offset = c(0.1, 0.3)
-        )
-    }
-
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
@@ -45,33 +36,33 @@ priors_shiny <- function(spatial_data,
                 shiny::sliderInput(
                     inputId = "prior_spatial_range",
                     label = "Spatial range:",
-                    min = 1, value = 1.5, max = 5
+                    min = 0.05, value = 0.1, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "prior_range_probability",
                     label = "Range probabilty:",
-                    min = 0.1, value = 0.5, max = 5
+                    min = 0.1, value = 0.7, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "prior_std_dev",
                     label = "Standard deviation:",
-                    min = 1, value = 1, max = 5
+                    min = 0.05, value = 0.1, max = 2
                 ),
                 shiny::sliderInput(
                     inputId = "prior_std_dev_prob",
                     label = "Standard dev. probability:",
-                    min = 0.01, value = 0.01, max = 1
+                    min = 0.1, value = 0.4, max = 1
                 ),
                 shiny::h3("Temporal priors"),
                 shiny::sliderInput(
                     inputId = "prior_alpha",
                     label = "Alpha:",
-                    min = 0, value = 0.01, max = 1
+                    min = -1, value = 0.1, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "prior_pg_alpha",
                     label = "PG Alpha:",
-                    min = 0, value = 0.9, max = 1
+                    min = 0, value = 0.7, max = 1
                 ),
                 shiny::textOutput(outputId = "status")
             ),
@@ -108,6 +99,8 @@ priors_shiny <- function(spatial_data,
     server <- function(input, output, session) {
         status_values <- shiny::reactiveValues("status" = "OK")
 
+        model_outputs <- shiny::reactiveValues(model_out = list(), run_number = 0)
+
         output$status <- shiny::renderText({
             paste("Status : ", status_values$status)
         })
@@ -136,7 +129,7 @@ priors_shiny <- function(spatial_data,
             )
         })
 
-        rhoprior <- shiny::reactive({
+        alphaprior <- shiny::reactive({
             list(theta = list(prior = "pccor1", param = c(input$prior_alpha, input$prior_pg_alpha)))
         })
 
@@ -161,7 +154,7 @@ priors_shiny <- function(spatial_data,
                 ngroup = n_groups,
                 control.group = list(
                     model = 'ar1',
-                    hyper = rhoprior())
+                    hyper = alphaprior())
                 )"
 
             if (input$f_func) {
@@ -174,7 +167,7 @@ priors_shiny <- function(spatial_data,
             formula_str()
         })
 
-        model_out <- shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
+        shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
@@ -183,21 +176,18 @@ priors_shiny <- function(spatial_data,
 
             tryCatch(
                 expr = {
-                    inlabru::bru(formula,
+                    model_output <- inlabru::bru(formula,
                         data = measurement_data,
                         family = "poisson",
                         E = measurement_data[[inla_exposure_param]],
                         control.family = list(link = "log"),
-                        # control.predictor = list(link = 1),
                         options = list(
-                            control.inla = list(
-                                reordering = "metis",
-                                int.strategy = "eb"
-                            ),
-                            verbose = TRUE,
-                            inla.mode = "experimental"
+                            verbose = FALSE
                         )
                     )
+
+                    model_outputs$run_number <- model_outputs$run_number + 1
+                    append(model_outputs$model_out, model_output)
                 },
                 error = function(e) {
                     list("INLA_crashed" = TRUE, err = toString(e))

@@ -321,6 +321,7 @@ post_rate <- base::cbind.data.frame(
     m3$fitted.mean.post, m4$fitted.mean.post
   )
 )
+
 ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
   ggplot2::geom_density()
 ```
@@ -376,7 +377,6 @@ p4 <- ggplot2::ggplot(pos_obs_rate, ggplot2::aes(x = rate, fill = scenario)) +
 
 gridExtra::grid.arrange(p1, p2, p3, p4, ncol = 2)
 ```
-
 
 
 # Compare the predicted mean fields for different priors
@@ -528,3 +528,27 @@ m6 <- INLA_infer(
 
 Model m6 encounters errors during execution: `*** inla.core.safe: inla.program has crashed.*** Fail to get good enough initial values.` 
 This highlights the importance of specifying appropriate priors for model parameters, as it directly impacts the model performance. Choosing suitable priors can help avoid issues like convergence problems and ensure the stability and accuracy of the model fitting process.
+
+
+## Shiny app
+
+To investigate the settings of priors interactively we've created a Shiny app that allows the priors to be changed and the outcomes plotted.
+We'll use the data loaded in above and some initial values for the priors and plot the model ouput within the app.
+
+We'll create the same mesh as above and pass that into the app.
+
+```{r createmesh, error=TRUE}
+initial_range <- diff(base::range(sp_data@data[, "LONG"])) / 3
+max_edge <- initial_range / 2
+
+mesh <- INLA::inla.mesh.2d(
+  loc = sp_data@data[, c("LONG", "LAT")],
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range, initial_range),
+  cutoff = max_edge / 7
+)
+```
+
+```{r eval=FALSE}
+fdmr::interactive_priors(spatial_data=sp_data, measurement_data = covid19_data, mesh=mesh)
+```
