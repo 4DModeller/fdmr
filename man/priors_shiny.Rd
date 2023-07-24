@@ -4,7 +4,18 @@
 \alias{priors_shiny}
 \title{Interactively set and see the result of different priors}
 \usage{
-priors_shiny(spatial_data, measurement_data, mesh = NULL)
+priors_shiny(
+  spatial_data,
+  measurement_data,
+  mesh,
+  inla_exposure_param = "Population",
+  prior_range = NULL,
+  ps_range = NULL,
+  prior_sigma = NULL,
+  pg_sigma = NULL,
+  prior_alpha = NULL,
+  pg_alpha = NULL
+)
 }
 \arguments{
 \item{spatial_data}{Spatial data}
@@ -12,6 +23,8 @@ priors_shiny(spatial_data, measurement_data, mesh = NULL)
 \item{measurement_data}{Measurement data}
 
 \item{mesh}{INLA mesh}
+
+\item{inla_exposure_param}{Exposure parameter for family = 'poisson' passed to inlabru::bru and then to INLA::inla. Must be column in measurement data.}
 }
 \value{
 shiny::app
