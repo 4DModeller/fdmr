@@ -25,6 +25,10 @@ priors_shiny <- function(spatial_data,
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
     }
 
+    plot_choices <- c("Range", "Marginal Stdev", "AR(1)", "Boxplot", "Density", "DIC")
+
+
+
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
@@ -90,7 +94,12 @@ priors_shiny <- function(spatial_data,
                         ),
                         shiny::actionButton(inputId = "run_model", label = "Run"),
                     ),
-                    shiny::tabPanel("Plot", shiny::verbatimTextOutput("Plot here"))
+                    shiny::tabPanel(
+                        "Plot",
+                        shiny::h2("Plot output"),
+                        shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices),
+                        shiny::plotOutput(outputId = "plot_model_out")
+                    )
                 )
             ),
         )
@@ -99,7 +108,8 @@ priors_shiny <- function(spatial_data,
     server <- function(input, output, session) {
         status_values <- shiny::reactiveValues("status" = "OK")
 
-        model_outputs <- shiny::reactiveValues(model_out = list(), run_number = 0)
+        run_no <- shiny::reactiveVal(0)
+        model_outputs <- shiny::reactiveValues(list())
 
         output$status <- shiny::renderText({
             paste("Status : ", status_values$status)
@@ -167,7 +177,7 @@ priors_shiny <- function(spatial_data,
             formula_str()
         })
 
-        shiny::eventReactive(input$run_model, ignoreNULL = TRUE, {
+        shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
@@ -186,8 +196,8 @@ priors_shiny <- function(spatial_data,
                         )
                     )
 
-                    model_outputs$run_number <- model_outputs$run_number + 1
-                    append(model_outputs$model_out, model_output)
+                    run_no(run_no() + 1)
+                    model_outputs[[run_no()]] <- model_output
                 },
                 error = function(e) {
                     list("INLA_crashed" = TRUE, err = toString(e))

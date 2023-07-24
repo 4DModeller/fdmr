@@ -18,6 +18,8 @@ navbar:
           href: articles/covid_mcmc.html
         - text: "COVID-19 MCMC (Space-time)"
           href: articles/covid_ST_mcmc.html
+        - test: "Data pre-processing"
+          href: articles/data_preprocessing.html
         - text: "Hydrology"
           href: articles/hydro.html
         - test: "Priors exploration"
