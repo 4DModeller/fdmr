@@ -109,7 +109,7 @@ priors_shiny <- function(spatial_data,
         status_values <- shiny::reactiveValues("status" = "OK")
 
         run_no <- shiny::reactiveVal(0)
-        model_outputs <- shiny::reactiveValues(list())
+        rv <- shiny::reactiveValues(model_outputs = list())
 
         output$status <- shiny::renderText({
             paste("Status : ", status_values$status)
@@ -197,20 +197,28 @@ priors_shiny <- function(spatial_data,
                     )
 
                     run_no(run_no() + 1)
-                    model_outputs[[run_no()]] <- model_output
+                    rv$model_outputs[[run_no()]] <- model_output
                 },
                 error = function(e) {
-                    list("INLA_crashed" = TRUE, err = toString(e))
+                    rv$model_outputs <- list("INLA_crashed" = TRUE, err = toString(e))
+                    run_no(0)
                 }
             )
         })
 
-        model_summary <- shiny::reactive({
-            summary(model_out())
-        })
+        # model_summary <- shiny::reactive({
+        #     tryCatch(
+        #         expr = {
+        #             model_outputs()
+        #         },
+        #         error = function(e) {
+        #             "No model output."
+        #         }
+        #     )
+        # })
 
         output$comparison_output <- shiny::renderPrint({
-            model_summary()
+            rv$model_outputs
         })
     }
 
