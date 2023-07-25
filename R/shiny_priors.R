@@ -12,7 +12,6 @@
 priors_shiny <- function(spatial_data,
                          measurement_data,
                          mesh,
-                         inla_exposure_param = "Population",
                          prior_range = NULL,
                          ps_range = NULL,
                          prior_sigma = NULL,
@@ -76,6 +75,7 @@ priors_shiny <- function(spatial_data,
                     shiny::tabPanel(
                         "Features",
                         shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
+                        shiny::selectInput(inputId = "exposure_param", label = "Exposure param", choices = features),
                         shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
                         shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
                         shiny::actionButton(inputId = "clear", label = "Clear"),
@@ -185,21 +185,23 @@ priors_shiny <- function(spatial_data,
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
-            formula <- cases ~ 0 + Intercept + f(
-                main = coordinates,
-                model = spde(),
-                group = group_index,
-                ngroup = n_groups,
-                control.group = list(
-                    model = "ar1",
-                    hyper = alphaprior()
-                )
-            )
+            # formula <- cases ~ 0 + Intercept + f(
+            #     main = coordinates,
+            #     model = spde(),
+            #     group = group_index,
+            #     ngroup = n_groups,
+            #     control.group = list(
+            #         model = "ar1",
+            #         hyper = alphaprior()
+            #     )
+            # )
+
+            formula <- eval(parse(formula_str()))
 
             model_output <- inlabru::bru(formula,
                 data = measurement_data,
                 family = "poisson",
-                E = measurement_data$Population,
+                E = measurement_data[[input$exposure_param]],
                 control.family = list(link = "log"),
                 options = list(
                     verbose = FALSE
@@ -211,7 +213,7 @@ priors_shiny <- function(spatial_data,
             # model_output <- inlabru::bru(formula,
             #     data = measurement_data,
             #     family = "poisson",
-            #     E = measurement_data[[inla_exposure_param]],
+                # E = measurement_data[[inla_exposure_param]],
             #     control.family = list(link = "log"),
             #     options = list(
             #         verbose = FALSE
