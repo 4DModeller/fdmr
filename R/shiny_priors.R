@@ -219,8 +219,8 @@ priors_shiny <- function(spatial_data,
             # )
 
             # TODO - just save the output of fdmr::parse_model_bru?
-            # run_no(run_no() + 1)
-            # rv$model_outputs[[run_no()]] <- model_output
+            run_no(run_no() + 1)
+            rv$model_outputs[[run_no()]] <- model_output
             #     },
             #     error = function(e) {
             #         rv$model_outputs <- list("INLA_crashed" = TRUE, err = toString(e))
