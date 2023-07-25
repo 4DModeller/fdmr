@@ -34,7 +34,7 @@ parse_model_bru <- function(model_output) {
 #' @return list
 #' @export
 parse_model <- function(model_output, model_type = "inlabru") {
-    if (model_type == "bru") {
+    if (model_type == "inlabru") {
         return(parse_model_bru(model_output = model_output))
     }
 }

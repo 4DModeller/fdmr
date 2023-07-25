@@ -17,8 +17,8 @@ priors_shiny <- function(spatial_data,
                          ps_range = NULL,
                          prior_sigma = NULL,
                          pg_sigma = NULL,
-                         prior_alpha = NULL,
-                         pg_alpha = NULL) {
+                         prior_ar1 = NULL,
+                         pg_ar1 = NULL) {
     initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
     features <- names(measurement_data)
     if (is.null(features)) {
@@ -40,33 +40,33 @@ priors_shiny <- function(spatial_data,
                 shiny::sliderInput(
                     inputId = "prior_range",
                     label = "Spatial range:",
-                    min = 0.05, value = 0.1, max = 1
+                    min = 0.05, value = 0.05, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "ps_range",
                     label = "Range probabilty:",
-                    min = 0.1, value = 0.7, max = 1
+                    min = 0.1, value = 0.1, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "prior_sigma",
                     label = "Standard deviation:",
-                    min = 0.05, value = 0.1, max = 2
+                    min = 0.05, value = 0.05, max = 2
                 ),
                 shiny::sliderInput(
                     inputId = "pg_sigma",
                     label = "Standard dev. probability:",
-                    min = 0.1, value = 0.4, max = 1
+                    min = 0.1, value = 0.2, max = 1
                 ),
                 shiny::h3("Temporal priors"),
                 shiny::sliderInput(
-                    inputId = "prior_alpha",
+                    inputId = "prior_ar1",
                     label = "Alpha:",
-                    min = -1, value = 0.1, max = 1
+                    min = -1, value = -0.2, max = 1
                 ),
                 shiny::sliderInput(
-                    inputId = "pg_alpha",
+                    inputId = "pg_ar1",
                     label = "PG Alpha:",
-                    min = 0, value = 0.7, max = 1
+                    min = 0, value = 0.8, max = 1
                 ),
                 shiny::textOutput(outputId = "status")
             ),
@@ -131,20 +131,20 @@ priors_shiny <- function(spatial_data,
             shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
 
-        # spde <- shiny::reactive({
-        #     INLA::inla.spde2.pcmatern(
-        #         mesh = mesh,
-        #         prior.range = c(input$prior_range, input$ps_range),
-        #         prior.sigma = c(input$prior_sigma, input$pg_sigma)
-        #     )
-        # })
+        spde <- shiny::reactive({
+            INLA::inla.spde2.pcmatern(
+                mesh = mesh,
+                prior.range = c(input$prior_range, input$ps_range),
+                prior.sigma = c(input$prior_sigma, input$pg_sigma)
+            )
+        })
 
-        # alphaprior <- shiny::reactive({
-        #     base::list(theta = list(
-        #         prior = "pccor1",
-        #         param = c(input$prior_ar1, input$pg_ar1)
-        #     ))
-        # })
+        alphaprior <- shiny::reactive({
+           base::list(theta = list(
+                prior = "pccor1",
+                param = c(input$prior_ar1, input$pg_ar1)
+            ))
+        })
 
 
         formula_str <- shiny::reactive({
@@ -187,22 +187,21 @@ priors_shiny <- function(spatial_data,
 
             # TODO - add regex to check this for sensible values
             # formula <- eval(parse(text = formula_str()))
-
             spde <- INLA::inla.spde2.pcmatern(
                 mesh = mesh,
-                prior.range = c(0.1, 0.7),
-                prior.sigma = c(0.1, 0.4)
+                prior.range = c(input$prior_range, input$ps_range),
+                prior.sigma = c(input$prior_sigma, input$pg_sigma)
             )
 
-            alphaprior <- base::list(theta = list(
-                prior = "pccor1",
-                param = c(0.1, 0.7)
-            ))
+            # alphaprior <- base::list(theta = list(
+            #     prior = "pccor1",
+            #     param = c(-0.2, 0.8)
+            # ))
 
 
             group_index <- measurement_data$week
             n_groups <- base::length(base::unique(measurement_data$week))
-            # sp::coordinates(data) <- c("LONG", "LAT")
+            # sp::coordinates(measurement_data) <- c("LONG", "LAT")
 
             formula <- cases ~ 0 + Intercept + f(
                 main = coordinates,
@@ -210,8 +209,8 @@ priors_shiny <- function(spatial_data,
                 group = group_index,
                 ngroup = n_groups,
                 control.group = list(
-                model = "ar1",
-                hyper = alphaprior
+                    model = "ar1",
+                    hyper = alphaprior()
                 )
             )
 
@@ -221,10 +220,9 @@ priors_shiny <- function(spatial_data,
                 E = measurement_data$Population,
                 control.family = list(link = "log"),
                 options = list(
-                verbose = FALSE
+                    verbose = FALSE
                 )
             )
-
             # formula <- cases ~ 0 + Intercept + f(
             #     main = coordinates,
             #     model = spde(),
@@ -238,19 +236,19 @@ priors_shiny <- function(spatial_data,
 
             # tryCatch(
             #     expr = {
-                    # model_output <- inlabru::bru(formula,
-                    #     data = measurement_data,
-                    #     family = "poisson",
-                    #     E = measurement_data[[inla_exposure_param]],
-                    #     control.family = list(link = "log"),
-                    #     options = list(
-                    #         verbose = FALSE
-                    #     )
-                    # )
+            # model_output <- inlabru::bru(formula,
+            #     data = measurement_data,
+            #     family = "poisson",
+            #     E = measurement_data[[inla_exposure_param]],
+            #     control.family = list(link = "log"),
+            #     options = list(
+            #         verbose = FALSE
+            #     )
+            # )
 
             # TODO - just save the output of fdmr::parse_model_bru?
-            run_no(run_no() + 1)
-            rv$model_outputs[[run_no()]] <- model_output
+            # run_no(run_no() + 1)
+            # rv$model_outputs[[run_no()]] <- model_output
             #     },
             #     error = function(e) {
             #         rv$model_outputs <- list("INLA_crashed" = TRUE, err = toString(e))
