@@ -8,13 +8,12 @@ priors_shiny(
   spatial_data,
   measurement_data,
   mesh,
-  inla_exposure_param = "Population",
   prior_range = NULL,
   ps_range = NULL,
   prior_sigma = NULL,
   pg_sigma = NULL,
-  prior_alpha = NULL,
-  pg_alpha = NULL
+  prior_ar1 = NULL,
+  pg_ar1 = NULL
 )
 }
 \arguments{

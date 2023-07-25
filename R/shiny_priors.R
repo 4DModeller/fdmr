@@ -26,8 +26,6 @@ priors_shiny <- function(spatial_data,
 
     plot_choices <- c("Range", "Marginal Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
-
-
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
@@ -99,6 +97,10 @@ priors_shiny <- function(spatial_data,
                         shiny::h2("Plot output"),
                         shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices),
                         shiny::plotOutput(outputId = "plot_model_out")
+                    ),
+                    shiny::tabPanel(
+                        "Code",
+                        shiny::textOutput(outputId = "code_out")
                     )
                 )
             ),
@@ -109,7 +111,7 @@ priors_shiny <- function(spatial_data,
         status_value <- shiny::reactiveVal("OK")
 
         run_no <- shiny::reactiveVal(0)
-        rv <- shiny::reactiveValues(model_outputs = list())
+        model_vals <- shiny::reactiveValues(model_outputs = list(), parsed_outputs = list())
 
         output$status <- shiny::renderText({
             paste("Status : ", status_value())
@@ -199,7 +201,11 @@ priors_shiny <- function(spatial_data,
                     )
 
                     run_no(run_no() + 1)
-                    rv$model_outputs[[run_no()]] <- model_output
+                    model_vals$model_outputs[[run_no()]] <- model_output
+                    model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
+                        model_output = model_output,
+                        measurement_data = measurement_data
+                    )
                 },
                 error = function(e) {
                     # TODO - write to logfile
@@ -209,10 +215,12 @@ priors_shiny <- function(spatial_data,
         })
 
         output$comparison_output <- shiny::renderPrint({
-            if (length(rv$model_outputs) == 0) {
+            if (length(model_vals$model_outputs) == 0) {
                 "No model output."
             } else {
-                rv$model_outputs
+                # TODO - improve this output, some kind of table format for the parsed values?
+                paste("We have ", run_no(), " successful model runs.")
+                # model_vals$parsed_outputs
             }
         })
     }
@@ -231,3 +239,27 @@ priors_shiny <- function(spatial_data,
 interactive_priors <- function(spatial_data, measurement_data, mesh = NULL) {
     shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, mesh = mesh))
 }
+
+
+
+# parse_modelout <- function(model_output, measurement_data) {
+#     fitted.mean.post <- model_output$summary.fitted.values$mean[1:nrow(measurement_data)]
+#     fitted.sd.post <- model_output$summary.fitted.values$mean[1:nrow(measurement_data)]
+#     mean.post <- model_output$summary.random$f$mean
+#     sd.post <- model_output$summary.random$f$sd
+#     fixed.mean <- model_output$summary.fixed$mean
+#     dic <- model_output$dic$dic
+#     pars <- model_output$marginals.hyperparm1
+
+#     parsed_output <- list(
+#         fitted.mean.post = fitted.mean.post,
+#         fitted.sd.post = fitted.sd.post,
+#         mean.post = mean.post,
+#         sd.post = sd.post,
+#         fixed.mean = fixed.mean,
+#         dic = dic,
+#         pars = pars
+#     )
+
+#     return(parsed_output)
+# }
