@@ -248,6 +248,7 @@ priors_shiny <- function(spatial_data,
                     #     )
                     # )
 
+            # TODO - just save the output of fdmr::parse_model_bru?
             run_no(run_no() + 1)
             rv$model_outputs[[run_no()]] <- model_output
             #     },
