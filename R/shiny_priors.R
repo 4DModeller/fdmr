@@ -185,27 +185,9 @@ priors_shiny <- function(spatial_data,
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
-            # TODO - add regex to check this for sensible values
-            # formula <- eval(parse(text = formula_str()))
-            spde <- INLA::inla.spde2.pcmatern(
-                mesh = mesh,
-                prior.range = c(input$prior_range, input$ps_range),
-                prior.sigma = c(input$prior_sigma, input$pg_sigma)
-            )
-
-            # alphaprior <- base::list(theta = list(
-            #     prior = "pccor1",
-            #     param = c(-0.2, 0.8)
-            # ))
-
-
-            group_index <- measurement_data$week
-            n_groups <- base::length(base::unique(measurement_data$week))
-            # sp::coordinates(measurement_data) <- c("LONG", "LAT")
-
             formula <- cases ~ 0 + Intercept + f(
                 main = coordinates,
-                model = spde,
+                model = spde(),
                 group = group_index,
                 ngroup = n_groups,
                 control.group = list(
@@ -223,16 +205,6 @@ priors_shiny <- function(spatial_data,
                     verbose = FALSE
                 )
             )
-            # formula <- cases ~ 0 + Intercept + f(
-            #     main = coordinates,
-            #     model = spde(),
-            #     group = group_index,
-            #     ngroup = n_groups,
-            #     control.group = list(
-            #         model = "ar1",
-            #         hyper = alphaprior()
-            #     )
-            # )
 
             # tryCatch(
             #     expr = {
