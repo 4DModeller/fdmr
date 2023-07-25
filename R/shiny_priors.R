@@ -185,18 +185,7 @@ priors_shiny <- function(spatial_data,
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
-            # formula <- cases ~ 0 + Intercept + f(
-            #     main = coordinates,
-            #     model = spde(),
-            #     group = group_index,
-            #     ngroup = n_groups,
-            #     control.group = list(
-            #         model = "ar1",
-            #         hyper = alphaprior()
-            #     )
-            # )
-
-            formula <- eval(parse(formula_str()))
+            formula <- eval(parse(text = formula_str()))
 
             model_output <- inlabru::bru(formula,
                 data = measurement_data,
