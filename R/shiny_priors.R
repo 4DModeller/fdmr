@@ -106,13 +106,13 @@ priors_shiny <- function(spatial_data,
     )
 
     server <- function(input, output, session) {
-        status_values <- shiny::reactiveValues("status" = "OK")
+        status_value <- shiny::reactiveVal("OK")
 
         run_no <- shiny::reactiveVal(0)
         rv <- shiny::reactiveValues(model_outputs = list())
 
         output$status <- shiny::renderText({
-            paste("Status : ", status_values$status)
+            paste("Status : ", status_value())
         })
 
         initial_equation <- shiny::reactive({
@@ -140,12 +140,11 @@ priors_shiny <- function(spatial_data,
         })
 
         alphaprior <- shiny::reactive({
-           base::list(theta = list(
+            base::list(theta = list(
                 prior = "pccor1",
                 param = c(input$prior_ar1, input$pg_ar1)
             ))
         })
-
 
         formula_str <- shiny::reactive({
             eval_str <- initial_equation()
@@ -187,37 +186,26 @@ priors_shiny <- function(spatial_data,
 
             formula <- eval(parse(text = formula_str()))
 
-            model_output <- inlabru::bru(formula,
-                data = measurement_data,
-                family = "poisson",
-                E = measurement_data[[input$exposure_param]],
-                control.family = list(link = "log"),
-                options = list(
-                    verbose = FALSE
-                )
+            tryCatch(
+                expr = {
+                    model_output <- inlabru::bru(formula,
+                        data = measurement_data,
+                        family = "poisson",
+                        E = measurement_data[[input$exposure_param]],
+                        control.family = list(link = "log"),
+                        options = list(
+                            verbose = FALSE
+                        )
+                    )
+
+                    run_no(run_no() + 1)
+                    rv$model_outputs[[run_no()]] <- model_output
+                },
+                error = function(e) {
+                    # TODO - write to logfile
+                    status_value("INLA Error, check log.")
+                }
             )
-
-            # tryCatch(
-            #     expr = {
-            # model_output <- inlabru::bru(formula,
-            #     data = measurement_data,
-            #     family = "poisson",
-                # E = measurement_data[[inla_exposure_param]],
-            #     control.family = list(link = "log"),
-            #     options = list(
-            #         verbose = FALSE
-            #     )
-            # )
-
-            # TODO - just save the output of fdmr::parse_model_bru?
-            run_no(run_no() + 1)
-            rv$model_outputs[[run_no()]] <- model_output
-            #     },
-            #     error = function(e) {
-            #         rv$model_outputs <- list("INLA_crashed" = TRUE, err = toString(e))
-            #         run_no(0)
-            #     }
-            # )
         })
 
         output$comparison_output <- shiny::renderPrint({
