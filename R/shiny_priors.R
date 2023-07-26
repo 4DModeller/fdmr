@@ -24,7 +24,8 @@ priors_shiny <- function(spatial_data,
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
     }
 
-    plot_choices <- c("Range", "Marginal Stdev", "AR(1)", "Boxplot", "Density", "DIC")
+    # plot_choices <- c("Range", "Marginal Stdev",
+    plot_choices <- c("Boxplot", "AR(1)", "Density", "DIC")
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
@@ -95,7 +96,7 @@ priors_shiny <- function(spatial_data,
                     shiny::tabPanel(
                         "Plot",
                         shiny::h2("Plot output"),
-                        shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices),
+                        shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
                         shiny::plotOutput(outputId = "plot_model_out")
                     ),
                     shiny::tabPanel(
@@ -223,6 +224,23 @@ priors_shiny <- function(spatial_data,
                 # model_vals$parsed_outputs
             }
         })
+
+        model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
+            if (length(model_vals$parsed_outputs) == 0) {
+                return()
+            }
+
+            data <- model_vals$parsed_outputs
+            if (input$plot_type == "Range") {
+                return(plot_line_comparison(data = data, to_plot = "Range for f"))
+            } else if (input$plot_type == "Boxplot") {
+                return(plot_priors_boxplot(data = data))
+            }
+        })
+
+        output$plot_model_out <- shiny::renderPlot({
+            model_plot()
+        })
     }
 
     shiny::shinyApp(ui = ui, server = server)
@@ -241,25 +259,69 @@ interactive_priors <- function(spatial_data, measurement_data, mesh = NULL) {
 }
 
 
+#  Analysis plots from priors vignette
+#' Compare model output
+#'
+#' @param data Parsed model output
+#' @param to_plot Type of data to plot, "Range for f" etc
+#'
+#' @return ggplot2::ggplot
+#' @keywords internal
+plot_line_comparison <- function(data, to_plot) {
+    line_plot <- ggplot2::ggplot()
+    colour_hex <- RColorBrewer::brewer.pal(n = 8, name = "Set1")
+    colours <- list()
 
-# parse_modelout <- function(model_output, measurement_data) {
-#     fitted.mean.post <- model_output$summary.fitted.values$mean[1:nrow(measurement_data)]
-#     fitted.sd.post <- model_output$summary.fitted.values$mean[1:nrow(measurement_data)]
-#     mean.post <- model_output$summary.random$f$mean
-#     sd.post <- model_output$summary.random$f$sd
-#     fixed.mean <- model_output$summary.fixed$mean
-#     dic <- model_output$dic$dic
-#     pars <- model_output$marginals.hyperparm1
+    i <- 1
+    for (d in data) {
+        name <- paste0("Set-", i)
+        colours[[name]] <- colour_hex[i]
+        i <- i + 1
+    }
 
-#     parsed_output <- list(
-#         fitted.mean.post = fitted.mean.post,
-#         fitted.sd.post = fitted.sd.post,
-#         mean.post = mean.post,
-#         sd.post = sd.post,
-#         fixed.mean = fixed.mean,
-#         dic = dic,
-#         pars = pars
-#     )
+    for (d in data) {
+        df <- as.data.frame(d$pars[[to_plot]])
+        # line_plot <- line_plot + ggplot2::geom_line(data = df, ggplot2::aes(x = x, y = y, color = paste0("Set-", n)))
+        line_plot <- line_plot + ggplot2::geom_line(data = df, ggplot2::aes(x = x, y = y))
+        # n <- n + 1
+    }
 
-#     return(parsed_output)
-# }
+    # line_plot <- line_plot + ggplot2::scale_color_manual(name = "Model runs")
+    # line_plot <- line_plot + ggplot2::scale_color_manual(name = "Model runs", values = as.vector(colours))
+
+    return(line_plot)
+}
+
+#' Create boxplots from priors run data
+#'
+#' @param data
+#'
+#' @return graphics::boxplot
+#' @keywords internal
+plot_priors_boxplot <- function(data) {
+    # TODO - I'm sure this can be done in a nicer functional way
+    fitted_mean_post <- purrr::map(data, function(x) x$fitted_mean_post)
+    names(fitted_mean_post) <- purrr::map(seq(1, length(data)), function(x) paste0("Run-", x))
+
+    post_rate <- cbind.data.frame(fitted_mean_post)
+    graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Rate estimates")
+}
+
+#' Plot ...
+#'
+#' @param data
+#'
+#' @return graphics::boxplot
+#' @keywords internal
+plot_priors_density <- function(data) {
+    post_rate <- base::cbind.data.frame(
+        "Prior scenario" = rep(c("set1", "set2", "set3", "set4"), each = nrow(covid19_data)),
+        "Rate estimates" = c(
+            m1$fitted.mean.post, m2$fitted.mean.post,
+            m3$fitted.mean.post, m4$fitted.mean.post
+        )
+    )
+
+    ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
+        ggplot2::geom_density()
+}
