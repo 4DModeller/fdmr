@@ -101,7 +101,8 @@ priors_shiny <- function(spatial_data,
                     ),
                     shiny::tabPanel(
                         "Code",
-                        shiny::textOutput(outputId = "code_out")
+                        shiny::selectInput(inputId = "select_run", label = "Select run:", choices = c("Run 1")),
+                        shiny::verbatimTextOutput(outputId = "code_out")
                     )
                 )
             ),
@@ -112,7 +113,7 @@ priors_shiny <- function(spatial_data,
         status_value <- shiny::reactiveVal("OK")
 
         run_no <- shiny::reactiveVal(0)
-        model_vals <- shiny::reactiveValues(model_outputs = list(), parsed_outputs = list())
+        model_vals <- shiny::reactiveValues(model_outputs = list(), parsed_outputs = list(), run_params = list())
 
         output$status <- shiny::renderText({
             paste("Status : ", status_value())
@@ -133,6 +134,13 @@ priors_shiny <- function(spatial_data,
         shiny::observeEvent(input$model_var, {
             shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
+
+        # shiny::reactive({
+        #     ch
+        #     shiny::updateSelectInput(session = session, inputId = select_run, choices = )
+        # })
+
+
 
         spde <- shiny::reactive({
             INLA::inla.spde2.pcmatern(
@@ -207,6 +215,18 @@ priors_shiny <- function(spatial_data,
                         model_output = model_output,
                         measurement_data = measurement_data
                     )
+
+                    # Save the model run parameters
+                    run_params <- list(
+                        "prior_range" = input$prior_range,
+                        "ps_range" = input$ps_range,
+                        "prior_sigma" = input$prior_sigma,
+                        "pg_sigma" = input$pg_sigma,
+                        "prior_ar1" = input$prior_ar1,
+                        "pg_ar1" = input$pg_ar1
+                    )
+
+                    model_vals$run_params[[run_no()]] <- run_params
                 },
                 error = function(e) {
                     # TODO - write to logfile
@@ -240,6 +260,38 @@ priors_shiny <- function(spatial_data,
 
         output$plot_model_out <- shiny::renderPlot({
             model_plot()
+        })
+
+        output$code_out <- shiny::reactive({
+            #               paste0(
+            #     "mesh <- inla.mesh.2d(loc = location_data,
+            #       max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
+            #       cutoff = ", input$cutoff, ",
+            #       offset=c(", paste0(input$offset, collapse = ", "), "))\n"
+            #   )
+
+            paste0(
+                "spde <- INLA::inla.spde2.pcmatern(
+                mesh = mesh,
+                prior.range = c(input$prior_range, input$ps_range),
+                prior.sigma = c(input$prior_sigma, input$pg_sigma)
+            )", "\n\n",
+                paste0(
+                    "alphaprior <- list(theta = list(
+                prior = 'pccor1',
+                param = c(input$prior_ar1, input$pg_ar1)
+            )", "\n\n",
+                    paste0("model_output <- inlabru::bru(formula,
+                        data = measurement_data,
+                        family = 'poisson',
+                        E = measurement_data[[", input$exposure_param, "]],
+                        control.family = list(link = 'log'),
+                        options = list(
+                            verbose = FALSE
+                        )
+                    )")
+                )
+            )
         })
     }
 
