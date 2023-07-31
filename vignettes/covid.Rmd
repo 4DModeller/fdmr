@@ -158,7 +158,7 @@ fdmr::plot_mesh(mesh = mesh, point_data = point_data)
 ```
 
 # Build the SPDE model on the mesh and set priors for the spatial parameters
-We use the INLA::inla.spde2.pcmatern() function to build the SPDE model and specify Penalised Complexity (PC) priors for the parameters of the Matérn field. PC priors for the parameters range and marginal standard deviation of the Matérn field are specified by setting the values $m_r$, $p_r$,  $m_\sigma$ and $p_\sigma$ in the relations that P(spatial range<$m_r$)= $p_r$, and  P($\sigma>m_\sigma$)= $p_\sigma$. The spatial range of the process is the distance at which the correlation between two values is close to 0.1. In this study we use a prior of P(spatial range<0.296)= 0.5 for the spatial range parameter based on an exploratory variogram analysis. It means that the probability that the spatial range is smaller than 0.296 degrees of latitude (which is equivalent to 32.856 kilometers) is 0.5. $\sigma$ controls the marginal standard deviation of the process, and is specified a prior of P($\sigma$ >1)= 0.01.
+We use the INLA::inla.spde2.pcmatern() function to build the SPDE model and specify Penalised Complexity (PC) priors for the parameters of the Matérn field. PC priors for the parameters range and marginal standard deviation of the Matérn field are specified by setting the values $m_r$, $p_r$,  $m_\sigma$ and $p_\sigma$ in the relations that P(spatial range<$m_r$)= $p_r$, and  P($\sigma>m_\sigma$)= $p_\sigma$. The spatial range of the process is the distance at which the correlation between two values is close to 0.1. In this study we use a prior of P(spatial range<1.480)= 0.5 for the spatial range parameter based on an exploratory variogram analysis. It means that the probability that the spatial range is smaller than 1.480 degrees of latitude (which is equivalent to about 164 kilometers) is 0.5. $\sigma$ controls the marginal standard deviation of the process, and is specified a prior of P($\sigma$ >1)= 0.01.
 
 
 ```{r spde, error=TRUE}
@@ -228,7 +228,6 @@ inlabru_model <- inlabru::bru(formula,
   family = "poisson",
   E = covid19_data$Population,
   control.family = list(link = "log"),
-  control.predictor = list(link = 1),
   options = list(
     control.inla = list(
       reordering = "metis",
