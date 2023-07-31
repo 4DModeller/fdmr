@@ -135,13 +135,6 @@ priors_shiny <- function(spatial_data,
             shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
 
-        # shiny::reactive({
-        #     ch
-        #     shiny::updateSelectInput(session = session, inputId = select_run, choices = )
-        # })
-
-
-
         spde <- shiny::reactive({
             INLA::inla.spde2.pcmatern(
                 mesh = mesh,
@@ -263,23 +256,16 @@ priors_shiny <- function(spatial_data,
         })
 
         output$code_out <- shiny::reactive({
-            #               paste0(
-            #     "mesh <- inla.mesh.2d(loc = location_data,
-            #       max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
-            #       cutoff = ", input$cutoff, ",
-            #       offset=c(", paste0(input$offset, collapse = ", "), "))\n"
-            #   )
-
             paste0(
                 "spde <- INLA::inla.spde2.pcmatern(
                 mesh = mesh,
-                prior.range = c(input$prior_range, input$ps_range),
-                prior.sigma = c(input$prior_sigma, input$pg_sigma)
+                prior.range = c(", input$prior_range, ",", input$ps_range, "),
+                prior.sigma = c(", input$prior_sigma, ",", input$pg_sigma, ")
             )", "\n\n",
                 paste0(
                     "alphaprior <- list(theta = list(
                 prior = 'pccor1',
-                param = c(input$prior_ar1, input$pg_ar1)
+                param = c(", input$prior_ar1, ",", input$pg_ar1, ")
             )", "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
