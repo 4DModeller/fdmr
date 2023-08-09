@@ -339,7 +339,8 @@ plot_line_comparison <- function(data, to_plot, title) {
 
     ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
         ggplot2::geom_line() +
-        ggplot2::ggtitle(title)
+        ggplot2::ggtitle(title) +
+        ggplot2::theme(text = ggplot2::element_text(size=16))
 }
 
 
@@ -358,7 +359,8 @@ plot_ar1 <- function(data) {
     }
 
     ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
-        ggplot2::geom_line()
+        ggplot2::geom_line() +
+        ggplot2::theme(text = ggplot2::element_text(size=16))
 }
 
 #' Create boxplots from priors run data
@@ -395,7 +397,8 @@ plot_priors_density <- function(data, measurement_data) {
     )
 
     ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
-        ggplot2::geom_density()
+        ggplot2::geom_density() +
+        ggplot2::theme(text = ggplot2::element_text(size=16))
 }
 
 
@@ -414,5 +417,6 @@ plot_dic <- function(data) {
     infocri$priors <- base::as.factor(infocri$priors)
 
     ggplot2::ggplot(infocri, ggplot2::aes(x = priors, y = DIC)) +
-        ggplot2::geom_point()
+        ggplot2::geom_point() +
+        ggplot2::theme(text = ggplot2::element_text(size=16))
 }
