@@ -196,6 +196,7 @@ priors_shiny <- function(spatial_data,
         })
 
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
+            # TODO - what would be the best way of creating these?
             group_index <- measurement_data$week
             n_groups <- length(unique(measurement_data$week))
 
