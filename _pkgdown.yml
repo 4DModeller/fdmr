@@ -24,6 +24,8 @@ navbar:
           href: articles/hydro.html
         - test: "Priors exploration"
           href: articles/priors.html
+        - test: "Interactive priors exploration"
+          href: articles/priors_app.html
         - text: "Mapping"
           href: articles/mapping.html
         - text: "Meshing"
@@ -38,17 +40,38 @@ authors:
     href: https://www.researchgate.net/profile/Xueqing_Yin
   John Aiken:
     href: https://mnky9800n.github.io/
-# reference:
-# - title: Plotting
-#   desc:  Basic plotting tools
-#   contents:
-#     - starts_with("plot_")
-# - title: Utility functions
-#   desc:  These help us handle paths, retrieve data etc
-#   contents:
-#     - require_package
-#     - get_tutorial_datapath
-#     - retrieve_tutorial_data
-#     - load_tutorial_data
-#     - clean_path
+reference:
+- title: Plotting
+  desc:  Create simple figures
+  contents:
+    - starts_with("plot_")
+- title: Shiny apps
+  desc: Interactive tools for building meshes, plotting maps and investigating priors
+  contents:
+    - plot_interactive_map
+    - mesh_builder
+    - interactive_priors
+- title: Parsing model output
+  desc: Functions to help parse model output and extract useful information
+  contents:
+    - parse_model_output
+- title: Mesh tools
+  desc: Functions to help with creation and investigation of meshes
+  contents:
+    - mesh_to_spatial
+    - mesh_checker
+- title: Geospatial helpers
+  desc: Functions to help convert coordinates and units
+  contents:
+    - latlong_to_utm
+    - to_dates
+- title: Utility functions
+  desc:  These help us handle paths, retrieve data etc
+  contents:
+    - get_tutorial_datapath
+    - retrieve_tutorial_data
+    - clear_caches
+    - require_packages
+    - load_tutorial_data
+    - numbers_only
 
