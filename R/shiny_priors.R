@@ -27,8 +27,8 @@ priors_shiny <- function(spatial_data,
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
     }
 
-    # plot_choices <- c("Range", "Marginal Stdev",
-    plot_choices <- c("Boxplot", "AR(1)", "Density", "DIC")
+    # plot_choices <- c(",
+    plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
@@ -249,15 +249,32 @@ priors_shiny <- function(spatial_data,
             data <- model_vals$parsed_outputs
 
             if (input$plot_type == "Range") {
-                return(plot_line_comparison(data = data, to_plot = "Range for f"))
+                return(plot_line_comparison(
+                    data = data,
+                    to_plot = "Range for f",
+                    title = "Range"
+                ))
+            } else if (input$plot_type == "Stdev") {
+                return(plot_line_comparison(
+                    data = data,
+                    to_plot = "Stdev for f",
+                    title = "Marginal standard deviation"
+                ))
+            } else if (input$plot_type == "AR(1)") {
+                return(plot_line_comparison(
+                    data = data,
+                    to_plot = "GroupRho for f",
+                    title = "AR(1)"
+                ))
             } else if (input$plot_type == "Boxplot") {
                 return(plot_priors_boxplot(data = data))
             } else if (input$plot_type == "Density") {
-                return(plot_priors_density(data = data, measurement_data = measurement_data))
+                return(plot_priors_density(
+                    data = data,
+                    measurement_data = measurement_data
+                ))
             } else if (input$plot_type == "DIC") {
                 return(plot_dic(data = data))
-            } else if (input$plot_type == "AR(1)") {
-                return(plot_ar1(data = data))
             }
         })
 
@@ -304,6 +321,25 @@ priors_shiny <- function(spatial_data,
 #' @export
 interactive_priors <- function(spatial_data, measurement_data, mesh = NULL) {
     shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, mesh = mesh))
+}
+
+#' Plot line comparison for stdev etc
+#'
+#' @param data Parsed model output
+#' @param to_plot Type of data to plot, "Range for f" etc
+#'
+#' @return ggplot2::ggplot
+#' @keywords internal
+plot_line_comparison <- function(data, to_plot, title) {
+    ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars[[to_plot]]))
+    single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
+    if (nrow(single_df) == 0) {
+        return("No pars data.")
+    }
+
+    ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
+        ggplot2::geom_line() +
+        ggplot2::ggtitle(title)
 }
 
 

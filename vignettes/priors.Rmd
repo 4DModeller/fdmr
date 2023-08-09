@@ -187,7 +187,7 @@ INLA_infer <- function(mesh, prior_range, ps_range,
   sd.post <- inlabru_model$summary.random$f$sd
   fixed.mean <- inlabru_model$summary.fixed$mean
   dic <- inlabru_model$dic$dic
-  pars <- inlabru_model$marginals.hyperparm1
+  pars <- inlabru_model$marginals.hyperpar
 
   return(list(
     fitted.mean.post = fitted.mean.post,
@@ -215,38 +215,38 @@ m1 <- INLA_infer(
   data = covid19_data
 )
 
-# m2 <- INLA_infer(
-#   mesh = mesh,
-#   prior_range = priors_dat$prior_range[2],
-#   ps_range = priors_dat$ps_range[2],
-#   prior_sigma = priors_dat$prior_sigma[2],
-#   pg_sigma = priors_dat$pg_sigma[2],
-#   prior_ar1 = priors_dat$prior_alpha[2],
-#   pg_ar1 = priors_dat$pg_alpha[2],
-#   data = covid19_data
-# )
+m2 <- INLA_infer(
+  mesh = mesh,
+  prior_range = priors_dat$prior_range[2],
+  ps_range = priors_dat$ps_range[2],
+  prior_sigma = priors_dat$prior_sigma[2],
+  pg_sigma = priors_dat$pg_sigma[2],
+  prior_ar1 = priors_dat$prior_alpha[2],
+  pg_ar1 = priors_dat$pg_alpha[2],
+  data = covid19_data
+)
 
-# m3 <- INLA_infer(
-#   mesh = mesh,
-#   prior_range = priors_dat$prior_range[3],
-#   ps_range = priors_dat$ps_range[3],
-#   prior_sigma = priors_dat$prior_sigma[3],
-#   pg_sigma = priors_dat$pg_sigma[3],
-#   prior_ar1 = priors_dat$prior_alpha[3],
-#   pg_ar1 = priors_dat$pg_alpha[3],
-#   data = covid19_data
-# )
+m3 <- INLA_infer(
+  mesh = mesh,
+  prior_range = priors_dat$prior_range[3],
+  ps_range = priors_dat$ps_range[3],
+  prior_sigma = priors_dat$prior_sigma[3],
+  pg_sigma = priors_dat$pg_sigma[3],
+  prior_ar1 = priors_dat$prior_alpha[3],
+  pg_ar1 = priors_dat$pg_alpha[3],
+  data = covid19_data
+)
 
-# m4 <- INLA_infer(
-#   mesh = mesh,
-#   prior_range = priors_dat$prior_range[4],
-#   ps_range = priors_dat$ps_range[4],
-#   prior_sigma = priors_dat$prior_sigma[4],
-#   pg_sigma = priors_dat$pg_sigma[4],
-#   prior_ar1 = priors_dat$prior_alpha[4],
-#   pg_ar1 = priors_dat$pg_alpha[4],
-#   data = covid19_data
-# )
+m4 <- INLA_infer(
+  mesh = mesh,
+  prior_range = priors_dat$prior_range[4],
+  ps_range = priors_dat$ps_range[4],
+  prior_sigma = priors_dat$prior_sigma[4],
+  pg_sigma = priors_dat$pg_sigma[4],
+  prior_ar1 = priors_dat$prior_alpha[4],
+  pg_ar1 = priors_dat$pg_alpha[4],
+  data = covid19_data
+)
 ```
 
 

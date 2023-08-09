@@ -14,7 +14,7 @@ parse_model_output_bru <- function(model_output, measurement_data) {
     fixed_mean <- model_output$summary.fixed$mean
 
     dic <- model_output$dic$dic
-    pars <- model_output$marginals.hyperparm1
+    pars <- model_output$marginals.hyperpar
 
     parsed_output <- list(
         fitted_mean_post = fitted_mean_post,
