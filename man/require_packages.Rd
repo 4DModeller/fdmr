@@ -2,9 +2,7 @@
 % Please edit documentation in R/util_packages.R
 \name{require_packages}
 \alias{require_packages}
-\title{Checks if a package is installed. If it is it's loaded,
-otherwise stop is called with a message telling the user
-the package is required.}
+\title{Checks if packages are installed.}
 \usage{
 require_packages(packages)
 }
@@ -12,8 +10,6 @@ require_packages(packages)
 \item{packages}{Package name}
 }
 \description{
-Checks if a package is installed. If it is it's loaded,
-otherwise stop is called with a message telling the user
-the package is required.
+Checks if packages are installed.
 }
 \keyword{internal}

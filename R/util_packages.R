@@ -1,6 +1,4 @@
-#' Checks if a package is installed. If it is it's loaded,
-#' otherwise stop is called with a message telling the user
-#' the package is required.
+#' Checks if packages are installed.
 #'
 #' @param packages Package name
 #'

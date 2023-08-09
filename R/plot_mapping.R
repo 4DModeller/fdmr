@@ -48,6 +48,7 @@ plot_map <- function(polygon_data = NULL,
         title = legend_title
       )
     }
+
     m <- leaflet::addPolygons(m,
       data = polygon_data,
       fillColor = polygon_fill_colour,

@@ -18,6 +18,9 @@ priors_shiny <- function(spatial_data,
                          pg_sigma = NULL,
                          prior_ar1 = NULL,
                          pg_ar1 = NULL) {
+    require_packages(packages = "INLA")
+    loadNamespace("INLA")
+
     initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
     features <- names(measurement_data)
     if (is.null(features)) {
@@ -244,10 +247,17 @@ priors_shiny <- function(spatial_data,
             }
 
             data <- model_vals$parsed_outputs
+
             if (input$plot_type == "Range") {
                 return(plot_line_comparison(data = data, to_plot = "Range for f"))
             } else if (input$plot_type == "Boxplot") {
                 return(plot_priors_boxplot(data = data))
+            } else if (input$plot_type == "Density") {
+                return(plot_priors_density(data = data, measurement_data = measurement_data))
+            } else if (input$plot_type == "DIC") {
+                return(plot_dic(data = data))
+            } else if (input$plot_type == "AR(1)") {
+                return(plot_ar1(data = data))
             }
         })
 
@@ -297,37 +307,22 @@ interactive_priors <- function(spatial_data, measurement_data, mesh = NULL) {
 }
 
 
-#  Analysis plots from priors vignette
-#' Compare model output
+#' Plot AR(1)
 #'
 #' @param data Parsed model output
 #' @param to_plot Type of data to plot, "Range for f" etc
 #'
 #' @return ggplot2::ggplot
 #' @keywords internal
-plot_line_comparison <- function(data, to_plot) {
-    line_plot <- ggplot2::ggplot()
-    colour_hex <- RColorBrewer::brewer.pal(n = 8, name = "Set1")
-    colours <- list()
-
-    i <- 1
-    for (d in data) {
-        name <- paste0("Set-", i)
-        colours[[name]] <- colour_hex[i]
-        i <- i + 1
+plot_ar1 <- function(data) {
+    ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars$`GroupRho for f`))
+    single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
+    if (nrow(single_df) == 0) {
+        return("No pars data.")
     }
 
-    for (d in data) {
-        df <- as.data.frame(d$pars[[to_plot]])
-        # line_plot <- line_plot + ggplot2::geom_line(data = df, ggplot2::aes(x = x, y = y, color = paste0("Set-", n)))
-        line_plot <- line_plot + ggplot2::geom_line(data = df, ggplot2::aes(x = x, y = y))
-        # n <- n + 1
-    }
-
-    # line_plot <- line_plot + ggplot2::scale_color_manual(name = "Model runs")
-    # line_plot <- line_plot + ggplot2::scale_color_manual(name = "Model runs", values = as.vector(colours))
-
-    return(line_plot)
+    ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
+        ggplot2::geom_line()
 }
 
 #' Create boxplots from priors run data
@@ -339,27 +334,49 @@ plot_line_comparison <- function(data, to_plot) {
 plot_priors_boxplot <- function(data) {
     # TODO - I'm sure this can be done in a nicer functional way
     fitted_mean_post <- purrr::map(data, function(x) x$fitted_mean_post)
-    names(fitted_mean_post) <- purrr::map(seq(1, length(data)), function(x) paste0("Run-", x))
+    names(fitted_mean_post) <- purrr::map(seq(1, length(data)), function(x) paste("Run", x))
 
     post_rate <- cbind.data.frame(fitted_mean_post)
     graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Rate estimates")
 }
 
-#' Plot ...
+#' Plot density function
 #'
-#' @param data
 #'
-#' @return graphics::boxplot
+#' @param data Parsed model outputs
+#' @param measurement_data Measurement data
+#'
+#' @return ggplot2::ggplot
 #' @keywords internal
-plot_priors_density <- function(data) {
+plot_priors_density <- function(data, measurement_data) {
+    # Can this be done in a cleaner way? Just create a dataframe from the lists?
+    rate_estimates <- unlist(purrr::map(data, function(x) x$fitted_mean_post))
+    run_strings <- unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x)))
+
     post_rate <- base::cbind.data.frame(
-        "Prior scenario" = rep(c("set1", "set2", "set3", "set4"), each = nrow(covid19_data)),
-        "Rate estimates" = c(
-            m1$fitted.mean.post, m2$fitted.mean.post,
-            m3$fitted.mean.post, m4$fitted.mean.post
-        )
+        "Prior scenario" = rep(run_strings, each = nrow(measurement_data)),
+        "Rate estimates" = rate_estimates
     )
 
     ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
         ggplot2::geom_density()
+}
+
+
+#' Plot Deviance Information Criterion (DIC) values
+#'
+#' @param data
+#'
+#' @return ggplot2::ggplot
+#' @keywords internal
+plot_dic <- function(data) {
+    infocri <- base::cbind.data.frame(
+        priors = unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x))),
+        DIC = unlist(purrr::map(data, function(x) x$dic))
+    )
+
+    infocri$priors <- base::as.factor(infocri$priors)
+
+    ggplot2::ggplot(infocri, ggplot2::aes(x = priors, y = DIC)) +
+        ggplot2::geom_point()
 }
