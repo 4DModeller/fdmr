@@ -276,7 +276,6 @@ lines(m4$pars$`Range for f`, col = 4)
 legend("topright", legend = c("set1", "set2", "set3", "set4"), lty = rep(1, 4), col = c(1, 2, 3, 4))
 ```
 
-
 ```{r parsigma, eval=TRUE, fig.width=8, fig.height=4, fig.align='center'}
 plot(m1$pars$`Stdev for f`,
   type = "l",
@@ -537,7 +536,7 @@ We'll use the data loaded in above and some initial values for the priors and pl
 
 We'll create the same mesh as above and pass that into the app.
 
-```{r createmesh, error=TRUE}
+```{r createmesh_shiny, error=TRUE}
 initial_range <- diff(base::range(sp_data@data[, "LONG"])) / 3
 max_edge <- initial_range / 2
 
