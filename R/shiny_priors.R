@@ -104,7 +104,7 @@ priors_shiny <- function(spatial_data,
                     ),
                     shiny::tabPanel(
                         "Code",
-                        shiny::selectInput(inputId = "select_run", label = "Select run:", choices = c("Run 1")),
+                        shiny::selectInput(inputId = "select_run", label = "Select run:", choices = c()),
                         shiny::verbatimTextOutput(outputId = "code_out")
                     )
                 )
@@ -124,6 +124,14 @@ priors_shiny <- function(spatial_data,
 
         initial_equation <- shiny::reactive({
             stringr::str_replace(initial_equation_val, "model_var", input$model_var)
+        })
+
+        run_names <- shiny::reactive({
+            names(model_vals$run_params)
+        })
+
+        shiny::observe({
+            shiny::updateSelectInput(session = session, inputId = "select_run", choices = run_names())
         })
 
         shiny::observeEvent(input$features, {
@@ -222,7 +230,8 @@ priors_shiny <- function(spatial_data,
                         "pg_ar1" = input$pg_ar1
                     )
 
-                    model_vals$run_params[[run_no()]] <- run_params
+                    run_label <- paste0("Run-", run_no())
+                    model_vals$run_params[[run_label]] <- run_params
                 },
                 error = function(e) {
                     # TODO - write to logfile
@@ -283,16 +292,22 @@ priors_shiny <- function(spatial_data,
         })
 
         output$code_out <- shiny::reactive({
+            if (is.null(run_names())) {
+                return()
+            }
+
+            params <- model_vals$run_params[[input$select_run]]
+
             paste0(
                 "spde <- INLA::inla.spde2.pcmatern(
                 mesh = mesh,
-                prior.range = c(", input$prior_range, ",", input$ps_range, "),
-                prior.sigma = c(", input$prior_sigma, ",", input$pg_sigma, ")
+                prior.range = c(", params[["prior_range"]], ",", params[["ps_range"]], "),
+                prior.sigma = c(", params[["prior_sigma"]], ",", params[["pg_sigma"]], ")
             )", "\n\n",
                 paste0(
                     "alphaprior <- list(theta = list(
                 prior = 'pccor1',
-                param = c(", input$prior_ar1, ",", input$pg_ar1, ")
+                param = c(", params[["prior_ar1"]], ",", params[["pg_ar1"]], ")
             )", "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
@@ -340,7 +355,7 @@ plot_line_comparison <- function(data, to_plot, title) {
     ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
         ggplot2::geom_line() +
         ggplot2::ggtitle(title) +
-        ggplot2::theme(text = ggplot2::element_text(size=16))
+        ggplot2::theme(text = ggplot2::element_text(size = 16))
 }
 
 
@@ -360,7 +375,7 @@ plot_ar1 <- function(data) {
 
     ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
         ggplot2::geom_line() +
-        ggplot2::theme(text = ggplot2::element_text(size=16))
+        ggplot2::theme(text = ggplot2::element_text(size = 16))
 }
 
 #' Create boxplots from priors run data
@@ -398,7 +413,7 @@ plot_priors_density <- function(data, measurement_data) {
 
     ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
         ggplot2::geom_density() +
-        ggplot2::theme(text = ggplot2::element_text(size=16))
+        ggplot2::theme(text = ggplot2::element_text(size = 16))
 }
 
 
@@ -418,5 +433,5 @@ plot_dic <- function(data) {
 
     ggplot2::ggplot(infocri, ggplot2::aes(x = priors, y = DIC)) +
         ggplot2::geom_point() +
-        ggplot2::theme(text = ggplot2::element_text(size=16))
+        ggplot2::theme(text = ggplot2::element_text(size = 16))
 }
