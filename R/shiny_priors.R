@@ -27,13 +27,15 @@ priors_shiny <- function(spatial_data,
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
     }
 
-    # plot_choices <- c(",
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
+
+    # loading_gif <- system.file("logo/4DMlogo_loading.gif", package = "fdmr")
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
         shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
+        # shinybusy::add_busy_gif(loading_gif, height = 100, width = 100, position = "top-right"),
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
