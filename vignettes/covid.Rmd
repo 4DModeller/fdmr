@@ -24,8 +24,11 @@ The first thing is to load all the packages used in the COVID-19 case study.
 
 The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The shapefile of the study region `shape` is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods.load
 
-We first need to retrieve the data from the fdmr example data store and unpack it and we'll use `retrieve_tutorial_data` to do this.
+We first load INLA and then retrieve the data from the fdmr example data store. We'll use `retrieve_tutorial_data` to do this.
 
+```{r}
+library(INLA)
+```
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid")
 ```

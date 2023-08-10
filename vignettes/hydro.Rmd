@@ -11,7 +11,11 @@ vignette: >
   
 If you do not have `INLA` or `inlabru` installed [please go to the following installation tutorial before continuing](link%20to%20installation%20tutorial).
 
-First we'll download the data for this tutorial from our [data repository](https://github.com/4DModeller/fdmr_data) using `retrieve_tutorial_data`.
+First we load INLA and then download the data for this tutorial from our [data repository](https://github.com/4DModeller/fdmr_data) using `retrieve_tutorial_data`.
+
+```{r}
+library(INLA)
+```
 
 ```{r error=TRUE,message=FALSE,warning=FALSE}
 fdmr::retrieve_tutorial_data(dataset = "hydro")
