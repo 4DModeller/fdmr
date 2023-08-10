@@ -31,11 +31,12 @@ priors_shiny <- function(spatial_data,
 
     # loading_gif <- system.file("logo/4DMlogo_loading.gif", package = "fdmr")
 
+
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
-        shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
-        # shinybusy::add_busy_gif(loading_gif, height = 100, width = 100, position = "top-right"),
+        # shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
+        shinybusy::add_busy_gif("https://raw.githubusercontent.com/4DModeller/logo/main/4DMlogo_loading.gif", height = 100, width = 100, position = "top-right"),
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
@@ -93,8 +94,11 @@ priors_shiny <- function(spatial_data,
                         "Model",
                         shiny::fluidRow(
                             shiny::h2("Model output"),
-                            shiny::textOutput(outputId = "comparison_output"),
-                            style = "height:80vh;"
+                            # shiny::h3("Hyperparameter summary"),
+                            shiny::tableOutput(outputId = "hyper_param_out"),
+                            # shiny::h3("Fixed summary"),
+                            shiny::tableOutput(outputId = "fixed_out"),
+                            style = "height:70vh;"
                         ),
                         shiny::actionButton(inputId = "run_model", label = "Run"),
                     ),
@@ -243,15 +247,33 @@ priors_shiny <- function(spatial_data,
             )
         })
 
-        output$comparison_output <- shiny::renderPrint({
-            if (length(model_vals$model_outputs) == 0) {
-                "No model output."
-            } else {
-                # TODO - improve this output, some kind of table format for the parsed values?
-                paste("We have ", run_no(), " successful model runs.")
-                # model_vals$parsed_outputs
-            }
-        })
+        output$hyper_param_out <- shiny::renderTable(
+            {
+                if (length(model_vals$model_outputs) == 0) {
+                    return()
+                } else {
+                    # TODO - improve this output, some kind of table format for the parsed values?
+                    last_run <- model_vals$model_outputs[[length(model_vals$model_outputs)]]
+                    last_run$summary.hyperpar
+                    # model_vals$parsed_outputs
+                }
+            },
+            rownames = TRUE
+        )
+
+        output$fixed_out <- shiny::renderTable(
+            {
+                if (length(model_vals$model_outputs) == 0) {
+                    return()
+                } else {
+                    # TODO - improve this output, some kind of table format for the parsed values?
+                    last_run <- model_vals$model_outputs[[length(model_vals$model_outputs)]]
+                    last_run$summary.fixed
+                    # model_vals$parsed_outputs
+                }
+            },
+            rownames = TRUE
+        )
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
             if (length(model_vals$parsed_outputs) == 0) {

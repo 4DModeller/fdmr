@@ -50,7 +50,7 @@ Imports:
     archive,
     shiny,
     stringr,
-    shinybusy
+    shinybusy,
 Suggests: 
     bookdown,
     knitr,
