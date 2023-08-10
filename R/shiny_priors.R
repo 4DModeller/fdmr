@@ -64,7 +64,7 @@ priors_shiny <- function(spatial_data,
                 shiny::sliderInput(
                     inputId = "prior_ar1",
                     label = "Alpha:",
-                    min = -1, value = -0.2, max = 1
+                    min = -1, value = -0.2, max = 1.0, step = 0.1,
                 ),
                 shiny::sliderInput(
                     inputId = "pg_ar1",
