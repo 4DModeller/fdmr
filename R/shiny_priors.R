@@ -27,10 +27,16 @@ priors_shiny <- function(spatial_data,
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
     }
 
+    # Logfile path
+    log_filename <- paste0("priors_exploration_data_", lubridate::format_ISO8601(lubridate::now()), ".txt")
+    log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
+    if (!fs::dir_exists(log_folder)) {
+        fs::dir_create(log_folder)
+    }
+
+    log_filepath <- fs::path(log_folder, log_filename)
+
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
-
-    # loading_gif <- system.file("logo/4DMlogo_loading.gif", package = "fdmr")
-
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
