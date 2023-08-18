@@ -2,8 +2,8 @@
 #'
 #' @param spatial_data Spatial data
 #' @param measurement_data Measurement data
+#' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
-#' @param inla_exposure_param Exposure parameter for family = 'poisson' passed to inlabru::bru and then to INLA::inla. Must be column in measurement data.
 #'
 #' @importFrom INLA f
 #'
@@ -11,15 +11,26 @@
 #' @keywords internal
 priors_shiny <- function(spatial_data,
                          measurement_data,
-                         mesh,
-                         prior_range = NULL,
-                         ps_range = NULL,
-                         prior_sigma = NULL,
-                         pg_sigma = NULL,
-                         prior_ar1 = NULL,
-                         pg_ar1 = NULL) {
+                         time_variable,
+                         mesh) {
     require_packages(packages = "INLA")
     loadNamespace("INLA")
+
+    # Text for priors help
+    prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
+                        where ρ is the spatial range of the random field."
+
+    prior_sigma_text <- "A length 2 vector, with (sigma0, Psigma) specifying that P(σ > σ_0)=p_σ,
+                        where σ is the marginal standard deviation of the field."
+
+    control_group_text <- "Temporal priors are set using alpha and PG alpha. These are passed used to create alphaprior.
+                            We use pass this to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior). This specifes that across time,
+                            the process evolves according to an AR(1) process where the prior for the autocorrelation
+                            parameter a is given by alphaprior. We define alphaprior with the prior 'pccor1' which is a PC
+                            prior for the autocorrelation parameter a where a=1 is the base model."
+
+    citation_priors <- "Spatial and field prior explanation taken from https://rdrr.io/github/INBO-BMK/INLA/man/inla.spde2.pcmatern.html"
+    citation_control_group <- "Prior explanation text modified from https://www.paulamoraga.com/book-geospatial/sec-geostatisticaldataexamplest.html"
 
     initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
     features <- names(measurement_data)
@@ -118,6 +129,21 @@ priors_shiny <- function(spatial_data,
                         "Code",
                         shiny::selectInput(inputId = "select_run", label = "Select run:", choices = c()),
                         shiny::verbatimTextOutput(outputId = "code_out")
+                    ),
+                    shiny::tabPanel(
+                        "Help",
+                        shiny::h3("Help"),
+                        shiny::h4("Spatial priors"),
+                        shiny::p(prior_range_text),
+                        shiny::h4("Field priors"),
+                        shiny::p(prior_sigma_text),
+                        shiny::h4("Temporal priors"),
+                        shiny::p(control_group_text),
+                        shiny::br(),
+                        shiny::br(),
+                        shiny::h4("Notes"),
+                        shiny::p(citation_priors),
+                        shiny::p(citation_control_group)
                     )
                 )
             ),
@@ -167,7 +193,7 @@ priors_shiny <- function(spatial_data,
         })
 
         alphaprior <- shiny::reactive({
-            base::list(theta = list(
+            list(theta = list(
                 prior = "pccor1",
                 param = c(input$prior_ar1, input$pg_ar1)
             ))
@@ -208,9 +234,8 @@ priors_shiny <- function(spatial_data,
         })
 
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
-            # TODO - what would be the best way of creating these?
-            group_index <- measurement_data$week
-            n_groups <- length(unique(measurement_data$week))
+            group_index <- measurement_data[[time_variable]]
+            n_groups <- length(unique(group_index))
 
             formula <- eval(parse(text = formula_str()))
 
@@ -361,108 +386,11 @@ priors_shiny <- function(spatial_data,
 #'
 #' @param spatial_data Spatial data
 #' @param measurement_data Measurement data
+#' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
 #'
 #' @return shiny::app
 #' @export
-interactive_priors <- function(spatial_data, measurement_data, mesh = NULL) {
-    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, mesh = mesh))
-}
-
-#' Plot line comparison for stdev etc
-#'
-#' @param data Parsed model output
-#' @param to_plot Type of data to plot, "Range for f" etc
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_line_comparison <- function(data, to_plot, title) {
-    ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars[[to_plot]]))
-    single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
-    if (nrow(single_df) == 0) {
-        return("No pars data.")
-    }
-
-    ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
-        ggplot2::geom_line() +
-        ggplot2::ggtitle(title) +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
-}
-
-
-#' Plot AR(1)
-#'
-#' @param data Parsed model output
-#' @param to_plot Type of data to plot, "Range for f" etc
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_ar1 <- function(data) {
-    ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars$`GroupRho for f`))
-    single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
-    if (nrow(single_df) == 0) {
-        return("No pars data.")
-    }
-
-    ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
-        ggplot2::geom_line() +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
-}
-
-#' Create boxplots from priors run data
-#'
-#' @param data
-#'
-#' @return graphics::boxplot
-#' @keywords internal
-plot_priors_boxplot <- function(data) {
-    # TODO - I'm sure this can be done in a nicer functional way
-    fitted_mean_post <- purrr::map(data, function(x) x$fitted_mean_post)
-    names(fitted_mean_post) <- purrr::map(seq(1, length(data)), function(x) paste("Run", x))
-
-    post_rate <- cbind.data.frame(fitted_mean_post)
-    graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Rate estimates")
-}
-
-#' Plot density function
-#'
-#'
-#' @param data Parsed model outputs
-#' @param measurement_data Measurement data
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_priors_density <- function(data, measurement_data) {
-    # Can this be done in a cleaner way? Just create a dataframe from the lists?
-    rate_estimates <- unlist(purrr::map(data, function(x) x$fitted_mean_post))
-    run_strings <- unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x)))
-
-    post_rate <- base::cbind.data.frame(
-        "Prior scenario" = rep(run_strings, each = nrow(measurement_data)),
-        "Rate estimates" = rate_estimates
-    )
-
-    ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
-        ggplot2::geom_density() +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
-}
-
-
-#' Plot Deviance Information Criterion (DIC) values
-#'
-#' @param data
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_dic <- function(data) {
-    infocri <- base::cbind.data.frame(
-        priors = unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x))),
-        DIC = unlist(purrr::map(data, function(x) x$dic))
-    )
-
-    infocri$priors <- base::as.factor(infocri$priors)
-
-    ggplot2::ggplot(infocri, ggplot2::aes(x = priors, y = DIC)) +
-        ggplot2::geom_point() +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
+interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh) {
+    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh))
 }
