@@ -15,6 +15,9 @@ priors_shiny <- function(spatial_data,
                          mesh) {
     require_packages(packages = "INLA")
     loadNamespace("INLA")
+    library(future)
+    library(promises)
+    future::plan(future::multisession())
 
     # Text for priors help
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
@@ -61,7 +64,6 @@ priors_shiny <- function(spatial_data,
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
         busy_spinner,
-        shinybusy::add_busy_gif(gif_pa, height = 100, width = 100, position = "top-right"),
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
@@ -234,7 +236,18 @@ priors_shiny <- function(spatial_data,
                 eval_str <- paste(eval_str, " + ", f_func)
             }
 
-            return(eval_str)
+            eval_str
+        })
+
+        inla_formula <- shiny::reactive({
+            group_index <- measurement_data[[time_variable]]
+            n_groups <- length(unique(group_index))
+
+            eval(parse(text = formula_str()))
+        })
+
+        exposure_param <- shiny::reactive({
+            input$exposure_param
         })
 
         output$final_equation <- shiny::renderText({
@@ -242,46 +255,47 @@ priors_shiny <- function(spatial_data,
         })
 
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
-            group_index <- measurement_data[[time_variable]]
-            n_groups <- length(unique(group_index))
+            inla_formula_local <- inla_formula()
+            exposure_param_local <- exposure_param()
 
-            formula <- eval(parse(text = formula_str()))
+            promise <- promises::future_promise({
+                inlabru::bru(inla_formula_local,
+                    data = measurement_data,
+                    family = "poisson",
+                    E = measurement_data[[exposure_param_local]],
+                    control.family = list(link = "log"),
+                    options = list(
+                        verbose = FALSE
+                    )
+                )
+            })
 
-            tryCatch(
-                expr = {
-                    model_output <- inlabru::bru(formula,
-                        data = measurement_data,
-                        family = "poisson",
-                        E = measurement_data[[input$exposure_param]],
-                        control.family = list(link = "log"),
-                        options = list(
-                            verbose = FALSE
+            promises::then(promise,
+                onFulfilled =
+                    function(model_output) {
+                        # Run the model
+                        run_no(run_no() + 1)
+                        model_vals$model_outputs[[run_no()]] <- model_output
+                        model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
+                            model_output = model_output,
+                            measurement_data = measurement_data
                         )
-                    )
 
-                    run_no(run_no() + 1)
-                    model_vals$model_outputs[[run_no()]] <- model_output
-                    model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
-                        model_output = model_output,
-                        measurement_data = measurement_data
-                    )
+                        # Save the model run parameters
+                        run_params <- list(
+                            "prior_range" = input$prior_range,
+                            "ps_range" = input$ps_range,
+                            "prior_sigma" = input$prior_sigma,
+                            "pg_sigma" = input$pg_sigma,
+                            "prior_ar1" = input$prior_ar1,
+                            "pg_ar1" = input$pg_ar1
+                        )
 
-                    # Save the model run parameters
-                    run_params <- list(
-                        "prior_range" = input$prior_range,
-                        "ps_range" = input$ps_range,
-                        "prior_sigma" = input$prior_sigma,
-                        "pg_sigma" = input$pg_sigma,
-                        "prior_ar1" = input$prior_ar1,
-                        "pg_ar1" = input$pg_ar1
-                    )
-
-                    run_label <- paste0("Run-", run_no())
-                    model_vals$run_params[[run_label]] <- run_params
-                },
-                error = function(e) {
-                    # TODO - write to logfile
-                    status_value("INLA Error, check log.")
+                        run_label <- paste0("Run-", run_no())
+                        model_vals$run_params[[run_label]] <- run_params
+                    },
+                onRejected = function(err) {
+                    warning("INLA crashed with error: ", err)
                 }
             )
         })
