@@ -55,16 +55,15 @@ mesh <- INLA::inla.mesh.2d(
 )
 ```
 
-In order to fit the model, we also need to define a temporal index (must be an integer starting at 1) and the number of discrete time points we want to model.
+In order to fit the model, we also need to define a temporal index (must be an integer starting at 1) and the number of discrete time points we want to model. The app will do this for us, we just need to tell it which time variable to use, here we use `week`.
 
 ```{r, error=TRUE, eval=FALSE}
-group_index <- covid19_data$week
-n_groups <- length(unique(covid19_data$week))
+time_variable <- "week"
 ```
 
 # Set coordinates on data
 
-We will use the function `bru()` of package `inlabru` to fit the model. `bru` expects the coordinates of the data, thus we transform `covid19_data_bris` data set to a SpatialPointsDataFrame using the function `coordinates()` of the `sp` package.
+We will use the function `bru()` of package `inlabru` to fit the model. `bru` expects the coordinates of the data, thus we transform `covid19_data_bris` data set to a `SpatialPointsDataFrame` using the function `coordinates()` of the `sp` package.
 
 ```{r, error=TRUE, eval=FALSE}
 sp::coordinates(covid19_data) <- c("LONG", "LAT")
@@ -78,7 +77,7 @@ First start by selecting the variable to model. In this example we'll select `ca
 Click on the checkboxes to select your formula and then click the `Run Model` button to run the model see it's output plot on the right of the window.
 
 ```{r eval=FALSE}
-fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh=mesh)
+fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, time_variable="week", mesh=mesh)
 ```
 
 

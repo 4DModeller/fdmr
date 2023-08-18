@@ -4,12 +4,14 @@
 \alias{interactive_priors}
 \title{Interactively set and see the result of different priors}
 \usage{
-interactive_priors(spatial_data, measurement_data, mesh = NULL)
+interactive_priors(spatial_data, measurement_data, time_variable, mesh)
 }
 \arguments{
 \item{spatial_data}{Spatial data}
 
 \item{measurement_data}{Measurement data}
+
+\item{time_variable}{Time variable in measurement_data}
 
 \item{mesh}{INLA mesh}
 }

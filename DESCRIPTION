@@ -51,6 +51,7 @@ Imports:
     shiny,
     stringr,
     shinybusy,
+    curl
 Suggests: 
     bookdown,
     knitr,

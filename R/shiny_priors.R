@@ -46,14 +46,22 @@ priors_shiny <- function(spatial_data,
     }
 
     log_filepath <- fs::path(log_folder, log_filename)
-
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
+
+    # TODO - if we modularise the Shiny apps and setup a different directory
+    # structure we can remove this
+    got_internet <- curl::has_internet()
+    if (got_internet) {
+        busy_spinner <- shinybusy::add_busy_gif("https://raw.githubusercontent.com/4DModeller/logo/main/4DMlogo_loading.gif", height = 100, width = 100, position = "top-right")
+    } else {
+        busy_spinner <- shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20))
+    }
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
-        # shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
-        shinybusy::add_busy_gif("https://raw.githubusercontent.com/4DModeller/logo/main/4DMlogo_loading.gif", height = 100, width = 100, position = "top-right"),
+        busy_spinner,
+        shinybusy::add_busy_gif(gif_pa, height = 100, width = 100, position = "top-right"),
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
@@ -283,10 +291,8 @@ priors_shiny <- function(spatial_data,
                 if (length(model_vals$model_outputs) == 0) {
                     return()
                 } else {
-                    # TODO - improve this output, some kind of table format for the parsed values?
                     last_run <- model_vals$model_outputs[[length(model_vals$model_outputs)]]
                     last_run$summary.hyperpar
-                    # model_vals$parsed_outputs
                 }
             },
             rownames = TRUE
@@ -297,10 +303,8 @@ priors_shiny <- function(spatial_data,
                 if (length(model_vals$model_outputs) == 0) {
                     return()
                 } else {
-                    # TODO - improve this output, some kind of table format for the parsed values?
                     last_run <- model_vals$model_outputs[[length(model_vals$model_outputs)]]
                     last_run$summary.fixed
-                    # model_vals$parsed_outputs
                 }
             },
             rownames = TRUE
