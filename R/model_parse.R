@@ -1,4 +1,4 @@
-#' Parses inlabru::bru model output
+#' Parses inlabru::bru model output to create a list of model parameters
 #'
 #' @param model_output Output from running inlabru::bru
 #' @param measurement_data Measurement data
@@ -30,7 +30,7 @@ parse_model_output_bru <- function(model_output, measurement_data) {
 }
 
 
-#' Parse model output
+#' Parse model output to create a list of model parameters
 #'
 #' @param model_output Data returned by model
 #' @param measurement_data Measurement data

@@ -14,7 +14,10 @@ priors_shiny <- function(spatial_data,
                          time_variable,
                          mesh) {
     require_packages(packages = "INLA")
-    loadNamespace("INLA")
+    library(INLA)
+    library(future)
+    library(promises)
+    future::plan(future::multisession())
 
     # Text for priors help
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
@@ -118,7 +121,7 @@ priors_shiny <- function(spatial_data,
                         "Model",
                         shiny::fluidRow(
                             shiny::h2("Model output"),
-                            # shiny::h3("Hyperparameter summary"),
+                            # shiny::conditionalPanel("output.gotoutput", shiny::h3("Hyperparameter summary")),
                             shiny::tableOutput(outputId = "hyper_param_out"),
                             # shiny::h3("Fixed summary"),
                             shiny::tableOutput(outputId = "fixed_out"),
@@ -191,19 +194,8 @@ priors_shiny <- function(spatial_data,
             shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
 
-        spde <- shiny::reactive({
-            INLA::inla.spde2.pcmatern(
-                mesh = mesh,
-                prior.range = c(input$prior_range, input$ps_range),
-                prior.sigma = c(input$prior_sigma, input$pg_sigma)
-            )
-        })
-
-        alphaprior <- shiny::reactive({
-            list(theta = list(
-                prior = "pccor1",
-                param = c(input$prior_ar1, input$pg_ar1)
-            ))
+        output$gotoutput <- shiny::reactive({
+            length(model_vals$model_outputs > 0)
         })
 
         formula_str <- shiny::reactive({
@@ -221,66 +213,92 @@ priors_shiny <- function(spatial_data,
 
             f_func <- "f(
                 main = coordinates,
-                model = spde(),
+                model = spde,
                 group = group_index,
                 ngroup = n_groups,
                 control.group = list(
                     model = 'ar1',
-                    hyper = alphaprior())
+                    hyper = alphaprior)
                 )"
 
             if (input$f_func) {
                 eval_str <- paste(eval_str, " + ", f_func)
             }
 
-            return(eval_str)
+            eval_str
         })
+
+        inla_formula <- shiny::reactive({
+            group_index <- measurement_data[[time_variable]]
+            n_groups <- length(unique(group_index))
+
+            spde <- INLA::inla.spde2.pcmatern(
+                mesh = mesh,
+                prior.range = c(input$prior_range, input$ps_range),
+                prior.sigma = c(input$prior_sigma, input$pg_sigma)
+            )
+
+            alphaprior <- list(theta = list(
+                prior = "pccor1",
+                param = c(input$prior_ar1, input$pg_ar1)
+            ))
+
+            eval(parse(text = formula_str()))
+        })
+
 
         output$final_equation <- shiny::renderText({
             formula_str()
         })
 
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
-            group_index <- measurement_data[[time_variable]]
-            n_groups <- length(unique(group_index))
+            exposure_param_local <- input$exposure_param
+            formula_local <- inla_formula()
+            measurement_data_local <- measurement_data
 
-            formula <- eval(parse(text = formula_str()))
-
-            tryCatch(
-                expr = {
-                    model_output <- inlabru::bru(formula,
-                        data = measurement_data,
+            promise <- promises::future_promise(
+                {
+                    # Without loading INLA here we get errors
+                    library(INLA)
+                    inlabru::bru(formula_local,
+                        data = measurement_data_local,
                         family = "poisson",
-                        E = measurement_data[[input$exposure_param]],
+                        E = measurement_data_local[[exposure_param_local]],
                         control.family = list(link = "log"),
                         options = list(
                             verbose = FALSE
                         )
                     )
-
-                    run_no(run_no() + 1)
-                    model_vals$model_outputs[[run_no()]] <- model_output
-                    model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
-                        model_output = model_output,
-                        measurement_data = measurement_data
-                    )
-
-                    # Save the model run parameters
-                    run_params <- list(
-                        "prior_range" = input$prior_range,
-                        "ps_range" = input$ps_range,
-                        "prior_sigma" = input$prior_sigma,
-                        "pg_sigma" = input$pg_sigma,
-                        "prior_ar1" = input$prior_ar1,
-                        "pg_ar1" = input$pg_ar1
-                    )
-
-                    run_label <- paste0("Run-", run_no())
-                    model_vals$run_params[[run_label]] <- run_params
                 },
-                error = function(e) {
-                    # TODO - write to logfile
-                    status_value("INLA Error, check log.")
+                seed = TRUE
+            )
+
+            promises::then(promise,
+                onFulfilled =
+                    function(model_output) {
+                        # Run the model
+                        run_no(run_no() + 1)
+                        model_vals$model_outputs[[run_no()]] <- model_output
+                        model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
+                            model_output = model_output,
+                            measurement_data = measurement_data
+                        )
+
+                        # Save the model run parameters
+                        run_params <- list(
+                            "prior_range" = input$prior_range,
+                            "ps_range" = input$ps_range,
+                            "prior_sigma" = input$prior_sigma,
+                            "pg_sigma" = input$pg_sigma,
+                            "prior_ar1" = input$prior_ar1,
+                            "pg_ar1" = input$pg_ar1
+                        )
+
+                        run_label <- paste0("Run-", run_no())
+                        model_vals$run_params[[run_label]] <- run_params
+                    },
+                onRejected = function(err) {
+                    warning("INLA crashed with error: ", err)
                 }
             )
         })
