@@ -14,7 +14,7 @@ priors_shiny <- function(spatial_data,
                          time_variable,
                          mesh) {
     require_packages(packages = "INLA")
-    library(INLA)
+    loadNamespace(INLA)
     library(future)
     library(promises)
     future::plan(future::multisession())
