@@ -61,7 +61,6 @@ priors_shiny <- function(spatial_data,
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
         busy_spinner,
-        shinybusy::add_busy_gif(gif_pa, height = 100, width = 100, position = "top-right"),
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
