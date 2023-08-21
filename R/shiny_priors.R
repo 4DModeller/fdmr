@@ -14,7 +14,7 @@ priors_shiny <- function(spatial_data,
                          time_variable,
                          mesh) {
     require_packages(packages = "INLA")
-    loadNamespace("INLA")
+    library(INLA)
     library(future)
     library(promises)
     future::plan(future::multisession())
@@ -121,7 +121,7 @@ priors_shiny <- function(spatial_data,
                         "Model",
                         shiny::fluidRow(
                             shiny::h2("Model output"),
-                            # shiny::h3("Hyperparameter summary"),
+                            # shiny::conditionalPanel("output.gotoutput", shiny::h3("Hyperparameter summary")),
                             shiny::tableOutput(outputId = "hyper_param_out"),
                             # shiny::h3("Fixed summary"),
                             shiny::tableOutput(outputId = "fixed_out"),
@@ -194,15 +194,8 @@ priors_shiny <- function(spatial_data,
             shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
 
-        # spde <- shiny::reactive({
-
-        # })
-
-        alphaprior <- shiny::reactive({
-            list(theta = list(
-                prior = "pccor1",
-                param = c(input$prior_ar1, input$pg_ar1)
-            ))
+        output$gotoutput <- shiny::reactive({
+            length(model_vals$model_outputs > 0)
         })
 
         formula_str <- shiny::reactive({
@@ -250,20 +243,7 @@ priors_shiny <- function(spatial_data,
                 param = c(input$prior_ar1, input$pg_ar1)
             ))
 
-            formula <- cases ~ 0 + Intercept + f(
-                main = coordinates,
-                model = spde,
-                group = group_index,
-                ngroup = n_groups,
-                control.group = list(
-                    model = "ar1",
-                    hyper = alphaprior
-                )
-            )
-
-            return(formula)
-
-            # eval(parse(text = formula_str()))
+            eval(parse(text = formula_str()))
         })
 
 
@@ -274,15 +254,16 @@ priors_shiny <- function(spatial_data,
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
             exposure_param_local <- input$exposure_param
             formula_local <- inla_formula()
+            measurement_data_local <- measurement_data
 
             promise <- promises::future_promise(
                 {
                     # Without loading INLA here we get errors
                     library(INLA)
                     inlabru::bru(formula_local,
-                        data = measurement_data,
+                        data = measurement_data_local,
                         family = "poisson",
-                        E = measurement_data[[exposure_param_local]],
+                        E = measurement_data_local[[exposure_param_local]],
                         control.family = list(link = "log"),
                         options = list(
                             verbose = FALSE
