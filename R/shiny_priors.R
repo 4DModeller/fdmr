@@ -194,13 +194,9 @@ priors_shiny <- function(spatial_data,
             shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
 
-        spde <- shiny::reactive({
-            INLA::inla.spde2.pcmatern(
-                mesh = mesh,
-                prior.range = c(input$prior_range, input$ps_range),
-                prior.sigma = c(input$prior_sigma, input$pg_sigma)
-            )
-        })
+        # spde <- shiny::reactive({
+
+        # })
 
         alphaprior <- shiny::reactive({
             list(theta = list(
@@ -224,12 +220,12 @@ priors_shiny <- function(spatial_data,
 
             f_func <- "f(
                 main = coordinates,
-                model = spde(),
+                model = spde,
                 group = group_index,
                 ngroup = n_groups,
                 control.group = list(
                     model = 'ar1',
-                    hyper = alphaprior())
+                    hyper = alphaprior)
                 )"
 
             if (input$f_func) {
@@ -243,32 +239,58 @@ priors_shiny <- function(spatial_data,
             group_index <- measurement_data[[time_variable]]
             n_groups <- length(unique(group_index))
 
-            eval(parse(text = formula_str()))
+            spde <- INLA::inla.spde2.pcmatern(
+                mesh = mesh,
+                prior.range = c(input$prior_range, input$ps_range),
+                prior.sigma = c(input$prior_sigma, input$pg_sigma)
+            )
+
+            alphaprior <- list(theta = list(
+                prior = "pccor1",
+                param = c(input$prior_ar1, input$pg_ar1)
+            ))
+
+            formula <- cases ~ 0 + Intercept + f(
+                main = coordinates,
+                model = spde,
+                group = group_index,
+                ngroup = n_groups,
+                control.group = list(
+                    model = "ar1",
+                    hyper = alphaprior
+                )
+            )
+
+            return(formula)
+
+            # eval(parse(text = formula_str()))
         })
 
-        exposure_param <- shiny::reactive({
-            input$exposure_param
-        })
 
         output$final_equation <- shiny::renderText({
             formula_str()
         })
 
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
-            inla_formula_local <- inla_formula()
-            exposure_param_local <- exposure_param()
+            exposure_param_local <- input$exposure_param
+            formula_local <- inla_formula()
 
-            promise <- promises::future_promise({
-                inlabru::bru(inla_formula_local,
-                    data = measurement_data,
-                    family = "poisson",
-                    E = measurement_data[[exposure_param_local]],
-                    control.family = list(link = "log"),
-                    options = list(
-                        verbose = FALSE
+            promise <- promises::future_promise(
+                {
+                    # Without loading INLA here we get errors
+                    library(INLA)
+                    inlabru::bru(formula_local,
+                        data = measurement_data,
+                        family = "poisson",
+                        E = measurement_data[[exposure_param_local]],
+                        control.family = list(link = "log"),
+                        options = list(
+                            verbose = FALSE
+                        )
                     )
-                )
-            })
+                },
+                seed = TRUE
+            )
 
             promises::then(promise,
                 onFulfilled =
