@@ -14,7 +14,7 @@ priors_shiny <- function(spatial_data,
                          time_variable,
                          mesh) {
     require_packages(packages = "INLA")
-    require(INLA)
+    # require(INLA)
     require(future)
     require(promises)
     future::plan(future::multisession())
@@ -259,7 +259,7 @@ priors_shiny <- function(spatial_data,
             promise <- promises::future_promise(
                 {
                     # Without loading INLA here we get errors
-                    require(INLA)
+                    # require(INLA)
                     inlabru::bru(formula_local,
                         data = measurement_data_local,
                         family = "poisson",
