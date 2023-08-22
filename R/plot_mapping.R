@@ -48,6 +48,7 @@ plot_map <- function(polygon_data = NULL,
         title = legend_title
       )
     }
+
     m <- leaflet::addPolygons(m,
       data = polygon_data,
       fillColor = polygon_fill_colour,
@@ -71,7 +72,7 @@ plot_map <- function(polygon_data = NULL,
   }
 
   if (!is.null(markers)) {
-    m <- leaflet::addMarkers(m, lng = markers$longitude, lat = markers$latitude, label = markers$label)
+    m <- leaflet::addMarkers(m, lng = markers$longitude, lat = markers$latitude, label = markers$label, group = "Markers")
     layers <- append(layers, "Markers")
   }
 
