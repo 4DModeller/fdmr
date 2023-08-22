@@ -27,7 +27,8 @@
     <a class="dropdown-item" href="../articles/data_preprocessing.html"></a>
     <a class="dropdown-item" href="../articles/hydro.html">Hydrology</a>
     <a class="dropdown-item" href="../articles/priors.html"></a>
-    <a class="dropdown-item" href="../articles/mapping.html">Mapping</a>
+    <a class="dropdown-item" href="../articles/priors_app.html"></a>
+    <a class="dropdown-item" href="../articles/mapping.html">Map plotting</a>
     <a class="dropdown-item" href="../articles/meshbuilder.html">Meshing</a>
   </div>
 </li>
@@ -57,9 +58,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Create simple figures</p>
 
       
     </div><div id="" class="section level2">
@@ -68,60 +69,6 @@
       
 
       <dl><dt>
-          
-          <code><a href="clear_caches.html">clear_caches()</a></code> 
-        </dt>
-        <dd>Clear both tutorial data and downloaded archive caches</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_tutorial_datapath.html">get_tutorial_datapath()</a></code> 
-        </dt>
-        <dd>Return the filepath for a tutorial data file.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="interactive_priors.html">interactive_priors()</a></code> 
-        </dt>
-        <dd>Interactively set and see the result of different priors</dd>
-      </dl><dl><dt>
-          
-          <code><a href="latlong_to_utm.html">latlong_to_utm()</a></code> 
-        </dt>
-        <dd>Convert latitude and longitude to UTM coordinates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="load_tutorial_data.html">load_tutorial_data()</a></code> 
-        </dt>
-        <dd>Load data from the tutorial data store</dd>
-      </dl><dl><dt>
-          
-          <code><a href="mesh_builder.html">mesh_builder()</a></code> 
-        </dt>
-        <dd>Mesh building shiny app. Creates and visualises a mesh from some spatial data.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="mesh_checker.html">mesh_checker()</a></code> 
-        </dt>
-        <dd>Check a mesh for errors:
-<ol><li><p>A greater number of mesh nodes than observations</p></li>
-<li><p>A greater number of mesh triangles than observations</p></li>
-<li><p>Isolated triangles in mesh</p></li>
-</ol></dd>
-      </dl><dl><dt>
-          
-          <code><a href="mesh_to_spatial.html">mesh_to_spatial()</a></code> 
-        </dt>
-        <dd>Convert an INLA mesh to a SpatialPolygonsDataFrame</dd>
-      </dl><dl><dt>
-          
-          <code><a href="numbers_only.html">numbers_only()</a></code> 
-        </dt>
-        <dd>Removes any character that isn't a letter</dd>
-      </dl><dl><dt>
-          
-          <code><a href="parse_model_output.html">parse_model_output()</a></code> 
-        </dt>
-        <dd>Parse model output to create a list of model parameters</dd>
-      </dl><dl><dt>
           
           <code><a href="plot_barchart.html">plot_barchart()</a></code> 
         </dt>
@@ -156,6 +103,110 @@
           <code><a href="plot_timeseries.html">plot_timeseries()</a></code> 
         </dt>
         <dd>Plot timeseries data</dd>
+      </dl></div><div class="section level2">
+      <h2 id="shiny-apps">Shiny apps<a class="anchor" aria-label="anchor" href="#shiny-apps"></a></h2>
+      
+      <p class="section-desc"></p><p>Interactive tools for building meshes, plotting maps and investigating priors</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="plot_interactive_map.html">plot_interactive_map()</a></code> 
+        </dt>
+        <dd>Run the Shiny app for plotting raster and polygon data on a leaflet map.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mesh_builder.html">mesh_builder()</a></code> 
+        </dt>
+        <dd>Mesh building shiny app. Creates and visualises a mesh from some spatial data.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="interactive_priors.html">interactive_priors()</a></code> 
+        </dt>
+        <dd>Interactively set and see the result of different priors</dd>
+      </dl></div><div class="section level2">
+      <h2 id="parsing-model-output">Parsing model output<a class="anchor" aria-label="anchor" href="#parsing-model-output"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to help parse model output and extract useful information</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="parse_model_output.html">parse_model_output()</a></code> 
+        </dt>
+        <dd>Parse model output to create a list of model parameters</dd>
+      </dl></div><div class="section level2">
+      <h2 id="mesh-tools">Mesh tools<a class="anchor" aria-label="anchor" href="#mesh-tools"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to help with creation and investigation of meshes</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="mesh_to_spatial.html">mesh_to_spatial()</a></code> 
+        </dt>
+        <dd>Convert an INLA mesh to a SpatialPolygonsDataFrame</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mesh_checker.html">mesh_checker()</a></code> 
+        </dt>
+        <dd>Check a mesh for errors:
+<ol><li><p>A greater number of mesh nodes than observations</p></li>
+<li><p>A greater number of mesh triangles than observations</p></li>
+<li><p>Isolated triangles in mesh</p></li>
+</ol></dd>
+      </dl></div><div class="section level2">
+      <h2 id="geospatial-helpers">Geospatial helpers<a class="anchor" aria-label="anchor" href="#geospatial-helpers"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to help convert coordinates and units</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="latlong_to_utm.html">latlong_to_utm()</a></code> 
+        </dt>
+        <dd>Convert latitude and longitude to UTM coordinates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="to_dates.html">to_dates()</a></code> 
+        </dt>
+        <dd>Convert vector of date strings to Date objects</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utility-functions">Utility functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>These help us handle paths, retrieve data etc</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="get_tutorial_datapath.html">get_tutorial_datapath()</a></code> 
+        </dt>
+        <dd>Return the filepath for a tutorial data file.</dd>
       </dl><dl><dt>
           
           <code><a href="retrieve_tutorial_data.html">retrieve_tutorial_data()</a></code> 
@@ -163,11 +214,27 @@
         <dd>Retrieve a tutorial dataset and unpacks it to ~/fdmr/tutorial_data</dd>
       </dl><dl><dt>
           
-          <code><a href="to_dates.html">to_dates()</a></code> 
+          <code><a href="clear_caches.html">clear_caches()</a></code> 
         </dt>
-        <dd>Convert vector of date strings to Date objects</dd>
+        <dd>Clear both tutorial data and downloaded archive caches</dd>
+      </dl><dl><dt>
+          
+          <code><a href="require_packages.html">require_packages()</a></code> 
+        </dt>
+        <dd>Checks if packages are installed.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="load_tutorial_data.html">load_tutorial_data()</a></code> 
+        </dt>
+        <dd>Load data from the tutorial data store</dd>
+      </dl><dl><dt>
+          
+          <code><a href="numbers_only.html">numbers_only()</a></code> 
+        </dt>
+        <dd>Removes any character that isn't a letter</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
