@@ -34,6 +34,9 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/priors.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/priors_app.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/authors.html</loc>
   </url>
   <url>
@@ -64,6 +67,9 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/interactive_priors.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/latlong_to_utm.html</loc>
   </url>
   <url>
@@ -85,10 +91,22 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/numbers_only.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/parse_model_output.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/parse_model_output_bru.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_ar1.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_barchart.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_boxplot.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_dic.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_interactive_map.html</loc>
@@ -97,13 +115,25 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_line_average.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_line_comparison.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_map.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_mesh.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_priors_boxplot.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_priors_density.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_timeseries.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/priors_shiny.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/raster_mapping_app.html</loc>
