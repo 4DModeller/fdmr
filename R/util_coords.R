@@ -20,3 +20,23 @@ latlong_to_utm <- function(lat, lon) {
   # Return the UTM coordinates as a vector
   return(c(output_point@coords[, 1], output_point@coords[, 2]))
 }
+
+
+#' Check if spatial data has coordinates set using sp::coordinates()
+#' Returns TRUE if coordinates have been set
+#'
+#' @param spatial_data
+#'
+#' @return bool
+#' @export
+has_coords <- function(spatial_data) {
+  tryCatch(
+    {
+      sp::coordinates(spatial_data)
+      TRUE
+    },
+    error = function(err) {
+      FALSE
+    }
+  )
+}
