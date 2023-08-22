@@ -26,10 +26,10 @@ priors_shiny <- function(spatial_data,
                         where σ is the marginal standard deviation of the field."
 
     control_group_text <- "Temporal priors are set using alpha and PG alpha. These are passed used to create alphaprior.
-                            We use pass this to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior). This specifes that across time,
+                            We use pass this to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior). This specifies that across time,
                             the process evolves according to an AR(1) process where the prior for the autocorrelation
-                            parameter a is given by alphaprior. We define alphaprior with the prior 'pccor1' which is a PC
-                            prior for the autocorrelation parameter a where a=1 is the base model."
+                            parameter α is given by alphaprior. We define alphaprior with the prior 'pccor1' which is a PC
+                            prior for the autocorrelation parameter a where α=1 is the base model."
 
     citation_priors <- "Spatial and field prior explanation taken from https://rdrr.io/github/INBO-BMK/INLA/man/inla.spde2.pcmatern.html"
     citation_control_group <- "Prior explanation text modified from https://www.paulamoraga.com/book-geospatial/sec-geostatisticaldataexamplest.html"
