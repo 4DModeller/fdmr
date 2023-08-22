@@ -46,7 +46,10 @@ priors_shiny <- function(spatial_data,
     parameters_file <- paste0("priors_exploration_parameters_", timestamp_str, ".json")
     model_outputs_file <- paste0("priors_exploration_modelout_", timestamp_str, ".rds")
 
-
+    log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
+    if (!fs::dir_exists(log_folder)) {
+        fs::dir_create(log_folder)
+    }
 
     log_filepath <- fs::path(log_folder, log_filename)
     parameters_filepath <- fs::path(log_folder, parameters_file)
