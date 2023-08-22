@@ -13,9 +13,9 @@ priors_shiny <- function(spatial_data,
                          measurement_data,
                          time_variable,
                          mesh) {
-    requireNamespace("INLA")
-    requireNamespace("future")
-    requireNamespace("promises")
+    # requireNamespace("INLA")
+    # requireNamespace("future")
+    # requireNamespace("promises")
     future::plan(future::multisession())
 
     # Text for priors help
@@ -41,13 +41,17 @@ priors_shiny <- function(spatial_data,
     }
 
     # Logfile path
-    log_filename <- paste0("priors_exploration_data_", lubridate::format_ISO8601(lubridate::now()), ".txt")
-    log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
-    if (!fs::dir_exists(log_folder)) {
-        fs::dir_create(log_folder)
-    }
+    timestamp_str <- lubridate::format_ISO8601(lubridate::now())
+    log_filename <- paste0("priors_exploration_applog_", timestamp_str, ".txt")
+    parameters_file <- paste0("priors_exploration_parameters_", timestamp_str, ".json")
+    model_outputs_file <- paste0("priors_exploration_modelout_", timestamp_str, ".rds")
+
+
 
     log_filepath <- fs::path(log_folder, log_filename)
+    parameters_filepath <- fs::path(log_folder, parameters_file)
+    modeloutputs_filepath <- fs::path(log_folder, model_outputs_file)
+
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
     # TODO - if we modularise the Shiny apps and setup a different directory
@@ -258,7 +262,7 @@ priors_shiny <- function(spatial_data,
             promise <- promises::future_promise(
                 {
                     # Without loading INLA here we get errors
-                    requireNamespace("INLA")
+                    require("INLA")
                     inlabru::bru(formula_local,
                         data = measurement_data_local,
                         family = "poisson",
@@ -295,9 +299,13 @@ priors_shiny <- function(spatial_data,
 
                         run_label <- paste0("Run-", run_no())
                         model_vals$run_params[[run_label]] <- run_params
+
+                        write_parameters(logfile = parameters_filepath, parameters = model_vals$run_params)
+                        saveRDS(model_vals$parsed_outputs, file = modeloutputs_filepath)
                     },
                 onRejected = function(err) {
                     warning("INLA crashed with error: ", err)
+                    write_log(logfile = log_filepath, message = err)
                 }
             )
         })
