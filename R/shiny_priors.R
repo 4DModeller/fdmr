@@ -13,10 +13,12 @@ priors_shiny <- function(spatial_data,
                          measurement_data,
                          time_variable,
                          mesh) {
-    # requireNamespace("INLA")
-    # requireNamespace("future")
-    # requireNamespace("promises")
     future::plan(future::multisession())
+
+    got_coords <- has_coords(spatial_data = spatial_data)
+    if (!got_coords) {
+        stop("Please make sure you have set coordinates on spatial_data using sp::coordinates.")
+    }
 
     # Text for priors help
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
