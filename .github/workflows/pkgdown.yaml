@@ -28,16 +28,6 @@ jobs:
         with:
           use-public-rspm: true
           extra-repositories: https://inla.r-inla-download.org/R/stable
-      - name: Check INLA cache
-        id: install-inla
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.R_LIBS_USER }}/*
-          key: ${{ runner.os }}-INLA-cache
-      - name: Install INLA
-        if: steps.install-inla.outputs.cache-hit != 'true'
-        run: install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
-        shell: Rscript {0}
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
