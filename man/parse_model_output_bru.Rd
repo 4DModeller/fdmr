@@ -2,7 +2,7 @@
 % Please edit documentation in R/model_parse.R
 \name{parse_model_output_bru}
 \alias{parse_model_output_bru}
-\title{Parses inlabru::bru model output}
+\title{Parses inlabru::bru model output to create a list of model parameters}
 \usage{
 parse_model_output_bru(model_output, measurement_data)
 }
@@ -15,6 +15,6 @@ parse_model_output_bru(model_output, measurement_data)
 list
 }
 \description{
-Parses inlabru::bru model output
+Parses inlabru::bru model output to create a list of model parameters
 }
 \keyword{internal}

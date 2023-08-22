@@ -53,11 +53,11 @@ Imports:
     shinybusy,
     curl,
     promises,
-    future
+    future,
+    INLA (>= 23.4.24)
 Suggests: 
     bookdown,
     knitr,
-    INLA,
     openssl,
     pkgdown,
     rmarkdown,
@@ -66,3 +66,5 @@ Suggests:
     rcmdcheck
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Remotes:  
+    https://inla.r-inla-download.org/R/stable
