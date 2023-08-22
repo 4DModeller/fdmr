@@ -38,7 +38,7 @@ meshbuilder_shiny <- function(
 
   create_mesh <- function(location_data, max_edge, cutoff, offset, crs) {
     shiny::withProgress(message = "Creating mesh...", value = 0, {
-      INLA::inla.mesh.2d(
+      fmesher::fm_mesh_2d(
         loc = location_data,
         max.edge = max_edge,
         cutoff = cutoff,

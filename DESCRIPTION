@@ -54,7 +54,8 @@ Imports:
     curl,
     promises,
     future,
-    INLA (>= 23.4.24)
+    INLA (>= 23.4.24),
+    fmesher
 Suggests: 
     bookdown,
     knitr,
@@ -66,5 +67,5 @@ Suggests:
     rcmdcheck
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-Remotes:  
+Remotes: 
     https://inla.r-inla-download.org/R/stable
