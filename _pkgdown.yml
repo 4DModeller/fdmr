@@ -24,9 +24,9 @@ navbar:
           href: articles/hydro.html
         - test: "Priors exploration"
           href: articles/priors.html
-        - test: "Interactive priors exploration"
+        - test: "Interactive priors Shiny app"
           href: articles/priors_app.html
-        - text: "Mapping"
+        - text: "Map plotting"
           href: articles/mapping.html
         - text: "Meshing"
           href: articles/meshbuilder.html
