@@ -2,7 +2,7 @@
 % Please edit documentation in R/model_parse.R
 \name{parse_model_output}
 \alias{parse_model_output}
-\title{Parse model output}
+\title{Parse model output to create a list of model parameters}
 \usage{
 parse_model_output(model_output, measurement_data, model_type = "inlabru")
 }
@@ -17,5 +17,5 @@ parse_model_output(model_output, measurement_data, model_type = "inlabru")
 list
 }
 \description{
-Parse model output
+Parse model output to create a list of model parameters
 }

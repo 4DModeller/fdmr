@@ -536,7 +536,7 @@ We'll use the data loaded in above and some initial values for the priors and pl
 
 We'll create the same mesh as above and pass that into the app.
 
-```{r createmesh_shiny, error=TRUE}
+```{r createmesh_shiny, error=TRUE, eval=FALSE}
 initial_range <- diff(base::range(sp_data@data[, "LONG"])) / 3
 max_edge <- initial_range / 2
 

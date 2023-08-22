@@ -1,5 +1,5 @@
 ---
-title: "Data preprocessing"
+title: "Data pre-processing"
 output: 
   bookdown::html_document2:
     base_format: rmarkdown::html_vignette
@@ -7,7 +7,7 @@ output:
 bibliography: "covid.bib"
 link-citations: yes
 vignette: >
-  %\VignetteIndexEntry{Data preprocessing}
+  %\VignetteIndexEntry{Data pre-processing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

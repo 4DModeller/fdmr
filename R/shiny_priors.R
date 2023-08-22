@@ -2,8 +2,8 @@
 #'
 #' @param spatial_data Spatial data
 #' @param measurement_data Measurement data
+#' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
-#' @param inla_exposure_param Exposure parameter for family = 'poisson' passed to inlabru::bru and then to INLA::inla. Must be column in measurement data.
 #'
 #' @importFrom INLA f
 #'
@@ -11,15 +11,28 @@
 #' @keywords internal
 priors_shiny <- function(spatial_data,
                          measurement_data,
-                         mesh,
-                         prior_range = NULL,
-                         ps_range = NULL,
-                         prior_sigma = NULL,
-                         pg_sigma = NULL,
-                         prior_ar1 = NULL,
-                         pg_ar1 = NULL) {
-    require_packages(packages = "INLA")
-    loadNamespace("INLA")
+                         time_variable,
+                         mesh) {
+    # requireNamespace("INLA")
+    # requireNamespace("future")
+    # requireNamespace("promises")
+    future::plan(future::multisession())
+
+    # Text for priors help
+    prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
+                        where ρ is the spatial range of the random field."
+
+    prior_sigma_text <- "A length 2 vector, with (sigma0, Psigma) specifying that P(σ > σ_0)=p_σ,
+                        where σ is the marginal standard deviation of the field."
+
+    control_group_text <- "Temporal priors are set using alpha and PG alpha. These are passed used to create alphaprior.
+                            We use pass this to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior). This specifies that across time,
+                            the process evolves according to an AR(1) process where the prior for the autocorrelation
+                            parameter α is given by alphaprior. We define alphaprior with the prior 'pccor1' which is a PC
+                            prior for the autocorrelation parameter a where α=1 is the base model."
+
+    citation_priors <- "Spatial and field prior explanation taken from https://rdrr.io/github/INBO-BMK/INLA/man/inla.spde2.pcmatern.html"
+    citation_control_group <- "Prior explanation text modified from https://www.paulamoraga.com/book-geospatial/sec-geostatisticaldataexamplest.html"
 
     initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
     features <- names(measurement_data)
@@ -27,15 +40,36 @@ priors_shiny <- function(spatial_data,
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
     }
 
+    # Logfile path
+    timestamp_str <- lubridate::format_ISO8601(lubridate::now())
+    log_filename <- paste0("priors_exploration_applog_", timestamp_str, ".txt")
+    parameters_file <- paste0("priors_exploration_parameters_", timestamp_str, ".json")
+    model_outputs_file <- paste0("priors_exploration_modelout_", timestamp_str, ".rds")
+
+    log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
+    if (!fs::dir_exists(log_folder)) {
+        fs::dir_create(log_folder)
+    }
+
+    log_filepath <- fs::path(log_folder, log_filename)
+    parameters_filepath <- fs::path(log_folder, parameters_file)
+    modeloutputs_filepath <- fs::path(log_folder, model_outputs_file)
+
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
-    # loading_gif <- system.file("logo/4DMlogo_loading.gif", package = "fdmr")
+    # TODO - if we modularise the Shiny apps and setup a different directory
+    # structure we can remove this
+    got_internet <- curl::has_internet()
+    if (got_internet) {
+        busy_spinner <- shinybusy::add_busy_gif("https://raw.githubusercontent.com/4DModeller/logo/main/4DMlogo_loading.gif", height = 100, width = 100, position = "top-right")
+    } else {
+        busy_spinner <- shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20))
+    }
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
         # Use this function somewhere in UI
-        shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20)),
-        # shinybusy::add_busy_gif(loading_gif, height = 100, width = 100, position = "top-right"),
+        busy_spinner,
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
             shiny::sidebarPanel(
@@ -64,7 +98,7 @@ priors_shiny <- function(spatial_data,
                 shiny::sliderInput(
                     inputId = "prior_ar1",
                     label = "Alpha:",
-                    min = -1, value = -0.2, max = 1
+                    min = -1, value = -0.2, max = 1.0, step = 0.1,
                 ),
                 shiny::sliderInput(
                     inputId = "pg_ar1",
@@ -93,8 +127,11 @@ priors_shiny <- function(spatial_data,
                         "Model",
                         shiny::fluidRow(
                             shiny::h2("Model output"),
-                            shiny::textOutput(outputId = "comparison_output"),
-                            style = "height:80vh;"
+                            # shiny::conditionalPanel("output.gotoutput", shiny::h3("Hyperparameter summary")),
+                            shiny::tableOutput(outputId = "hyper_param_out"),
+                            # shiny::h3("Fixed summary"),
+                            shiny::tableOutput(outputId = "fixed_out"),
+                            style = "height:70vh;"
                         ),
                         shiny::actionButton(inputId = "run_model", label = "Run"),
                     ),
@@ -108,6 +145,21 @@ priors_shiny <- function(spatial_data,
                         "Code",
                         shiny::selectInput(inputId = "select_run", label = "Select run:", choices = c()),
                         shiny::verbatimTextOutput(outputId = "code_out")
+                    ),
+                    shiny::tabPanel(
+                        "Help",
+                        shiny::h3("Help"),
+                        shiny::h4("Spatial priors"),
+                        shiny::p(prior_range_text),
+                        shiny::h4("Field priors"),
+                        shiny::p(prior_sigma_text),
+                        shiny::h4("Temporal priors"),
+                        shiny::p(control_group_text),
+                        shiny::br(),
+                        shiny::br(),
+                        shiny::h4("Notes"),
+                        shiny::p(citation_priors),
+                        shiny::p(citation_control_group)
                     )
                 )
             ),
@@ -148,19 +200,8 @@ priors_shiny <- function(spatial_data,
             shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
         })
 
-        spde <- shiny::reactive({
-            INLA::inla.spde2.pcmatern(
-                mesh = mesh,
-                prior.range = c(input$prior_range, input$ps_range),
-                prior.sigma = c(input$prior_sigma, input$pg_sigma)
-            )
-        })
-
-        alphaprior <- shiny::reactive({
-            base::list(theta = list(
-                prior = "pccor1",
-                param = c(input$prior_ar1, input$pg_ar1)
-            ))
+        output$gotoutput <- shiny::reactive({
+            length(model_vals$model_outputs > 0)
         })
 
         formula_str <- shiny::reactive({
@@ -178,80 +219,123 @@ priors_shiny <- function(spatial_data,
 
             f_func <- "f(
                 main = coordinates,
-                model = spde(),
+                model = spde,
                 group = group_index,
                 ngroup = n_groups,
                 control.group = list(
                     model = 'ar1',
-                    hyper = alphaprior())
+                    hyper = alphaprior)
                 )"
 
             if (input$f_func) {
                 eval_str <- paste(eval_str, " + ", f_func)
             }
 
-            return(eval_str)
+            eval_str
         })
+
+        inla_formula <- shiny::reactive({
+            group_index <- measurement_data[[time_variable]]
+            n_groups <- length(unique(group_index))
+
+            spde <- INLA::inla.spde2.pcmatern(
+                mesh = mesh,
+                prior.range = c(input$prior_range, input$ps_range),
+                prior.sigma = c(input$prior_sigma, input$pg_sigma)
+            )
+
+            alphaprior <- list(theta = list(
+                prior = "pccor1",
+                param = c(input$prior_ar1, input$pg_ar1)
+            ))
+
+            eval(parse(text = formula_str()))
+        })
+
 
         output$final_equation <- shiny::renderText({
             formula_str()
         })
 
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
-            # TODO - what would be the best way of creating these?
-            group_index <- measurement_data$week
-            n_groups <- length(unique(measurement_data$week))
+            exposure_param_local <- input$exposure_param
+            formula_local <- inla_formula()
+            measurement_data_local <- measurement_data
 
-            formula <- eval(parse(text = formula_str()))
-
-            tryCatch(
-                expr = {
-                    model_output <- inlabru::bru(formula,
-                        data = measurement_data,
+            promise <- promises::future_promise(
+                {
+                    # Without loading INLA here we get errors
+                    require("INLA")
+                    inlabru::bru(formula_local,
+                        data = measurement_data_local,
                         family = "poisson",
-                        E = measurement_data[[input$exposure_param]],
+                        E = measurement_data_local[[exposure_param_local]],
                         control.family = list(link = "log"),
                         options = list(
                             verbose = FALSE
                         )
                     )
-
-                    run_no(run_no() + 1)
-                    model_vals$model_outputs[[run_no()]] <- model_output
-                    model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
-                        model_output = model_output,
-                        measurement_data = measurement_data
-                    )
-
-                    # Save the model run parameters
-                    run_params <- list(
-                        "prior_range" = input$prior_range,
-                        "ps_range" = input$ps_range,
-                        "prior_sigma" = input$prior_sigma,
-                        "pg_sigma" = input$pg_sigma,
-                        "prior_ar1" = input$prior_ar1,
-                        "pg_ar1" = input$pg_ar1
-                    )
-
-                    run_label <- paste0("Run-", run_no())
-                    model_vals$run_params[[run_label]] <- run_params
                 },
-                error = function(e) {
-                    # TODO - write to logfile
-                    status_value("INLA Error, check log.")
+                seed = TRUE
+            )
+
+            promises::then(promise,
+                onFulfilled =
+                    function(model_output) {
+                        # Run the model
+                        run_no(run_no() + 1)
+                        model_vals$model_outputs[[run_no()]] <- model_output
+                        model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
+                            model_output = model_output,
+                            measurement_data = measurement_data
+                        )
+
+                        # Save the model run parameters
+                        run_params <- list(
+                            "prior_range" = input$prior_range,
+                            "ps_range" = input$ps_range,
+                            "prior_sigma" = input$prior_sigma,
+                            "pg_sigma" = input$pg_sigma,
+                            "prior_ar1" = input$prior_ar1,
+                            "pg_ar1" = input$pg_ar1
+                        )
+
+                        run_label <- paste0("Run-", run_no())
+                        model_vals$run_params[[run_label]] <- run_params
+
+                        write_parameters(logfile = parameters_filepath, parameters = model_vals$run_params)
+                        saveRDS(model_vals$parsed_outputs, file = modeloutputs_filepath)
+                    },
+                onRejected = function(err) {
+                    warning("INLA crashed with error: ", err)
+                    write_log(logfile = log_filepath, message = err)
                 }
             )
         })
 
-        output$comparison_output <- shiny::renderPrint({
-            if (length(model_vals$model_outputs) == 0) {
-                "No model output."
-            } else {
-                # TODO - improve this output, some kind of table format for the parsed values?
-                paste("We have ", run_no(), " successful model runs.")
-                # model_vals$parsed_outputs
-            }
-        })
+        output$hyper_param_out <- shiny::renderTable(
+            {
+                if (length(model_vals$model_outputs) == 0) {
+                    return()
+                } else {
+                    last_run <- model_vals$model_outputs[[length(model_vals$model_outputs)]]
+                    last_run$summary.hyperpar
+                }
+            },
+            rownames = TRUE
+        )
+
+        output$fixed_out <- shiny::renderTable(
+            {
+                if (length(model_vals$model_outputs) == 0) {
+                    return()
+                } else {
+                    last_run <- model_vals$model_outputs[[length(model_vals$model_outputs)]]
+                    last_run$summary.fixed
+                }
+            },
+            rownames = TRUE
+        )
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
             if (length(model_vals$parsed_outputs) == 0) {
@@ -333,108 +417,11 @@ priors_shiny <- function(spatial_data,
 #'
 #' @param spatial_data Spatial data
 #' @param measurement_data Measurement data
+#' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
 #'
 #' @return shiny::app
 #' @export
-interactive_priors <- function(spatial_data, measurement_data, mesh = NULL) {
-    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, mesh = mesh))
-}
-
-#' Plot line comparison for stdev etc
-#'
-#' @param data Parsed model output
-#' @param to_plot Type of data to plot, "Range for f" etc
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_line_comparison <- function(data, to_plot, title) {
-    ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars[[to_plot]]))
-    single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
-    if (nrow(single_df) == 0) {
-        return("No pars data.")
-    }
-
-    ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
-        ggplot2::geom_line() +
-        ggplot2::ggtitle(title) +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
-}
-
-
-#' Plot AR(1)
-#'
-#' @param data Parsed model output
-#' @param to_plot Type of data to plot, "Range for f" etc
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_ar1 <- function(data) {
-    ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars$`GroupRho for f`))
-    single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
-    if (nrow(single_df) == 0) {
-        return("No pars data.")
-    }
-
-    ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
-        ggplot2::geom_line() +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
-}
-
-#' Create boxplots from priors run data
-#'
-#' @param data
-#'
-#' @return graphics::boxplot
-#' @keywords internal
-plot_priors_boxplot <- function(data) {
-    # TODO - I'm sure this can be done in a nicer functional way
-    fitted_mean_post <- purrr::map(data, function(x) x$fitted_mean_post)
-    names(fitted_mean_post) <- purrr::map(seq(1, length(data)), function(x) paste("Run", x))
-
-    post_rate <- cbind.data.frame(fitted_mean_post)
-    graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Rate estimates")
-}
-
-#' Plot density function
-#'
-#'
-#' @param data Parsed model outputs
-#' @param measurement_data Measurement data
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_priors_density <- function(data, measurement_data) {
-    # Can this be done in a cleaner way? Just create a dataframe from the lists?
-    rate_estimates <- unlist(purrr::map(data, function(x) x$fitted_mean_post))
-    run_strings <- unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x)))
-
-    post_rate <- base::cbind.data.frame(
-        "Prior scenario" = rep(run_strings, each = nrow(measurement_data)),
-        "Rate estimates" = rate_estimates
-    )
-
-    ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
-        ggplot2::geom_density() +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
-}
-
-
-#' Plot Deviance Information Criterion (DIC) values
-#'
-#' @param data
-#'
-#' @return ggplot2::ggplot
-#' @keywords internal
-plot_dic <- function(data) {
-    infocri <- base::cbind.data.frame(
-        priors = unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x))),
-        DIC = unlist(purrr::map(data, function(x) x$dic))
-    )
-
-    infocri$priors <- base::as.factor(infocri$priors)
-
-    ggplot2::ggplot(infocri, ggplot2::aes(x = priors, y = DIC)) +
-        ggplot2::geom_point() +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))
+interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh) {
+    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh))
 }
