@@ -1,8 +1,8 @@
 ---
-title: "Interactive priors exploration"
+title: "Interactive priors Shiny app"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Priors Shiny App}
+  %\VignetteIndexEntry{Interactive priors Shiny app}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -70,7 +70,7 @@ We will use the function `bru()` of package `inlabru` to fit the model. `bru` ex
 sp::coordinates(covid19_data) <- c("LONG", "LAT")
 ```
 
-# Use the Explore Priors Shiny app
+# Use the Interactive Priors Shiny app
 
 Now we have the filtered data we are ready to pass in the spatial 
 
@@ -87,4 +87,4 @@ The outputs of the model run by the app can be viewed in the `fdmr/logs` folder 
 
 1. `priors_exploration_applog_timestamp.txt` - holds general logging information and errors
 2. `priors_exploration_parameters_timestamp.json` - holds the priors used in each model run
-3. `priors_exploration_modelout_timestamp.rds` - holds the model output for each
+3. `priors_exploration_modelout_timestamp.rds` - holds the model output for each run
