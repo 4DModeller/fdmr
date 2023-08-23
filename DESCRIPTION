@@ -67,3 +67,4 @@ Suggests:
     rcmdcheck
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+
