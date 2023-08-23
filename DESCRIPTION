@@ -55,7 +55,7 @@ Imports:
     shinybusy,
     curl,
     promises,
-    future
+    fmesher
 Suggests: 
     bookdown,
     knitr,
