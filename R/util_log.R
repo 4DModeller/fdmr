@@ -9,7 +9,14 @@ write_log <- function(filepath, message) {
   filepath <- ensure_filepath_writable(filepath)
   exists <- fs::file_exists(filepath)
   message <- paste0("[", lubridate::format_ISO8601(lubridate::now()), "] - ", message, "\n")
-  cat(message, file = filepath, append = exists)
+  tryCatch(
+    expr = {
+      cat(message, file = filepath, append = exists)
+    },
+    error = function(cond) {
+      warning("Unable to write log to file ", cond)
+    }
+  )
 }
 
 
@@ -22,7 +29,14 @@ write_log <- function(filepath, message) {
 #' @keywords internal
 write_parameters <- function(filepath, parameters) {
   filepath <- ensure_filepath_writable(filepath)
-  write(jsonlite::toJSON(parameters), file = filepath)
+  tryCatch(
+    expr = {
+      write(jsonlite::toJSON(parameters), file = filepath)
+    },
+    error = function(cond) {
+      warning("Unable to parameters to file ", cond)
+    }
+  )
 }
 
 #' Checks if we can write to the given filepath
