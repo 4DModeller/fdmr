@@ -305,12 +305,12 @@ priors_shiny <- function(spatial_data,
                         run_label <- paste0("Run-", run_no())
                         model_vals$run_params[[run_label]] <- run_params
 
-                        write_parameters(logfile = parameters_filepath, parameters = model_vals$run_params)
+                        write_parameters(filepath = parameters_filepath, parameters = model_vals$run_params)
                         saveRDS(model_vals$parsed_outputs, file = modeloutputs_filepath)
                     },
                 onRejected = function(err) {
                     warning("INLA crashed with error: ", err)
-                    write_log(logfile = log_filepath, message = err)
+                    write_log(filepath = log_filepath, message = err)
                 }
             )
         })
