@@ -1,6 +1,6 @@
 #' Mesh building shiny app
 #'
-#' @param spatial_data Spatial data
+#' @param spatial_data a data.frame or tibble containing spatial data
 #' @param data Observations data, for use with the check_mesh functionality
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
@@ -20,8 +20,13 @@ meshbuilder_shiny <- function(
     max_edge = NULL,
     offset = NULL,
     cutoff = NULL,
+    plot_poly = FALSE,
     latitude_column = "LAT",
     longitude_column = "LONG") {
+  if (!is.data.frame(spatial_data)) {
+    stop("spatial_data must be a data.frame or tibble containing columns with latitude and longitude data.")
+  }
+
   default_max_edge <- c(0.1, 0.3)
   default_offset <- c(0.2, 0.7)
   default_cutoff <- 0.2
@@ -29,6 +34,29 @@ meshbuilder_shiny <- function(
   if (is.null(max_edge)) max_edge <- default_max_edge
   if (is.null(offset)) offset <- default_offset
   if (is.null(cutoff)) cutoff <- default_cutoff
+
+  # plot_poly <- FALSE
+  # plot_points <- FALSE
+  # We
+  # spatial_points <- NULL
+  # Do some checks to see what kind of data we have
+  # If we have a SpatialPolygonsDataFrame, we can plot the polygons
+  # otherwise if we just have SpatialPoints we can plot the points
+  # otherwise we don't plot anything
+  # if (class(spatial_data) == "SpatialPolygonsDataFrame") {
+  #   plot_poly <- TRUE
+  #   plot_points <- FALSE
+  # } else {
+  #   # Try and create some points from the dataframe
+  #   spatial_points <- spatial_data[, c(longitude_column, longitude_column)]
+  #   names(spatial_points) <- c("LONG", "LAT")
+  #   spatial_points <- sp::SpatialPoints(
+  #     coords = spatial_points,
+  #     proj4string = sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+  #   )
+  # }
+
+
 
   # TODO - should we enforce these?
   max_n_mesh <- c(48000, 16000)
@@ -41,7 +69,7 @@ meshbuilder_shiny <- function(
         max.edge = max_edge,
         cutoff = cutoff,
         offset = offset,
-        crs = crs,
+        # crs = crs,
         # max.n = c(48000, 16000),
         # max.n.strict = c(128000, 128000)
       )
@@ -55,8 +83,7 @@ meshbuilder_shiny <- function(
     }
   }
 
-  # TODO - make this a bit more intelligent so we can handle differently named position data
-  got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data@data))
+  got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data))
   if (!got_lat_long) {
     stop("Cannot read latitude and longitude data from spatial data.")
   }
@@ -70,7 +97,7 @@ meshbuilder_shiny <- function(
   # lat_max <- extent@ymax
 
   # Let's extract the data we want to create the mesh
-  location_data <- spatial_data@data[, c("LONG", "LAT")]
+  location_data <- spatial_data[, c(longitude_column, latitude_column)]
 
   # loc: the spatial locations of data points
   # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
@@ -140,16 +167,22 @@ meshbuilder_shiny <- function(
     )
 
     output$map <- leaflet::renderLeaflet({
-      leaflet::leaflet() %>%
-        leaflet::addTiles(group = "OSM") %>%
-        leaflet::addPolygons(data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh") %>%
-        leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial") %>%
-        leaflet::addLayersControl(
-          position = "topright",
-          baseGroups = c("OSM"),
-          overlayGroups = c("Mesh", "Spatial"),
-          options = leaflet::layersControlOptions(collapsed = FALSE)
-        )
+      m <- leaflet::leaflet()
+      m <- leaflet::addTiles(m, group = "OSM")
+      m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
+      if (plot_poly) {
+        m <- leaflet::addPolygons(m, data = spatial_data, lat = latitude_column, lng = longitude_column, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
+      }
+      # else if (plot_points) {
+      #   m <- leaflet::addCircles(m, data = spatial_data_points)
+      # }
+
+      m <- leaflet::addLayersControl(m,
+        position = "topright",
+        baseGroups = c("OSM"),
+        overlayGroups = c("Mesh", "Spatial"),
+        options = leaflet::layersControlOptions(collapsed = FALSE)
+      )
     })
 
     output$mesh_code <- shiny::reactive(
