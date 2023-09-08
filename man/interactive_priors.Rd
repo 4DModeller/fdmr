@@ -4,7 +4,13 @@
 \alias{interactive_priors}
 \title{Interactively set and see the result of different priors}
 \usage{
-interactive_priors(spatial_data, measurement_data, time_variable, mesh)
+interactive_priors(
+  spatial_data,
+  measurement_data,
+  time_variable,
+  mesh,
+  log_folder = NULL
+)
 }
 \arguments{
 \item{spatial_data}{Spatial data}
@@ -14,6 +20,8 @@ interactive_priors(spatial_data, measurement_data, time_variable, mesh)
 \item{time_variable}{Time variable in measurement_data}
 
 \item{mesh}{INLA mesh}
+
+\item{log_folder}{Folder to write logs to}
 }
 \value{
 shiny::app

@@ -77,6 +77,8 @@ Now we have the filtered data we are ready to pass in the spatial
 First start by selecting the variable to model. In this example we'll select `cases`, then select the features to add to the formula. At the bottom of the window you'll see the formula being constructed.
 Click on the checkboxes to select your formula and then click the `Run Model` button to run the model see it's output plot on the right of the window.
 
+> **_NOTE:_**  By default the app will write out parameter sets and logs to the `fdmr/logs` directory in your home folder. If you want these logs to be written to a different folder, you can pass in the folder path to the `log_folder` argument.
+
 ```{r eval=FALSE}
 fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh=mesh, time_variable="week")
 ```
