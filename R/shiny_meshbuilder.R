@@ -1,9 +1,3 @@
-# This app is partly based on the meshbuilder tool from r-inla
-# Code for that app can be found here:
-# https://github.com/hrue/r-inla/blob/Version_23.05.22/rinla/R/meshbuilder.R
-
-
-
 #' Mesh building shiny app
 #'
 #' @param spatial_data Spatial data
@@ -78,7 +72,6 @@ meshbuilder_shiny <- function(
   # Let's extract the data we want to create the mesh
   location_data <- spatial_data@data[, c("LONG", "LAT")]
 
- 
   # loc: the spatial locations of data points
   # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
   # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
