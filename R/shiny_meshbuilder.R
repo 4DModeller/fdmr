@@ -12,6 +12,8 @@
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d
 #' @param cutoff The minimum allowed distance between points, passed to inla.mesh.2d
+#' @param latitude_column Name of the latitude column in the spatial data
+#' @param longitude_column Name of the longitude column in the spatial data
 #'
 #' @importFrom magrittr %>%
 #'
@@ -23,7 +25,9 @@ meshbuilder_shiny <- function(
     crs = NULL,
     max_edge = NULL,
     offset = NULL,
-    cutoff = NULL) {
+    cutoff = NULL,
+    latitude_column = "LAT",
+    longitude_column = "LONG") {
   default_max_edge <- c(0.1, 0.3)
   default_offset <- c(0.2, 0.7)
   default_cutoff <- 0.2
@@ -58,7 +62,7 @@ meshbuilder_shiny <- function(
   }
 
   # TODO - make this a bit more intelligent so we can handle differently named position data
-  got_lat_long <- all(c("LONG", "LAT") %in% names(spatial_data@data))
+  got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data@data))
   if (!got_lat_long) {
     stop("Cannot read latitude and longitude data from spatial data.")
   }
@@ -74,25 +78,7 @@ meshbuilder_shiny <- function(
   # Let's extract the data we want to create the mesh
   location_data <- spatial_data@data[, c("LONG", "LAT")]
 
-  # tryCatch(
-  #   {
-  #     location_data <- spatial_data@data[, c("LONG", "LAT")]
-  #   },
-  #   error = function(err) {
-  #     location_data <- NULL
-  #   }
-  # )
-
-  # if (is.null(location_data)) {
-  #   tryCatch(
-  #     {
-  #       location_data <- spatial_data[, c("LONG", "LAT")]
-  #     },
-  #     error = function(err) {
-  #       stop("Cannot read location data from spatial data. Please make sure it has LONG and LAT columns.")
-  #     }
-  #   )
-  # }
+ 
   # loc: the spatial locations of data points
   # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
   # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
@@ -136,18 +122,6 @@ meshbuilder_shiny <- function(
 
   # Define server logic required to draw a histogram
   server <- function(input, output, session) {
-    # mesh_1 <- shiny::reactive({
-    #   if (input$auto_plot) {
-    #     create_mesh(
-    #       location_data,
-    #       input$max_edge,
-    #       input$cutoff,
-    #       input$offset,
-    #       crs
-    #     )
-    #   }
-    # })
-
     shiny::observeEvent(input$reset_mesh, {
       shiny::updateSliderInput(session, inputId = "max_edge", value = default_max_edge)
       shiny::updateSliderInput(session, inputId = "offset", value = default_offset)
@@ -173,8 +147,6 @@ meshbuilder_shiny <- function(
     )
 
     output$map <- leaflet::renderLeaflet({
-      # mesh <- if (input$auto_plot) mesh_1() else mesh_2()
-      # mesh <- mesh_2()
       leaflet::leaflet() %>%
         leaflet::addTiles(group = "OSM") %>%
         leaflet::addPolygons(data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh") %>%
@@ -186,18 +158,6 @@ meshbuilder_shiny <- function(
           options = leaflet::layersControlOptions(collapsed = FALSE)
         )
     })
-
-    # output$map <- leaflet::renderLeaflet({
-    #   leaflet::leaflet(mesh_spatial()) %>%
-    #     leaflet::addTiles() %>%
-    #     leaflet::addPolygons(weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca") %>%
-    #     leaflet::addPolygons(data = spatial_data, fillColor = "#d66363", color = "green", weight = 1)
-    # })
-
-    # shiny::observe({
-    #   leaflet::leafletProxy("map") %>%
-
-    # })
 
     output$mesh_code <- shiny::reactive(
       paste0(
@@ -241,16 +201,20 @@ meshbuilder_shiny <- function(
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d
 #' @param cutoff The minimum allowed distance between points, passed to inla.mesh.2d
+#' @param latitude_column Name of the latitude column in the spatial data
+#' @param longitude_column Name of the longitude column in the spatial data
 #'
 #' @return shiny::app
 #' @export
-mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL) {
+mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL, latitude_column = "LAT", longitude_column = "LONG") {
   shiny::runApp(meshbuilder_shiny(
     spatial_data = spatial_data,
     obs_data = obs_data,
     crs = crs,
     max_edge = max_edge,
     offset = offset,
-    cutoff = cutoff
+    cutoff = cutoff,
+    latitude_column = latitude_column,
+    longitude_column = longitude_column
   ))
 }
