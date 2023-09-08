@@ -51,25 +51,22 @@ priors_shiny <- function(spatial_data,
     model_outputs_file <- paste0("priors_exploration_modelout_", timestamp_str, ".rds")
 
     write_logs <- TRUE
-    if (log_folder == NULL) {
+    if (is.null(log_folder)) {
         log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
-        if (!fs::dir_exists(log_folder)) {
-            fs::dir_create(log_folder)
-        }
 
-        # Can we just check we can write to the folder here?
         if (!as.numeric(file.access(log_folder)) == 0) {
             tmpdir <- get_tmpdir()
             log_folder <- fs::path(tmpdir, "fdmr", "logs")
-            if (!fs::dir_exists(log_folder)) {
-                fs::dir_create(log_folder)
-            }
 
             if (!as.numeric(file.access(log_folder)) == 0) {
                 warning("We are unable to find a folder to write logs to, please pass a folder path to log_folder")
                 write_logs <- FALSE
             }
         }
+    }
+
+    if (!fs::dir_exists(log_folder)) {
+        fs::dir_create(log_folder)
     }
 
     cat("We will write log files to ", log_folder)
