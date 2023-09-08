@@ -6,7 +6,6 @@
 #' @return NULL
 #' @keywords internal
 write_log <- function(filepath, message) {
-  filepath <- ensure_filepath_writable(filepath)
   exists <- fs::file_exists(filepath)
   message <- paste0("[", lubridate::format_ISO8601(lubridate::now()), "] - ", message, "\n")
   tryCatch(
@@ -15,6 +14,27 @@ write_log <- function(filepath, message) {
     },
     error = function(cond) {
       warning("Unable to write log to file ", cond)
+    }
+  )
+}
+
+#' A thin wrapper to write to an RDS file but also
+#' checks to make sure we can write out to the filepath
+#'
+#' @param filepath Path to log
+#' @param data Data to write
+#' @param compress Compress the data
+#'
+#'
+#' @return NULL
+#' @keywords internal
+write_rds <- function(filepath, data, compress = TRUE) {
+  tryCatch(
+    expr = {
+      saveRDS(data, filepath, compress = compress)
+    },
+    error = function(cond) {
+      warning("Unable to write rds file ", cond)
     }
   )
 }
@@ -28,7 +48,6 @@ write_log <- function(filepath, message) {
 #' @return NULL
 #' @keywords internal
 write_parameters <- function(filepath, parameters) {
-  filepath <- ensure_filepath_writable(filepath)
   tryCatch(
     expr = {
       write(jsonlite::toJSON(parameters), file = filepath)
@@ -37,22 +56,4 @@ write_parameters <- function(filepath, parameters) {
       warning("Unable to parameters to file ", cond)
     }
   )
-}
-
-#' Checks if we can write to the given filepath
-#' and if we can't updates it to use the system
-#' temporary directory
-#'
-#' @param filepath Path to file
-
-#' @return fs::path
-#' @keywords internal
-ensure_filepath_writable <- function(filepath) {
-  if (!as.numeric(file.access(filepath)) == 0) {
-    filename <- fs::path_file(filepath)
-    warning("Unable to write to ", filepath)
-    filepath <- fs::path(get_tmpdir(), filename)
-    warning("Updating path to ", filepath)
-  }
-  filepath
 }
