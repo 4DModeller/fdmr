@@ -29,7 +29,7 @@ meshbuilder_shiny <- function(
   # Check we don't have any NAs in our spatial data
   if (sum(is.na(spatial_data)) > 0) {
     warning("spatial_data contains NA values, removing them.")
-    spatial_data <- spatial_data[stats::complete.cases(spatial_data), ]
+    spatial_data <- na.omit(spatial_data)
   }
 
   # Do a quick check on the spatial data to see how long it'll take to create a mesh
