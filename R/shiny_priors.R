@@ -69,6 +69,7 @@ priors_shiny <- function(spatial_data,
         fs::dir_create(log_folder)
     }
 
+    log_folder <- fs::path_expand(log_folder)
     cat("We will write log files to ", log_folder)
 
     log_filepath <- fs::path(log_folder, log_filename)
