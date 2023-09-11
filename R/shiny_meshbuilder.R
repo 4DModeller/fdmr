@@ -26,6 +26,14 @@ meshbuilder_shiny <- function(
   if (!is.data.frame(spatial_data)) {
     stop("spatial_data must be a data.frame or tibble containing columns with latitude and longitude data.")
   }
+  # Check we don't have any NAs in our spatial data
+  if (sum(is.na(spatial_data)) > 0) {
+    warning("spatial_data contains NA values, removing them.")
+    spatial_data <- spatial_data[stats::complete.cases(spatial_data), ]
+  }
+
+  # Do a quick check on the spatial data to see how long it'll take to create a mesh
+  # TODO - Do we need to check the obs data as well?
 
   default_max_edge <- c(0.1, 0.3)
   default_offset <- c(0.2, 0.7)
@@ -49,7 +57,7 @@ meshbuilder_shiny <- function(
 
   got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data))
   if (!got_lat_long) {
-    stop("Cannot read latitude and longitude data from spatial data.")
+    stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
 
   # Make sure we have our own internal correctly formatted version of the data
