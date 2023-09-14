@@ -32,6 +32,9 @@ meshbuilder_shiny <- function(
     spatial_data <- na.omit(spatial_data)
   }
 
+  # The number of nodes we count as being a big mesh
+  n_nodes_big_mesh <- 10000
+
   # Do a quick check on the spatial data to see how long it'll take to create a mesh
   # TODO - Do we need to check the obs data as well?
 
@@ -86,6 +89,11 @@ meshbuilder_shiny <- function(
     )
   }
 
+  # If we have a big mesh we'll display a modal to the user
+  # once so they know the app might be a bit slow and it hasn't just
+  # crashed
+  mesh_warning_displayed <- FALSE
+
   # loc: the spatial locations of data points
   # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
   # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
@@ -134,17 +142,30 @@ meshbuilder_shiny <- function(
       shiny::updateSliderInput(session, inputId = "cutoff", value = default_cutoff)
     })
 
+    warning("Number of mesh nodes: , ", mesh()$n)
     mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
       shiny::withProgress(message = "Creating mesh...", value = 0, {
-        fmesher::fm_mesh_2d(
+        mesh <- fmesher::fm_mesh_2d(
           loc = coords_only,
           max.edge = input$max_edge,
           cutoff = input$cutoff,
           offset = input$offset,
           crs = crs,
         )
+        # if (!mesh_warning_displayed && mesh$n > n_nodes_big_mesh) {
+        #   shiny::showModal(shiny::modalDialog(
+        #     "Mesh is large, plotting may be slow.",
+        #     title = "Mesh warning",
+        #     easyClose = TRUE,
+        #     footer = NULL
+        #   ))
+        #   mesh_warning_displayed <- TRUE
+        # }
+        mesh
       })
     })
+
+    
 
     mesh_spatial <- shiny::reactive(
       suppressMessages(
@@ -161,7 +182,7 @@ meshbuilder_shiny <- function(
       if (plot_polygons) {
         m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
       } else if (plot_points) {
-        m <- leaflet::addCircles(m, data = spatial_points, group = "Spatial", fillColor = "#b9220b")
+        m <- leaflet::addCircles(m, data = spatial_points, group = "Spatial", fillColor = "#b9220b", color = "#b9220b")
       }
 
       m <- leaflet::addLayersControl(m,
