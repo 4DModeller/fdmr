@@ -94,12 +94,11 @@ meshbuilder_shiny <- function(
   # crashed
   mesh_warning_displayed <- FALSE
 
-  # loc: the spatial locations of data points
-  # max.edge: it determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
-  # or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect.
-  # offset: it specifies the size of the inner and outer extensions around the data locations.
-  # cutoff: it defines the minimum allowed distance between data points.
+  busy_spinner <- get_busy_spinner()
+
   ui <- shiny::fluidPage(
+    busy_spinner,
+    shiny::headerPanel(title = "Creating a mesh"),
     shiny::sidebarLayout(
       shiny::sidebarPanel(
         shiny::sliderInput(
@@ -128,7 +127,18 @@ meshbuilder_shiny <- function(
         shiny::tabsetPanel(
           type = "tabs",
           shiny::tabPanel("Plot", leaflet::leafletOutput("map", height = "80vh")),
-          shiny::tabPanel("Code", shiny::verbatimTextOutput("mesh_code"))
+          shiny::tabPanel("Code", shiny::verbatimTextOutput("mesh_code")),
+          shiny::tabPanel(
+            "Help",
+            shiny::h3("Help"),
+            shiny::h4("Max edge"),
+            shiny::p("Determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
+                      or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect."),
+            shiny::h4("Offset"),
+            shiny::p("Specifies the size of the inner and outer extensions around data locations."),
+            shiny::h4("Cutoff"),
+            shiny::p("Minimum allowed distance between data points."),
+          )
         )
       )
     )
@@ -144,23 +154,13 @@ meshbuilder_shiny <- function(
 
     mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
       shiny::withProgress(message = "Creating mesh...", value = 0, {
-        mesh <- fmesher::fm_mesh_2d(
+        fmesher::fm_mesh_2d_inla(
           loc = coords_only,
           max.edge = input$max_edge,
           cutoff = input$cutoff,
           offset = input$offset,
           crs = crs,
         )
-        # if (!mesh_warning_displayed && mesh$n > n_nodes_big_mesh) {
-        #   shiny::showModal(shiny::modalDialog(
-        #     "Mesh is large, plotting may be slow.",
-        #     title = "Mesh warning",
-        #     easyClose = TRUE,
-        #     footer = NULL
-        #   ))
-        #   mesh_warning_displayed <- TRUE
-        # }
-        mesh
       })
     })
 
