@@ -9,6 +9,13 @@ vignette: >
 
 Here we'll cover building a mesh from some spatial data, modifying its parameters and plotting it and the data on an interactive map.
 
+## Load in spatial data
+
+To load data into the mesh builder we need to make sure it's in the correct format. We require latitude and longitude data
+for each area in the spatial data. This can be in the form of a `SpatialPolygonsDataFrame` or a `SpatialPointsDataFrame`.
+
+
+
 We'll first load in some spatial data to create the mesh. This is the same data we previously used in the COVID-19 tutorial.
 
 ```{r eval=FALSE}

@@ -23,28 +23,17 @@ meshbuilder_shiny <- function(
     plot_poly = FALSE,
     latitude_column = "LAT",
     longitude_column = "LONG") {
-  if (!is.data.frame(spatial_data)) {
+  if (!is.data.frame(spatial_data) && !is(spatial_data, "SpatialPolygonsDataFrame") && !is(spatial_data, "SpatialPointsDataFrame")) {
     stop("spatial_data must be a data.frame or tibble containing columns with latitude and longitude data.")
   }
-  # Check we don't have any NAs in our spatial data
-  if (sum(is.na(spatial_data)) > 0) {
-    warning("spatial_data contains NA values, removing them.")
-    spatial_data <- na.omit(spatial_data)
+
+  if (is.data.frame(spatial_data)) {
+    # Check we don't have any NAs in our spatial data
+    if (sum(is.na(spatial_data)) > 0) {
+      warning("spatial_data contains NA values, removing them.")
+      spatial_data <- na.omit(spatial_data)
+    }
   }
-
-  # The number of nodes we count as being a big mesh
-  n_nodes_big_mesh <- 10000
-
-  # Do a quick check on the spatial data to see how long it'll take to create a mesh
-  # TODO - Do we need to check the obs data as well?
-
-  default_max_edge <- c(0.1, 0.3)
-  default_offset <- c(0.2, 0.7)
-  default_cutoff <- 0.2
-  # TODO - these defaults need changing?
-  if (is.null(max_edge)) max_edge <- default_max_edge
-  if (is.null(offset)) offset <- default_offset
-  if (is.null(cutoff)) cutoff <- default_cutoff
 
   if (is.null(crs)) {
     crs <- sf::st_crs(spatial_data)
@@ -63,6 +52,17 @@ meshbuilder_shiny <- function(
     stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
 
+  # The number of nodes we count as being a big mesh
+  n_nodes_big_mesh <- 10000
+
+  default_max_edge <- c(0.1, 0.3)
+  default_offset <- c(0.2, 0.7)
+  default_cutoff <- 0.2
+  # TODO - these defaults need changing?
+  if (is.null(max_edge)) max_edge <- default_max_edge
+  if (is.null(offset)) offset <- default_offset
+  if (is.null(cutoff)) cutoff <- default_cutoff
+
   # Make sure we have our own internal correctly formatted version of the data
   coords_only <- spatial_data[, c(longitude_column, latitude_column)]
   names(coords_only) <- c("LONG", "LAT")
@@ -76,10 +76,8 @@ meshbuilder_shiny <- function(
   # otherwise if we just have SpatialPoints we can plot the points
   # otherwise we don't plot anything
   if (class(spatial_data) == "SpatialPolygonsDataFrame") {
-    plot_poly <- TRUE
-    plot_points <- FALSE
+    plot_polygons <- TRUE
   } else {
-    plot_poly <- FALSE
     plot_points <- TRUE
 
     spatial_points <- sp::SpatialPointsDataFrame(
@@ -89,18 +87,13 @@ meshbuilder_shiny <- function(
     )
   }
 
-  # If we have a big mesh we'll display a modal to the user
-  # once so they know the app might be a bit slow and it hasn't just
-  # crashed
-  mesh_warning_displayed <- FALSE
-
   busy_spinner <- get_busy_spinner()
 
   ui <- shiny::fluidPage(
     busy_spinner,
     shinybusy::add_loading_state(
       "#map",
-      timeout = 3000,
+      timeout = 600,
       text = "Calculating mesh...",
       svgColor = "steelblue"
     ),
@@ -155,8 +148,6 @@ meshbuilder_shiny <- function(
 
   # Define server logic required to draw a histogram
   server <- function(input, output, session) {
-    # modal_shown <- shiny::reactiveVal(FALSE)
-
     shiny::observeEvent(input$reset_mesh, {
       shiny::updateSliderInput(session, inputId = "max_edge", value = default_max_edge)
       shiny::updateSliderInput(session, inputId = "offset", value = default_offset)
