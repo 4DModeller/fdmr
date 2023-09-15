@@ -98,6 +98,12 @@ meshbuilder_shiny <- function(
 
   ui <- shiny::fluidPage(
     busy_spinner,
+    shinybusy::add_loading_state(
+      "#map",
+      timeout = 3000,
+      text = "Calculating mesh...",
+      svgColor = "steelblue"
+    ),
     shiny::headerPanel(title = "Creating a mesh"),
     shiny::sidebarLayout(
       shiny::sidebarPanel(
@@ -126,7 +132,10 @@ meshbuilder_shiny <- function(
       shiny::mainPanel(
         shiny::tabsetPanel(
           type = "tabs",
-          shiny::tabPanel("Plot", leaflet::leafletOutput("map", height = "80vh")),
+          shiny::tabPanel(
+            "Plot",
+            shiny::div(id = "map_div", leaflet::leafletOutput("map", height = "80vh"))
+          ),
           shiny::tabPanel("Code", shiny::verbatimTextOutput("mesh_code")),
           shiny::tabPanel(
             "Help",
@@ -146,6 +155,8 @@ meshbuilder_shiny <- function(
 
   # Define server logic required to draw a histogram
   server <- function(input, output, session) {
+    # modal_shown <- shiny::reactiveVal(FALSE)
+
     shiny::observeEvent(input$reset_mesh, {
       shiny::updateSliderInput(session, inputId = "max_edge", value = default_max_edge)
       shiny::updateSliderInput(session, inputId = "offset", value = default_offset)
@@ -153,20 +164,18 @@ meshbuilder_shiny <- function(
     })
 
     mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
-      shiny::withProgress(message = "Creating mesh...", value = 0, {
-        fmesher::fm_mesh_2d_inla(
-          loc = coords_only,
-          max.edge = input$max_edge,
-          cutoff = input$cutoff,
-          offset = input$offset,
-          crs = crs,
-        )
-      })
+      fmesher::fm_mesh_2d_inla(
+        loc = coords_only,
+        max.edge = input$max_edge,
+        cutoff = input$cutoff,
+        offset = input$offset,
+        crs = crs,
+      )
     })
 
-    large_mesh <- shiny::reactive({
-      mesh()$n > n_nodes_big_mesh
-    })
+    # large_mesh <- shiny::reactive({
+    #   mesh()$n > n_nodes_big_mesh
+    # })
 
     mesh_spatial <- shiny::reactive(
       suppressMessages(
@@ -203,16 +212,17 @@ meshbuilder_shiny <- function(
       )
     )
 
-    shiny::observe({
-      if (large_mesh()) {
-        shiny::showModal(shiny::modalDialog(
-          "Mesh is large, plotting may be slow.",
-          title = "Mesh warning",
-          easyClose = TRUE,
-          footer = NULL
-        ))
-      }
-    })
+    # shiny::observe({
+    #   if (large_mesh() && !modal_shown()) {
+    #     shiny::showModal(shiny::modalDialog(
+    #       "Mesh is large, plotting may be slow.",
+    #       title = "Mesh warning",
+    #       easyClose = TRUE,
+    #       footer = NULL
+    #     ))
+    #   }
+    #   modal_shown(TRUE)
+    # })
 
 
     shiny::observeEvent(input$check_button, {
