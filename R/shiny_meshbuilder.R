@@ -142,7 +142,6 @@ meshbuilder_shiny <- function(
       shiny::updateSliderInput(session, inputId = "cutoff", value = default_cutoff)
     })
 
-    warning("Number of mesh nodes: , ", mesh()$n)
     mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
       shiny::withProgress(message = "Creating mesh...", value = 0, {
         mesh <- fmesher::fm_mesh_2d(
@@ -165,7 +164,9 @@ meshbuilder_shiny <- function(
       })
     })
 
-    
+    large_mesh <- shiny::reactive({
+      mesh()$n > n_nodes_big_mesh
+    })
 
     mesh_spatial <- shiny::reactive(
       suppressMessages(
@@ -201,6 +202,17 @@ meshbuilder_shiny <- function(
           offset=c(", paste0(input$offset, collapse = ", "), "))\n"
       )
     )
+
+    shiny::observe({
+      if (large_mesh()) {
+        shiny::showModal(shiny::modalDialog(
+          "Mesh is large, plotting may be slow.",
+          title = "Mesh warning",
+          easyClose = TRUE,
+          footer = NULL
+        ))
+      }
+    })
 
 
     shiny::observeEvent(input$check_button, {
