@@ -1,0 +1,39 @@
+---
+title: "How to choose how to model"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Priors exploration}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+4d-Modeller and INLA/inlabru allow you to use both fixed and random effects in your model with SPDEs allowing you to model continuous random processes in your data. Below we explain briefly each of these processes and how to choose when to use them.
+
+## Fixed Effects
+
+```{r}
+example code
+```
+
+## Random Effects
+
+```{r}
+example code
+```
+
+### Random Effects of Unobserved Processes
+
+```{r}
+example code
+```
+
+### Random Effects Constrained by Observed Processes
+
+```{r}
+example code
+```
