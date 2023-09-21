@@ -23,11 +23,11 @@ The model can be run in verbose mode so that it outputs feedback. This feedback 
 fit.mod<-bru(formula, data =XX,
                    family = XX,
                    options = list(
-                     inla.mode="classic", # or “inla.mode="experimental"
                      verbose = TRUE) )
 ```
 
 ## Memory issues
+
 - How large is your data set?
 - How many mesh nodes? Is the mesh well designed (e.g., no isolated triangles)?
 - Have you tried reducing the number of mesh nodes and testing which mesh size avoids errors?

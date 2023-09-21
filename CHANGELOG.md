@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - This changelog - [PR #99](https://github.com/4DModeller/fdmr/pull/99)
+- Added an INLA FAQ vignette that covers INLA crashes we have encountered in the past - [PR #116](https://github.com/4DModeller/fdmr/pull/116)
 
 ### Fixed
 
