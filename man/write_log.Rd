@@ -4,10 +4,10 @@
 \alias{write_log}
 \title{Write to a logfile}
 \usage{
-write_log(logfile, message)
+write_log(filepath, message)
 }
 \arguments{
-\item{logfile}{Path to log}
+\item{filepath}{Path to log}
 
 \item{message}{Message to write}
 }

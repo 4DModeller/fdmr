@@ -4,6 +4,7 @@
 #' @param measurement_data Measurement data
 #' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
+#' @param log_folder Folder to write out logs
 #'
 #' @importFrom INLA f
 #'
@@ -12,7 +13,8 @@
 priors_shiny <- function(spatial_data,
                          measurement_data,
                          time_variable,
-                         mesh) {
+                         mesh,
+                         log_folder = NULL) {
     future::plan(future::multisession())
 
     got_coords <- has_coords(spatial_data = spatial_data)
@@ -48,10 +50,27 @@ priors_shiny <- function(spatial_data,
     parameters_file <- paste0("priors_exploration_parameters_", timestamp_str, ".json")
     model_outputs_file <- paste0("priors_exploration_modelout_", timestamp_str, ".rds")
 
-    log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
+    write_logs <- TRUE
+    if (is.null(log_folder)) {
+        log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
+
+        if (!as.numeric(file.access(log_folder)) == 0) {
+            tmpdir <- get_tmpdir()
+            log_folder <- fs::path(tmpdir, "fdmr", "logs")
+
+            if (!as.numeric(file.access(log_folder)) == 0) {
+                warning("We are unable to find a folder to write logs to, please pass a folder path to log_folder")
+                write_logs <- FALSE
+            }
+        }
+    }
+
     if (!fs::dir_exists(log_folder)) {
         fs::dir_create(log_folder)
     }
+
+    log_folder <- fs::path_expand(log_folder)
+    cat("We will write log files to ", log_folder)
 
     log_filepath <- fs::path(log_folder, log_filename)
     parameters_filepath <- fs::path(log_folder, parameters_file)
@@ -300,12 +319,14 @@ priors_shiny <- function(spatial_data,
                         run_label <- paste0("Run-", run_no())
                         model_vals$run_params[[run_label]] <- run_params
 
-                        write_parameters(logfile = parameters_filepath, parameters = model_vals$run_params)
-                        saveRDS(model_vals$parsed_outputs, file = modeloutputs_filepath)
+                        if (write_logs) {
+                            write_parameters(filepath = parameters_filepath, parameters = model_vals$run_params)
+                            write_rds(modeloutputs_filepath, model_vals$parsed_outputs)
+                        }
                     },
                 onRejected = function(err) {
                     warning("INLA crashed with error: ", err)
-                    write_log(logfile = log_filepath, message = err)
+                    if (write_logs) write_log(filepath = log_filepath, message = err)
                 }
             )
         })
@@ -416,9 +437,10 @@ priors_shiny <- function(spatial_data,
 #' @param measurement_data Measurement data
 #' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
+#' @param log_folder Folder to write logs to
 #'
 #' @return shiny::app
 #' @export
-interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh) {
-    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh))
+interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh, log_folder = NULL) {
+    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh, log_folder = log_folder))
 }

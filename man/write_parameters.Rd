@@ -4,10 +4,10 @@
 \alias{write_parameters}
 \title{Write a parameter set to JSON}
 \usage{
-write_parameters(logfile, parameters)
+write_parameters(filepath, parameters)
 }
 \arguments{
-\item{logfile}{Path to parameter file}
+\item{filepath}{Path to parameter file}
 
 \item{message}{Parameters to write}
 }
