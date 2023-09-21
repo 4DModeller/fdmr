@@ -72,6 +72,9 @@ summary(result)
 
 A random effect in a bayesian model has an effect whose value is drawn from a probability distribution and has associated uncertainty drawn from it's own distribution.  
 
+### Random Effects of Unobserved Processes
+
+CONTENT
 
 ```{r, error=TRUE}
 # Define a formula for the model
@@ -87,13 +90,10 @@ result <- inla(formula, data = df, family = "gaussian")
 summary(result)
 ```
 
-### Random Effects of Unobserved Processes
-
-```{r, error=TRUE}
-example code
-```
 
 ### Random Effects Constrained by Observed Processes
+
+CONTENT
 
 ```{r, error=TRUE}
 library(inlabru)
@@ -108,3 +108,7 @@ print(summary(fit))
 ### Comparing the output
 
 Finally, we can compare the output of all the models using the DIC. This is important as we would like to know the fittedness of each model even if we have some theoretical belief that a model should be specificied in a certain way.
+
+```{r error=TRUE}
+plot(DICs)
+```
