@@ -15,10 +15,11 @@ To load data into the mesh builder we need to make sure it's in the correct form
 data that covers the Tibetan plateau from CSV.
 
 First we download the data from our data repository. And then load in the data using `read.csv`
+
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "tibetan_lakes")
-lake_data_filepath <- fdmr::get_tutorial_datapath(dataset = "tibetan_lakes", filename = "tibetan_lakes.csv")
-lake_data <- read.csv(lake_data)
+lake_data_filepath <- fdmr::get_tutorial_datapath(dataset = "tibetan_lakes", filename = "example_lake_data.csv")
+lake_data <- read.csv(lake_data_filepath)
 ```
 
 Now let's have a look at the names of the columns in the `data.frame`.
@@ -27,13 +28,13 @@ Now let's have a look at the names of the columns in the `data.frame`.
 names(lakes_data)
 ```
 
-To create the mesh we need to pass in the latitude and longitude data to the [`fmesher::fmesher::fm_mesh_2d_inla`](https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html) function. Looking at the column names we can see that `centroid_long` and `centroid_lat` look like likely candidates. We can have a quick look at them to make sure they look right.
+To create the mesh we need to pass in the latitude and longitude data to the [`fmesher::fmesher::fm_mesh_2d_inla`](https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html) function. Looking at the column names we can see that `centroid_long` and `centroid_lat` look like likely candidates. Let's have a quick look at them.
 
 ```{r}
 head(lakes_data[, c("centroid_lon", "centroid_lat")])
 ``` 
 
-That looks correct. By default `mesh_builder` will look for `"LAT"` and `"LONG"` columns and raise an error if it can't find them. To avoid this we can either change the names of the columns or simply pass in the names of those columns when we call the function. 
+That looks correct. By default `mesh_builder` will look for `"LAT"` and `"LONG"` columns and raise an error if it can't find them. To avoid this we can either change the names of the columns in our data or pass in the names of those columns when we call the function. 
 
 Let's call the `mesh_builder` function and pass in the data and tell it to use `centroid_long` and `centroid_lat` as the longitude and latitude columns. As we only have have a `data.frame` here we also need to pass in the coordinate reference system we want to use. We'll use the WGS84 coordinate reference system and create a CRS object using the `sp::CRS` function and passing in a `proj4string`.
 
@@ -43,7 +44,7 @@ crs <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 
 We're now ready to launch the mesh builder app.
 
-```{r}
+```{r eval=FALSE}
 fdmr::mesh_builder(spatial_data = lakes_data, longitude_column = "centroid_lon", latitude_column = "centroid_lat", crs = crs)
 ``` 
 
@@ -51,10 +52,10 @@ fdmr::mesh_builder(spatial_data = lakes_data, longitude_column = "centroid_lon",
 
 In other cases we may be given an `.rds` file. Let's load in an example from our COVID-19 dataset. This is the same data we previously used in the COVID-19 tutorial.
 
-```{r eval=FALSE}
+```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid")
 sp_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "spatial_data.rds")
-sp_data
+head(sp_data)
 ```
 
 The `sp_data` object is a `SpatialPolygonsDataFrame` containing 6789 features for areas of England. This object contains all the  contains all the values we
@@ -66,9 +67,9 @@ fdmr::mesh_builder(spatial_data = sp_data)
  
 ## Customise initial parameters
 
-If you want to customise the initial parameters used to build the mesh you can pass in 
+If you want to customise the initial parameters used to build the mesh you can pass those values to the `mesh_builder` function. To see what parameters you can pass to the function you can use the `args` function.
 
-```{r eval=FALSE}
+```{r}
 args(fdmr::mesh_builder)
 ```
 
