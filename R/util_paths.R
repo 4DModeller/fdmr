@@ -95,7 +95,7 @@ clear_caches <- function() {
 #' Get the system temporary directory
 #'
 #' @return NULL
-#' @export
+#' @keywords internal
 get_tmpdir <- function() {
   fs::path_dir(fs::path_temp())
 }

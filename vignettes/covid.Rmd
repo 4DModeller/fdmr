@@ -28,7 +28,9 @@ We first load INLA and then retrieve the data from the fdmr example data store. 
 
 ```{r}
 library(INLA)
+library(magrittr)
 ```
+
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid")
 ```
@@ -406,6 +408,21 @@ Finally, we create a map showing the spatial pattern of the time averaged risks 
 
 ```{r mapaverisk, error=TRUE, fig.cap="Map of the average predicted infection risks ",  fig.width=8, fig.height=4, fig.align = "center"}
 average_risk_by_nb <-
+  dplyr::group_by(predictions, MSOA11CD) %>% dplyr::summarize(ave.risk = mean(pred.mean))
+
+sp_data@data$ave.risk <- average_risk_by_nb$ave.risk
+
+domain <- sp_data@data$ave.risk
+
+fdmr::plot_map(
+  polygon_data = sp_data,
+  domain = domain,
+  palette = "Reds",
+  legend_title = "Risk",
+  add_scale_bar = TRUE,
+  polygon_fill_opacity = 1,
+  polygon_line_colour = "transparent"
+) <-
   dplyr::group_by(predictions, MSOA11CD) %>% dplyr::summarize(ave.risk = mean(pred.mean))
 
 sp_data@data$ave.risk <- average_risk_by_nb$ave.risk
