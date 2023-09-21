@@ -7,7 +7,7 @@
 #' @keywords internal
 parse_model_output_bru <- function(model_output, measurement_data) {
     fitted_mean_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
-    fitted_sd_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
+    fitted_sd_post <- model_output$summary.fitted.values$sd[seq_len(nrow(measurement_data))]
 
     mean_post <- model_output$summary.random$f$mean
     sd_post <- model_output$summary.random$f$sd
