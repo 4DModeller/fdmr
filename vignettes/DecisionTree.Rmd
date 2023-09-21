@@ -17,8 +17,9 @@ vignette: >
 In this document we will use the following data for examples:
 
 ```{r, error=TRUE}
+library(INLA) # for modeling later
 library(MASS)  # for true multivariate normal simulation
-set.seed(123)
+set.seed(42)
 
 n <- 100  # number of observations
 timesteps <- 10  # number of time steps
@@ -62,7 +63,9 @@ You would choose to model an effect as a fixed effect if you believe the effect 
 ### example of a fixed effect in r-inla/inlabru
 
 ```{r, error=TRUE}
-example code
+formula <- value ~ 1 + x + y + time
+result <- inla(formula, data = df, family = "gaussian")
+summary(result)
 ```
 
 ## Random Effects
@@ -73,10 +76,9 @@ A random effect in a bayesian model has an effect whose value is drawn from a pr
 ```{r, error=TRUE}
 # Define a formula for the model
 # Load the INLA library
-library(INLA)
 
 # Define the formula for the INLA model
-formula <- value ~ 1 + f(x, y, model = "iid") + f(time, model = "rw1")
+formula <- value ~ 1 + x + y + f(time, model = "rw1")
 
 # Fit the INLA model
 result <- inla(formula, data = df, family = "gaussian")
@@ -94,14 +96,13 @@ example code
 ### Random Effects Constrained by Observed Processes
 
 ```{r, error=TRUE}
-# Define the model
-formula <- value ~ f(space, model = "rw2") + f(time, model = "rw1")
+library(inlabru)
 
-# Fit the model using INLA
-result <- inla(formula, data = df, family = "gaussian")
+# Fit a simple model
+fit <- bru(value ~ 1 + f(x + y, model = "spde"), data = df)
 
-# Summary of the model
-summary(result)
+# Print the model summary
+print(summary(fit))
 ```
 
 ### Comparing the output
