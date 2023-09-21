@@ -14,26 +14,96 @@ vignette: >
 
 4d-Modeller and INLA/inlabru allow you to use both fixed and random effects in your model with SPDEs allowing you to model continuous random processes in your data. Below we explain briefly each of these processes and how to choose when to use them.
 
+In this document we will use the following data for examples:
+
+```{r, error=TRUE}
+library(MASS)  # for true multivariate normal simulation
+set.seed(123)
+
+n <- 100  # number of observations
+timesteps <- 10  # number of time steps
+
+# Create a basic time and space grid
+df <- expand.grid(x = seq(1, 10, length.out = sqrt(n)),
+                  y = seq(1, 10, length.out = sqrt(n)),
+                  time = 1:timesteps)
+
+# Create a covariance matrix
+cov_matrix <- matrix(0.5, nrow = n, ncol = n)  # Example covariance matrix with 0.5 correlation
+diag(cov_matrix) <- 1  # Diagonal should be 1
+
+# Generate spatially and temporally correlated noise for each time step
+for (i in unique(df$time)) {
+  noise <- mvrnorm(n = 1, mu = rep(0, n), Sigma = cov_matrix)
+  df$value[df$time == i] <- noise
+}
+
+head(df)
+
+library(ggplot2)
+
+ggplot(df, aes(x = x, y = y, color = value)) +
+  geom_point() +
+  facet_wrap(~ time) +
+  scale_color_viridis_c() +
+  theme_minimal()
+
+
+```
+
 ## Fixed Effects
 
-```{r}
+A fixed effect in a bayesian model is an effect whose value is fixed in a location but has a probability distribution associated with it's uncertainty. A fixed effect represents a parameter or coefficient in a model that is assumed to have a fixed, constant value across different observations/locations. In a Bayesian model, a fixed effect is a special case of a random effect where we assume the effect has zero variance.
+
+### why would you choose a fixed effect?
+
+You would choose to model an effect as a fixed effect if you believe the effect will always have the same outcome no matter the context of that the observation is taken. For example, a unit of rain should fill a reservoir by that an equivalent unit no matter the conditions given constant climatic conditions.
+
+### example of a fixed effect in r-inla/inlabru
+
+```{r, error=TRUE}
 example code
 ```
 
 ## Random Effects
 
-```{r}
-example code
+A random effect in a bayesian model has an effect whose value is drawn from a probability distribution and has associated uncertainty drawn from it's own distribution.  
+
+
+```{r, error=TRUE}
+# Define a formula for the model
+# Load the INLA library
+library(INLA)
+
+# Define the formula for the INLA model
+formula <- value ~ 1 + f(x, y, model = "iid") + f(time, model = "rw1")
+
+# Fit the INLA model
+result <- inla(formula, data = df, family = "gaussian")
+
+# Print the summary of the INLA model
+summary(result)
 ```
 
 ### Random Effects of Unobserved Processes
 
-```{r}
+```{r, error=TRUE}
 example code
 ```
 
 ### Random Effects Constrained by Observed Processes
 
-```{r}
-example code
+```{r, error=TRUE}
+# Define the model
+formula <- value ~ f(space, model = "rw2") + f(time, model = "rw1")
+
+# Fit the model using INLA
+result <- inla(formula, data = df, family = "gaussian")
+
+# Summary of the model
+summary(result)
 ```
+
+### Comparing the output
+
+Finally, we can compare the output of all the models using the DIC. This is important as we would like to know the fittedness of each model even if we have some theoretical belief that a model should be specificied in a certain way.
