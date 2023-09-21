@@ -28,7 +28,7 @@ navbar:
           href: articles/priors_app.html
         - text: "Map plotting"
           href: articles/mapping.html
-        - text: "Meshing"
+        - text: "Mesh building"
           href: articles/meshbuilder.html
     hackathon:
       text: Hackathon
