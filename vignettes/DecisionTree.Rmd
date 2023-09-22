@@ -101,6 +101,8 @@ summary(result)
 
 Observed data can be used to constrain effects such that inla/inlabru can be used to do data driven inversion, i.e., estimating processes that cannot be observed directly. For example, 
 
+<!-- TODO: come up with example -->
+
 ```{r, error=TRUE}
 library(inlabru)
 
