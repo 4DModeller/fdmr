@@ -4,6 +4,22 @@
 
 4D-Modeller is a spatio-temporal modeling library that can be applied to problems at any scale from micro to processes that operate at a global scale. It includes data visualization tools, finite element mesh building tools, Bayesian hierarchical modeling based on Bayesian inference packages INLA and inlabru, and model evaluation and assessment tools.
 
+## Why should I use 4d-Modeller?
+
+4d-Modeller is an R toolbox that has been designed to make it easy to design spatially distributed, temporally dependent statistical models. It includes tools to easily build finite element meshes that models can be calculated on
+
+![fem](gif)
+
+tools for how to specify priors for the model to pick the best model hyperparameters:
+
+![priors](gif)
+
+and tools for evaluating the fully trained model output:
+
+![eval](gif)
+
+
+
 ## Quickstart
 
 To get the 4DModeller R package `fdmr` installed first you need to make sure you have a recent version of R installed.
