@@ -58,9 +58,11 @@ A fixed effect in a bayesian model is an effect whose value is fixed in a locati
 
 ### why would you choose a fixed effect?
 
-You would choose to model an effect as a fixed effect if you believe the effect will always have the same outcome no matter the context of that the observation is taken. For example, a unit of rain should fill a reservoir by that an equivalent unit no matter the conditions given constant climatic conditions.
+You would choose to model an effect as a fixed effect if you believe the effect will always have the same outcome no matter the context of that the observation is taken. For example, a unit of rain should fill a reservoir by that an equivalent unit no matter the conditions given constant climatic conditions with non-porous soil.
 
 ### example of a fixed effect in r-inla/inlabru
+
+A fixed effect is represented in the fit equation as the variable name. In the simulated data example, there are three columns `x`, `y`, and `time`. You can see below how these are written into the formula that is then passed to inla.
 
 ```{r, error=TRUE}
 formula <- value ~ 1 + x + y + time
@@ -70,7 +72,7 @@ summary(result)
 
 ## Random Effects
 
-A random effect in a bayesian model has an effect whose value is drawn from a probability distribution and has associated uncertainty drawn from it's own distribution.  
+A random effect in a bayesian model has an effect whose value is drawn from a probability distribution and has associated uncertainty drawn from it's own distribution. There are two types of random effects that can be modeled in inla, random effects of unobserved processes and random effects constrained by observed processes.
 
 ### Random Effects of Unobserved Processes
 
