@@ -76,7 +76,11 @@ A random effect in a bayesian model has an effect whose value is drawn from a pr
 
 ### Random Effects of Unobserved Processes
 
-CONTENT
+Unobserved processes are processes that may be spatially or temporally distributed that do not have data or a theoretical description as to what they might be. Instead, it is considered variance found within the data that is not representative of randomness and instead some kind of unobserved process.
+
+For example, patients being infected by COVID-19 were impacted by social and demographic factors that helped to control infection rates [link](link_to_covid_tutorial). But what if in addition to social and demographic factors, there was an unobserved migration of people into a neighborhood thereby increasing the total number of potential people who could be infected? This would create unobserved variance in the data set (assuming we do not have neighborhood population counts).
+
+Below we show a model that defines a formula where the `f` subroutine represents the unobserved variance occuring through time while `x` and `y` are fixed effects.
 
 ```{r, error=TRUE}
 # Define a formula for the model
