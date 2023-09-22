@@ -80,7 +80,7 @@ Unobserved processes are processes that may be spatially or temporally distribut
 
 For example, patients being infected by COVID-19 were impacted by social and demographic factors that helped to control infection rates [link](link_to_covid_tutorial). But what if in addition to social and demographic factors, there was an unobserved migration of people into a neighborhood thereby increasing the total number of potential people who could be infected? This would create unobserved variance in the data set (assuming we do not have neighborhood population counts).
 
-Below we show a model that defines a formula where the `f` subroutine represents the unobserved variance occuring through time while `x` and `y` are fixed effects.
+Below we show a model that defines a formula where the `f` subroutine represents the unobserved variance occuring through time while `x` and `y` are fixed effects.gi
 
 ```{r, error=TRUE}
 # Define a formula for the model
@@ -99,13 +99,13 @@ summary(result)
 
 ### Random Effects Constrained by Observed Processes
 
-CONTENT
+Observed data can be used to constrain effects such that inla/inlabru can be used to do data driven inversion, i.e., estimating processes that cannot be observed directly. For example, 
 
 ```{r, error=TRUE}
 library(inlabru)
 
 # Fit a simple model
-fit <- bru(value ~ 1 + f(x + y, model = "spde"), data = df)
+fit <- bru(value ~ 1 + observed(x + y, model = "linear"), data = df)
 
 # Print the model summary
 print(summary(fit))
