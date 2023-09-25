@@ -6,7 +6,9 @@
 
 ## Why should I use 4d-Modeller?
 
-4d-Modeller is an R toolbox that has been designed to make it easy to design spatially distributed, temporally dependent statistical models. It includes tools to easily build finite element meshes that models can be calculated on
+4d-Modeller is an R toolbox that has been designed to make it easy to design spatially distributed, temporally dependent statistical models. Typically, 4d-Modeller expects tabular data sets with spatial coordinates, time indices, and the values that change or remain constant over those times. It is designed to be used in the modeling process once data has been sufficiently organized from wherever it was gathered from.
+
+4d-Modeller has a stack of tools that include shiny apps, vignettes in R-markdown notebooks, and the library itself. These tools are designed to help you easily build finite element meshes that models can be calculated on:
 
 ![fem](gif)
 
