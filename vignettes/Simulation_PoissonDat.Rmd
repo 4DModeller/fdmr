@@ -1,0 +1,318 @@
+---
+title: "Simulation Tutorial (Poisson data)"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Simulation Tutorial (Poisson data)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+In this tutorial, we'll start by generating some simulated data. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
+
+# Data simulation
+
+First we simulate some Poisson distributed data observed at 500 spatial locations and 6 time points.
+
+
+```{r simdat} 
+
+# Load INLA 
+library(INLA) 
+
+# Time and locations. 
+
+# In this tutorial the spatial locations are defined using 
+# longitude and latitude coordinates
+
+n.time<-6
+n <- 500
+locs<- as.matrix(cbind(runif(n, -2.69,-2.52),runif(n,51.42,51.51)))
+
+# Construct a mesh and SPDE to introduce spatial correlation into the simulated data 
+
+initial_range <-diff(range(locs[,1]))/3
+max_edge<-initial_range /3
+mesh <- fmesher::fm_mesh_2d(loc=locs,
+                           max.edge = c(1,2)*max_edge,
+                           offset=c(initial_range /3, initial_range ),
+                           cutoff = max_edge/3
+)
+
+
+spde <- INLA::inla.spde2.pcmatern(
+  mesh = mesh, 
+  prior.range = c(initial_range , 0.5), 
+  prior.sigma = c(1, 0.01) 
+)
+
+# Simulate a spatial random field for each time point
+
+sigma0 <- 100
+range0 <- 0.03
+kappa0 <- sqrt(8 / 1) / range0
+tau0 <- 1 / (sqrt(4 * pi) * kappa0 * sigma0) 
+inla.seed <- sample.int(n=1E4, size=n.time)
+Q <- INLA::inla.spde.precision(spde, theta = c(log(tau0), log(kappa0)))
+x.mat<-matrix(NA,ncol=n.time,nrow =mesh$n)
+for (co in 1:ncol(x.mat)){
+  x.mat[,co]<-INLA::inla.qsample(n = 1, Q)
+} 
+
+# Create a matrix A that projects the random field values 
+# from mesh nodes to the observation locations for each time point
+
+A <- INLA::inla.spde.make.A(mesh=mesh, loc=locs)
+x.dat<-matrix(NA,ncol=n.time,nrow =n)
+for (t in 1:ncol(x.dat)){
+  x.dat[,t] <- drop(A %*% x.mat[,t]) 
+}
+
+# Specify the temporal correlation coefficient, and 
+# simulate the data at time point t based on the data at time t-1 
+
+alpha<-0.9
+sp.mat<-matrix(NA,ncol = n.time,nrow = n)
+sp.mat[,1]<-x.dat[,1]
+for (t in 2:n.time){
+  sp.mat[,t]<-alpha*sp.mat[,t-1]+x.dat[,t]
+}
+
+# Linear predictor
+beta0 <- 0.5 
+sigma_e <- 0.1 
+lin.pred <- beta0 + sp.mat + matrix(rnorm(n*n.time,0,sigma_e),ncol=n.time)
+
+# Simulate the exposure data 
+
+E.mat <-matrix(rep(sample(20:50, n, replace=TRUE),n.time),ncol=n.time)
+
+# Compute the Poisson mean lambda, and 
+# simulate data from a Poisson distribution 
+
+lambda <- E.mat*exp(lin.pred)
+y.mat<-matrix(NA, ncol = n.time,nrow = n)
+for (t in 1:n.time){
+ y.mat[,t]<- rpois(n, lambda = lambda[,t])
+}
+
+# Organize the simulated data into a data frame, where each row
+# corresponds to an observation at a specific location and time. 
+# The variable `ID` is the spatial location identifier. 
+# Variable `time` denotes the time point. 
+# The variable `datn` represents the simulated response data. 
+# The longitude and latitude coordinates for each location are stored in
+# the variables `LONG` and `LAT`, respectively.
+
+simdf<-data.frame(ID=rep(1:n,each=n.time),
+                  time = rep(c(1:n.time),n),
+                  datn = as.numeric(t(y.mat)),
+                  E=as.numeric(t(E.mat)),
+                  LONG = rep(locs[,1],each=n.time),
+                  LAT = rep(locs[,2],each=n.time))
+
+```
+
+We will now generate a SpatialPolygonDataframe using the simulated data obtained above.
+
+```{r spdf}
+simdf$index <- seq(1,length(simdf$time),by=1)
+sim_loc <- data.table::data.table(base::unique(simdf$ID))
+base::names(sim_loc) <- "ID"
+sim_loc$lon <- simdf[base::match(sim_loc$ID,simdf$ID), "LONG"]
+sim_loc$lat <- simdf[base::match(sim_loc$ID,simdf$ID), "LAT"]
+
+sim_loc$tile_lonmin <- sim_loc$lon - 0.01
+sim_loc$tile_latmin <- sim_loc$lat - 0.01
+sim_loc$tile_lonmax <- sim_loc$lon + 0.01
+sim_loc$tile_latmax <- sim_loc$lat + 0.01
+
+# form a list of the Polygon boundaries (one row per PolyID)
+Polygon_list <- list()
+for(i in 1:base::nrow(sim_loc)){
+  for (t in 1:n.time){
+    lons <- stats::na.omit(base::as.numeric(c(sim_loc[i,"tile_lonmin"], sim_loc[i,"tile_lonmin"],
+                                              sim_loc[i,"tile_lonmax"], sim_loc[i,"tile_lonmax"],
+                                              sim_loc[i,"tile_lonmin"])))
+    lats <- stats::na.omit(base::as.numeric(c(sim_loc[i,"tile_latmin"], sim_loc[i,"tile_latmax"], 
+                                              sim_loc[i,"tile_latmax"], sim_loc[i,"tile_latmin"], 
+                                              sim_loc[i,"tile_latmin"])))
+    Polygon_list[[t+((i-1)*n.time)]] <- sp::Polygon(cbind(lons, lats))
+  }
+}
+
+Polygons_list <- base::lapply(1:base::length(Polygon_list), function(x) sp::Polygons(list(Polygon_list[[x]]), x))
+SpPolygon <- sp::SpatialPolygons(Polygons_list, proj4string = sp::CRS("+proj=longlat"))
+gic_area <- geosphere::areaPolygon(SpPolygon)
+area_data <- base::data.frame(base::cbind(base::seq(1,base::length(SpPolygon),by=1),gic_area))
+base::names(area_data) <- c("ID","area")
+sim_sp <- sp::SpatialPolygonsDataFrame(SpPolygon, data=base::merge(simdf,area_data,by="ID"))
+
+```
+
+# Model fitting
+
+With the simulation dataset now prepared, our next step is to implement a Bayesian spatio-temporal model using the INLA-SPDE approach.
+
+## Generate mesh, build the SPDE model, and set priors for the spatial parameters
+
+```{r meshSPDE}
+locs <- unique(simdf[, c("LONG", "LAT")])
+initial_range <-diff(range(locs[,1]))/3
+max_edge<-initial_range /3
+mesh <- fmesher::fm_mesh_2d(loc=locs,
+                           max.edge = c(1,2)*max_edge,
+                           offset=c(initial_range /3, initial_range ),
+                           cutoff = max_edge/3
+)
+
+spde <- INLA::inla.spde2.pcmatern(
+  mesh = mesh, 
+  prior.range = c(initial_range , 0.5), 
+  prior.sigma = c(1, 0.01) 
+)
+
+```
+
+## Define how the process evolves over time, set prior for the temporal parameter and define a temporal index
+
+```{r pccor, error=TRUE}
+rhoprior <- base::list(theta = list(prior = 'pccor1', param = c(0, 0.9)))
+group.index<-simdf$time
+n_groups<-length(unique(simdf$time)) 
+```
+
+We will use the function `bru()` of package `inlabru` to fit the model. `bru` expects the coordinates of the data, thus we transform `simdf` data set to a SpatialPointsDataFrame using the function `coordinates()` of the `sp` package.
+
+```{r, error=TRUE}
+sp::coordinates(simdf)<- c("LONG","LAT")
+```
+
+## Define the model formula
+
+```{r formula, error=TRUE}
+ formula <- datn ~ 0 + Intercept +
+   f(main=coordinates,  
+     model=spde,
+     group=group.index,
+     ngroup=n_groups,
+     control.group=list(model="ar1",
+                        hyper=rhoprior))
+
+```
+
+
+## Fit the model
+Finally, we fit the spatio-temporal model using SPDE approach and AR(1) process by calling the function `bru()` of the package `inlabru`. 
+
+```{r fitmodel}
+inlabru_model <- inlabru::bru(formula,
+                              data = simdf,
+                              family = "poisson",
+                              E = simdf$E,
+                              control.family = list(link = "log"),
+                              options = list(
+                                verbose = TRUE
+                              )
+)
+```
+
+## Results summary
+
+After completing the model fitting process, you can examine the main result summaries by typing `summary(inlabru_model)`. Additionally, you can check the parameter estimates for fixed effects, random effects, and hyperparameters as follows.
+
+```{r summary,eval=FALSE}
+model_summary<-summary(inlabru_model)
+model_fixed <- inlabru_model$summary.fixed
+model_random<-inlabru_model$summary.random
+model_hyperparams <- inlabru_model$summary.hyperpar
+```
+
+The Deviance Information Criterion (DIC) value, which measures the goodness of model fit, can be examined as follows.
+
+
+```{r dicvalue}
+model_dic<-inlabru_model$dic$dic
+
+```
+
+
+You can obtain the model's fitted values and compare them with the observed values as follows.
+
+```{r fittedvals,eval=TRUE}
+
+fitted_vals<-inlabru_model$summary.fitted.values[1:nrow(simdf),]
+
+```
+
+
+```{r plotfitted, error=TRUE,fig.cap="A plot of the fitted and observed values.", fig.width=8, fig.height=4, fig.align = "center"}
+par(pty="s")
+plot(fitted_vals$mean,simdf$datn/simdf$E, xlab='fitted',ylab='observed')
+
+```
+
+# Exploring the functionality of the `fdmr` Package
+
+Next, we'll demonstrate the key functionality offered by the `fdmr` package.
+
+## fdmr::plot_mesh 
+
+The `fdmr::plot_mesh` function displays both the mesh and the observation points overlaid on the mesh.
+
+
+```{r meshplot, error=TRUE,fig.cap="A plot of the mesh.", fig.width=8, fig.height=4, fig.align = "center"}
+
+fdmr::plot_mesh(mesh = mesh, point_data = simdf@coords,
+                point_colour = "blue", cex = 0.8)
+```
+
+## fdmr::mesh_builder
+
+`fdmr` provides an interactive mesh builder tool called `fdmr::mesh_builder`. It allows you to build a mesh from some spatial data, modify its parameters and plot it and the data on an interactive map. To build a mesh, we need to pass `sim_sp` to the `mesh_builder` function.
+
+```{r meshbuilder,eval=FALSE}
+fdmr::mesh_builder(spatial_data = sim_sp)
+
+```
+
+The interactive map allows you to customise the initial parameters such as `max_edge`, `offset` and `cutoff` to change the shape and size of the mesh. We also provide a simple function to check if there are any errors with the meshes created using the mesh builder tool. To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Specifically, create a mesh of your design using the meshbuilder tool. When you’re finished, click the “Check mesh” button on the user interface. This passes the created mesh to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
+
+```{r meshchecking,eval=FALSE}
+fdmr::mesh_builder(spatial_data = sim_sp, obs_data = simdf)
+```
+
+## Interactive priors Shiny app
+`fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::interactive_priors` function.
+
+
+```{r priorapp, eval=FALSE}
+fdmr::interactive_priors(spatial_data = sim_sp, 
+                         measurement_data = simdf, 
+                         mesh=mesh, 
+                         time_variable="time")
+```
+
+
+On the app interface, you can start by choosing the variable to model. In this example we’ll select `datn`, then select `E` for the exposure parameter, and the features to add to the formula. At the bottom of the window you’ll see the formula being constructed. On the left side, you can change the priors for the model parameters. Click on the checkboxes to select your formula and then click the Run Model button to run the model see it’s output plot on the right of the window.
+
+
+## fdmr::plot_map
+
+The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.
+
+```{r rmap, error=TRUE,fig.cap="A map of the region based on the simulated data.", fig.width=8, fig.height=4, fig.align = "center"}
+fdmr::plot_map(polygon_data = sim_sp)
+```
+
+
+
