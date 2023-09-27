@@ -10,7 +10,9 @@ mesh_builder(
   crs = NULL,
   max_edge = NULL,
   offset = NULL,
-  cutoff = NULL
+  cutoff = NULL,
+  latitude_column = "LAT",
+  longitude_column = "LONG"
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ mesh_builder(
 \item{offset}{Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d}
 
 \item{cutoff}{The minimum allowed distance between points, passed to inla.mesh.2d}
+
+\item{latitude_column}{Name of the latitude column in the spatial data}
+
+\item{longitude_column}{Name of the longitude column in the spatial data}
 }
 \value{
 shiny::app
