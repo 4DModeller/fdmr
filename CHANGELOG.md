@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Read of `mean` twice from INLA model output instead of reading `sd` - [PR #121](https://github.com/4DModeller/fdmr/pull/121)
+
 ### Changed
 
 ### Removed
