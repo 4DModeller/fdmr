@@ -18,8 +18,8 @@ First we download the data from our data repository. And then load in the data u
 
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "tibetan_lakes")
-lake_data_filepath <- fdmr::get_tutorial_datapath(dataset = "tibetan_lakes", filename = "example_lake_data.csv")
-lake_data <- read.csv(lake_data_filepath)
+lakes_data_filepath <- fdmr::get_tutorial_datapath(dataset = "tibetan_lakes", filename = "example_lake_data.csv")
+lakes_data <- read.csv(lakes_data_filepath)
 ```
 
 Now let's have a look at the names of the columns in the `data.frame`.
