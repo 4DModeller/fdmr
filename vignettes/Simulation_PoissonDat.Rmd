@@ -17,12 +17,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-In this tutorial, we'll start by generating some simulated data. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
+In this tutorial, we'll start by generating some simulated spatio-temporal data, with the city of Bristol as our study region. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
 
 # Data simulation
 
-First we simulate some Poisson distributed data observed at 500 spatial locations and 6 time points.
+First we simulate some Poisson distributed data observed at 55 spatial locations in Bristol, UK and across 6 time points. We use the `load_tutorial_data function` to load in the geographical information for the spatial locations in Bristol.
 
+```{r loadsp}
+sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_dataBris.rds")
+
+```
+
+Then we simulate the Poisson data.
 
 ```{r simdat} 
 
@@ -35,17 +41,17 @@ library(INLA)
 # longitude and latitude coordinates
 
 n.time<-6
-n <- 500
-locs<- as.matrix(cbind(runif(n, -2.69,-2.52),runif(n,51.42,51.51)))
+n <- 55
+locs<- as.matrix(sp_data@data[,c("LONG","LAT")])
 
 # Construct a mesh and SPDE to introduce spatial correlation into the simulated data 
 
 initial_range <-diff(range(locs[,1]))/3
-max_edge<-initial_range /3
+max_edge<-initial_range /2
 mesh <- fmesher::fm_mesh_2d(loc=locs,
                            max.edge = c(1,2)*max_edge,
-                           offset=c(initial_range /3, initial_range ),
-                           cutoff = max_edge/3
+                           offset=c(initial_range , initial_range ),
+                           cutoff = max_edge/7
 )
 
 
@@ -122,41 +128,10 @@ simdf<-data.frame(ID=rep(1:n,each=n.time),
 
 ```
 
-We will now generate a SpatialPolygonDataframe using the simulated data obtained above.
+A histogram is created to visualize the distribution of the simulated data.
 
-```{r spdf}
-simdf$index <- seq(1,length(simdf$time),by=1)
-sim_loc <- data.table::data.table(base::unique(simdf$ID))
-base::names(sim_loc) <- "ID"
-sim_loc$lon <- simdf[base::match(sim_loc$ID,simdf$ID), "LONG"]
-sim_loc$lat <- simdf[base::match(sim_loc$ID,simdf$ID), "LAT"]
-
-sim_loc$tile_lonmin <- sim_loc$lon - 0.01
-sim_loc$tile_latmin <- sim_loc$lat - 0.01
-sim_loc$tile_lonmax <- sim_loc$lon + 0.01
-sim_loc$tile_latmax <- sim_loc$lat + 0.01
-
-# form a list of the Polygon boundaries (one row per PolyID)
-Polygon_list <- list()
-for(i in 1:base::nrow(sim_loc)){
-  for (t in 1:n.time){
-    lons <- stats::na.omit(base::as.numeric(c(sim_loc[i,"tile_lonmin"], sim_loc[i,"tile_lonmin"],
-                                              sim_loc[i,"tile_lonmax"], sim_loc[i,"tile_lonmax"],
-                                              sim_loc[i,"tile_lonmin"])))
-    lats <- stats::na.omit(base::as.numeric(c(sim_loc[i,"tile_latmin"], sim_loc[i,"tile_latmax"], 
-                                              sim_loc[i,"tile_latmax"], sim_loc[i,"tile_latmin"], 
-                                              sim_loc[i,"tile_latmin"])))
-    Polygon_list[[t+((i-1)*n.time)]] <- sp::Polygon(cbind(lons, lats))
-  }
-}
-
-Polygons_list <- base::lapply(1:base::length(Polygon_list), function(x) sp::Polygons(list(Polygon_list[[x]]), x))
-SpPolygon <- sp::SpatialPolygons(Polygons_list, proj4string = sp::CRS("+proj=longlat"))
-gic_area <- geosphere::areaPolygon(SpPolygon)
-area_data <- base::data.frame(base::cbind(base::seq(1,base::length(SpPolygon),by=1),gic_area))
-base::names(area_data) <- c("ID","area")
-sim_sp <- sp::SpatialPolygonsDataFrame(SpPolygon, data=base::merge(simdf,area_data,by="ID"))
-
+```{r hist,error=TRUE,fig.cap="A histogram of the simulated Poisson data.", fig.width=8, fig.height=4, fig.align = "center"}
+hist(simdf$datn,main='', xlab='Data')
 ```
 
 # Model fitting
@@ -168,11 +143,11 @@ With the simulation dataset now prepared, our next step is to implement a Bayesi
 ```{r meshSPDE}
 locs <- unique(simdf[, c("LONG", "LAT")])
 initial_range <-diff(range(locs[,1]))/3
-max_edge<-initial_range /3
+max_edge<-initial_range /2
 mesh <- fmesher::fm_mesh_2d(loc=locs,
                            max.edge = c(1,2)*max_edge,
-                           offset=c(initial_range /3, initial_range ),
-                           cutoff = max_edge/3
+                           offset=c(initial_range , initial_range ),
+                           cutoff = max_edge/5
 )
 
 spde <- INLA::inla.spde2.pcmatern(
@@ -278,17 +253,17 @@ fdmr::plot_mesh(mesh = mesh, point_data = simdf@coords,
 
 ## fdmr::mesh_builder
 
-`fdmr` provides an interactive mesh builder tool called `fdmr::mesh_builder`. It allows you to build a mesh from some spatial data, modify its parameters and plot it and the data on an interactive map. To build a mesh, we need to pass `sim_sp` to the `mesh_builder` function.
+`fdmr` provides an interactive mesh builder tool called `fdmr::mesh_builder`. It allows you to build a mesh from some spatial data, modify its parameters and plot it and the data on an interactive map. To build a mesh, we need to pass `sp_data` to the `mesh_builder` function.
 
 ```{r meshbuilder,eval=FALSE}
-fdmr::mesh_builder(spatial_data = sim_sp)
+fdmr::mesh_builder(spatial_data = sp_data)
 
 ```
 
 The interactive map allows you to customise the initial parameters such as `max_edge`, `offset` and `cutoff` to change the shape and size of the mesh. We also provide a simple function to check if there are any errors with the meshes created using the mesh builder tool. To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Specifically, create a mesh of your design using the meshbuilder tool. When you’re finished, click the “Check mesh” button on the user interface. This passes the created mesh to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
 
 ```{r meshchecking,eval=FALSE}
-fdmr::mesh_builder(spatial_data = sim_sp, obs_data = simdf)
+fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
 ```
 
 ## Interactive priors Shiny app
@@ -296,7 +271,7 @@ fdmr::mesh_builder(spatial_data = sim_sp, obs_data = simdf)
 
 
 ```{r priorapp, eval=FALSE}
-fdmr::interactive_priors(spatial_data = sim_sp, 
+fdmr::interactive_priors(spatial_data = sp_data, 
                          measurement_data = simdf, 
                          mesh=mesh, 
                          time_variable="time")
@@ -310,9 +285,7 @@ On the app interface, you can start by choosing the variable to model. In this e
 
 The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.
 
-```{r rmap, error=TRUE,fig.cap="A map of the region based on the simulated data.", fig.width=8, fig.height=4, fig.align = "center"}
-fdmr::plot_map(polygon_data = sim_sp)
+```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align = "center"}
+fdmr::plot_map(polygon_data = sp_data)
 ```
-
-
 
