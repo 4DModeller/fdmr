@@ -38,7 +38,8 @@ meshbuilder_shiny <- function(
   if (is.null(crs)) {
     crs <- sf::st_crs(spatial_data)
     if (is.na(crs$input)) {
-      stop("Unable to read CRS from data, please pass proj4string CRS to crs argument.")
+      # stop("Unable to read CRS from data, please pass proj4string CRS to crs argument.")
+      crs <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
     }
   } else {
     # We try and create a CRS to make sure a valid CRS has been passed
