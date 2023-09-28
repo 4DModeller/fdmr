@@ -9,9 +9,6 @@ vignette: >
 
 4DModeller provides some simple map plotting functions that help you create maps from many different types of data.
 
-```{r}
-library(fdmr)
-```
 ## Polygons
 
 We'll first start off by plotting some polygon data on a map. To do this we'll use some of the data we use in our Hydrology tutorial, where we display a catchment area on map.
@@ -25,7 +22,7 @@ norway_polygon_filepath <- fdmr::get_tutorial_datapath(dataset = "hydro", filena
 Next we read in the shapefile and transform to the coordinate reference system (CRS) we need to plot it on the `leaflet` map.
 
 ```{r}
-norway_polygon <- sf::read_sf(norway_polygon_filepath) %>% sf::st_zm()
+norway_polygon <- sf::st_zm(sf::read_sf(norway_polygon_filepath))
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
