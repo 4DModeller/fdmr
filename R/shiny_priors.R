@@ -377,7 +377,7 @@ priors_shiny <- function(spatial_data,
             rownames = TRUE
         )
 
-        map_raster <- shiny::eventReactive(input$select_run_map, ignoreNULL = FALSE, {
+        map_raster <- shiny::reactive({
             if (length(model_vals$parsed_outputs) == 0) {
                 return()
             }
@@ -388,23 +388,25 @@ priors_shiny <- function(spatial_data,
             xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
             A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
 
-            var_a <- data$mean_post[input$map_var_a]
-            var_b <- data$mean_post[input$map_var_b]
+            var_a <- data[[input$map_var_a]]
+            var_b <- data[[input$map_var_b]]
 
             z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
             pred_field <- base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
             # pred_field <- create_prediction_field(var_a = input$map_var_a, var_b = input$map_var_b, mesh = mesh)
-            create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
+            raster <- create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
+
+            return(raster)
         })
 
         output$map_out <- leaflet::renderLeaflet({
-            if (is.null(map_plot())) {
+            if (is.null(map_raster())) {
                 return()
             }
 
             m <- leaflet::leaflet()
             m <- leaflet::addTiles(m, group = "OSM")
-            m <- leaflet::addRasterImage(m, map_plot(), opacity = 0.9, group = "Raster")
+            m <- leaflet::addRasterImage(m, map_raster(), opacity = 0.9, group = "Raster")
             m
         })
 
