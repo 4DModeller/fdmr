@@ -220,8 +220,18 @@ priors_shiny <- function(spatial_data,
                 run_name <- run_names()[1]
                 var_names <- names(model_vals$parsed_outputs[[run_name]])
 
-                shiny::updateSelectInput(session = session, inputId = "map_var_a", choices = var_names)
-                shiny::updateSelectInput(session = session, inputId = "map_var_b", choices = var_names)
+                selected_a <- NULL
+                selected_b <- NULL
+                if ("mean_post" %in% var_names) {
+                    selected_a <- "mean_post"
+                }
+
+                if ("fixed_mean" %in% var_names) {
+                    selected_b <- "fixed_mean"
+                }
+
+                shiny::updateSelectInput(session = session, inputId = "map_var_a", choices = var_names, selected = selected_a)
+                shiny::updateSelectInput(session = session, inputId = "map_var_b", choices = var_names, selected = selected_b)
             }
         })
 
