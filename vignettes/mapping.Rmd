@@ -19,18 +19,13 @@ First we need to retrieve the example data, then load in the raster data from fi
 
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "hydro")
-norway_polygon_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
+norway_polygon_filepath <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
 ```
 
-Next we need to manipulate the data to ensure we plot the area correctly,
+Next we read in the shapefile and transform to the coordinate reference system (CRS) we need to plot it on the `leaflet` map.
 
 ```{r}
-norway_polygon <- rgdal::readOGR(norway_polygon_location)
-norway_polygon <- sf::st_as_sf(norway_polygon,
-  coords = c("longitude", "latitude"),
-  crs = "+proj=utm +zone=32"
-)
-
+norway_polygon <- sf::read_sf(norway_polygon_filepath) %>% sf::st_zm()
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
@@ -90,13 +85,8 @@ investigate your data. Below are a couple of examples showing how to use the int
 We want to create a plot on the map covering the rain catchment area around the power plant. To do this we read in a GeoJSON file containing the coordinates of the catchment area and make sure it's in the correct coordinate reference system to plot on our map.
 
 ```{r}
-norway_polygon_location <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-norway_polygon <- rgdal::readOGR(norway_polygon_location)
-norway_polygon <- sf::st_as_sf(norway_polygon,
-  coords = c("longitude", "latitude"),
-  crs = "+proj=utm +zone=32"
-)
-
+norway_polygon_filepath <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
+norway_polygon <- sf::read_sf(norway_polygon_filepath) %>% sf::st_zm()
 norway_polygon <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
