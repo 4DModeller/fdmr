@@ -67,7 +67,7 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
       utils::download.file(url = data_url, destfile = download_path)
     }
 
-    archive::archive_extract(download_path, dir = extract_path)
+    utils::untar(download_path, exdir = extract_path)
     base::cat("\nTutorial data extracted to ", extract_path, "\n")
   } else {
     stop("Invalid dataset, please see available datasets at https://github.com/4DModeller/fdmr_data")

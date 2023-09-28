@@ -10,7 +10,7 @@ parse_model_output_bru <- function(model_output, measurement_data) {
     return(NULL)
 
     fitted_mean_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
-    fitted_sd_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
+    fitted_sd_post <- model_output$summary.fitted.values$sd[seq_len(nrow(measurement_data))]
 
     pred.25 <- inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)]
     pred.975 <- inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
@@ -48,4 +48,27 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
     if (model_type == "inlabru") {
         return(parse_model_output_bru(model_output = model_output, measurement_data = measurement_data))
     }
+}
+
+
+#' Create a prediction field from the parsed model output and the mesh
+#'
+#' @param var_a 
+#' @param var_b 
+#' @param mesh 
+#'
+#' @return data.frame
+#' @export
+create_prediction_field <- function(var_a, var_b, mesh) {
+    mod_proj <- fmesher::fm_evaluator(mesh)
+    xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
+    A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
+
+    z <- base::exp(base::as.numeric(A_proj %*%  var_a[1:mesh$n]) + base::sum(var_b))
+    base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
+}
+
+
+create_raster <- function(dataframe, crs) {
+    raster::rasterFromXYZ(dataframe, crs = crs)
 }
