@@ -216,8 +216,10 @@ priors_shiny <- function(spatial_data,
             shiny::updateSelectInput(session = session, inputId = "select_run_code", choices = run_names())
 
             if (!is.null(run_names())) {
+                # They'll all have the same variable names so we can just take the first
                 run_name <- run_names()[1]
                 var_names <- names(model_vals$parsed_outputs[[run_name]])
+
                 shiny::updateSelectInput(session = session, inputId = "map_var_a", choices = var_names)
                 shiny::updateSelectInput(session = session, inputId = "map_var_b", choices = var_names)
             }
@@ -319,8 +321,10 @@ priors_shiny <- function(spatial_data,
                     function(model_output) {
                         # Run the model
                         run_no(run_no() + 1)
-                        model_vals$model_outputs[[run_no()]] <- model_output
-                        model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
+                        run_label <- paste0("Run-", run_no())
+
+                        model_vals$model_outputs[[run_label]] <- model_output
+                        model_vals$parsed_outputs[[run_label]] <- parse_model_output(
                             model_output = model_output,
                             measurement_data = measurement_data
                         )
@@ -335,7 +339,6 @@ priors_shiny <- function(spatial_data,
                             "pg_ar1" = input$pg_ar1
                         )
 
-                        run_label <- paste0("Run-", run_no())
                         model_vals$run_params[[run_label]] <- run_params
 
                         if (write_logs) {
@@ -374,17 +377,31 @@ priors_shiny <- function(spatial_data,
             rownames = TRUE
         )
 
-        map_plot <- shiny::eventReactive(input$select_run_map, ignoreNULL = FALSE, {
+        map_raster <- shiny::eventReactive(input$select_run_map, ignoreNULL = FALSE, {
             if (length(model_vals$parsed_outputs) == 0) {
                 return()
             }
 
             data <- model_vals$parsed_outputs[[input$select_run_map]]
-            pred_field <- create_prediction_field(var_a = input$map_var_a, var_b = input$map_var_b, mesh = mesh)
+
+            mod_proj <- fmesher::fm_evaluator(mesh)
+            xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
+            A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
+
+            var_a <- data$mean_post[input$map_var_a]
+            var_b <- data$mean_post[input$map_var_b]
+
+            z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
+            pred_field <- base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
+            # pred_field <- create_prediction_field(var_a = input$map_var_a, var_b = input$map_var_b, mesh = mesh)
             create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
         })
 
         output$map_out <- leaflet::renderLeaflet({
+            if (is.null(map_plot())) {
+                return()
+            }
+
             m <- leaflet::leaflet()
             m <- leaflet::addTiles(m, group = "OSM")
             m <- leaflet::addRasterImage(m, map_plot(), opacity = 0.9, group = "Raster")

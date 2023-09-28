@@ -92,11 +92,10 @@ By default the app will write out parameter sets and logs to the `fdmr/logs` dir
 
 We're now ready to run the app. To do this we'll call the `fdmr::interactive_priors` function, passing in
 
-- `sp_data` - the spatial data covering areas across the city of Bristol
-- `covid19_data` - the COVID-19 data we want to model
-- `mesh` - the mesh we created above
-
-data we want to use, the measurement data 
+- `spatial_data = sp_data` - the spatial data covering areas across the city of Bristol
+- `measurement_data = covid19_data` - the COVID-19 data we want to model
+- `mesh = mesh` - the mesh we created above
+- `time_variable = week` - the name of the time variable in the data
 
 ```{r eval=FALSE}
 fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh=mesh, time_variable="week")
@@ -106,6 +105,6 @@ fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data
 
 The outputs of the model run by the app can be viewed in the `fdmr/logs` folder in your home directory. There you'll find three log files
 
-1. `priors_exploration_applog_timestamp.txt` - holds general logging information and errors
-2. `priors_exploration_parameters_timestamp.json` - holds the priors used in each model run
-3. `priors_exploration_modelout_timestamp.rds` - holds the model output for each run
+- `priors_exploration_applog_timestamp.txt` - holds general logging information and errors
+- `priors_exploration_parameters_timestamp.json` - holds the priors used in each model run
+- `priors_exploration_modelout_timestamp.rds` - holds the model output for each run
