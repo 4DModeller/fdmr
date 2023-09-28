@@ -24,6 +24,8 @@ navbar:
           href: articles/hydro.html
         - text: "Priors exploration"
           href: articles/priors.html
+        - text: INLA Crash FAQ
+          href: articles/inla_FAQ.html
         - text: "Interactive priors Shiny app"
           href: articles/priors_app.html
         - text: "Map plotting"
