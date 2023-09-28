@@ -393,20 +393,8 @@ priors_shiny <- function(spatial_data,
             }
 
             data <- model_vals$parsed_outputs[[input$select_run_map]]
-
-            mod_proj <- fmesher::fm_evaluator(mesh)
-            xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
-            A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
-
-            var_a <- data[[input$map_var_a]]
-            var_b <- data[[input$map_var_b]]
-
-            z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
-            pred_field <- base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
-            # pred_field <- create_prediction_field(var_a = input$map_var_a, var_b = input$map_var_b, mesh = mesh)
-            raster <- create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
-
-            return(raster)
+            pred_field <- create_prediction_field(var_a = data[[input$map_var_a]], var_b = data[[input$map_var_b]], mesh = mesh)
+            create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
         })
 
         output$map_out <- leaflet::renderLeaflet({
