@@ -10,11 +10,14 @@ meshbuilder_shiny(
   crs = NULL,
   max_edge = NULL,
   offset = NULL,
-  cutoff = NULL
+  cutoff = NULL,
+  plot_poly = FALSE,
+  latitude_column = "LAT",
+  longitude_column = "LONG"
 )
 }
 \arguments{
-\item{spatial_data}{Spatial data}
+\item{spatial_data}{a data.frame or tibble containing spatial data}
 
 \item{crs}{CRS as a proj4string}
 
@@ -23,6 +26,10 @@ meshbuilder_shiny(
 \item{offset}{Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d}
 
 \item{cutoff}{The minimum allowed distance between points, passed to inla.mesh.2d}
+
+\item{latitude_column}{Name of the latitude column in the spatial data}
+
+\item{longitude_column}{Name of the longitude column in the spatial data}
 
 \item{data}{Observations data, for use with the check_mesh functionality}
 }

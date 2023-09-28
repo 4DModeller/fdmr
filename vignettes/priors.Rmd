@@ -183,7 +183,7 @@ INLA_infer <- function(mesh, prior_range, ps_range,
   )
 
   fitted.mean.post <- inlabru_model$summary.fitted.values$mean[1:nrow(data)]
-  fitted.sd.post <- inlabru_model$summary.fitted.values$mean[1:nrow(data)]
+  fitted.sd.post <- inlabru_model$summary.fitted.values$sd[1:nrow(data)]
 
   mean.post <- inlabru_model$summary.random$f$mean
   sd.post <- inlabru_model$summary.random$f$sd

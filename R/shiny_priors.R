@@ -80,12 +80,7 @@ priors_shiny <- function(spatial_data,
 
     # TODO - if we modularise the Shiny apps and setup a different directory
     # structure we can remove this
-    got_internet <- curl::has_internet()
-    if (got_internet) {
-        busy_spinner <- shinybusy::add_busy_gif("https://raw.githubusercontent.com/4DModeller/logo/main/4DMlogo_loading.gif", height = 100, width = 100, position = "top-right")
-    } else {
-        busy_spinner <- shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20))
-    }
+    busy_spinner <- get_busy_spinner()
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
