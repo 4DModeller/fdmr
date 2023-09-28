@@ -340,3 +340,5 @@ regr_est <- cbind.data.frame(
 
 regr_est
 ```
+
+The modelling performance and results of the MCMC-BYM, INLA-BYM and INLA-SPDE approaches can be affected by the choice of the spatial model, the inference method and the data characteristics. MCMC-BYM and INLA-BYM use different inference methods, with the latter being faster. In the MCMC-BYM approach, spatial correlation structure is captured by a $n\times n$ adjacency matrix. Specifically, if two locations are adjacent in geography, they are spatially correlated, leading to data smoothing between them. However, the INLA-SPDE approach uses the Matern model, where spatial correlation depends on the distance between two locations, rather than their geographic adjacency. Thus, even if two locations are not geographically adjacent, they can still exhibit correlation. 
