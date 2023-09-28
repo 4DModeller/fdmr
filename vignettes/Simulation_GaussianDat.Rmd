@@ -21,7 +21,6 @@ knitr::opts_chunk$set(echo = TRUE)
 In this tutorial, we'll start by generating some simulated spatio-temporal data, with the city of Bristol as our study region. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
 
 
-
 # Data simulation
 First we simulate some Gaussian distributed data observed at 55 spatial locations in Bristol, UK and across 6 time points. We use the `load_tutorial_data function` to load in the geographical information for the spatial locations in Bristol.
 
@@ -30,22 +29,16 @@ sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_data
 
 ```
 
-Then we simulate the Gaussian data.
+
+Then we simulate the Gaussian data that exhibit spatio-temporal correlation. These simulated data are finally organized into a data frame named `simdf`, where each row corresponds to an observation at a specific location and time. The variable `ID` is the spatial location identifier. Variable `time` denotes the time point. The variable `datn` represents the simulated response data. The longitude and latitude coordinates for each location are stored in the variables `LONG` and `LAT`, respectively.
 
 ```{r simdat} 
-
-# Load INLA 
 library(INLA) 
-
-# Time and locations. 
-# In this tutorial the spatial locations are defined using 
-# longitude and latitude coordinates
 
 n.time<-6
 n <- 55
 locs<- as.matrix(sp_data@data[,c("LONG","LAT")])
 
-# Construct a mesh and SPDE to introduce spatial correlation into the simulated data  
 initial_range <-diff(range(locs[,1]))/3
 max_edge<-initial_range /2
 mesh <- fmesher::fm_mesh_2d(loc=locs,
@@ -61,8 +54,6 @@ spde <- INLA::inla.spde2.pcmatern(
   prior.sigma = c(1, 0.01) 
 )
 
-# Simulate a spatial random field for each time point
-
 sigma0 <- 7
 range0 <- 0.03
 kappa0 <- sqrt(8 / 1) / range0
@@ -75,17 +66,12 @@ for (co in 1:ncol(x.mat)){
   x.mat[,co]<-INLA::inla.qsample(n = 1, Q)
 } 
 
-# Create a matrix A that projects the random field values 
-# from mesh nodes to the observation locations for each time point
-
 A <- INLA::inla.spde.make.A(mesh=mesh, loc=locs)
 x.dat<-matrix(NA,ncol=n.time,nrow =n)
 for (t in 1:ncol(x.dat)){
   x.dat[,t] <- drop(A %*% x.mat[,t]) 
 }
 
-# Specify the temporal correlation coefficient, and 
-# simulate the data at time point t based on the data at time t-1 
 
 alpha<-0.9
 sp.mat<-matrix(NA,ncol = n.time,nrow = n)
@@ -94,20 +80,11 @@ for (t in 2:n.time){
   sp.mat[,t]<-alpha*sp.mat[,t-1]+x.dat[,t]
 }
 
-# Linear predictor
+
 beta0 <- 0.5 
 sigma_e <- 0.1 
 lin.pred <- beta0 + sp.mat
 y.mat <- lin.pred+matrix(rnorm(n*n.time,0,sigma_e),ncol=n.time)
-
-# Organize the simulated data into a data frame, where each row
-# corresponds to an observation at a specific location and time. 
-# The variable `ID` is the spatial location identifier. 
-# Variable `time` denotes the time point. 
-# The variable `datn` represents the simulated response data. 
-# The longitude and latitude coordinates for each location are stored in
-# the variables `LONG` and `LAT`, respectively.
-
 
 simdf<-data.frame(ID=rep(1:n,each=n.time),
                   time = rep(c(1:n.time),n),
@@ -121,6 +98,21 @@ A histogram is created to visualize the distribution of the simulated Gaussian d
 
 ```{r hist,error=TRUE,fig.cap="A histogram of the simulated Gaussian data.", fig.width=8, fig.height=4, fig.align = "center"}
 hist(simdf$datn,main='', xlab='Data')
+```
+
+We can also map the simulated data using the `fdmr::plot_map` function. For example, a map of the simulated data at the first time point is given as
+
+```{r mapsimdat,error=TRUE,fig.cap="A map of the simulated data in Bristol at the first time point.", fig.width=8, fig.height=4, fig.align = "center"}
+fdmr::plot_map(
+  polygon_data = sp_data,
+  domain = simdf[simdf$time==1,"datn"],
+  palette = "Reds",
+  legend_title = "Data",
+  add_scale_bar = TRUE,
+  polygon_fill_opacity = 1,
+  polygon_line_colour = "transparent"
+)
+
 ```
 
 
@@ -149,6 +141,7 @@ spde <- INLA::inla.spde2.pcmatern(
 ```
 
 ## Define how the process evolves over time, set prior for the temporal parameter and define a temporal index
+
 ```{r pccor, error=TRUE}
 rhoprior <- base::list(theta = list(prior = 'pccor1', param = c(0, 0.9)))
 group.index<-simdf$time
@@ -175,6 +168,7 @@ sp::coordinates(simdf)<- c("LONG","LAT")
 
 
 ## Fit the model
+
 Finally, we fit the spatio-temporal model using SPDE approach and AR(1) process by calling the function `bru()` of the package `inlabru`.
 
 ```{r fitmodel}
@@ -269,7 +263,3 @@ The `fdmr::plot_map` function generates a map of the region based on the provide
 ```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align = "center"}
 fdmr::plot_map(polygon_data = sp_data)
 ```
-
-
-
-
