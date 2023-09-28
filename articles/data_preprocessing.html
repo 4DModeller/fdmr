@@ -228,16 +228,72 @@ MSOA. The remaining columns store the data for each covariate in each
 MSOA and week.</p>
 <p>Therefore, the expected observation and measurement data format for a
 spatio-temporal Bayesian hierarchical model as in the COVID-19 tutorial
-should be a data frame that includes one column for the response data
-(e.g., <code>cases</code>), two columns for the spatial location of each
-observation (e.g., <code>LONG</code> and <code>LAT</code>), and one
-column containing time point indices indicating when each observation
-was collected (e.g., <code>week</code> = 1, 2, …). If the model
-incorporates covariates, then the covariate data should also be included
-in the same data frame, and each covariate is stored in one column.
-Users can use any variable names for the columns, as long as they ensure
-consistency with those used when defining the model formula and fitting
-the model.</p>
+should be a data frame that includes one column for the response
+variable (e.g., <code>cases</code>), two columns for the spatial
+location of each observation (e.g., <code>LONG</code> and
+<code>LAT</code>), and one column containing time point indices
+indicating when each observation was collected (e.g., <code>week</code>
+= 1, 2, …). If the model incorporates covariates, then the covariate
+data should also be included in the same data frame, and each covariate
+is stored in one column. Users can use any variable names for the
+columns, as long as they ensure consistency with those used when
+defining the model formula and fitting the model. The following table
+provides a summary of the expected data format for running the BHM in
+the <code>fdmr</code> package:</p>
+<table class="table">
+<colgroup>
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+</colgroup>
+<thead><tr class="header">
+<th>ID</th>
+<th>LONG</th>
+<th>LAT</th>
+<th>Time</th>
+<th>Response Variable</th>
+<th>Covariate 1</th>
+<th>Covariate 2</th>
+<th>Covariate…</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr class="odd">
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table>
 <p>With <code>sp_data</code> and <code>covid19_data</code> in the
 expected data object and format, we now possess all the essential
 information required for the fitting the BHM and visualising the
