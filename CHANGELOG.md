@@ -22,4 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Use of `rgdal` functions migrated to `sf` equivalents due to [`rgdal` retirement](https://r-spatial.org/r/2022/04/12/evolution.html) - [PR #145](https://github.com/4DModeller/fdmr/pull/145)
+
 ### Removed
