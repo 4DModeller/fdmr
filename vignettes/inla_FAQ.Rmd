@@ -2,7 +2,7 @@
 title: "INLA FAQ"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{inlaFAQ}
+  %\VignetteIndexEntry{INLA FAQ}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
