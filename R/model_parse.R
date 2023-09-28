@@ -43,3 +43,26 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
         return(parse_model_output_bru(model_output = model_output, measurement_data = measurement_data))
     }
 }
+
+
+#' Create a prediction field from the parsed model output and the mesh
+#'
+#' @param var_a 
+#' @param var_b 
+#' @param mesh 
+#'
+#' @return data.frame
+#' @export
+create_prediction_field <- function(var_a, var_b, mesh) {
+    mod_proj <- fmesher::fm_evaluator(mesh)
+    xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
+    A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
+
+    z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
+    base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
+}
+
+
+create_raster <- function(dataframe, crs) {
+    raster::rasterFromXYZ(dataframe, crs = crs)
+}

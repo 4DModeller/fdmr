@@ -41,13 +41,13 @@ utils::head(covid19_data)
 
 # Create the mesh
 
-We can have a look at the mesh and change it interactively using the `mesh_builder` Shiny app. Using the app I came up with a mesh with the following parameters, we'll use this
-and pass it into the Setting Priors Shiny app below.
+We can have a look at the mesh and change it interactively using the `fdmr::mesh_builder` Shiny app. Using the app I came up with a mesh with the following parameters, we'll use this and pass it into the "Setting Priors Shiny app" below.
 
 ```{r createmesh, error=TRUE}
 initial_range <- diff(base::range(sp_data@data[, "LONG"])) / 3
 max_edge <- initial_range / 2
-mesh <- INLA::inla.mesh.2d(
+
+mesh <- fmesher::fm_mesh_2d_inla(
   loc = sp_data@data[, c("LONG", "LAT")],
   max.edge = c(1, 2) * max_edge,
   offset = c(initial_range, initial_range),
@@ -64,7 +64,7 @@ n_groups <- length(unique(covid19_data$week))
 
 # Set coordinates on data
 
-We will use the function `bru()` of package `inlabru` to fit the model. `bru` expects the coordinates of the data, thus we transform `covid19_data_bris` data set to a SpatialPointsDataFrame using the function `coordinates()` of the `sp` package.
+We will use the function [`inlabru::bru`](https://inlabru-org.github.io/inlabru/reference/bru.html) function to fit the model which expects the coordinates of the data, thus we transform `covid19_data` data set to a [`SpatialPointsDataFrame`](https://www.rdocumentation.org/packages/sp/versions/2.0-0/topics/SpatialPointsDataFrame-class) using the [`sp::coordinates`](https://www.rdocumentation.org/packages/sp/versions/2.0-0/topics/coordinates) function.
 
 ```{r, error=TRUE, eval=FALSE}
 sp::coordinates(covid19_data) <- c("LONG", "LAT")
@@ -74,9 +74,29 @@ sp::coordinates(covid19_data) <- c("LONG", "LAT")
 
 Now we have the filtered data we are ready to pass in the spatial 
 
-First start by selecting the variable to model. In this example we'll select `cases`, then select the features to add to the formula. At the bottom of the window you'll see the formula being constructed.
-Click on the checkboxes to select your formula and then click the `Run Model` button to run the model see it's output plot on the right of the window.
+## Selecting priors
+
+First start by selecting the variable to model. In this example we'll select `cases`, then select the features to add to the formula. At the bottom of the window you'll see the formula being constructed. Once you've setup the formula to your specifications click on the `Model` tab and click `Run`. Once the model run has finished you'll see a table of summarised model outputs.
+
+## Plotting model outputs
+
+Once the model has run you view plots of model outputs by clicking on the `Plot` tab. Each time you run a model with different sets or priors the parsed model output saved and can be compared with previous runs. 
+
+## Plotting model ouputs on a map
+
+To plot model predictions on a map click on the `Map` tab. This will use the `fdmr::create_prediction_field` and `fdmr::create_raster` functions to first create a `data.frame` of model predictions and then create a raster image from this data.
+
+## Saving model outputs
+
 By default the app will write out parameter sets and logs to the `fdmr/logs` directory in your home folder. If you want these logs to be written to a different folder, you can pass in the folder path to the `log_folder` argument.
+
+We're now ready to run the app. To do this we'll call the `fdmr::interactive_priors` function, passing in
+
+- `sp_data` - the spatial data covering areas across the city of Bristol
+- `covid19_data` - the COVID-19 data we want to model
+- `mesh` - the mesh we created above
+
+data we want to use, the measurement data 
 
 ```{r eval=FALSE}
 fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh=mesh, time_variable="week")

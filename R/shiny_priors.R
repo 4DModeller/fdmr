@@ -158,8 +158,15 @@ priors_shiny <- function(spatial_data,
                         shiny::plotOutput(outputId = "plot_model_out")
                     ),
                     shiny::tabPanel(
+                        "Map",
+                        shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c()),
+                        shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = c()),
+                        shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = c()),
+                        leaflet::leafletOutput(outputId = "map_out")
+                    ),
+                    shiny::tabPanel(
                         "Code",
-                        shiny::selectInput(inputId = "select_run", label = "Select run:", choices = c()),
+                        shiny::selectInput(inputId = "select_run_code", label = "Select run:", choices = c()),
                         shiny::verbatimTextOutput(outputId = "code_out")
                     ),
                     shiny::tabPanel(
@@ -200,8 +207,20 @@ priors_shiny <- function(spatial_data,
             names(model_vals$run_params)
         })
 
+        model_summary_variables <- shiny::reactive({
+            names(model_vals$model_outputs)
+        })
+
         shiny::observe({
-            shiny::updateSelectInput(session = session, inputId = "select_run", choices = run_names())
+            shiny::updateSelectInput(session = session, inputId = "select_run_map", choices = run_names())
+            shiny::updateSelectInput(session = session, inputId = "select_run_code", choices = run_names())
+
+            if (!is.null(run_names())) {
+                run_name <- run_names()[1]
+                var_names <- names(model_vals$parsed_outputs[[run_name]])
+                shiny::updateSelectInput(session = session, inputId = "map_var_a", choices = var_names)
+                shiny::updateSelectInput(session = session, inputId = "map_var_b", choices = var_names)
+            }
         })
 
         shiny::observeEvent(input$features, {
@@ -354,6 +373,23 @@ priors_shiny <- function(spatial_data,
             },
             rownames = TRUE
         )
+
+        map_plot <- shiny::eventReactive(input$select_run_map, ignoreNULL = FALSE, {
+            if (length(model_vals$parsed_outputs) == 0) {
+                return()
+            }
+
+            data <- model_vals$parsed_outputs[[input$select_run_map]]
+            pred_field <- create_prediction_field(var_a = input$map_var_a, var_b = input$map_var_b, mesh = mesh)
+            create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
+        })
+
+        output$map_out <- leaflet::renderLeaflet({
+            m <- leaflet::leaflet()
+            m <- leaflet::addTiles(m, group = "OSM")
+            m <- leaflet::addRasterImage(m, map_plot(), opacity = 0.9, group = "Raster")
+            m
+        })
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
             if (length(model_vals$parsed_outputs) == 0) {
