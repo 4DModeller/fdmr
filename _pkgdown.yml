@@ -76,4 +76,5 @@ reference:
     - require_packages
     - load_tutorial_data
     - numbers_only
+    - get_tmpdir
 

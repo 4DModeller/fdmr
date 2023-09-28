@@ -3,7 +3,7 @@
 #' TODO - add this gif to the package
 #'
 #' @return busyspinner
-#' @export
+#' @keywords internal
 get_busy_spinner <- function() {
     if (curl::has_internet()) {
         busy_spinner <- shinybusy::add_busy_gif("https://raw.githubusercontent.com/4DModeller/logo/main/4DMlogo_loading.gif", height = 100, width = 100, position = "top-right")
