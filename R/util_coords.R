@@ -28,7 +28,7 @@ latlong_to_utm <- function(lat, lon) {
 #' @param spatial_data
 #'
 #' @return bool
-#' @export
+#' @keywords internal
 has_coords <- function(spatial_data) {
   tryCatch(
     {

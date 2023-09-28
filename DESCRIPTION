@@ -49,7 +49,6 @@ Imports:
     spdep,
     gridExtra,
     leaflet,
-    archive,
     shiny,
     stringr,
     shinybusy,
