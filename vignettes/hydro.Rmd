@@ -315,7 +315,11 @@ inlabru_model2 <- inlabru::bru(formula2,
 )
 ```
 
-Now it's time to see its output
+Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, measurement data and mesh. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data.
+
+```{r eval=FALSE}
+fdmr::model_viewer()
+```
 
 ```{r error=TRUE}
 # TODO : this could be where the model_eval function I recommend could be used
