@@ -22,9 +22,10 @@ In this tutorial, we'll start by generating some simulated spatio-temporal data,
 
 
 # Data simulation
-First we simulate some Gaussian distributed data observed at 55 spatial locations in Bristol, UK and across 6 time points. We use the `load_tutorial_data function` to load in the geographical information for the spatial locations in Bristol.
+First we simulate some Gaussian distributed data observed at 55 spatial locations in Bristol, UK and across 6 time points. We use the `fdmr::retrieve_tutorial_data` function and the `fdmr::load_tutorial_data` function to retrieve and load in the geographical information for the spatial locations in Bristol from the `fdmr` example data store.
 
 ```{r loadsp}
+fdmr::retrieve_tutorial_data(dataset = "priors")
 sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_dataBris.rds")
 
 ```
