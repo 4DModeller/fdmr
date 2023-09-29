@@ -35,11 +35,12 @@ meshbuilder_shiny <- function(
     }
   }
 
+  # TODO : can we change here so that it uses the following string:
+  #.       "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
   if (is.null(crs)) {
     crs <- sf::st_crs(spatial_data)
     if (is.na(crs$input)) {
-      # stop("Unable to read CRS from data, please pass proj4string CRS to crs argument.")
-      crs <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+      stop("Unable to read CRS from data, please pass proj4string CRS to crs argument.")
     }
   } else {
     # We try and create a CRS to make sure a valid CRS has been passed
