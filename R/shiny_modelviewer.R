@@ -5,16 +5,19 @@
 #'
 #' @return shiny::app
 #' @keywords internal
-model_viewer_shiny <- function(model_output, measurement_data, mesh) {
+model_viewer_shiny <- function(model_output, mesh, measurement_data) {
     busy_spinner <- get_busy_spinner()
 
-    parsed_model_output <- parse_model_output(model_output = model_output, measurement_data = measurement_data)
+    parsed_model_output <- parse_model_output(
+        model_output = model_output,
+        measurement_data = measurement_data
+    )
 
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
     parsed_names <- names(parsed_model_output)
     map_vars <- parsed_names[!parsed_names %in% c("dic", "pars")]
-
+    browser()
     ui <- shiny::fluidPage(
         busy_spinner,
         shiny::headerPanel(title = "Model viewer"),
@@ -38,7 +41,6 @@ model_viewer_shiny <- function(model_output, measurement_data, mesh) {
                     ),
                     shiny::tabPanel(
                         "Map",
-                        shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c()),
                         shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = map_vars),
                         shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = map_vars),
                         leaflet::leafletOutput(outputId = "map_out")
@@ -71,20 +73,19 @@ model_viewer_shiny <- function(model_output, measurement_data, mesh) {
                 leaflet::addRasterImage(map_raster(), opacity = 0.9, group = "Raster")
         })
         # Run the application
-        shiny::shinyApp(ui = ui, server = server)
     }
+
+    shiny::shinyApp(ui = ui, server = server)
 }
 
 #' Mesh building shiny app. Creates and visualises a mesh from some spatial data.
 #'
-#' @param spatial_data Spatial datas
+#' @param model_output INLA model output
+#' @param mesh INLA mesh
+#' @param measurement_data Measurement data
 #'
 #' @return shiny::app
 #' @export
-model_viewer <- function(spatial_data, measurement_data, mesh) {
-    shiny::runApp(model_viewer_shiny(
-        spatial_data = spatial_data,
-        measurement_data = measurement_data,
-        mesh = mesh
-    ))
+model_viewer <- function(model_output, mesh, measurement_data) {
+    shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data))
 }

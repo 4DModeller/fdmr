@@ -6,9 +6,6 @@
 #' @return list
 #' @keywords internal
 parse_model_output_bru <- function(model_output, measurement_data) {
-    cat(nrow(measurement_data), nrow(model_output$summary.fitted.values))
-    return(NULL)
-
     fitted_mean_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
     fitted_sd_post <- model_output$summary.fitted.values$sd[seq_len(nrow(measurement_data))]
 
@@ -53,9 +50,9 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
 
 #' Create a prediction field from the parsed model output and the mesh
 #'
-#' @param var_a 
-#' @param var_b 
-#' @param mesh 
+#' @param var_a
+#' @param var_b
+#' @param mesh
 #'
 #' @return data.frame
 #' @export
@@ -64,7 +61,7 @@ create_prediction_field <- function(var_a, var_b, mesh) {
     xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
     A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
 
-    z <- base::exp(base::as.numeric(A_proj %*%  var_a[1:mesh$n]) + base::sum(var_b))
+    z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
     base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
 }
 

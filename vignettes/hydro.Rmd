@@ -298,27 +298,27 @@ formula2 <- streamflow ~ 0 + Intercept + precip +
 
 
 ```{r error=TRUE, modelrun}
-inlabru_model1 <- inlabru::bru(formula1,
+model_out_a <- inlabru::bru(formula1,
   data = inla_data,
   family = "gaussian",
   options = list(
-    verbose = TRUE
+    verbose = FALSE
   )
 )
 
-inlabru_model2 <- inlabru::bru(formula2,
-  data = inla_data,
-  family = "gaussian",
-  options = list(
-    verbose = TRUE
-  )
-)
+# inlabru_model2 <- inlabru::bru(formula2,
+#   data = inla_data,
+#   family = "gaussian",
+#   options = list(
+#     verbose = TRUE
+#   )
+# )
 ```
 
 Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, measurement data and mesh. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data.
 
 ```{r eval=FALSE}
-fdmr::model_viewer()
+fdmr::model_viewer(model_output = model_out_a, mesh = mesh, measurement_data = inla_data)
 ```
 
 ```{r error=TRUE}
