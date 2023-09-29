@@ -1,6 +1,9 @@
 #' Parse inlabru model output
 #'
-#' @param
+#' @param model_output INLA model output
+#' @param mesh INLA mesh
+#' @param measurement_data Measurement data
+#' 
 #' @importFrom magrittr %>%
 #'
 #' @return shiny::app
@@ -17,7 +20,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
 
     parsed_names <- names(parsed_model_output)
     map_vars <- parsed_names[!parsed_names %in% c("dic", "pars")]
-    browser()
+  
     ui <- shiny::fluidPage(
         busy_spinner,
         shiny::headerPanel(title = "Model viewer"),
@@ -64,7 +67,8 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
             )
 
             crs <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
-            create_raster(dataframe = pred_field, crs = sp::CRS(crs))
+            raster = create_raster(dataframe = pred_field, crs = sp::CRS(crs))
+            browser()
         })
 
         output$map_out <- leaflet::renderLeaflet({

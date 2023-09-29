@@ -28,7 +28,8 @@ First we will look at the location of the dam by making a map and plotting the s
 ```{r error=TRUE,warning=FALSE}
 # TODO : here is a good example for the map function
 norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
+#norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
+norway_polygon <- rgdal::readOGR(norway_polygon_path)
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map`
@@ -301,13 +302,13 @@ model_out_a <- inlabru::bru(formula1,
   )
 )
 
-# inlabru_model2 <- inlabru::bru(formula2,
-#   data = inla_data,
-#   family = "gaussian",
-#   options = list(
-#     verbose = TRUE
-#   )
-# )
+inlabru_model2 <- inlabru::bru(formula2,
+  data = inla_data,
+  family = "gaussian",
+  options = list(
+    verbose = TRUE
+  )
+)
 ```
 
 Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, measurement data and mesh. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data.

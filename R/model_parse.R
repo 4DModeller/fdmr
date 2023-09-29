@@ -47,9 +47,9 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
 
 #' Create a prediction field from the parsed model output and the mesh
 #'
-#' @param var_a
-#' @param var_b
-#' @param mesh
+#' @param var_a Variable a data
+#' @param var_b Variable b data
+#' @param mesh INLA mesh
 #'
 #' @return data.frame
 #' @export
