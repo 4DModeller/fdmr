@@ -4,6 +4,7 @@ pkgdown_sha: ~
 articles:
   DecisionTree: DecisionTree.html
   Simulation_GaussianDat: Simulation_GaussianDat.html
+  Simulation_PoissonDat: Simulation_PoissonDat.html
   covid: covid.html
   covid_ST_mcmc: covid_ST_mcmc.html
   covid_mcmc: covid_mcmc.html
@@ -14,7 +15,7 @@ articles:
   meshbuilder: meshbuilder.html
   priors: priors.html
   priors_app: priors_app.html
-last_built: 2023-09-29T10:29Z
+last_built: 2023-09-29T10:41Z
 urls:
   reference: https://4dmodeller.github.io/fdmr/reference
   article: https://4dmodeller.github.io/fdmr/articles
