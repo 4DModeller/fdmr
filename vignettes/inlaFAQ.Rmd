@@ -1,0 +1,72 @@
+---
+title: "INLA FAQ"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{inlaFAQ}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+There are number of issues that can crop up when running/fitting the model either using INLA or inlabru. Below we have compiled issues that we find common but we also recommend asking questions on the [google groups forum](https://groups.google.com/g/r-inla-discussion-group).
+
+## Has the model actually crashed?
+
+Does the model stop running and give error like `inla.inlaprogram.has.crash(): the inla-program exited with an error. …..`? Or does it give other messages but has not actually crashed?
+
+INLA models can take some time to produce solutions and often times will give messages like "failed to factorize Q". However this does not mean the model has completely failed, only that in that iteration it did not complete it's task. Allow the model to run as long as it needs or returns a crash message.
+
+## Are you running the model in verbose mode?
+
+The model can be run in verbose mode so that it outputs feedback. This feedback can be useful for diagnosing issues. Running in verbose mode is done like so:
+
+```{rerror=TRUE,message=FALSE,warning=FALSE}
+fit.mod<-bru(formula, data =XX,
+                   family = XX,
+                   options = list(
+                     inla.mode="classic", # or “inla.mode="experimental"
+                     verbose = TRUE) )
+```
+
+## Memory issues
+- How large is your data set?
+- How many mesh nodes? Is the mesh well designed (e.g., no isolated triangles)?
+- Have you tried reducing the number of mesh nodes and testing which mesh size avoids errors?
+ 
+
+## `inla.mode="classic"` or `inla.mode="experimental"`
+
+`inlabru` has two modes "classic" and "experimental". It is often the case that if you switch the mode then the model will not crash and you will get a result. To do so, add the parameter either `inla.mode="classic"` or `inla.mode="experimental"` to the INLAbru call function. So, it’s something like:
+
+```{rerror=TRUE,message=FALSE,warning=FALSE}
+fit.mod<-bru(formula, data =XX,
+                   family = XX,
+                   options = list(
+                     inla.mode="classic", # or “inla.mode="experimental"
+                     verbose = TRUE) )
+```
+
+## How many threads are you using?
+
+By default, `inlabru` will use however many threads are available. However this can cause issues. You can limit the number of threads with `num.threads`, by setting `num.threads="1:1"`:
+
+```{rerror=TRUE,message=FALSE,warning=FALSE}
+fit.mod<-bru(formula, data =XX,
+                   family = XX,
+                   options = list(
+                     num.threads="1:1", 
+                     verbose = TRUE) 
+             )
+```
+
+## Have you selected reasonable control parameters?
+
+INLA has a number options that can be accessed in the fitting formula using the `options` parameter. [The list of options is rather large and we encourage you to explore and experiment with them](https://www.rdocumentation.org/packages/inlabru/versions/2.9.0/topics/bru_options). Typically this looks something like:
+
+```{rerror=TRUE,message=FALSE,warning=FALSE}
+fit.mod<-bru(formula, data =XX, family = XX,
+            options = list(
+                     control.inla = list(
+                       reordering = "metis",
+                       int.strategy = "eb"),
+                     verbose = TRUE ) )
+```
