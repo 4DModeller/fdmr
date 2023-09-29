@@ -14,6 +14,7 @@ First we load INLA and then download the data for this tutorial from our [data r
 
 ```{r}
 library(INLA)
+library(magrittr)
 ```
 
 ```{r error=TRUE,message=FALSE,warning=FALSE}
@@ -27,13 +28,7 @@ First we will look at the location of the dam by making a map and plotting the s
 ```{r error=TRUE,warning=FALSE}
 # TODO : here is a good example for the map function
 norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-norway_polygon <- rgdal::readOGR(norway_polygon_path)
-norway_polygon <- sf::st_as_sf(norway_polygon,
-  coords = c("longitude", "latitude"),
-  crs = "+proj=utm +zone=32"
-)
-
-
+norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map`
