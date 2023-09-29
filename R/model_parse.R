@@ -9,9 +9,6 @@ parse_model_output_bru <- function(model_output, measurement_data) {
     fitted_mean_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
     fitted_sd_post <- model_output$summary.fitted.values$sd[seq_len(nrow(measurement_data))]
 
-    pred.25 <- inlabru_model$summary.fitted.values$`0.025quant`[1:nrow(covid19_data)]
-    pred.975 <- inlabru_model$summary.fitted.values$`0.975quant`[1:nrow(covid19_data)]
-
     mean_post <- model_output$summary.random$f$mean
     sd_post <- model_output$summary.random$f$sd
     fixed_mean <- model_output$summary.fixed$mean
