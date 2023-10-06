@@ -68,7 +68,14 @@ utils::head(covid19_data)
 The data frame contains 23 columns. `MSOA11CD` represents the spatial identifier for each data observation. Variable `cases` is the response variable, which is the weekly reported number of COVID-19 cases in each of the 6789 MSOAs in main England over the period from 2022-01-01 to 2022-03-26. Variable `date` indicates the start date of each observation week when the COVID-19 infections data for each MSOA were reported. Variable `week` indicates the week index number that each data observation was collected from. Columns `LONG` and `LAT` indicate the longitude and latitude for each MSOA. Variable `Population` indicates the population size for each MSOA. The remaining columns store the data for each covariate in each MSOA and week. 
 
 
-Therefore, the expected observation and measurement data format for a spatio-temporal Bayesian hierarchical model as in the COVID-19 tutorial should be a data frame that includes one column for the response data (e.g., `cases`), two columns for the spatial location of each observation (e.g., `LONG` and `LAT`), and one column containing time point indices indicating when each observation was collected (e.g., `week` = 1, 2, ...). If the model incorporates covariates, then the covariate data should also be included in the same data frame, and each covariate is stored in one column. Users can use any variable names for the columns, as long as they ensure consistency with those used when defining the model formula and fitting the model.  
+Therefore, the expected observation and measurement data format for a spatio-temporal Bayesian hierarchical model as in the COVID-19 tutorial should be a data frame that includes one column for the response variable (e.g., `cases`), two columns for the spatial location of each observation (e.g., `LONG` and `LAT`), and one column containing time point indices indicating when each observation was collected (e.g., `week` = 1, 2, ...). If the model incorporates covariates, then the covariate data should also be included in the same data frame, and each covariate is stored in one column. Users can use any variable names for the columns, as long as they ensure consistency with those used when defining the model formula and fitting the model. The following table provides a summary of the expected data format for running the BHM in the `fdmr` package:
+
+
+| ID | LONG | LAT | Time  | Response Variable| Covariate  1 | Covariate  2 | Covariate...
+| --- | --- | --- |---|---|--- |---|---|
+| 1 | ... | ... | ... | ... | ... | ... | ...| 
+| 2 | ... | ... | ... | ... | ... | ... | ...| 
+| ... | ... | ... | ... | ... | ... | ... | ...| 
 
 
 With `sp_data` and `covid19_data` in the expected data object and format, we now possess all the essential information required for the fitting the BHM and visualising the results. More details regarding the model fitting process can be found at in the [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html).
