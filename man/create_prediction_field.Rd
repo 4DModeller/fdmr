@@ -4,16 +4,24 @@
 \alias{create_prediction_field}
 \title{Create a prediction field from the parsed model output and the mesh}
 \usage{
-create_prediction_field(var_a, var_b, mesh, crs = NULL)
+create_prediction_field(
+  mesh,
+  plot_type = "predicted_mean_fields",
+  data_type = "poisson",
+  var_a = NULL,
+  var_b = NULL
+)
 }
 \arguments{
-\item{var_a}{Variable a data}
-
-\item{var_b}{Variable b data}
-
 \item{mesh}{INLA mesh}
 
-\item{crs}{CRS as a proj4string}
+\item{plot_type}{Type of plot to create, "predicted_mean_fields" etc}
+
+\item{data_type}{Type of data, "poisson" etc}
+
+\item{var_a}{Data for variable a, required for "predicted_mean_fields" and "random_effect_fields"}
+
+\item{var_b}{Data for variable b, required for "predicted_mean_fields"}
 }
 \value{
 data.frame
