@@ -25,24 +25,23 @@ First we'll retrieve the tutorial dataset `preprocessing`.
 fdmr::retrieve_tutorial_data(dataset = "preprocessing")
 ```
 
-Then we load in the shapefile into R, and store it in an object named `sp_data`.
+Then we load in the shapefile into R using [`sf::read_sf`](https://r-spatial.github.io/sf/reference/st_read.html), and store it in an object named `sp_data`.
 
 ```{r shapefile, warning=FALSE,error=FALSE}
 shapefilepath <- fdmr::get_tutorial_datapath(dataset = "preprocessing", filename = "MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp")
-sp_data <- rgdal::readOGR(dsn = shapefilepath)
+sp_data <- sf::read_sf(dsn = shapefilepath)
 ```
 
-The type of the object `sp_data` is a SpatialPolygonsDataFrame. 
+The type of the object `sp_data` is `sf` which behind the scenes is a `tibble_df`.
 
 ```{r classsp}
 class(sp_data)
 ```
 
-Then we retrieve the projection attributes of the shapefile, i.e., `sp_data`, and transform it from its original coordinate reference system (CRS) to a new CRS, which is the World Geodetic System 1984 (WGS84).
+Then we retrieve the projection attributes of the shapefile, i.e., `sp_data`, and transform it from its original coordinate reference system (CRS) to a new CRS, which is the World Geodetic System 1984 (WGS84). Finally, we convert it to a `SpatialPolygonsDataFrame` using [`sf::as_Spatial`](https://r-spatial.github.io/sf/reference/coerce-methods.html).
 
 ```{r transCRS}
-sp::proj4string(sp_data)
-sp_data <- sp::spTransform(sp_data, sp::CRS("+proj=longlat +datum=WGS84 +no_defs"))
+sp_data <- sf::st_transform(sp_data, sf::st_crs("+proj=longlat +datum=WGS84 +no_defs"))
 ```
 
 In the COVID-19 tutorial, the raw COVID-19 infections data and the related covariate data were obtained from the official UK Government COVID-19 dashboard and the Office for National Statistics (ONS). The data were initially downloaded, organised and saved in a CSV file format. The CSV file can be imported into R using the `utils::read.csv()` function. 
@@ -69,7 +68,14 @@ utils::head(covid19_data)
 The data frame contains 23 columns. `MSOA11CD` represents the spatial identifier for each data observation. Variable `cases` is the response variable, which is the weekly reported number of COVID-19 cases in each of the 6789 MSOAs in main England over the period from 2022-01-01 to 2022-03-26. Variable `date` indicates the start date of each observation week when the COVID-19 infections data for each MSOA were reported. Variable `week` indicates the week index number that each data observation was collected from. Columns `LONG` and `LAT` indicate the longitude and latitude for each MSOA. Variable `Population` indicates the population size for each MSOA. The remaining columns store the data for each covariate in each MSOA and week. 
 
 
-Therefore, the expected observation and measurement data format for a spatio-temporal Bayesian hierarchical model as in the COVID-19 tutorial should be a data frame that includes one column for the response data (e.g., `cases`), two columns for the spatial location of each observation (e.g., `LONG` and `LAT`), and one column containing time point indices indicating when each observation was collected (e.g., `week` = 1, 2, ...). If the model incorporates covariates, then the covariate data should also be included in the same data frame, and each covariate is stored in one column. Users can use any variable names for the columns, as long as they ensure consistency with those used when defining the model formula and fitting the model.  
+Therefore, the expected observation and measurement data format for a spatio-temporal Bayesian hierarchical model as in the COVID-19 tutorial should be a data frame that includes one column for the response variable (e.g., `cases`), two columns for the spatial location of each observation (e.g., `LONG` and `LAT`), and one column containing time point indices indicating when each observation was collected (e.g., `week` = 1, 2, ...). If the model incorporates covariates, then the covariate data should also be included in the same data frame, and each covariate is stored in one column. Users can use any variable names for the columns, as long as they ensure consistency with those used when defining the model formula and fitting the model. The following table provides a summary of the expected data format for running the BHM in the `fdmr` package:
+
+
+| ID | LONG | LAT | Time  | Response Variable| Covariate  1 | Covariate  2 | Covariate...
+| --- | --- | --- |---|---|--- |---|---|
+| 1 | ... | ... | ... | ... | ... | ... | ...| 
+| 2 | ... | ... | ... | ... | ... | ... | ...| 
+| ... | ... | ... | ... | ... | ... | ... | ...| 
 
 
 With `sp_data` and `covid19_data` in the expected data object and format, we now possess all the essential information required for the fitting the BHM and visualising the results. More details regarding the model fitting process can be found at in the [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html).
