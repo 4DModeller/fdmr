@@ -10,9 +10,9 @@ parse_model_output_bru <- function(model_output, measurement_data) {
     fitted_sd_post <- model_output$summary.fitted.values$sd[seq_len(nrow(measurement_data))]
 
     random_effect_fields <- model_output$summary.random$f$mean
+    mean_post <- model_output$summary.random$f$mean
     sd_post <- model_output$summary.random$f$sd
     fixed_mean <- model_output$summary.fixed$mean
-
     dic <- model_output$dic$dic
     pars <- model_output$marginals.hyperpar
 
@@ -20,6 +20,7 @@ parse_model_output_bru <- function(model_output, measurement_data) {
         fitted_mean_post = fitted_mean_post,
         fitted_sd_post = fitted_sd_post,
         random_effect_fields = random_effect_fields,
+        mean_post = mean_post,
         sd_post = sd_post,
         fixed_mean = fixed_mean,
         dic = dic,
@@ -85,7 +86,9 @@ create_prediction_field <- function(mesh,
             z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
         }
     } else {
-        z <- var_a[1:mesh$n]
+        # We get an error here as we only have 265 items
+        # z <- var_a[1:mesh$n]
+        z <- base::as.numeric(A_proj %*% var_a[1:mesh$n])
     }
 
     base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)

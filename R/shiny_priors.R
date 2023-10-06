@@ -382,14 +382,14 @@ priors_shiny <- function(spatial_data,
                     plot_type = "predicted_mean_fields",
                     data_type = data_type,
                     var_a = data[["mean_post"]],
-                    var_b = data[[input$map_var_b]]
+                    var_b = data[["fixed_mean"]]
                 )
             } else {
                 pred_field <- create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
                     data_type = data_type,
-                    var_a = data[[input$map_var_a]]
+                    var_a = data[["mean_post"]]
                 )
             }
 
@@ -453,7 +453,7 @@ priors_shiny <- function(spatial_data,
                 return()
             }
 
-            params <- model_vals$run_params[[input$select_run]]
+            params <- model_vals$run_params[[input$select_run_code]]
 
             paste0(
                 "spde <- INLA::inla.spde2.pcmatern(
