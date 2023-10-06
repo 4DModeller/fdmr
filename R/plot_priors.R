@@ -12,10 +12,13 @@ plot_line_comparison <- function(data, to_plot, title) {
         return("No pars data.")
     }
 
-    ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
+    plot <- ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
         ggplot2::geom_line() +
         ggplot2::ggtitle(title) +
         ggplot2::theme(text = ggplot2::element_text(size = 16))
+
+    browser()
+    plot
 }
 
 

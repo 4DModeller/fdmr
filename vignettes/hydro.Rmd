@@ -32,6 +32,17 @@ norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename =
 norway_polygon <- rgdal::readOGR(norway_polygon_path)
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
+
+```{r}
+norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
+norway_polygon <- rgdal::readOGR(norway_polygon_path)
+norway_polygon <- sf::st_as_sf(norway_polygon,
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
+)
+
+sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
+```
 We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map`
 function with the names and positions. We'll create a list for each of the points and then use the (`dplyr::bind_rows`)[https://dplyr.tidyverse.org/reference/bind.html] function to create a 
 `data.frame` from these.
@@ -193,7 +204,7 @@ get_stream_data <- function(row) {
 pixel_dist_gauge$streamflow <- apply(pixel_dist_gauge, 1, get_stream_data)
 ```
 
-Now we create a new `SpatialPointDataFrame` called `inla_data` for model fitting. The data frame contains the response and predictor data at each spatial location and time point.
+Now we create a new `SpatialPointsDataFrame` called `inla_data` for model fitting. The `data.frame` contains the response and predictor data at each spatial location and time point.
 
 ```{r error=TRUE,inladat}
 inla_data <- merge(pixel_dist_gauge, raster_df, by = c("time", "x", "y"))
@@ -218,7 +229,6 @@ In order to model this with the 4D-Modeller we need to:
 Create the triangulated mesh of the study region and have a quick look at it.
 
 ```{r error=TRUE,warning=FALSE, fig.width=7, fig.height=7}
-# TODO: it would be nice to map the mesh onto the dataset using the mapmaker function i am suggesting
 e <- era5_precip_cropped@extent
 resolution <- raster::res(era5_precip_cropped)
 sr <- "+proj=utm +zone=32"
@@ -227,12 +237,9 @@ xres <- resolution[1] * 2
 yres <- resolution[2] * 2
 
 xy <- sp::coordinates(era5_precip_cropped)
-
-# Maybe this makes the mesh smaller
 xy <- xy[seq(1, nrow(xy), by = 2), ]
+
 colnames(xy) <- c("LONG", "LAT")
-# mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1000, xres*10000), cutoff=2000, crs=sr)
-# mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=2000, crs=sr)
 
 mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = sr)
 
@@ -294,7 +301,7 @@ formula2 <- streamflow ~ 0 + Intercept + precip +
 
 
 ```{r error=TRUE, modelrun}
-model_out_a <- inlabru::bru(formula1,
+inlabru_model1 <- inlabru::bru(formula1,
   data = inla_data,
   family = "gaussian",
   options = list(
@@ -306,19 +313,28 @@ inlabru_model2 <- inlabru::bru(formula2,
   data = inla_data,
   family = "gaussian",
   options = list(
-    verbose = TRUE
+    verbose = FALSE
   )
 )
 ```
+As `create_prediction_field` expects us to have coordinates in degrees of latitude and longitude we need to transform `inla_data` the `SpatialPointsDataFrame` we pass to INLA so that we can easily plot it. We first take the extent of the map
+
+```{r}
+parsed_output = parse_model_output(inlabru_model2, inla_data)
+```
+
+```{r}
+pred_field <- create_prediction_field(parsed_model_output$mean_post, parsed_model_output$fixed_mean, mesh)
+```
+
 
 Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, measurement data and mesh. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data.
 
 ```{r eval=FALSE}
-fdmr::model_viewer(model_output = model_out_a, mesh = mesh, measurement_data = inla_data)
+fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data)
 ```
 
 ```{r error=TRUE}
-# TODO : this could be where the model_eval function I recommend could be used
 summary(inlabru_model1)
 ```
 ```{r error=TRUE}

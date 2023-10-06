@@ -50,11 +50,22 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
 #' @param var_a Variable a data
 #' @param var_b Variable b data
 #' @param mesh INLA mesh
+#' @param crs CRS as a proj4string
 #'
 #' @return data.frame
 #' @export
-create_prediction_field <- function(var_a, var_b, mesh) {
-    mod_proj <- fmesher::fm_evaluator(mesh)
+create_prediction_field <- function(var_a, var_b, mesh, crs = NULL) {
+    if (is.null(crs)) {
+        read_crs <- mesh$crs$input
+        if (is.null(read_crs)) {
+            warning("Cannot read CRS from mesh, pass proj4string to crs otherwise we'll assume crs = +proj=longlat +datum=WGS84")
+            crs <- "+proj=longlat +datum=WGS84"
+        } else {
+            crs <- read_crs
+        }
+    }
+
+    mod_proj <- fmesher::fm_evaluator(mesh, crs = crs)
     xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
     A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
 

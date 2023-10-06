@@ -3,7 +3,7 @@
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
 #' @param measurement_data Measurement data
-#' 
+#'
 #' @importFrom magrittr %>%
 #'
 #' @return shiny::app
@@ -16,11 +16,17 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
         measurement_data = measurement_data
     )
 
+    crs <- mesh$crs$input
+    if (is.null(crs)) {
+        warning("Unable to read CRS from mesh, using default WGS84.")
+        crs <- "+proj=longlat +datum=WGS84"
+    }
+
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
     parsed_names <- names(parsed_model_output)
     map_vars <- parsed_names[!parsed_names %in% c("dic", "pars")]
-  
+
     ui <- shiny::fluidPage(
         busy_spinner,
         shiny::headerPanel(title = "Model viewer"),
@@ -44,8 +50,8 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
                     ),
                     shiny::tabPanel(
                         "Map",
-                        shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = map_vars),
-                        shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = map_vars),
+                        shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = map_vars, selected = "mean_post"),
+                        shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = map_vars, selected = "fixed_mean"),
                         leaflet::leafletOutput(outputId = "map_out")
                     ),
                     shiny::tabPanel(
@@ -66,9 +72,8 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
                 mesh = mesh
             )
 
-            crs <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
-            raster = create_raster(dataframe = pred_field, crs = sp::CRS(crs))
-            browser()
+            raster <- create_raster(dataframe = pred_field, crs = crs)
+            raster
         })
 
         output$map_out <- leaflet::renderLeaflet({
@@ -76,7 +81,41 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
                 leaflet::addTiles(group = "OSM") %>%
                 leaflet::addRasterImage(map_raster(), opacity = 0.9, group = "Raster")
         })
-        # Run the application
+
+        model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
+            if (input$plot_type == "Range") {
+                return(plot_line_comparison(
+                    data = parsed_model_output,
+                    to_plot = "Range for f",
+                    title = "Range"
+                ))
+            } else if (input$plot_type == "Stdev") {
+                return(plot_line_comparison(
+                    data = parsed_model_output,
+                    to_plot = "Stdev for f",
+                    title = "Marginal standard deviation"
+                ))
+            } else if (input$plot_type == "AR(1)") {
+                return(plot_line_comparison(
+                    data = parsed_model_output,
+                    to_plot = "GroupRho for f",
+                    title = "AR(1)"
+                ))
+            } else if (input$plot_type == "Boxplot") {
+                return(plot_priors_boxplot(data = parsed_model_output))
+            } else if (input$plot_type == "Density") {
+                return(plot_priors_density(
+                    data = parsed_model_output,
+                    measurement_data = measurement_data
+                ))
+            } else if (input$plot_type == "DIC") {
+                return(plot_dic(data = parsed_model_output))
+            }
+        })
+
+        output$plot_model_out <- shiny::renderPlot({
+            model_plot()
+        })
     }
 
     shiny::shinyApp(ui = ui, server = server)
