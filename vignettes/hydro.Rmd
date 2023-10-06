@@ -325,6 +325,7 @@ parsed_output = parse_model_output(inlabru_model2, inla_data)
 
 ```{r}
 pred_field <- create_prediction_field(parsed_model_output$mean_post, parsed_model_output$fixed_mean, mesh)
+pred_field
 ```
 
 

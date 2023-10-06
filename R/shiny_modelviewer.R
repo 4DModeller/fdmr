@@ -16,6 +16,9 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
         measurement_data = measurement_data
     )
 
+    # The comparison functions expect a list of lists
+    parsed_modeloutput_plots <- list(parsed_model_output)
+
     crs <- mesh$crs$input
     if (is.null(crs)) {
         warning("Unable to read CRS from mesh, using default WGS84.")
@@ -33,7 +36,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
         shiny::sidebarLayout(
             shiny::sidebarPanel(
                 shiny::selectInput(
-                    inputId = "plot_type",
+                    inputId = "model_type",
                     label = "Model type:",
                     choices = c("inlabru"),
                     selected = "inlabru"
@@ -85,31 +88,31 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
             if (input$plot_type == "Range") {
                 return(plot_line_comparison(
-                    data = parsed_model_output,
+                    data = parsed_modeloutput_plots,
                     to_plot = "Range for f",
                     title = "Range"
                 ))
             } else if (input$plot_type == "Stdev") {
                 return(plot_line_comparison(
-                    data = parsed_model_output,
+                    data = parsed_modeloutput_plots,
                     to_plot = "Stdev for f",
                     title = "Marginal standard deviation"
                 ))
             } else if (input$plot_type == "AR(1)") {
                 return(plot_line_comparison(
-                    data = parsed_model_output,
+                    data = parsed_modeloutput_plots,
                     to_plot = "GroupRho for f",
                     title = "AR(1)"
                 ))
             } else if (input$plot_type == "Boxplot") {
-                return(plot_priors_boxplot(data = parsed_model_output))
+                return(plot_priors_boxplot(data = parsed_modeloutput_plots))
             } else if (input$plot_type == "Density") {
                 return(plot_priors_density(
-                    data = parsed_model_output,
+                    data = parsed_modeloutput_plots,
                     measurement_data = measurement_data
                 ))
             } else if (input$plot_type == "DIC") {
-                return(plot_dic(data = parsed_model_output))
+                return(plot_dic(data = parsed_modeloutput_plots))
             }
         })
 

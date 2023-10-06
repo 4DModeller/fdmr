@@ -68,7 +68,6 @@ create_prediction_field <- function(var_a, var_b, mesh, crs = NULL) {
     mod_proj <- fmesher::fm_evaluator(mesh, crs = crs)
     xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
     A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
-
     z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
     base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
 }
