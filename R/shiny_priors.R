@@ -160,8 +160,8 @@ priors_shiny <- function(spatial_data,
                     shiny::tabPanel(
                         "Map",
                         shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c()),
-                        shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = c()),
-                        shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = c()),
+                        shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
                         leaflet::leafletOutput(outputId = "map_out")
                     ),
                     shiny::tabPanel(
@@ -214,25 +214,6 @@ priors_shiny <- function(spatial_data,
         shiny::observe({
             shiny::updateSelectInput(session = session, inputId = "select_run_map", choices = run_names())
             shiny::updateSelectInput(session = session, inputId = "select_run_code", choices = run_names())
-
-            if (!is.null(run_names())) {
-                # They'll all have the same variable names so we can just take the first
-                run_name <- run_names()[1]
-                var_names <- names(model_vals$parsed_outputs[[run_name]])
-
-                selected_a <- NULL
-                selected_b <- NULL
-                if ("mean_post" %in% var_names) {
-                    selected_a <- "mean_post"
-                }
-
-                if ("fixed_mean" %in% var_names) {
-                    selected_b <- "fixed_mean"
-                }
-
-                shiny::updateSelectInput(session = session, inputId = "map_var_a", choices = var_names, selected = selected_a)
-                shiny::updateSelectInput(session = session, inputId = "map_var_b", choices = var_names, selected = selected_b)
-            }
         })
 
         shiny::observeEvent(input$features, {
@@ -393,7 +374,25 @@ priors_shiny <- function(spatial_data,
             }
 
             data <- model_vals$parsed_outputs[[input$select_run_map]]
-            pred_field <- create_prediction_field(var_a = data[[input$map_var_a]], var_b = data[[input$map_var_b]], mesh = mesh)
+            # c("Predicted mean fields", "Random effect fields")
+            data_type <- tolower(input$map_data_type)
+            if (input$map_plot_type == "Predicted mean fields") {
+                pred_field <- create_prediction_field(
+                    mesh = mesh,
+                    plot_type = "predicted_mean_fields",
+                    data_type = data_type,
+                    var_a = data[["mean_post"]],
+                    var_b = data[["fixed_mean"]]
+                )
+            } else {
+                pred_field <- create_prediction_field(
+                    mesh = mesh,
+                    plot_type = "random_effect_fields",
+                    data_type = data_type,
+                    var_a = data[["mean_post"]]
+                )
+            }
+
             create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
         })
 
@@ -454,7 +453,7 @@ priors_shiny <- function(spatial_data,
                 return()
             }
 
-            params <- model_vals$run_params[[input$select_run]]
+            params <- model_vals$run_params[[input$select_run_code]]
 
             paste0(
                 "spde <- INLA::inla.spde2.pcmatern(

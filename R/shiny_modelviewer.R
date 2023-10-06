@@ -16,7 +16,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
         measurement_data = measurement_data
     )
 
-    # The comparison functions expect a list of lists
+    # The comparison plotting functions expect a list of lists
     parsed_modeloutput_plots <- list(parsed_model_output)
 
     crs <- mesh$crs$input
@@ -27,40 +27,27 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
 
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
-    parsed_names <- names(parsed_model_output)
-    map_vars <- parsed_names[!parsed_names %in% c("dic", "pars")]
-
     ui <- shiny::fluidPage(
         busy_spinner,
         shiny::headerPanel(title = "Model viewer"),
         shiny::sidebarLayout(
-            shiny::sidebarPanel(
-                shiny::selectInput(
-                    inputId = "model_type",
-                    label = "Model type:",
-                    choices = c("inlabru"),
-                    selected = "inlabru"
+            shiny::tabsetPanel(
+                type = "tabs",
+                shiny::tabPanel(
+                    "Plots",
+                    shiny::h2("Plot output"),
+                    shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
+                    shiny::plotOutput(outputId = "plot_model_out")
                 ),
-            ),
-            shiny::mainPanel(
-                shiny::tabsetPanel(
-                    type = "tabs",
-                    shiny::tabPanel(
-                        "Plot",
-                        shiny::h2("Plot output"),
-                        shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
-                        shiny::plotOutput(outputId = "plot_model_out")
-                    ),
-                    shiny::tabPanel(
-                        "Map",
-                        shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = map_vars, selected = "mean_post"),
-                        shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = map_vars, selected = "fixed_mean"),
-                        leaflet::leafletOutput(outputId = "map_out")
-                    ),
-                    shiny::tabPanel(
-                        "Help",
-                        shiny::h3("Help"),
-                    )
+                shiny::tabPanel(
+                    "Map",
+                    shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = map_vars, selected = "mean_post"),
+                    shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = map_vars, selected = "fixed_mean"),
+                    leaflet::leafletOutput(outputId = "map_out")
+                ),
+                shiny::tabPanel(
+                    "Help",
+                    shiny::h3("Help"),
                 )
             )
         )

@@ -84,7 +84,7 @@ Once the model has run you view plots of model outputs by clicking on the `Plot`
 
 ## Plotting model ouputs on a map
 
-To plot model predictions on a map click on the `Map` tab. This will use the `fdmr::create_prediction_field` and `fdmr::create_raster` functions to first create a `data.frame` of model predictions and then create a raster image from this data.
+To plot model predictions on a map click on the `Map` tab. This will use the `fdmr::create_prediction_field` and `fdmr::create_raster` functions to first create a `data.frame` of model predictions and then create a raster image from this data. You can select between two different plot types, the predicted mean fields or the random effect fields. You can also select Gaussian or Poisson data type.
 
 ## Saving model outputs
 
