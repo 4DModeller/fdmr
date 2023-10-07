@@ -4,6 +4,7 @@
 #' @param measurement_data Measurement data
 #' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
+#' @param data_distribution Data distribution, Poisson or Gaussian
 #' @param log_folder Folder to write out logs
 #'
 #' @importFrom INLA f
@@ -14,8 +15,15 @@ priors_shiny <- function(spatial_data,
                          measurement_data,
                          time_variable,
                          mesh,
+                         data_distribution = "Poisson",
                          log_folder = NULL) {
     future::plan(future::multisession())
+
+    if (!(data_distribution %in% c("Poisson", "Gaussian"))) {
+        stop("We only support Poisson and Gaussian data")
+    }
+
+    data_distribution_lower <- tolower(data_distribution)
 
     got_coords <- has_coords(spatial_data = spatial_data)
     if (!got_coords) {
@@ -33,6 +41,9 @@ priors_shiny <- function(spatial_data,
     } else {
         crs <- mesh_crs
     }
+
+    brewer_palettes <- RColorBrewer::brewer.pal.info
+    default_colours <- rownames(brewer_palettes[brewer_palettes$cat == "seq", ])
 
     # Text for priors help
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
@@ -171,9 +182,27 @@ priors_shiny <- function(spatial_data,
                     ),
                     shiny::tabPanel(
                         "Map",
-                        shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c()),
-                        shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
+                        shiny::fluidRow(
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+                                shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
+                            ),
+                            shiny::column(
+                                6,
+                                shiny::selectInput(
+                                    inputId = "colour_category",
+                                    label = "Palette type",
+                                    choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
+                                    selected = "Viridis"
+                                ),
+                                shiny::selectInput(
+                                    inputId = "colour_scheme",
+                                    label = "Color Scheme",
+                                    choices = default_colours,
+                                ),
+                            )
+                        ),
                         leaflet::leafletOutput(outputId = "map_out")
                     ),
                     shiny::tabPanel(
@@ -302,15 +331,20 @@ priors_shiny <- function(spatial_data,
             formula_local <- inla_formula()
             measurement_data_local <- measurement_data
 
+            family_control <- NULL
+            if (data_distribution_lower == "poisson") {
+                family_control <- list(link = "log")
+            }
+
             promise <- promises::future_promise(
                 {
                     # Without loading INLA here we get errors
                     require("INLA")
                     inlabru::bru(formula_local,
                         data = measurement_data_local,
-                        family = "poisson",
+                        family = data_distribution_lower,
                         E = measurement_data_local[[exposure_param_local]],
-                        control.family = list(link = "log"),
+                        control.family = family_control,
                         options = list(
                             verbose = FALSE
                         )
@@ -491,6 +525,11 @@ priors_shiny <- function(spatial_data,
 
             params <- model_vals$run_params[[input$select_run_code]]
 
+            family_control_str <- "NULL"
+            if (data_distribution_lower == "poisson") {
+                family_control_str <- "control.family = list(link = 'log'),"
+            }
+
             paste0(
                 "spde <- INLA::inla.spde2.pcmatern(
                 mesh = mesh,
@@ -504,9 +543,9 @@ priors_shiny <- function(spatial_data,
             )", "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
-                        family = 'poisson',
+                        family = ", data_distribution_lower, ",
                         E = measurement_data[[", input$exposure_param, "]],
-                        control.family = list(link = 'log'),
+                        control.family = ", family_control_str, "
                         options = list(
                             verbose = FALSE
                         )
