@@ -33,16 +33,16 @@ norway_polygon <- rgdal::readOGR(norway_polygon_path)
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
-```{r}
-norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-norway_polygon <- rgdal::readOGR(norway_polygon_path)
-norway_polygon <- sf::st_as_sf(norway_polygon,
-  coords = c("longitude", "latitude"),
-  crs = "+proj=utm +zone=32"
-)
+# ```{r}
+# norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
+# norway_polygon <- rgdal::readOGR(norway_polygon_path)
+# norway_polygon <- sf::st_as_sf(norway_polygon,
+#   coords = c("longitude", "latitude"),
+#   crs = "+proj=utm +zone=32"
+# )
 
-sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
-```
+# sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
+# ```
 We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map`
 function with the names and positions. We'll create a list for each of the points and then use the (`dplyr::bind_rows`)[https://dplyr.tidyverse.org/reference/bind.html] function to create a 
 `data.frame` from these.
@@ -324,7 +324,7 @@ parsed_output = parse_model_output(inlabru_model2, inla_data)
 ```
 
 ```{r}
-pred_field <- create_prediction_field(parsed_model_output$mean_post, parsed_model_output$fixed_mean, mesh)
+pred_field <- create_prediction_field(mesh, plot_type = "predicted_mean_fields", data_type = "poisson", parsed_model_output$mean_post, parsed_model_output$fixed_mean)
 pred_field
 ```
 

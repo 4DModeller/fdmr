@@ -93,8 +93,3 @@ create_prediction_field <- function(mesh,
 
     base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
 }
-
-
-create_raster <- function(dataframe, crs) {
-    raster::rasterFromXYZ(dataframe, crs = crs)
-}

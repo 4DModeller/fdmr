@@ -20,8 +20,8 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
     parsed_modeloutput_plots <- list(parsed_model_output)
 
     crs <- mesh$crs$input
-    if (is.null(crs)) {
-        warning("Unable to read CRS from mesh, using default WGS84.")
+    if (is.null(crs) || is.na(crs)) {
+        warning("Cannot read CRS from mesh, using default CRS = +proj=longlat +datum=WGS84")
         crs <- "+proj=longlat +datum=WGS84"
     }
 
@@ -30,25 +30,23 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
     ui <- shiny::fluidPage(
         busy_spinner,
         shiny::headerPanel(title = "Model viewer"),
-        shiny::sidebarLayout(
-            shiny::tabsetPanel(
-                type = "tabs",
-                shiny::tabPanel(
-                    "Plots",
-                    shiny::h2("Plot output"),
-                    shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
-                    shiny::plotOutput(outputId = "plot_model_out")
-                ),
-                shiny::tabPanel(
-                    "Map",
-                    shiny::selectInput(inputId = "map_var_a", label = "Variable a:", choices = map_vars, selected = "mean_post"),
-                    shiny::selectInput(inputId = "map_var_b", label = "Variable b:", choices = map_vars, selected = "fixed_mean"),
-                    leaflet::leafletOutput(outputId = "map_out")
-                ),
-                shiny::tabPanel(
-                    "Help",
-                    shiny::h3("Help"),
-                )
+        shiny::tabsetPanel(
+            type = "tabs",
+            shiny::tabPanel(
+                "Plots",
+                shiny::h2("Plot output"),
+                shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
+                shiny::plotOutput(outputId = "plot_model_out")
+            ),
+            shiny::tabPanel(
+                "Map",
+                shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+                shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
+                leaflet::leafletOutput(outputId = "map_out")
+            ),
+            shiny::tabPanel(
+                "Help",
+                shiny::h3("Help"),
             )
         )
     )
@@ -56,14 +54,25 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
     # Define server logic required to draw a histogram
     server <- function(input, output, session) {
         map_raster <- shiny::reactive({
-            pred_field <- create_prediction_field(
-                var_a = parsed_model_output[[input$map_var_a]],
-                var_b = parsed_model_output[[input$map_var_b]],
-                mesh = mesh
-            )
+            data_type <- tolower(input$map_data_type)
+            if (input$map_plot_type == "Predicted mean fields") {
+                pred_field <- create_prediction_field(
+                    mesh = mesh,
+                    plot_type = "predicted_mean_fields",
+                    data_type = data_type,
+                    var_a = parsed_model_output[["mean_post"]],
+                    var_b = parsed_model_output[["fixed_mean"]]
+                )
+            } else {
+                pred_field <- create_prediction_field(
+                    mesh = mesh,
+                    plot_type = "random_effect_fields",
+                    data_type = data_type,
+                    var_a = parsed_model_output[["mean_post"]]
+                )
+            }
 
-            raster <- create_raster(dataframe = pred_field, crs = crs)
-            raster
+            raster::rasterFromXYZ(pred_field, crs = crs)
         })
 
         output$map_out <- leaflet::renderLeaflet({
