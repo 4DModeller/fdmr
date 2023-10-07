@@ -368,7 +368,7 @@ priors_shiny <- function(spatial_data,
             rownames = TRUE
         )
 
-        map_raster <- shiny::reactive({
+        prediction_field <- shiny::reactive({
             if (length(model_vals$parsed_outputs) == 0) {
                 return()
             }
@@ -377,7 +377,7 @@ priors_shiny <- function(spatial_data,
             # c("Predicted mean fields", "Random effect fields")
             data_type <- tolower(input$map_data_type)
             if (input$map_plot_type == "Predicted mean fields") {
-                pred_field <- create_prediction_field(
+                create_prediction_field(
                     mesh = mesh,
                     plot_type = "predicted_mean_fields",
                     data_type = data_type,
@@ -385,15 +385,22 @@ priors_shiny <- function(spatial_data,
                     var_b = data[["fixed_mean"]]
                 )
             } else {
-                pred_field <- create_prediction_field(
+                create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
                     data_type = data_type,
                     var_a = data[["mean_post"]]
                 )
             }
+        })
 
-            create_raster(dataframe = pred_field, crs = sp::proj4string(spatial_data))
+        map_raster <- shiny::reactive({
+            raster::rasterFromXYZ(prediction_field(), crs = crs)
+        })
+
+        map_colours <- shiny::reactive({
+            range <- prediction_field()[["z"]]
+            leaflet::colorNumeric(palette = "viridis", domain = range, reverse = FALSE)
         })
 
         output$map_out <- leaflet::renderLeaflet({
@@ -401,10 +408,10 @@ priors_shiny <- function(spatial_data,
                 return()
             }
 
-            m <- leaflet::leaflet()
-            m <- leaflet::addTiles(m, group = "OSM")
-            m <- leaflet::addRasterImage(m, map_raster(), opacity = 0.9, group = "Raster")
-            m
+            leaflet::leaflet() %>%
+                leaflet::addTiles(group = "OSM") %>%
+                leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
+                leaflet::addLegend(position = "topright", pal = map_colours(), values = prediction_field()[["z"]])
         })
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
