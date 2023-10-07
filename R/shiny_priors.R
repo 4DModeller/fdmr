@@ -34,6 +34,9 @@ priors_shiny <- function(spatial_data,
         crs <- mesh_crs
     }
 
+    brewer_palettes <- RColorBrewer::brewer.pal.info
+    default_colours <- rownames(brewer_palettes[brewer_palettes$cat == "seq", ])
+
     # Text for priors help
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
                         where ρ is the spatial range of the random field."
@@ -140,8 +143,17 @@ priors_shiny <- function(spatial_data,
                     type = "tabs",
                     shiny::tabPanel(
                         "Features",
-                        shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
-                        shiny::selectInput(inputId = "exposure_param", label = "Exposure param", choices = features),
+                        shiny::fluidRow(
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
+                                shiny::selectInput(inputId = "exposure_param", label = "Exposure param", choices = features),
+                            ),
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian")),
+                            )
+                        ),
                         shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
                         shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
                         shiny::actionButton(inputId = "clear", label = "Clear"),
@@ -171,9 +183,28 @@ priors_shiny <- function(spatial_data,
                     ),
                     shiny::tabPanel(
                         "Map",
-                        shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c()),
-                        shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
+                        shiny::fluidRow(
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+                                shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
+                            ),
+                            shiny::column(
+                                6,
+                                shiny::selectInput(
+                                    inputId = "colour_category",
+                                    label = "Palette type",
+                                    choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
+                                    selected = "Viridis"
+                                ),
+                                shiny::selectInput(
+                                    inputId = "colour_scheme",
+                                    label = "Color Scheme",
+                                    choices = default_colours,
+                                    selected = "viridis",
+                                ),
+                            )
+                        ),
                         leaflet::leafletOutput(outputId = "map_out")
                     ),
                     shiny::tabPanel(
@@ -297,10 +328,20 @@ priors_shiny <- function(spatial_data,
             formula_str()
         })
 
+        data_distribution <- shiny::reactive({
+            tolower(input$data_dist)
+        })
+
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
             exposure_param_local <- input$exposure_param
             formula_local <- inla_formula()
             measurement_data_local <- measurement_data
+
+            data_dist_local = data_distribution()
+            family_control <- NULL
+            if (data_dist_local == "poisson") {
+                family_control <- list(link = "log")
+            }
 
             promise <- promises::future_promise(
                 {
@@ -308,9 +349,9 @@ priors_shiny <- function(spatial_data,
                     require("INLA")
                     inlabru::bru(formula_local,
                         data = measurement_data_local,
-                        family = "poisson",
+                        family = data_dist_local,
                         E = measurement_data_local[[exposure_param_local]],
-                        control.family = list(link = "log"),
+                        control.family = family_control,
                         options = list(
                             verbose = FALSE
                         )
@@ -380,19 +421,33 @@ priors_shiny <- function(spatial_data,
             rownames = TRUE
         )
 
-        prediction_field <- shiny::reactive({
-            if (length(model_vals$parsed_outputs) == 0) {
-                return()
+        category_colours <- shiny::reactive({
+            if (input$colour_category == "Viridis") {
+                colours <- c("viridis", "magma", "inferno", "plasma")
+            } else {
+                palettes_mapping <- list("Sequential" = "seq", "Diverging" = "div", "Qualitative" = "qual")
+                chosen_cat <- palettes_mapping[input$colour_category]
+                colours <- rownames(subset(RColorBrewer::brewer.pal.info, category %in% chosen_cat))
             }
+            colours
+        })
 
+        colour_scheme <- shiny::reactive({
+            input$colour_scheme
+        })
+
+        shiny::observe({
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
+        })
+
+
+        prediction_field <- shiny::reactive({
             data <- model_vals$parsed_outputs[[input$select_run_map]]
-            # c("Predicted mean fields", "Random effect fields")
-            data_type <- tolower(input$map_data_type)
             if (input$map_plot_type == "Predicted mean fields") {
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "predicted_mean_fields",
-                    data_type = data_type,
+                    data_type = input$data_type,
                     var_a = data[["mean_post"]],
                     var_b = data[["fixed_mean"]]
                 )
@@ -400,10 +455,14 @@ priors_shiny <- function(spatial_data,
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
-                    data_type = data_type,
+                    data_type = input$data_type,
                     var_a = data[["mean_post"]]
                 )
             }
+        })
+
+        z_values <- shiny::reactive({
+            prediction_field()[["z"]]
         })
 
         map_raster <- shiny::reactive({
@@ -411,8 +470,7 @@ priors_shiny <- function(spatial_data,
         })
 
         map_colours <- shiny::reactive({
-            range <- prediction_field()[["z"]]
-            leaflet::colorNumeric(palette = "viridis", domain = range, reverse = FALSE)
+            leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
         })
 
         output$map_out <- leaflet::renderLeaflet({
@@ -423,7 +481,7 @@ priors_shiny <- function(spatial_data,
             leaflet::leaflet() %>%
                 leaflet::addTiles(group = "OSM") %>%
                 leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
-                leaflet::addLegend(position = "topright", pal = map_colours(), values = prediction_field()[["z"]])
+                leaflet::addLegend(position = "topright", pal = map_colours(), values = z_values())
         })
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
@@ -474,6 +532,11 @@ priors_shiny <- function(spatial_data,
 
             params <- model_vals$run_params[[input$select_run_code]]
 
+            family_control_str <- "NULL"
+            if (data_distribution() == "poisson") {
+                family_control_str <- "list(link = 'log'),"
+            }
+
             paste0(
                 "spde <- INLA::inla.spde2.pcmatern(
                 mesh = mesh,
@@ -487,9 +550,9 @@ priors_shiny <- function(spatial_data,
             )", "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
-                        family = 'poisson',
+                        family = ", data_distribution(), ",
                         E = measurement_data[[", input$exposure_param, "]],
-                        control.family = list(link = 'log'),
+                        control.family = ", family_control_str, "
                         options = list(
                             verbose = FALSE
                         )
