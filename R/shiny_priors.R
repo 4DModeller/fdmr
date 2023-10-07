@@ -147,7 +147,7 @@ priors_shiny <- function(spatial_data,
                             shiny::column(
                                 6,
                                 shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
-                                shiny::selectInput(inputId = "exposure_param", label = "Exposure param", choices = features),
+                                shiny::selectInput(inputId = "exposure_param", label = "Exposure (time variable)", choices = features),
                             ),
                             shiny::column(
                                 6,
