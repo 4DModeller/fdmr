@@ -50,7 +50,7 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
 #'
 #' @param mesh INLA mesh
 #' @param plot_type Type of plot to create, "predicted_mean_fields" etc
-#' @param data_type Type of data, "poisson" etc
+#' @param data_dist Type of data, "poisson" etc
 #' @param var_a Data for variable a, required for "predicted_mean_fields" and "random_effect_fields"
 #' @param var_b Data for variable b, required for "predicted_mean_fields"
 #'
@@ -58,7 +58,7 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
 #' @export
 create_prediction_field <- function(mesh,
                                     plot_type = "predicted_mean_fields",
-                                    data_type = "poisson",
+                                    data_dist = "poisson",
                                     var_a = NULL,
                                     var_b = NULL) {
     valid_plots <- c("predicted_mean_fields", "random_effect_fields")
@@ -66,10 +66,9 @@ create_prediction_field <- function(mesh,
         stop("Invalid plot type, select from ", valid_plots)
     }
 
-    data_type <- tolower(data_type)
-    valid_data_types <- c("poisson", "gaussian")
-    if (!(data_type %in% valid_data_types)) {
-        stop("Invalid data type, select from ", valid_data_types)
+    valid_data_dists <- c("poisson", "gaussian")
+    if (!(data_dist %in% valid_data_dists)) {
+        stop("Invalid data type, select from ", valid_data_dists)
     }
 
     if (plot_type == "predicted_mean_fields" && is.null(var_b)) {

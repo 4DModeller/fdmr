@@ -151,8 +151,17 @@ priors_shiny <- function(spatial_data,
                     type = "tabs",
                     shiny::tabPanel(
                         "Features",
-                        shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
-                        shiny::selectInput(inputId = "exposure_param", label = "Exposure param", choices = features),
+                        shiny::fluidRow(
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
+                                shiny::selectInput(inputId = "exposure_param", label = "Exposure param", choices = features),
+                            ),
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian")),
+                            )
+                        ),
                         shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
                         shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
                         shiny::actionButton(inputId = "clear", label = "Clear"),
@@ -186,7 +195,7 @@ priors_shiny <- function(spatial_data,
                             shiny::column(
                                 6,
                                 shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                                shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
+                                shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c())
                             ),
                             shiny::column(
                                 6,
@@ -198,7 +207,7 @@ priors_shiny <- function(spatial_data,
                                 ),
                                 shiny::selectInput(
                                     inputId = "colour_scheme",
-                                    label = "Color Scheme",
+                                    label = "Colour Scheme",
                                     choices = default_colours,
                                 ),
                             )
@@ -248,18 +257,11 @@ priors_shiny <- function(spatial_data,
             names(model_vals$run_params)
         })
 
-        model_summary_variables <- shiny::reactive({
-            names(model_vals$model_outputs)
-        })
-
         shiny::observe({
             shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
             shiny::updateSelectInput(session = session, inputId = "select_run_map", choices = run_names())
             shiny::updateSelectInput(session = session, inputId = "select_run_code", choices = run_names())
-        })
-
-        shiny::observeEvent(input$features, {
-            print(paste0("You have chosen: ", input$features))
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
         })
 
         shiny::observeEvent(input$clear, {
@@ -327,13 +329,18 @@ priors_shiny <- function(spatial_data,
             formula_str()
         })
 
+        data_distribution <- shiny::reactive({
+            tolower(input$data_dist)
+        })
+
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
             exposure_param_local <- input$exposure_param
             formula_local <- inla_formula()
             measurement_data_local <- measurement_data
 
+            data_dist_local <- data_distribution()
             family_control <- NULL
-            if (data_distribution_lower == "poisson") {
+            if (data_dist_local == "poisson") {
                 family_control <- list(link = "log")
             }
 
@@ -343,7 +350,7 @@ priors_shiny <- function(spatial_data,
                     require("INLA")
                     inlabru::bru(formula_local,
                         data = measurement_data_local,
-                        family = data_distribution_lower,
+                        family = data_dist_local,
                         E = measurement_data_local[[exposure_param_local]],
                         control.family = family_control,
                         options = list(
@@ -436,7 +443,7 @@ priors_shiny <- function(spatial_data,
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "predicted_mean_fields",
-                    data_type = input$data_type,
+                    data_dist = data_distribution(),
                     var_a = data[["mean_post"]],
                     var_b = data[["fixed_mean"]]
                 )
@@ -444,7 +451,7 @@ priors_shiny <- function(spatial_data,
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
-                    data_type = input$data_type,
+                    data_dist = data_distribution(),
                     var_a = data[["mean_post"]]
                 )
             }
@@ -522,8 +529,8 @@ priors_shiny <- function(spatial_data,
             params <- model_vals$run_params[[input$select_run_code]]
 
             family_control_str <- "NULL"
-            if (data_distribution_lower == "poisson") {
-                family_control_str <- "control.family = list(link = 'log'),"
+            if (data_distribution() == "poisson") {
+                family_control_str <- "list(link = 'log'),"
             }
 
             paste0(
@@ -539,7 +546,7 @@ priors_shiny <- function(spatial_data,
             )", "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
-                        family = ", data_distribution_lower, ",
+                        family = '", data_distribution(), "',
                         E = measurement_data[[", input$exposure_param, "]],
                         control.family = ", family_control_str, "
                         options = list(
