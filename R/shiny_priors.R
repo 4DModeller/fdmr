@@ -22,6 +22,18 @@ priors_shiny <- function(spatial_data,
         stop("Please make sure you have set coordinates on spatial_data using sp::coordinates.")
     }
 
+    spatial_crs <- sp::proj4string(spatial_data)
+    mesh_crs <- mesh$crs$input
+
+    if (is.na(mesh_crs) && is.na(spatial_crs)) {
+        warning("Cannot read CRS from mesh or spatial_data, using default CRS = +proj=longlat +datum=WGS84")
+        crs <- "+proj=longlat +datum=WGS84"
+    } else if (is.na(mesh_crs)) {
+        crs <- spatial_crs
+    } else {
+        crs <- mesh_crs
+    }
+
     # Text for priors help
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
                         where ρ is the spatial range of the random field."
