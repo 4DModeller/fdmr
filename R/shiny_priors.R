@@ -252,6 +252,7 @@ priors_shiny <- function(spatial_data,
         shiny::observe({
             shiny::updateSelectInput(session = session, inputId = "select_run_map", choices = run_names())
             shiny::updateSelectInput(session = session, inputId = "select_run_code", choices = run_names())
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
         })
 
         shiny::observeEvent(input$clear, {
@@ -427,10 +428,6 @@ priors_shiny <- function(spatial_data,
             input$colour_scheme
         })
 
-        shiny::observe({
-            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
-        })
-
 
         prediction_field <- shiny::reactive({
             if (length(model_vals$parsed_outputs) == 0) {
@@ -465,8 +462,7 @@ priors_shiny <- function(spatial_data,
         })
 
         map_colours <- shiny::reactive({
-            # leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
-            leaflet::colorNumeric(palette = "viridis", domain = z_values(), reverse = FALSE)
+            leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
         })
 
         output$map_out <- leaflet::renderLeaflet({
@@ -546,7 +542,7 @@ priors_shiny <- function(spatial_data,
             )", "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
-                        family = ", data_distribution(), ",
+                        family = '", data_distribution(), "',
                         E = measurement_data[[", input$exposure_param, "]],
                         control.family = ", family_control_str, "
                         options = list(
