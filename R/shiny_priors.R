@@ -380,19 +380,33 @@ priors_shiny <- function(spatial_data,
             rownames = TRUE
         )
 
-        prediction_field <- shiny::reactive({
-            if (length(model_vals$parsed_outputs) == 0) {
-                return()
+        category_colours <- shiny::reactive({
+            if (input$colour_category == "Viridis") {
+                colours <- c("viridis", "magma", "inferno", "plasma")
+            } else {
+                palettes_mapping <- list("Sequential" = "seq", "Diverging" = "div", "Qualitative" = "qual")
+                chosen_cat <- palettes_mapping[input$colour_category]
+                colours <- rownames(subset(RColorBrewer::brewer.pal.info, category %in% chosen_cat))
             }
+            colours
+        })
 
+        colour_scheme <- shiny::reactive({
+            input$colour_scheme
+        })
+
+        shiny::observe({
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
+        })
+
+
+        prediction_field <- shiny::reactive({
             data <- model_vals$parsed_outputs[[input$select_run_map]]
-            # c("Predicted mean fields", "Random effect fields")
-            data_type <- tolower(input$map_data_type)
             if (input$map_plot_type == "Predicted mean fields") {
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "predicted_mean_fields",
-                    data_type = data_type,
+                    data_type = input$data_type,
                     var_a = data[["mean_post"]],
                     var_b = data[["fixed_mean"]]
                 )
@@ -400,10 +414,14 @@ priors_shiny <- function(spatial_data,
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
-                    data_type = data_type,
+                    data_type = input$data_type,
                     var_a = data[["mean_post"]]
                 )
             }
+        })
+
+        z_values <- shiny::reactive({
+            prediction_field()[["z"]]
         })
 
         map_raster <- shiny::reactive({
@@ -411,8 +429,7 @@ priors_shiny <- function(spatial_data,
         })
 
         map_colours <- shiny::reactive({
-            range <- prediction_field()[["z"]]
-            leaflet::colorNumeric(palette = "viridis", domain = range, reverse = FALSE)
+            leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
         })
 
         output$map_out <- leaflet::renderLeaflet({
@@ -422,8 +439,8 @@ priors_shiny <- function(spatial_data,
 
             leaflet::leaflet() %>%
                 leaflet::addTiles(group = "OSM") %>%
-                leaflet::addRasterImage(map_raster(), colors=map_colours(), opacity = 0.9, group = "Raster") %>%
-                leaflet::addLegend(position = "topright", pal = map_colours(), values = prediction_field()[["z"]])
+                leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
+                leaflet::addLegend(position = "topright", pal = map_colours(), values = z_values())
         })
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {

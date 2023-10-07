@@ -3,13 +3,25 @@
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
 #' @param measurement_data Measurement data
+#' @param data_type Type of data, Poisson or Gaussian
 #'
 #' @importFrom magrittr %>%
 #'
 #' @return shiny::app
 #' @keywords internal
-model_viewer_shiny <- function(model_output, mesh, measurement_data) {
+model_viewer_shiny <- function(model_output, mesh, measurement_data, data_type) {
     busy_spinner <- get_busy_spinner()
+
+    crs <- mesh$crs$input
+    if (is.null(crs) || is.na(crs)) {
+        warning("Cannot read CRS from mesh, using default CRS = +proj=longlat +datum=WGS84")
+        crs <- "+proj=longlat +datum=WGS84"
+    }
+
+    data_type <- stringr::str_to_title(data_type)
+    if (!(data_type %in% c("Poisson", "Gaussian"))) {
+        stop("data_type must be one of Poisson or Gaussian")
+    }
 
     parsed_model_output <- parse_model_output(
         model_output = model_output,
@@ -19,11 +31,8 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
     # The comparison plotting functions expect a list of lists
     parsed_modeloutput_plots <- list(parsed_model_output)
 
-    crs <- mesh$crs$input
-    if (is.null(crs) || is.na(crs)) {
-        warning("Cannot read CRS from mesh, using default CRS = +proj=longlat +datum=WGS84")
-        crs <- "+proj=longlat +datum=WGS84"
-    }
+    brewer_palettes <- RColorBrewer::brewer.pal.info
+    default_colours <- rownames(brewer_palettes[brewer_palettes$cat == "seq", ])
 
     plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
@@ -40,8 +49,27 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
             ),
             shiny::tabPanel(
                 "Map",
-                shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = "Poisson"),
+                shiny::fluidRow(
+                    shiny::column(
+                        6,
+                        shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_type),
+                    ),
+                    shiny::column(
+                        6,
+                        shiny::selectInput(
+                            inputId = "colour_category",
+                            label = "Palette type",
+                            choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
+                            selected = "Viridis"
+                        ),
+                        shiny::selectInput(
+                            inputId = "colour_scheme",
+                            label = "Color Scheme",
+                            choices = default_colours,
+                        ),
+                    )
+                ),
                 leaflet::leafletOutput(outputId = "map_out")
             ),
             shiny::tabPanel(
@@ -53,10 +81,30 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
 
     # Define server logic required to draw a histogram
     server <- function(input, output, session) {
-        map_raster <- shiny::reactive({
+        category_colours <- shiny::reactive({
+            if (input$colour_category == "Viridis") {
+                colours <- c("viridis", "magma", "inferno", "plasma")
+            } else {
+                palettes_mapping <- list("Sequential" = "seq", "Diverging" = "div", "Qualitative" = "qual")
+                chosen_cat <- palettes_mapping[input$colour_category]
+                colours <- rownames(subset(RColorBrewer::brewer.pal.info, category %in% chosen_cat))
+            }
+            colours
+        })
+
+        colour_scheme <- shiny::reactive({
+            input$colour_scheme
+        })
+
+        shiny::observe({
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
+        })
+
+
+        prediction_field <- shiny::reactive({
             data_type <- tolower(input$map_data_type)
             if (input$map_plot_type == "Predicted mean fields") {
-                pred_field <- create_prediction_field(
+                create_prediction_field(
                     mesh = mesh,
                     plot_type = "predicted_mean_fields",
                     data_type = data_type,
@@ -64,21 +112,36 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
                     var_b = parsed_model_output[["fixed_mean"]]
                 )
             } else {
-                pred_field <- create_prediction_field(
+                create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
                     data_type = data_type,
                     var_a = parsed_model_output[["mean_post"]]
                 )
             }
+        })
 
-            raster::rasterFromXYZ(pred_field, crs = crs)
+        z_values <- shiny::reactive({
+            prediction_field()[["z"]]
+        })
+
+        map_raster <- shiny::reactive({
+            raster::rasterFromXYZ(prediction_field(), crs = crs)
+        })
+
+        map_colours <- shiny::reactive({
+            leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
         })
 
         output$map_out <- leaflet::renderLeaflet({
+            if (is.null(map_raster())) {
+                return()
+            }
+
             leaflet::leaflet() %>%
                 leaflet::addTiles(group = "OSM") %>%
-                leaflet::addRasterImage(map_raster(), opacity = 0.9, group = "Raster")
+                leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
+                leaflet::addLegend(position = "topright", pal = map_colours(), values = z_values())
         })
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
@@ -125,9 +188,10 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data) {
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
 #' @param measurement_data Measurement data
+#' @param data_type Type of data, Poisson or Gaussian
 #'
 #' @return shiny::app
 #' @export
-model_viewer <- function(model_output, mesh, measurement_data) {
-    shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data))
+model_viewer <- function(model_output, mesh, measurement_data, data_type = "Poisson") {
+    shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data, data_type = data_type))
 }

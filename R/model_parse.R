@@ -66,6 +66,7 @@ create_prediction_field <- function(mesh,
         stop("Invalid plot type, select from ", valid_plots)
     }
 
+    data_type <- tolower(data_type)
     valid_data_types <- c("poisson", "gaussian")
     if (!(data_type %in% valid_data_types)) {
         stop("Invalid data type, select from ", valid_data_types)
@@ -80,11 +81,8 @@ create_prediction_field <- function(mesh,
     A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
 
     if (plot_type == "predicted_mean_fields") {
-        if (data_type == "poisson") {
-            z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
-        } else {
-            z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
-        }
+        z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
+        if (data_type == "poisson") z <- base::exp(z)
     } else {
         # We get an error here as we only have 265 items
         # z <- var_a[1:mesh$n]

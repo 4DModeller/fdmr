@@ -66,13 +66,13 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
           inputId = "colour_category",
           label = "Palette type",
           choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
-          selected = "seq"
+          selected = "Viridis"
         ),
         shiny::selectInput(
           inputId = "colour_scheme",
           label = "Color Scheme",
           choices = default_colours,
-          selected = "Blues"
+          selected = "viridis"
         ),
         shiny::sliderInput(
           inputId = "raster_opacity",
@@ -138,6 +138,10 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
       colours
     })
 
+    colour_scheme <- shiny::reactive({
+      input$colour_scheme
+    })
+
     raster_opacity <- shiny::reactive({
       input$raster_opacity
     })
@@ -146,9 +150,6 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
       input$polygon_opacity
     })
 
-    colour_scheme <- shiny::reactive({
-      input$colour_scheme
-    })
 
     colour_palette <- shiny::reactive({
       if (is.null(palette)) {

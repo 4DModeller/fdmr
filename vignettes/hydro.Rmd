@@ -27,9 +27,16 @@ First we will look at the location of the dam by making a map and plotting the s
 
 ```{r error=TRUE,warning=FALSE}
 # TODO : here is a good example for the map function
-norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
+#norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
 #norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
+norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
 norway_polygon <- rgdal::readOGR(norway_polygon_path)
+norway_polygon <- sf::st_as_sf(norway_polygon,
+  coords = c("longitude", "latitude"),
+  crs = "+proj=utm +zone=32"
+)
+
+
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
@@ -324,15 +331,15 @@ parsed_output = parse_model_output(inlabru_model2, inla_data)
 ```
 
 ```{r}
-pred_field <- create_prediction_field(mesh, plot_type = "predicted_mean_fields", data_type = "poisson", parsed_model_output$mean_post, parsed_model_output$fixed_mean)
+pred_field <- create_prediction_field(mesh, plot_type = "predicted_mean_fields", data_type = "gaussian", parsed_output$mean_post, parsed_output$fixed_mean)
 pred_field
 ```
 
 
-Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, measurement data and mesh. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data.
+Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, mesh and measurement data. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data. Make sure you have a CRS set on your mesh. If not CRS can be read a default of `"+proj=longlat +datum=WGS84"` will be used which may lead to errors with data using UTM as we've done here.
 
 ```{r eval=FALSE}
-fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data)
+fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data, data_type = "Gaussian")
 ```
 
 ```{r error=TRUE}
