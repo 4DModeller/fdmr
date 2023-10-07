@@ -253,6 +253,7 @@ priors_shiny <- function(spatial_data,
         })
 
         shiny::observe({
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
             shiny::updateSelectInput(session = session, inputId = "select_run_map", choices = run_names())
             shiny::updateSelectInput(session = session, inputId = "select_run_code", choices = run_names())
         })
@@ -428,11 +429,6 @@ priors_shiny <- function(spatial_data,
         colour_scheme <- shiny::reactive({
             input$colour_scheme
         })
-
-        shiny::observe({
-            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
-        })
-
 
         prediction_field <- shiny::reactive({
             data <- model_vals$parsed_outputs[[input$select_run_map]]
