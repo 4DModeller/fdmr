@@ -9,6 +9,7 @@ priors_shiny(
   measurement_data,
   time_variable,
   mesh,
+  data_distribution = "Poisson",
   log_folder = NULL
 )
 }
@@ -20,6 +21,8 @@ priors_shiny(
 \item{time_variable}{Time variable in measurement_data}
 
 \item{mesh}{INLA mesh}
+
+\item{data_distribution}{Data distribution, Poisson or Gaussian}
 
 \item{log_folder}{Folder to write out logs}
 }

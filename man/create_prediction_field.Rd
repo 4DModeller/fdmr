@@ -7,7 +7,7 @@
 create_prediction_field(
   mesh,
   plot_type = "predicted_mean_fields",
-  data_type = "poisson",
+  data_dist = "poisson",
   var_a = NULL,
   var_b = NULL
 )
@@ -17,7 +17,7 @@ create_prediction_field(
 
 \item{plot_type}{Type of plot to create, "predicted_mean_fields" etc}
 
-\item{data_type}{Type of data, "poisson" etc}
+\item{data_dist}{Type of data, "poisson" etc}
 
 \item{var_a}{Data for variable a, required for "predicted_mean_fields" and "random_effect_fields"}
 

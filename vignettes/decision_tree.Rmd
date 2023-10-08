@@ -1,18 +1,13 @@
 ---
 title: "How to choose how to model"
-output: 
-  bookdown::html_document2:
-    base_format: rmarkdown::html_vignette
-    fig_caption: yes
-bibliography: "covid.bib"
-link-citations: yes
+output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Priors exploration}
+  %\VignetteIndexEntry{How to choose how to model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-4d-Modeller and INLA/inlabru allow you to use both fixed and random effects in your model with SPDEs allowing you to model continuous random processes in your data. Below we explain briefly each of these processes and how to choose when to use them.
+4DModeller and INLA/inlabru allow you to use both fixed and random effects in your model with SPDEs allowing you to model continuous random processes in your data. Below we explain briefly each of these processes and how to choose when to use them.
 
 In this document we will use the following data for examples:
 
@@ -83,9 +78,6 @@ For example, patients being infected by COVID-19 were impacted by social and dem
 Below we show a model that defines a formula where the `f` subroutine represents the unobserved variance occuring through time while `x` and `y` are fixed effects.gi
 
 ```{r, error=TRUE}
-# Define a formula for the model
-# Load the INLA library
-
 # Define the formula for the INLA model
 formula <- value ~ 1 + x + y + f(time, model = "rw1")
 
