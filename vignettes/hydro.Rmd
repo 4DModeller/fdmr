@@ -26,30 +26,11 @@ fdmr::retrieve_tutorial_data(dataset = "hydro")
 First we will look at the location of the dam by making a map and plotting the stream gauges on it.
 
 ```{r error=TRUE,warning=FALSE}
-# TODO : here is a good example for the map function
-#norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-#norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
 norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-norway_polygon <- rgdal::readOGR(norway_polygon_path)
-norway_polygon <- sf::st_as_sf(norway_polygon,
-  coords = c("longitude", "latitude"),
-  crs = "+proj=utm +zone=32"
-)
-
-
+norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
-# ```{r}
-# norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-# norway_polygon <- rgdal::readOGR(norway_polygon_path)
-# norway_polygon <- sf::st_as_sf(norway_polygon,
-#   coords = c("longitude", "latitude"),
-#   crs = "+proj=utm +zone=32"
-# )
-
-# sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
-# ```
 We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map`
 function with the names and positions. We'll create a list for each of the points and then use the (`dplyr::bind_rows`)[https://dplyr.tidyverse.org/reference/bind.html] function to create a 
 `data.frame` from these.
