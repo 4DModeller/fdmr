@@ -244,10 +244,10 @@ fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
 ```
 
 ## Interactive priors Shiny app
-`fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::interactive_priors` function.
+`fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::model_builder` function.
 
 ```{r priorapp, eval=FALSE}
-fdmr::interactive_priors(spatial_data = sp_data, 
+fdmr::model_builder(spatial_data = sp_data, 
                          measurement_data = simdf, 
                          mesh=mesh, 
                          time_variable="time")

@@ -10,11 +10,11 @@
 #'
 #' @return shiny::app
 #' @keywords internal
-priors_shiny <- function(spatial_data,
-                         measurement_data,
-                         time_variable,
-                         mesh,
-                         log_folder = NULL) {
+model_builder_shiny <- function(spatial_data,
+                                measurement_data,
+                                time_variable,
+                                mesh,
+                                log_folder = NULL) {
     future::plan(future::multisession())
 
     got_coords <- has_coords(spatial_data = spatial_data)
@@ -567,6 +567,6 @@ priors_shiny <- function(spatial_data,
 #'
 #' @return shiny::app
 #' @export
-interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh, log_folder = NULL) {
-    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh, log_folder = log_folder))
+model_builder <- function(spatial_data, measurement_data, time_variable, mesh, log_folder = NULL) {
+    shiny::runApp(model_builder_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh, log_folder = log_folder))
 }
