@@ -551,5 +551,5 @@ mesh <- INLA::inla.mesh.2d(
 ```
 
 ```{r eval=FALSE}
-fdmr::interactive_priors(spatial_data=sp_data, measurement_data = covid19_data, mesh=mesh)
+fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh = mesh)
 ```

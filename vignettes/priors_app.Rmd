@@ -98,7 +98,7 @@ We're now ready to run the app. To do this we'll call the `fdmr::interactive_pri
 - `time_variable = week` - the name of the time variable in the data
 
 ```{r eval=FALSE}
-fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh=mesh, time_variable="week")
+fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh = mesh, time_variable = "week")
 ```
 
 # Viewing model outputs and parameter sets
