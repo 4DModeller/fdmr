@@ -235,7 +235,7 @@ colnames(xy) <- c("LONG", "LAT")
 
 mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = sr)
 
-plot(mesh)
+plot_mesh_interactive(mesh)
 ```
 
 ## Priors

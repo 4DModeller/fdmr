@@ -15,6 +15,9 @@ plot_mesh(mesh, point_data, point_colour = "blue", cex = 0.1)
 
 \item{cex}{Point size magnifier}
 }
+\value{
+terra::plot
+}
 \description{
 Plot a mesh
 }
