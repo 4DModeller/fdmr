@@ -118,13 +118,11 @@ attributes of geographic features for the MSOAs.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"preprocessing"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
-<span><span class="co">## which was just loaded, will retire in October 2023.</span></span>
+<span><span class="co">## which was just loaded, were retired in October 2023.</span></span>
 <span><span class="co">## Please refer to R-spatial evolution reports for details, especially</span></span>
 <span><span class="co">## https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
 <span><span class="co">## It may be desirable to make the sf package available;</span></span>
-<span><span class="co">## package maintainers should consider adding sf to Suggests:.</span></span>
-<span><span class="co">## The sp package is now running under evolution status 2</span></span>
-<span><span class="co">##      (status 2 uses the sf package in place of rgdal)</span></span></code></pre>
+<span><span class="co">## package maintainers should consider adding sf to Suggests:.</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/preprocessing</span></span></code></pre>
 <p>Then we load in the shapefile into R, and store it in an object named
@@ -144,7 +142,7 @@ attributes of geographic features for the MSOAs.</p>
 <span><span class="co">## Loaded PROJ runtime: Rel. 8.2.1, January 1st, 2022, [PJ_VERSION: 821]</span></span>
 <span><span class="co">## Path to PROJ shared files: /home/runner/.local/share/proj:/usr/share/proj</span></span>
 <span><span class="co">## PROJ CDN enabled: FALSE</span></span>
-<span><span class="co">## Linking to sp version:2.0-0</span></span>
+<span><span class="co">## Linking to sp version:2.1-0</span></span>
 <span><span class="co">## To mute warnings of possible GDAL/OSR exportToProj4() degradation,</span></span>
 <span><span class="co">## use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.</span></span></code></pre>
 <pre><code><span><span class="co">## OGR data source with driver: ESRI Shapefile </span></span>
