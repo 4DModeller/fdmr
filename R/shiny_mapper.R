@@ -66,13 +66,12 @@ raster_mapping_app <- function(raster_data = NULL, polygon_data = NULL, date_for
           inputId = "colour_category",
           label = "Palette type",
           choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
-          selected = "seq"
+          selected = "Viridis"
         ),
         shiny::selectInput(
           inputId = "colour_scheme",
           label = "Color Scheme",
           choices = default_colours,
-          selected = "Blues"
         ),
         shiny::sliderInput(
           inputId = "raster_opacity",
