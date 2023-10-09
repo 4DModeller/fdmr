@@ -327,8 +327,10 @@ inlabru_model2 <- inlabru::bru(formula2,
 Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, mesh and measurement data. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data. Make sure you have a CRS set on your mesh. If no CRS can be read a default of `"+proj=longlat +datum=WGS84"` will be used which may lead to errors with data using UTM as we've done here.
 
 ```{r eval=FALSE}
-fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data, data_type = "Gaussian")
+fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data, data_distribution = "Gaussian")
 ```
+
+We can also view the summary of the model outputs
 
 ```{r error=TRUE}
 summary(inlabru_model1)

@@ -66,6 +66,7 @@ create_prediction_field <- function(mesh,
         stop("Invalid plot type, select from ", valid_plots)
     }
 
+    data_dist <- tolower(data_dist)
     valid_data_dists <- c("poisson", "gaussian")
     if (!(data_dist %in% valid_data_dists)) {
         stop("Invalid data type, select from ", valid_data_dists)
@@ -81,7 +82,7 @@ create_prediction_field <- function(mesh,
 
     if (plot_type == "predicted_mean_fields") {
         z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
-        if (data_type == "poisson") z <- base::exp(z)
+        if (data_dist == "poisson") z <- base::exp(z)
     } else {
         # We get an error here as we only have 265 items
         # z <- var_a[1:mesh$n]

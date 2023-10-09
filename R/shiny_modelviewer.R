@@ -3,13 +3,13 @@
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
 #' @param measurement_data Measurement data
-#' @param data_dist Type of data, Poisson or Gaussian
+#' @param data_distribution Type of data, Poisson or Gaussian
 #'
 #' @importFrom magrittr %>%
 #'
 #' @return shiny::app
 #' @keywords internal
-model_viewer_shiny <- function(model_output, mesh, measurement_data, data_dist) {
+model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distribution) {
     busy_spinner <- get_busy_spinner()
 
     crs <- mesh$crs$input
@@ -18,9 +18,9 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_dist) 
         crs <- "+proj=longlat +datum=WGS84"
     }
 
-    data_dist <- stringr::str_to_title(data_dist)
-    if (!(data_dist %in% c("Poisson", "Gaussian"))) {
-        stop("data_dist must be one of Poisson or Gaussian")
+    data_distribution <- stringr::str_to_title(data_distribution)
+    if (!(data_distribution %in% c("Poisson", "Gaussian"))) {
+        stop("data_distribution must be one of Poisson or Gaussian")
     }
 
     parsed_model_output <- parse_model_output(
@@ -53,7 +53,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_dist) 
                     shiny::column(
                         6,
                         shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_dist),
+                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_distribution),
                     ),
                     shiny::column(
                         6,
@@ -188,10 +188,10 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_dist) 
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
 #' @param measurement_data Measurement data
-#' @param data_dist Type of data, Poisson or Gaussian
+#' @param data_distribution Type of data, Poisson or Gaussian
 #'
 #' @return shiny::app
 #' @export
-model_viewer <- function(model_output, mesh, measurement_data, data_dist = "Poisson") {
-    shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data, data_dist = data_dist))
+model_viewer <- function(model_output, mesh, measurement_data, data_distribution = "Poisson") {
+    shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data, data_distribution = data_distribution))
 }
