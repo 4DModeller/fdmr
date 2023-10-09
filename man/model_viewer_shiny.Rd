@@ -4,7 +4,7 @@
 \alias{model_viewer_shiny}
 \title{Parse inlabru model output}
 \usage{
-model_viewer_shiny(model_output, mesh, measurement_data)
+model_viewer_shiny(model_output, mesh, measurement_data, data_distribution)
 }
 \arguments{
 \item{model_output}{INLA model output}
@@ -12,6 +12,8 @@ model_viewer_shiny(model_output, mesh, measurement_data)
 \item{mesh}{INLA mesh}
 
 \item{measurement_data}{Measurement data}
+
+\item{data_distribution}{Type of data, Poisson or Gaussian}
 }
 \value{
 shiny::app
