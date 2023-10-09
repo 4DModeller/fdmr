@@ -66,6 +66,7 @@ create_prediction_field <- function(mesh,
         stop("Invalid plot type, select from ", valid_plots)
     }
 
+    data_dist <- tolower(data_dist)
     valid_data_dists <- c("poisson", "gaussian")
     if (!(data_dist %in% valid_data_dists)) {
         stop("Invalid data type, select from ", valid_data_dists)
@@ -80,11 +81,8 @@ create_prediction_field <- function(mesh,
     A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
 
     if (plot_type == "predicted_mean_fields") {
-        if (data_dist == "poisson") {
-            z <- base::exp(base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b))
-        } else {
-            z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
-        }
+        z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
+        if (data_dist == "poisson") z <- base::exp(z)
     } else {
         # We get an error here as we only have 265 items
         # z <- var_a[1:mesh$n]
@@ -92,9 +90,4 @@ create_prediction_field <- function(mesh,
     }
 
     base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
-}
-
-
-create_raster <- function(dataframe, crs) {
-    raster::rasterFromXYZ(dataframe, crs = crs)
 }
