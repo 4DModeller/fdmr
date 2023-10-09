@@ -1,5 +1,5 @@
 ---
-title: "imulation Tutorial (Gaussian data)"
+title: "Simulation Tutorial (Gaussian data)"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Simulation Tutorial (Gaussian data)}
@@ -11,9 +11,7 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 In this tutorial, we'll start by generating some simulated spatio-temporal data, with the city of Bristol as our study region. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
-
 
 # Data simulation
 First we simulate some Gaussian distributed data observed at 55 spatial locations in Bristol, UK and across 6 time points. We use the `fdmr::retrieve_tutorial_data` function and the `fdmr::load_tutorial_data` function to retrieve and load in the geographical information for the spatial locations in Bristol from the `fdmr` example data store.
@@ -254,7 +252,7 @@ fdmr::interactive_priors(
 
 ## fdmr::plot_map
 
-The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.
+The `fdmr::plot_map` function generates a map of the region based on the provided `SpatialPolygonDataFrame`.
 
 ```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align = "center"}
 fdmr::plot_map(polygon_data = sp_data)

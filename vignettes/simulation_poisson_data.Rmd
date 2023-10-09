@@ -1,5 +1,5 @@
 ---
-title: "imulation Tutorial (Poisson data)"
+title: "Simulation Tutorial (Poisson data)"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Simulation Tutorial (Poisson data)}
