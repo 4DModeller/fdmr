@@ -52,7 +52,7 @@ reference:
   contents:
     - plot_interactive_map
     - mesh_builder
-    - interactive_priors
+    - model_builder
 - title: Parsing model output
   desc: Functions to help parse model output and extract useful information
   contents:
