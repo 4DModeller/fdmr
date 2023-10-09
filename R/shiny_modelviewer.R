@@ -3,13 +3,13 @@
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
 #' @param measurement_data Measurement data
-#' @param data_type Type of data, Poisson or Gaussian
+#' @param data_dist Type of data, Poisson or Gaussian
 #'
 #' @importFrom magrittr %>%
 #'
 #' @return shiny::app
 #' @keywords internal
-model_viewer_shiny <- function(model_output, mesh, measurement_data, data_type) {
+model_viewer_shiny <- function(model_output, mesh, measurement_data, data_dist) {
     busy_spinner <- get_busy_spinner()
 
     crs <- mesh$crs$input
@@ -18,9 +18,9 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_type) 
         crs <- "+proj=longlat +datum=WGS84"
     }
 
-    data_type <- stringr::str_to_title(data_type)
-    if (!(data_type %in% c("Poisson", "Gaussian"))) {
-        stop("data_type must be one of Poisson or Gaussian")
+    data_dist <- stringr::str_to_title(data_dist)
+    if (!(data_dist %in% c("Poisson", "Gaussian"))) {
+        stop("data_dist must be one of Poisson or Gaussian")
     }
 
     parsed_model_output <- parse_model_output(
@@ -53,7 +53,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_type) 
                     shiny::column(
                         6,
                         shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_type),
+                        shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_dist),
                     ),
                     shiny::column(
                         6,
@@ -102,12 +102,12 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_type) 
 
 
         prediction_field <- shiny::reactive({
-            data_type <- tolower(input$map_data_type)
+            data_dist <- tolower(input$map_data_type)
             if (input$map_plot_type == "Predicted mean fields") {
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "predicted_mean_fields",
-                    data_type = data_type,
+                    data_dist = data_dist,
                     var_a = parsed_model_output[["mean_post"]],
                     var_b = parsed_model_output[["fixed_mean"]]
                 )
@@ -115,7 +115,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_type) 
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
-                    data_type = data_type,
+                    data_dist = data_dist,
                     var_a = parsed_model_output[["mean_post"]]
                 )
             }
@@ -188,10 +188,10 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_type) 
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
 #' @param measurement_data Measurement data
-#' @param data_type Type of data, Poisson or Gaussian
+#' @param data_dist Type of data, Poisson or Gaussian
 #'
 #' @return shiny::app
 #' @export
-model_viewer <- function(model_output, mesh, measurement_data, data_type = "Poisson") {
-    shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data, data_type = data_type))
+model_viewer <- function(model_output, mesh, measurement_data, data_dist = "Poisson") {
+    shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data, data_dist = data_dist))
 }
