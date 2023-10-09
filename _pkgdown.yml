@@ -50,7 +50,6 @@ reference:
 - title: Shiny apps
   desc: Interactive tools for building meshes, plotting maps and investigating priors
   contents:
-    - plot_interactive_map
     - mesh_builder
     - model_builder
 - title: Parsing model output
