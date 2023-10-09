@@ -3,7 +3,7 @@
 #' @param data String data
 #'
 #' @return string data
-#' @export
+#' @keywords internal
 numbers_only <- function(data) {
   stringr::str_replace_all(data, pattern = "[A-Za-z]", replacement = "")
 }

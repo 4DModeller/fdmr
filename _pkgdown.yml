@@ -71,11 +71,13 @@ reference:
   contents:
     - plot_interactive_map
     - mesh_builder
-    - interactive_priors
+    - model_builder
+    - model_viewer
 - title: Parsing model output
   desc: Functions to help parse model output and extract useful information
   contents:
     - parse_model_output
+    - create_prediction_field
 - title: Mesh tools
   desc: Functions to help with creation and investigation of meshes
   contents:
@@ -89,13 +91,10 @@ reference:
 - title: Utility functions
   desc:  These help us handle paths, retrieve data etc
   contents:
-    - get_tutorial_datapath
     - retrieve_tutorial_data
-    - clear_caches
-    - require_packages
+    - get_tutorial_datapath
     - load_tutorial_data
-    - numbers_only
-    - get_tmpdir
-    - create_prediction_field
-    - model_viewer
+    - clear_caches
+    
+    
 
