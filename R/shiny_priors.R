@@ -12,11 +12,11 @@
 #' @return shiny::app
 #' @keywords internal
 model_builder_shiny <- function(spatial_data,
-                         measurement_data,
-                         time_variable,
-                         mesh,
-                         data_distribution = "Poisson",
-                         log_folder = NULL) {
+                                measurement_data,
+                                time_variable,
+                                mesh,
+                                data_distribution = "Poisson",
+                                log_folder = NULL) {
     future::plan(future::multisession())
 
     if (!(data_distribution %in% c("Poisson", "Gaussian"))) {
