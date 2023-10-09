@@ -9,6 +9,7 @@ model_builder(
   measurement_data,
   time_variable,
   mesh,
+  data_distribution = "Poisson",
   log_folder = NULL
 )
 }
