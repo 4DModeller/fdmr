@@ -90,7 +90,7 @@ To plot model predictions on a map click on the `Map` tab. This will use the `fd
 
 By default the app will write out parameter sets and logs to the `fdmr/logs` directory in your home folder. If you want these logs to be written to a different folder, you can pass in the folder path to the `log_folder` argument.
 
-We're now ready to run the app. To do this we'll call the `fdmr::interactive_priors` function, passing in
+We're now ready to run the app. To do this we'll call the `fdmr::model_builder` function, passing in
 
 - `spatial_data = sp_data` - the spatial data covering areas across the city of Bristol
 - `measurement_data = covid19_data` - the COVID-19 data we want to model
@@ -98,7 +98,7 @@ We're now ready to run the app. To do this we'll call the `fdmr::interactive_pri
 - `time_variable = week` - the name of the time variable in the data
 
 ```{r eval=FALSE}
-fdmr::interactive_priors(spatial_data = sp_data, measurement_data = covid19_data, mesh=mesh, time_variable="week")
+fdmr::model_builder(spatial_data = sp_data, measurement_data = covid19_data, mesh=mesh, time_variable="week")
 ```
 
 # Viewing model outputs and parameter sets
