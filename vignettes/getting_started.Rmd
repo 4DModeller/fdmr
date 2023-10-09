@@ -6,3 +6,45 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+## Installation
+
+To get the 4DModeller R package `fdmr` installed first you need to make sure you have a recent version of R installed.
+The easiest way to do this is to [install RStudio](https://posit.co/downloads/).
+
+As `fdmr` has not yet been submitted to [CRAN](https://cran.r-project.org/) we'll need to install it from our GitHub repository.
+We'll use the `devtools` package to do this so if you don't have it installed already in an R session run
+
+```{r eval=FALSE}
+install.packages("devtools")
+library(devtools)
+```
+
+Now we're ready to install `fdmr`
+
+```{r eval=FALSE}
+devtools::install_github("4DModeller/fdmr")
+```
+
+You should now have `fdmr` and all its dependencies installed and you can continue on [one of our tutorials](https://4dmodeller.github.io/fdmr/articles/).
+
+## Installation issues
+
+Here we cover issues we've encountered getting `fdmr` installed on different platforms.
+
+### Linux host and C++17 error
+
+Users on Linux systems may encounter issues during compilation of packages using C++17. You may see an error similar to
+
+```
+'Error: C++17 standard requested but CXX17 is not defined'
+```
+
+To fix this we need to tell R to use a compiler that supports C++17. Here we tell it to use `g++` and pass in the `-std=gnu++17` flag to enable C++17 support.
+
+```{bash eval=FALSE}
+mkdir -p ~/.R
+echo 'CXX17 = g++ -std=gnu++17 -fPIC' > ~/.R/Makevars
+```
+
+After running these commands try reinstalling `fdmr` and the packages should now compile correctly.
