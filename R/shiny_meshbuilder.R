@@ -45,8 +45,6 @@ meshbuilder_shiny <- function(
         crs <- "+proj=longlat +ellps=WGS84 +datum=WGS84"
       }
     )
-  } else {
-    sp::CRS(crs)
   }
 
   # Convert to an sp::CRS object as this is expected by inla mesher and SpatialPointsDataFrame below
