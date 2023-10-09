@@ -219,7 +219,7 @@ Create the triangulated mesh of the study region and have a quick look at it.
 ```{r error=TRUE,warning=FALSE, fig.width=7, fig.height=7}
 e <- era5_precip_cropped@extent
 resolution <- raster::res(era5_precip_cropped)
-sr <- "+proj=utm +zone=32"
+crs <- "+proj=utm +zone=32"
 
 xres <- resolution[1] * 2
 yres <- resolution[2] * 2
@@ -229,7 +229,7 @@ xy <- xy[seq(1, nrow(xy), by = 2), ]
 
 colnames(xy) <- c("LONG", "LAT")
 
-mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = sr)
+mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = crs)
 
 plot(mesh)
 ```
@@ -305,11 +305,13 @@ inlabru_model2 <- inlabru::bru(formula2,
   )
 )
 ```
-Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, mesh and measurement data. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data. Make sure you have a CRS set on your mesh. If not CRS can be read a default of `"+proj=longlat +datum=WGS84"` will be used which may lead to errors with data using UTM as we've done here.
+Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, mesh and measurement data. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data. Make sure you have a CRS set on your mesh. If no CRS can be read a default of `"+proj=longlat +datum=WGS84"` will be used which may lead to errors with data using UTM as we've done here.
 
 ```{r eval=FALSE}
-fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data, data_type = "Gaussian")
+fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data, data_distribution = "Gaussian")
 ```
+
+We can also view the summary of the model outputs
 
 ```{r error=TRUE}
 summary(inlabru_model1)

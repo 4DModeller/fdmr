@@ -23,8 +23,6 @@ priors_shiny <- function(spatial_data,
         stop("We only support Poisson and Gaussian data")
     }
 
-    data_distribution_lower <- tolower(data_distribution)
-
     got_coords <- has_coords(spatial_data = spatial_data)
     if (!got_coords) {
         stop("Please make sure you have set coordinates on spatial_data using sp::coordinates.")
@@ -33,10 +31,10 @@ priors_shiny <- function(spatial_data,
     spatial_crs <- sp::proj4string(spatial_data)
     mesh_crs <- mesh$crs$input
 
-    if (is.na(mesh_crs) && is.na(spatial_crs)) {
+    if ((is.null(mesh_crs) || is.na(mesh_crs)) && (is.na(spatial_crs) || is.null(spatial_crs))) {
         warning("Cannot read CRS from mesh or spatial_data, using default CRS = +proj=longlat +datum=WGS84")
         crs <- "+proj=longlat +datum=WGS84"
-    } else if (is.na(mesh_crs)) {
+    } else if (is.na(mesh_crs) || is.null(mesh_crs)) {
         crs <- spatial_crs
     } else {
         crs <- mesh_crs
@@ -47,16 +45,15 @@ priors_shiny <- function(spatial_data,
 
     # Text for priors help
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
-                        where ρ is the spatial range of the random field."
+                         where ρ is the spatial range of the random field. P(ρ < ρ_0)=p_ρ indicates that the probability of ρ smaller than ρ_0 (range0) is p_ρ (Prange)."
 
     prior_sigma_text <- "A length 2 vector, with (sigma0, Psigma) specifying that P(σ > σ_0)=p_σ,
-                        where σ is the marginal standard deviation of the field."
+                         where σ is the marginal standard deviation of the field. P(σ > σ_0)=p_σ indicates that the probability of σ greater than σ_0 (sigma0) is p_σ (Psigma)."
 
-    control_group_text <- "Temporal priors are set using alpha and PG alpha. These are passed used to create alphaprior.
-                            We use pass this to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior). This specifies that across time,
-                            the process evolves according to an AR(1) process where the prior for the autocorrelation
-                            parameter α is given by alphaprior. We define alphaprior with the prior 'pccor1' which is a PC
-                            prior for the autocorrelation parameter a where α=1 is the base model."
+    control_group_text <- "Temporal priors for the temporal autocorrelation parameter α are set using prior_alpha and pg_alpha, in the relation that P(α > prior_alpha) = pg_alpha, indicating that the probability of α greater than prior_alpha is pg_alpha.
+                           These values are used to create alphaprior, which is then passed to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior).
+                           It specifies that across time, the process evolves according to an AR(1) process where the prior for the autocorrelation parameter α is given by alphaprior.
+                           We define alphaprior with the prior 'pccor1', which is a Penalised Complexity (PC) prior for the temporal autocorrelation parameter α, with α = 1 indicating strong temporal dependence, and α = 0 indicating independence across time."
 
     citation_priors <- "Spatial and field prior explanation taken from https://rdrr.io/github/INBO-BMK/INLA/man/inla.spde2.pcmatern.html"
     citation_control_group <- "Prior explanation text modified from https://www.paulamoraga.com/book-geospatial/sec-geostatisticaldataexamplest.html"
@@ -115,33 +112,33 @@ priors_shiny <- function(spatial_data,
                 shiny::h3("Priors"),
                 shiny::sliderInput(
                     inputId = "prior_range",
-                    label = "Spatial range:",
+                    label = "range0:",
                     min = 0.05, value = 0.05, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "ps_range",
-                    label = "Range probabilty:",
+                    label = "Prange:",
                     min = 0.1, value = 0.1, max = 1
                 ),
                 shiny::sliderInput(
                     inputId = "prior_sigma",
-                    label = "Standard deviation:",
+                    label = "sigma0:",
                     min = 0.05, value = 0.05, max = 2
                 ),
                 shiny::sliderInput(
                     inputId = "pg_sigma",
-                    label = "Standard dev. probability:",
+                    label = "Psigma:",
                     min = 0.1, value = 0.2, max = 1
                 ),
                 shiny::h3("Temporal priors"),
                 shiny::sliderInput(
                     inputId = "prior_ar1",
-                    label = "Alpha:",
+                    label = "prior_alpha:",
                     min = -1, value = -0.2, max = 1.0, step = 0.1,
                 ),
                 shiny::sliderInput(
                     inputId = "pg_ar1",
-                    label = "PG Alpha:",
+                    label = "pg_alpha:",
                     min = 0, value = 0.8, max = 1
                 ),
                 shiny::textOutput(outputId = "status")
@@ -159,7 +156,7 @@ priors_shiny <- function(spatial_data,
                             ),
                             shiny::column(
                                 6,
-                                shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian")),
+                                shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian"), selected = data_distribution),
                             )
                         ),
                         shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
@@ -329,7 +326,7 @@ priors_shiny <- function(spatial_data,
             formula_str()
         })
 
-        data_distribution <- shiny::reactive({
+        data_distribution_internal <- shiny::reactive({
             tolower(input$data_dist)
         })
 
@@ -338,7 +335,7 @@ priors_shiny <- function(spatial_data,
             formula_local <- inla_formula()
             measurement_data_local <- measurement_data
 
-            data_dist_local <- data_distribution()
+            data_dist_local <- data_distribution_internal()
             family_control <- NULL
             if (data_dist_local == "poisson") {
                 family_control <- list(link = "log")
@@ -443,7 +440,7 @@ priors_shiny <- function(spatial_data,
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "predicted_mean_fields",
-                    data_dist = data_distribution(),
+                    data_dist = data_distribution_internal(),
                     var_a = data[["mean_post"]],
                     var_b = data[["fixed_mean"]]
                 )
@@ -451,7 +448,7 @@ priors_shiny <- function(spatial_data,
                 create_prediction_field(
                     mesh = mesh,
                     plot_type = "random_effect_fields",
-                    data_dist = data_distribution(),
+                    data_dist = data_distribution_internal(),
                     var_a = data[["mean_post"]]
                 )
             }
@@ -529,7 +526,7 @@ priors_shiny <- function(spatial_data,
             params <- model_vals$run_params[[input$select_run_code]]
 
             family_control_str <- "NULL"
-            if (data_distribution() == "poisson") {
+            if (data_distribution_internal() == "poisson") {
                 family_control_str <- "list(link = 'log'),"
             }
 
@@ -546,7 +543,7 @@ priors_shiny <- function(spatial_data,
             )", "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
-                        family = '", data_distribution(), "',
+                        family = '", data_distribution_internal(), "',
                         E = measurement_data[[", input$exposure_param, "]],
                         control.family = ", family_control_str, "
                         options = list(
@@ -571,6 +568,6 @@ priors_shiny <- function(spatial_data,
 #'
 #' @return shiny::app
 #' @export
-interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh, log_folder = NULL) {
-    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh, log_folder = log_folder))
+interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh, data_distribution = "Poisson", log_folder = NULL) {
+    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh, data_distribution = data_distribution, log_folder = log_folder))
 }
