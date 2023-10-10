@@ -36,16 +36,10 @@ head(lakes_data[, c("centroid_lon", "centroid_lat")])
 
 That looks correct. By default `mesh_builder` will look for `"LAT"` and `"LONG"` columns and raise an error if it can't find them. To avoid this we can either change the names of the columns in our data or pass in the names of those columns when we call the function. 
 
-Let's call the `mesh_builder` function and pass in the data and tell it to use `centroid_long` and `centroid_lat` as the longitude and latitude columns. As we only have have a `data.frame` here we also need to pass in the coordinate reference system we want to use. We'll use the WGS84 coordinate reference system and create a CRS object using the `sp::CRS` function and passing in a `proj4string`.
-
-```{r}
-crs <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
-```
-
-We're now ready to launch the mesh builder app.
+Let's call the `mesh_builder` function and pass in the data and tell it to use `centroid_long` and `centroid_lat` as the longitude and latitude columns. As we only have have a `data.frame` here we also need to pass in the coordinate reference system we want to use. We'll use the WGS84 coordinate reference system and pass in a `proj4string`. We're now ready to launch the mesh builder app.
 
 ```{r eval=FALSE}
-fdmr::mesh_builder(spatial_data = lakes_data, longitude_column = "centroid_lon", latitude_column = "centroid_lat", crs = crs)
+fdmr::mesh_builder(spatial_data = lakes_data, longitude_column = "centroid_lon", latitude_column = "centroid_lat", crs="+proj=longlat +ellps=WGS84 +datum=WGS84")
 ``` 
 
 ## Loading data - `rds` file

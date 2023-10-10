@@ -36,16 +36,21 @@ meshbuilder_shiny <- function(
   }
 
   if (is.null(crs)) {
-    crs <- sf::st_crs(spatial_data)
-    if (is.na(crs$input)) {
-      stop("Unable to read CRS from data, please pass proj4string CRS to crs argument.")
-    }
+    crs <- tryCatch(
+      {
+        crs <- sp::proj4string(spatial_data)
+      },
+      error = function(err) {
+        warning("Unable to read CRS from data, using default CRS = '+proj=longlat +ellps=WGS84 +datum=WGS84'")
+        crs <- "+proj=longlat +ellps=WGS84 +datum=WGS84"
+      }
+    )
   } else {
-    # We try and create a CRS to make sure a valid CRS has been passed
-    if (is.character(crs)) {
-      crs <- sp::CRS(crs)
-    }
+    sp::CRS(crs)
   }
+
+  # Convert to an sp::CRS object as this is expected by inla mesher and SpatialPointsDataFrame below
+  crs <- sp::CRS(crs)
 
   got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data))
   if (!got_lat_long) {
