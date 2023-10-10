@@ -9,3 +9,4 @@ get_tmpdir()
 \description{
 Get the system temporary directory
 }
+\keyword{internal}

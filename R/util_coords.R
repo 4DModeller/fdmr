@@ -40,3 +40,4 @@ has_coords <- function(spatial_data) {
     }
   )
 }
+
