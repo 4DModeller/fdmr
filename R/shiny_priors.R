@@ -21,14 +21,16 @@ priors_shiny <- function(spatial_data,
     }
 
     # Text for priors help
-    prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ, 
-                         where ρ is the spatial range of the random field. P(ρ < ρ_0)=p_ρ indicates that the probability of ρ smaller than ρ_0 (range0) is p_ρ (Prange)."
+    prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ, where ρ is the spatial range of the random field. The spatial range ρ is defined as the distance at which the spatial correlation between two locations is approximately 0. 
+                         P(ρ < ρ_0)=p_ρ indicates that the probability of ρ smaller than ρ_0 (range0) is p_ρ (Prange). Large values of Prange lead to a greater prior belief on small values of ρ."
 
     prior_sigma_text <- "A length 2 vector, with (sigma0, Psigma) specifying that P(σ > σ_0)=p_σ, 
-                         where σ is the marginal standard deviation of the field. P(σ > σ_0)=p_σ indicates that the probability of σ greater than σ_0 (sigma0) is p_σ (Psigma)."
+                         where σ is the marginal standard deviation of the field. P(σ > σ_0)=p_σ indicates that the probability of σ greater than σ_0 (sigma0) is p_σ (Psigma).
+                         Large values of Psigma lead to a greater prior belief on large values of σ."
 
-    control_group_text <- "Temporal priors for the temporal autocorrelation parameter α are set using prior_alpha and pg_alpha, in the relation that P(α > prior_alpha) = pg_alpha, indicating that the probability of α greater than prior_alpha is pg_alpha. 
-                           These values are used to create alphaprior, which is then passed to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior).
+    control_group_text <- "Temporal priors for the temporal autocorrelation parameter α are set using prior_alpha and pg_alpha, in the relation that P(α > prior_alpha) = pg_alpha, indicating that the probability of α greater than prior_alpha is pg_alpha.
+                           Large values of pg_alpha lead to a greater prior belief on large values of α.
+                           prior_alpha and pg_alpha are used to create alphaprior, which is then passed to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior).
                            It specifies that across time, the process evolves according to an AR(1) process where the prior for the autocorrelation parameter α is given by alphaprior. 
                            We define alphaprior with the prior 'pccor1', which is a Penalised Complexity (PC) prior for the temporal autocorrelation parameter α, with α = 1 indicating strong temporal dependence, and α = 0 indicating independence across time."
   
