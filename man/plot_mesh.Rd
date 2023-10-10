@@ -2,16 +2,28 @@
 % Please edit documentation in R/plot_mesh.R
 \name{plot_mesh}
 \alias{plot_mesh}
-\title{Plot a mesh on an interactive Leaflet map}
+\title{Plot a mesh on a Leaflet map}
 \usage{
-plot_mesh(mesh)
+plot_mesh(
+  mesh,
+  spatial_data = NULL,
+  longitude_column = "LONG",
+  latitude_column = "LAT"
+)
 }
 \arguments{
 \item{mesh}{Mesh data}
+
+\item{spatial_data}{Spatial data, either a SpatialPolygonsDataFrame, SpatialPointsDataFrame or an object
+that can be converted to a data.frame with longitude and latitude columns}
+
+\item{longitude_column}{Longitude column in spatial_data}
+
+\item{latitude_column}{Latitude column in spatial_data name}
 }
 \value{
 leaflet::leaflet
 }
 \description{
-Plot a mesh on an interactive Leaflet map
+Plot a mesh on a Leaflet map
 }

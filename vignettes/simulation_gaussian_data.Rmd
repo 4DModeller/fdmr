@@ -217,9 +217,7 @@ The `fdmr::plot_mesh` function displays both the mesh and the observation points
 
 ```{r meshplot, error=TRUE,fig.cap="A plot of the mesh.", fig.width=8, fig.height=4, fig.align = "center"}
 
-#fdmr::plot_mesh(mesh = mesh, point_data = simdf@coords, point_colour = "blue", cex = 0.8)
 fdmr::plot_mesh(mesh=mesh, spatial_data=simdf@coords)
-
 ```
 
 ## fdmr::mesh_builder
