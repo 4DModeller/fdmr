@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use of `rgdal` functions migrated to `sf` equivalents due to [`rgdal` retirement](https://r-spatial.org/r/2022/04/12/evolution.html) - [PR #145](https://github.com/4DModeller/fdmr/pull/145)
 - Move to use `utils::untar` instead of `archive::extract_archive` due to issues on some Linux systems - [PR #101](https://github.com/4DModeller/fdmr/pull/130)
+- The `plot_mesh` function now uses an interactive [Leaflet](https://rstudio.github.io/leaflet/) map with the optional to plot spatial data overlaid - [PR #162](https://github.com/4DModeller/fdmr/pull/162)
 
 ### Removed
 
