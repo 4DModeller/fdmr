@@ -1,13 +1,8 @@
 ---
-title: "How to choose how to model"
-output: 
-  bookdown::html_document2:
-    base_format: rmarkdown::html_vignette
-    fig_caption: yes
-bibliography: "covid.bib"
-link-citations: yes
+title: "How to choose a model"
+output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Priors exploration}
+  %\VignetteIndexEntry{How to choose a model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
