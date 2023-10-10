@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use of `rgdal` functions migrated to `sf` equivalents due to [`rgdal` retirement](https://r-spatial.org/r/2022/04/12/evolution.html) - [PR #145](https://github.com/4DModeller/fdmr/pull/145)
 - Move to use `utils::untar` instead of `archive::extract_archive` due to issues on some Linux systems - [PR #101](https://github.com/4DModeller/fdmr/pull/130)
-- Default colours for `plot_interactive_map` changed from Blues to Viridis - [PR #161](https://github.com/4DModeller/fdmr/pull/161)
 
 ### Removed
+
+- `plot_interactive_map` Shiny app removed due to limited usefulness - [PR #166](https://github.com/4DModeller/fdmr/pull/166)
+
