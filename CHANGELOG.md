@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clearer documentation on types expected by the `mesh_builder` tool - [PR #101](https://github.com/4DModeller/fdmr/pull/101)
 - Checks on the data types being passed into the `mesh_builder` tool - [PR #101](https://github.com/4DModeller/fdmr/pull/101)
 - Ability to plot either polygon or point data on Leaflet map of `mesh_builder` tool - [PR #101](https://github.com/4DModeller/fdmr/pull/101)
+- The ability to plot model predictions on a `leaflet` map in the our [Interactive priors Shiny app](https://4dmodeller.github.io/fdmr/articles/priors_app.html) - [PR #147](https://github.com/4DModeller/fdmr/pull/147)
+- A new Shiny app to parse and plot INLA model output, letting users easily view model parameters and predictions on a map - [PR #158](https://github.com/4DModeller/fdmr/pull/158)
 
 ### Fixed
 
@@ -26,3 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move to use `utils::untar` instead of `archive::extract_archive` due to issues on some Linux systems - [PR #101](https://github.com/4DModeller/fdmr/pull/130)
 
 ### Removed
+
+- `plot_interactive_map` Shiny app removed due to limited usefulness - [PR #166](https://github.com/4DModeller/fdmr/pull/166)
+

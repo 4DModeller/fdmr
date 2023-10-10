@@ -52,7 +52,8 @@ Imports:
     shinybusy,
     curl,
     promises,
-    fmesher
+    fmesher,
+    purrr
 Suggests: 
     bookdown,
     knitr,
@@ -64,4 +65,3 @@ Suggests:
     rcmdcheck
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-

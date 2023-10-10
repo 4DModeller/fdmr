@@ -28,7 +28,9 @@ We first load INLA and then retrieve the data from the fdmr example data store. 
 
 ```{r}
 library(INLA)
+library(magrittr)
 ```
+
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid")
 ```
