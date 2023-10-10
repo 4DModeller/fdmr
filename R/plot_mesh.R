@@ -1,25 +1,14 @@
-# #' Plot a mesh
-# #'
-# #' @param mesh Mesh data
-# #' @param point_data Points data
-# #' @param point_colour Colour for points
-# #' @param cex Point size magnifier
-# #'
-# #' @return terra::plot
-# #' @export
-# plot_mesh <- function(mesh, point_data, point_colour = "blue", cex = 0.1) {
-#   terra::plot(mesh, main = "")
-#   terra::points(point_data, col = point_colour, cex = cex)
-# }
-
-
-#' Plot a mesh on an interactive Leaflet map
+#' Plot a mesh on a Leaflet map
 #'
 #' @param mesh Mesh data
+#' @param spatial_data Spatial data, either a SpatialPolygonsDataFrame, SpatialPointsDataFrame or an object
+#' that can be converted to a data.frame with longitude and latitude columns
+#' @param longitude_column Longitude column in spatial_data
+#' @param latitude_column Latitude column in spatial_data name
 #'
 #' @return leaflet::leaflet
 #' @export
-plot_mesh <- function(mesh) {
+plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", latitude_column = "LAT") {
   expected_crs <- "+proj=longlat +datum=WGS84"
   crs_string <- fmesher::fm_proj4string(mesh)
 
@@ -35,7 +24,55 @@ plot_mesh <- function(mesh) {
 
   spatial_mesh <- fdmr::mesh_to_spatial(mesh = mesh, crs = expected_crs)
 
-  leaflet::leaflet() %>%
-    leaflet::addTiles(group = "OSM") %>%
-    leaflet::addPolygons(data = spatial_mesh, weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
+
+  plot_polygons <- FALSE
+  plot_points <- FALSE
+  if (!is.null(spatial_data)) {
+    coords_only <- spatial_data[, c(longitude_column, latitude_column)]
+    names(coords_only) <- c("LONG", "LAT")
+    # We may not use this
+    spatial_points <- NULL
+    # Do some checks to see what kind of data we have
+    # If we have a SpatialPolygonsDataFrame, we can plot the polygons
+    # otherwise if we just have SpatialPoints we can plot the points
+    # otherwise we don't plot anything
+    if (is(spatial_data, "SpatialPolygonsDataFrame")) {
+      plot_polygons <- TRUE
+    } else {
+      plot_points <- TRUE
+
+      if (!is.data.frame(spatial_data)) {
+        warning("Attempting to convert to a data.frame")
+        spatial_data <- as.data.frame(spatial_data)
+      }
+
+      spatial_points <- sp::SpatialPointsDataFrame(
+        coords = coords_only,
+        data = spatial_data,
+        proj4string = sp::CRS(expected_crs)
+      )
+    }
+  }
+
+  overlay_groups <- c("Mesh")
+
+  m <- leaflet::leaflet()
+  m <- leaflet::addTiles(m, group = "OSM")
+  m <- leaflet::addPolygons(m, data = spatial_mesh, weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
+
+  if (plot_polygons) {
+    m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
+    overlay_groups <- append(overlay_groups, "Spatial")
+  } else if (plot_points) {
+    m <- leaflet::addCircles(m, data = spatial_points, group = "Spatial", fillColor = "#b9220b", color = "#b9220b")
+    overlay_groups <- append(overlay_groups, "Spatial")
+  }
+
+  m <- leaflet::addLayersControl(m,
+    position = "topright",
+    baseGroups = c("OSM"),
+    overlayGroups = overlay_groups,
+    options = leaflet::layersControlOptions(collapsed = FALSE)
+  )
+  m
 }
