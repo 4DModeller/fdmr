@@ -10,16 +10,15 @@
 
 4DModeller has a stack of tools that include shiny apps, vignettes in R-markdown notebooks, and the library itself. These tools are designed to help you easily build finite element meshes that models can be calculated on:
 
-![fem](gif)
+https://github.com/4DModeller/fdmr/assets/8915182/b1dc1fc7-3340-4915-8de6-319a29ca7a89
 
 tools for how to specify priors for the model to pick the best model hyperparameters:
 
-![priors](gif)
+https://github.com/4DModeller/fdmr/assets/8915182/678fdb23-83c0-4609-bc54-0d0c874264fa
 
 and tools for evaluating the fully trained model output:
 
-![eval](gif)
-
+https://github.com/4DModeller/fdmr/assets/8915182/8e2bf77e-064b-421c-ac96-e5c45ad9cf5e
 
 ## Quickstart
 
