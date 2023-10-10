@@ -2,22 +2,16 @@
 % Please edit documentation in R/plot_mesh.R
 \name{plot_mesh}
 \alias{plot_mesh}
-\title{Plot a mesh}
+\title{Plot a mesh on an interactive Leaflet map}
 \usage{
-plot_mesh(mesh, point_data, point_colour = "blue", cex = 0.1)
+plot_mesh(mesh)
 }
 \arguments{
 \item{mesh}{Mesh data}
-
-\item{point_data}{Points data}
-
-\item{point_colour}{Colour for points}
-
-\item{cex}{Point size magnifier}
 }
 \value{
-terra::plot
+leaflet::leaflet
 }
 \description{
-Plot a mesh
+Plot a mesh on an interactive Leaflet map
 }
