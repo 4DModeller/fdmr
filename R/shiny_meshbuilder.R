@@ -174,7 +174,7 @@ meshbuilder_shiny <- function(
     mesh_spatial <- shiny::reactive(
       suppressMessages(
         suppressWarnings(
-          fdmr::mesh_to_spatial(mesh = mesh(), crs=crs)
+          fdmr::mesh_to_spatial(mesh = mesh(), crs = crs)
         )
       )
     )

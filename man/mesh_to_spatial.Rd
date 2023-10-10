@@ -4,7 +4,7 @@
 \alias{mesh_to_spatial}
 \title{Convert an INLA mesh to a SpatialPolygonsDataFrame}
 \usage{
-mesh_to_spatial(mesh, crs = NULL)
+mesh_to_spatial(mesh, crs)
 }
 \arguments{
 \item{mesh}{Mesh}

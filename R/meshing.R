@@ -6,27 +6,17 @@
 #'
 #' @return SpatialPolygonsDataFrame
 #' @export
-mesh_to_spatial <- function(mesh, crs = NULL) {
-  # TODO - update this function so it uses the newer fmsesher functions available
-  # in inlabru
-  # Try and read the CRS from the mesh
-  crs <- INLA::inla.CRS(INLA::inla.CRSargs(mesh$crs))
+mesh_to_spatial <- function(mesh, crs) {
+  is_geocentric <- identical(INLA::inla.as.list.CRS(crs)[["proj"]], "geocent")
 
-  if (is.null(crs)) {
-    stop("Cannot read CRS from mesh, please pass in crs argument")
-  }
-
-  # crs_new <- inlabru::fm_crs(inlabru::fm_CRSargs(mesh$crs))
-  isgeocentric <- identical(INLA::inla.as.list.CRS(crs)[["proj"]], "geocent")
-
-  if (isgeocentric || (mesh$manifold == "S2")) {
+  if (is_geocentric || mesh$manifold == "S2") {
     stop(paste0(
       "'sp' doesn't support storing polygons in geocentric coordinates.\n",
       "Convert to a map projection with inla.spTransform() before calling inla.mesh2sp()."
     ))
   }
 
-  triangles <- sp::SpatialPolygonsDataFrame(
+  sp::SpatialPolygonsDataFrame(
     Sr = sp::SpatialPolygons(
       lapply(
         seq_len(nrow(mesh$graph$tv)),
@@ -46,8 +36,4 @@ mesh_to_spatial <- function(mesh, crs = NULL) {
     data = as.data.frame(mesh$graph$tv[, c(1, 3, 2), drop = FALSE]),
     match.ID = FALSE
   )
-  # vertices <- sp::SpatialPoints(mesh$loc[, 1:2, drop = FALSE], proj4string = crs)
-  # list(triangles = triangles, vertices = vertices)
-
-  return(triangles)
 }
