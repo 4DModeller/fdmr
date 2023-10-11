@@ -2,12 +2,16 @@
 #' Convert an INLA mesh to a SpatialPolygonsDataFrame
 #'
 #' @param mesh Mesh
-#' @param crs Coordinate Reference System in proj4 format. Required if mesh has no CRS defined.
+#' @param crs Coordinate Reference System as proj4string
 #'
 #' @return SpatialPolygonsDataFrame
 #' @export
 mesh_to_spatial <- function(mesh, crs) {
-  is_geocentric <- "geocent" %in% fmesher::fm_proj4string(crs)
+  if (!is.character(crs)) {
+    stop("crs must be a proj4string")
+  }
+
+  is_geocentric <- "geocent" %in% crs
   if (is_geocentric || mesh$manifold == "S2") {
     stop(paste0(
       "'sp' doesn't support storing polygons in geocentric coordinates.\n",
@@ -30,7 +34,7 @@ mesh_to_spatial <- function(mesh, crs) {
           )
         }
       ),
-      proj4string = crs
+      proj4string = sp::CRS(crs)
     ),
     data = as.data.frame(mesh$graph$tv[, c(1, 3, 2), drop = FALSE]),
     match.ID = FALSE

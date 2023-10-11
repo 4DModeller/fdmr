@@ -7,10 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 In this tutorial, we'll start by generating some simulated spatio-temporal data, with the city of Bristol as our study region. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
 
 # Data simulation
@@ -22,7 +18,6 @@ fdmr::retrieve_tutorial_data(dataset = "priors")
 sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_dataBris.rds")
 
 ```
-
 
 Then we simulate the Gaussian data that exhibit spatio-temporal correlation. These simulated data are finally organized into a data frame named `simdf`, where each row corresponds to an observation at a specific location and time. The variable `ID` is the spatial location identifier. Variable `time` denotes the time point. The variable `datn` represents the simulated response data. The longitude and latitude coordinates for each location are stored in the variables `LONG` and `LAT`, respectively.
 
@@ -222,8 +217,7 @@ The `fdmr::plot_mesh` function displays both the mesh and the observation points
 
 ```{r meshplot, error=TRUE,fig.cap="A plot of the mesh.", fig.width=8, fig.height=4, fig.align = "center"}
 
-fdmr::plot_mesh(mesh = mesh, point_data = simdf@coords,
-                point_colour = "blue", cex = 0.8)
+fdmr::plot_mesh(mesh=mesh, spatial_data=simdf@coords)
 ```
 
 ## fdmr::mesh_builder

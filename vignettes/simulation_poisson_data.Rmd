@@ -165,6 +165,7 @@ sp::coordinates(simdf)<- c("LONG","LAT")
 ```
 
 ## Fit the model
+
 Finally, we fit the spatio-temporal model using SPDE approach and AR(1) process by calling the function `bru()` of the package `inlabru`. 
 
 ```{r fitmodel}
@@ -174,7 +175,7 @@ inlabru_model <- inlabru::bru(formula,
                               E = simdf$E,
                               control.family = list(link = "log"),
                               options = list(
-                                verbose = TRUE
+                                verbose = FALSE
                               )
 )
 ```
@@ -221,8 +222,7 @@ The `fdmr::plot_mesh` function displays both the mesh and the observation points
 
 ```{r meshplot, error=TRUE,fig.cap="A plot of the mesh.", fig.width=8, fig.height=4, fig.align = "center"}
 
-fdmr::plot_mesh(mesh = mesh, point_data = simdf@coords,
-                point_colour = "blue", cex = 0.8)
+fdmr::plot_mesh(mesh = mesh, spatial_data = simdf@coords)
 ```
 
 ## fdmr::mesh_builder
