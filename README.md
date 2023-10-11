@@ -10,17 +10,17 @@
 
 4DModeller has a stack of tools that include [Shiny apps](https://4dmodeller.github.io/fdmr/reference/index.html#shiny-apps), [tutorials as vignettes](https://4dmodeller.github.io/fdmr/articles/) in R Markdown notebooks, and the [package itself](https://github.com/4DModeller/fdmr). These tools are designed to help you:
 
-- easily build finite element meshes that models can be calculated on
+### - easily build finite element meshes that models can be calculated on
 
-https://github.com/4DModeller/fdmr/assets/8915182/b1dc1fc7-3340-4915-8de6-319a29ca7a89
+![meshbuilder](https://github.com/4DModeller/fdmr/assets/8915182/4c1d188d-3feb-471f-8831-97aa5fab4765)
 
-- specify priors for the model to pick the best model hyperparameters
+### - specify priors for the model to pick the best model hyperparameters
 
-https://github.com/4DModeller/fdmr/assets/8915182/678fdb23-83c0-4609-bc54-0d0c874264fa
+![priors](https://github.com/4DModeller/fdmr/assets/8915182/30bfea5e-80d8-42d8-96e7-ff0bce22029a)
 
-- evaluate the fully trained model output
+### - evaluate the fully trained model output
 
-https://github.com/4DModeller/fdmr/assets/8915182/8e2bf77e-064b-421c-ac96-e5c45ad9cf5e
+![modelviewer](https://github.com/4DModeller/fdmr/assets/8915182/fe791f74-c9b4-4db0-a52e-ffa018b12b41)
 
 ## Quickstart
 
