@@ -15,4 +15,3 @@ string data
 \description{
 Removes any character that isn't a letter
 }
-\keyword{internal}
