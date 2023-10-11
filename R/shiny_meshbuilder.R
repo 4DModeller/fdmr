@@ -41,14 +41,11 @@ meshbuilder_shiny <- function(
         crs <- sp::proj4string(spatial_data)
       },
       error = function(err) {
-        warning("Unable to read CRS from data, using default CRS = '+proj=longlat +ellps=WGS84 +datum=WGS84'")
-        crs <- "+proj=longlat +ellps=WGS84 +datum=WGS84"
+        warning("Unable to read CRS from data, using default CRS = '+proj=longlat +datum=WGS84'")
+        crs <- "+proj=longlat +datum=WGS84"
       }
     )
   }
-
-  # Convert to an sp::CRS object as this is expected by inla mesher and SpatialPointsDataFrame below
-  crs <- sp::CRS(crs)
 
   got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data))
   if (!got_lat_long) {
@@ -86,7 +83,7 @@ meshbuilder_shiny <- function(
     spatial_points <- sp::SpatialPointsDataFrame(
       coords = coords_only,
       data = spatial_data,
-      proj4string = crs
+      proj4string = sp::CRS(crs)
     )
   }
 
@@ -174,7 +171,7 @@ meshbuilder_shiny <- function(
     mesh_spatial <- shiny::reactive(
       suppressMessages(
         suppressWarnings(
-          fdmr::mesh_to_spatial(mesh = mesh())
+          fdmr::mesh_to_spatial(mesh = mesh(), crs = crs)
         )
       )
     )

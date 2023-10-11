@@ -4,12 +4,12 @@
 \alias{mesh_to_spatial}
 \title{Convert an INLA mesh to a SpatialPolygonsDataFrame}
 \usage{
-mesh_to_spatial(mesh, crs = NULL)
+mesh_to_spatial(mesh, crs)
 }
 \arguments{
 \item{mesh}{Mesh}
 
-\item{crs}{Coordinate Reference System in proj4 format. Required if mesh has no CRS defined.}
+\item{crs}{Coordinate Reference System object created by sp::CRS}
 }
 \value{
 SpatialPolygonsDataFrame

@@ -165,6 +165,7 @@ sp::coordinates(simdf)<- c("LONG","LAT")
 ```
 
 ## Fit the model
+
 Finally, we fit the spatio-temporal model using SPDE approach and AR(1) process by calling the function `bru()` of the package `inlabru`. 
 
 ```{r fitmodel}
@@ -174,7 +175,7 @@ inlabru_model <- inlabru::bru(formula,
                               E = simdf$E,
                               control.family = list(link = "log"),
                               options = list(
-                                verbose = TRUE
+                                verbose = FALSE
                               )
 )
 ```
