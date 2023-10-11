@@ -7,8 +7,7 @@
 #' @return SpatialPolygonsDataFrame
 #' @export
 mesh_to_spatial <- function(mesh, crs) {
-  is_geocentric <- identical(INLA::inla.as.list.CRS(crs)[["proj"]], "geocent")
-
+  is_geocentric <- "geocent" %in% fmesher::fm_proj4string(crs)
   if (is_geocentric || mesh$manifold == "S2") {
     stop(paste0(
       "'sp' doesn't support storing polygons in geocentric coordinates.\n",
