@@ -21,11 +21,11 @@ meshbuilder_shiny(
 
 \item{crs}{CRS as a proj4string}
 
-\item{max_edge}{The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d}
+\item{max_edge}{The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla}
 
-\item{offset}{Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d}
+\item{offset}{Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla}
 
-\item{cutoff}{The minimum allowed distance between points, passed to inla.mesh.2d}
+\item{cutoff}{The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla}
 
 \item{latitude_column}{Name of the latitude column in the spatial data}
 

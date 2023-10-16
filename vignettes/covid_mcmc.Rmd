@@ -130,7 +130,7 @@ Finally, we fit a BHM to the same dataset using the INLA-SPDE approach.
 initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
 max_edge <- initial_range / 8
 
-mesh <- INLA::inla.mesh.2d(
+mesh <- fmesher::fm_mesh_2d_inla(
   loc = sp_data@data[, c("LONG", "LAT")],
   max.edge = c(1, 2) * max_edge,
   offset = c(initial_range / 4, initial_range),

@@ -9,7 +9,7 @@ mesh_to_spatial(mesh, crs)
 \arguments{
 \item{mesh}{Mesh}
 
-\item{crs}{Coordinate Reference System object created by sp::CRS}
+\item{crs}{Coordinate Reference System as proj4string}
 }
 \value{
 SpatialPolygonsDataFrame

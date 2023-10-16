@@ -3,9 +3,9 @@
 #' @param spatial_data a data.frame or tibble containing spatial data
 #' @param data Observations data, for use with the check_mesh functionality
 #' @param crs CRS as a proj4string
-#' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
-#' @param max_edge The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d
-#' @param cutoff The minimum allowed distance between points, passed to inla.mesh.2d
+#' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
+#' @param max_edge The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla
+#' @param cutoff The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla
 #' @param latitude_column Name of the latitude column in the spatial data
 #' @param longitude_column Name of the longitude column in the spatial data
 #'
@@ -196,7 +196,7 @@ meshbuilder_shiny <- function(
 
     output$mesh_code <- shiny::reactive(
       paste0(
-        "mesh <- inla.mesh.2d(loc = location_data,
+        "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,
           max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
           cutoff = ", input$cutoff, ",
           offset=c(", paste0(input$offset, collapse = ", "), "))\n"
@@ -245,9 +245,9 @@ meshbuilder_shiny <- function(
 #' @param spatial_data Spatial data
 #' @param obs_data Measurement data
 #' @param crs CRS as a proj4string
-#' @param offset Specifies the size of the inner and outer extensions around data locations, passed to inla.mesh.2d
-#' @param max_edge The largest allowed triangle edge length. One or two values, passed to inla.mesh.2d
-#' @param cutoff The minimum allowed distance between points, passed to inla.mesh.2d
+#' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
+#' @param max_edge The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla
+#' @param cutoff The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla
 #' @param latitude_column Name of the latitude column in the spatial data
 #' @param longitude_column Name of the longitude column in the spatial data
 #'
