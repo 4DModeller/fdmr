@@ -268,7 +268,7 @@ formula2 <- streamflow ~ 0 + Intercept + precip +
   f(
     main = coordinates,
     model = spde,
-    group = group.index,
+    group = time,
     ngroup = n_groups,
     control.group = list(
       model = "ar1",
