@@ -2,25 +2,25 @@
 
 [![R-CMD-check](https://github.com/4DModeller/fdmr/actions/workflows/check-standard.yaml/badge.svg?branch=main)](https://github.com/4DModeller/fdmr/actions/workflows/check-standard.yaml)
 
-4D-Modeller is a spatio-temporal modeling library that can be applied to problems at any scale from micro to processes that operate at a global scale. It includes data visualization tools, finite element mesh building tools, Bayesian hierarchical modeling based on Bayesian inference packages INLA and inlabru, and model evaluation and assessment tools.
+4DModeller is a spatio-temporal modelling package that can be applied to problems at any scale from micro to processes that operate at a global scale. It includes data visualization tools, finite element mesh building tools, Bayesian hierarchical modelling based on Bayesian inference packages [INLA](https://www.r-inla.org/home) and [inlabru](https://github.com/inlabru-org/inlabru), and model evaluation and assessment tools.
 
-## Why should I use 4d-Modeller?
+## Why should I use 4DModeller?
 
-4d-Modeller is an R toolbox that has been designed to make it easy to design spatially distributed, temporally dependent statistical models. Typically, 4d-Modeller expects tabular data sets with spatial coordinates, time indices, and the values that change or remain constant over those times. It is designed to be used in the modeling process once data has been sufficiently organized from wherever it was gathered from.
+4DModeller has been designed to make it easy to design spatially distributed, temporally dependent statistical models. Typically, 4DModeller expects tabular data sets with spatial coordinates, time indices, and the values that change or remain constant over those times. It is designed to be used in the modelling process once data has been sufficiently organized from wherever it was gathered from.
 
-4d-Modeller has a stack of tools that include shiny apps, vignettes in R-markdown notebooks, and the library itself. These tools are designed to help you easily build finite element meshes that models can be calculated on:
+4DModeller has a stack of tools that include [Shiny apps](https://4dmodeller.github.io/fdmr/reference/index.html#shiny-apps), [tutorials as vignettes](https://4dmodeller.github.io/fdmr/articles/) in R Markdown notebooks, and the [package itself](https://github.com/4DModeller/fdmr). These tools are designed to help you:
 
-![fem](gif)
+### - easily build finite element meshes that models can be calculated on
 
-tools for how to specify priors for the model to pick the best model hyperparameters:
+![meshbuilder](https://github.com/4DModeller/fdmr/assets/8915182/4c1d188d-3feb-471f-8831-97aa5fab4765)
 
-![priors](gif)
+### - specify priors for the model to pick the best model hyperparameters
 
-and tools for evaluating the fully trained model output:
+![priors](https://github.com/4DModeller/fdmr/assets/8915182/30bfea5e-80d8-42d8-96e7-ff0bce22029a)
 
-![eval](gif)
+### - evaluate the fully trained model output
 
-
+![modelviewer](https://github.com/4DModeller/fdmr/assets/8915182/fe791f74-c9b4-4db0-a52e-ffa018b12b41)
 
 ## Quickstart
 
