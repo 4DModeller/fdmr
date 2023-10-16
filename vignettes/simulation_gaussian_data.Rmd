@@ -16,7 +16,6 @@ First we simulate some Gaussian distributed data observed at 55 spatial location
 ```{r loadsp}
 fdmr::retrieve_tutorial_data(dataset = "priors")
 sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_dataBris.rds")
-
 ```
 
 Then we simulate the Gaussian data that exhibit spatio-temporal correlation. These simulated data are finally organized into a data frame named `simdf`, where each row corresponds to an observation at a specific location and time. The variable `ID` is the spatial location identifier. Variable `time` denotes the time point. The variable `datn` represents the simulated response data. The longitude and latitude coordinates for each location are stored in the variables `LONG` and `LAT`, respectively.
@@ -145,7 +144,7 @@ sp::coordinates(simdf)<- c("LONG","LAT")
 
 ## Define the model formula
 ```{r formula, error=TRUE}
- formula <- datn ~ 0 + Intercept +
+ formula <- datn ~ 0 + Intercept(1) +
    f(main=coordinates,  
      model=spde,
      group=group.index,

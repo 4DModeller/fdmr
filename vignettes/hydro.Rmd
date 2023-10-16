@@ -262,13 +262,13 @@ The model below predicts the streamflow given the precipitation as a fixed effec
 Likely unobserved co-variates could be local elevation, temperature, soil permeability, or presence of vegetation.
 
 ```{r error=TRUE}
-formula1 <- streamflow ~ 0 + Intercept + precip
+formula1 <- streamflow ~ 0 + Intercept(1) + precip
 
-formula2 <- streamflow ~ 0 + Intercept + precip +
+formula2 <- streamflow ~ 0 + Intercept(1) + precip +
   f(
     main = coordinates,
     model = spde,
-    group = group.index,
+    group = time,
     ngroup = n_groups,
     control.group = list(
       model = "ar1",
