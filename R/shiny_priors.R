@@ -44,6 +44,7 @@ model_builder_shiny <- function(spatial_data,
     default_colours <- rownames(brewer_palettes[brewer_palettes$cat == "seq", ])
 
     # Text for priors help
+
     prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
                          where ρ is the spatial range of the random field. P(ρ < ρ_0)=p_ρ indicates that the probability of ρ smaller than ρ_0 (range0) is p_ρ (Prange)."
 
