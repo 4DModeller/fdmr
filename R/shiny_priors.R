@@ -435,6 +435,10 @@ model_builder_shiny <- function(spatial_data,
         })
 
         prediction_field <- shiny::reactive({
+            if (length(model_vals$parsed_outputs) == 0) {
+                return()
+            }
+
             data <- model_vals$parsed_outputs[[input$select_run_map]]
             if (input$map_plot_type == "Predicted mean fields") {
                 create_prediction_field(
@@ -455,11 +459,17 @@ model_builder_shiny <- function(spatial_data,
         })
 
         z_values <- shiny::reactive({
-            prediction_field()[["z"]]
+            field <- prediction_field()
+            if (!is.null(field)) {
+                return(field[["z"]])
+            }
         })
 
         map_raster <- shiny::reactive({
-            raster::rasterFromXYZ(prediction_field(), crs = crs)
+            field <- prediction_field()
+            if (!is.null(field)) {
+                raster::rasterFromXYZ(field, crs = crs)
+            }
         })
 
         map_colours <- shiny::reactive({
@@ -541,6 +551,7 @@ model_builder_shiny <- function(spatial_data,
                 prior = 'pccor1',
                 param = c(", params[["prior_ar1"]], ",", params[["pg_ar1"]], ")
             )", "\n\n",
+                    formula_str(), "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
                         family = '", data_distribution_internal(), "',
