@@ -91,12 +91,12 @@ The model is implemented through the INLA-SPDE approach in R programming. A few 
 
 # Mesh construction
 
-To implement the INLA-SPDE approach, it is necessary to discretize the space by creating a triangulated mesh that establishes a set of artificial neighbors across the study region. Here we use the `INLA::inla.mesh.2d` to construct our mesh.
+To implement the INLA-SPDE approach, it is necessary to discretize the space by creating a triangulated mesh that establishes a set of artificial neighbors across the study region. Here we use the `fmesher::fm_mesh_2d_inla` to construct our mesh.
 
 ```{r createmesh, error=TRUE}
 initial_range <- diff(base::range(sp_data@data[, "LONG"])) / 3
 max_edge <- initial_range / 2
-mesh <- INLA::inla.mesh.2d(
+mesh <- fmesher::fm_mesh_2d_inla(
   loc = sp_data@data[, c("LONG", "LAT")],
   max.edge = c(1, 2) * max_edge,
   offset = c(initial_range, initial_range),
@@ -542,7 +542,7 @@ We'll create the same mesh as above and pass that into the app.
 initial_range <- diff(base::range(sp_data@data[, "LONG"])) / 3
 max_edge <- initial_range / 2
 
-mesh <- INLA::inla.mesh.2d(
+mesh <- fmesher::fm_mesh_2d_inla(
   loc = sp_data@data[, c("LONG", "LAT")],
   max.edge = c(1, 2) * max_edge,
   offset = c(initial_range, initial_range),
