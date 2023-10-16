@@ -53,7 +53,8 @@ Imports:
     curl,
     promises,
     fmesher,
-    purrr
+    purrr,
+    shinyjs
 Suggests: 
     bookdown,
     knitr,
