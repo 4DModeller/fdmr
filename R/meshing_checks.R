@@ -10,7 +10,7 @@
 #' @export
 mesh_checker <- function(mesh, observations) {
   # Suppose the number of observation data points is "n_obs", and
-  # our mesh is an object obtained using INLA::inla.mesh.2d
+  # our mesh is an object obtained using fmesher::fm_mesh_2d_inla
   errors <- list()
 
   # Warning 1: if the mesh has a very high resolution?

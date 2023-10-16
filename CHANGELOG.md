@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Read of `mean` twice from INLA model output instead of reading `sd` - [PR #121](https://github.com/4DModeller/fdmr/pull/121)
 - Issue with the exposure parameter being selectable when using Gaussian data, updated the model builder Shiny app to reflect this fix in its code output tab - [PR #183](https://github.com/4DModeller/fdmr/pull/183)
+- Bug when trying to plot a map of model predictions without having run a model in the model builder Shiny app - [PR #181](https://github.com/4DModeller/fdmr/pull/181)
 
 ### Changed
 
@@ -29,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move to use `utils::untar` instead of `archive::extract_archive` due to issues on some Linux systems - [PR #101](https://github.com/4DModeller/fdmr/pull/130)
 - The `plot_mesh` function now uses an interactive [Leaflet](https://rstudio.github.io/leaflet/) map with the optional to plot spatial data overlaid - [PR #162](https://github.com/4DModeller/fdmr/pull/162)
 - Use of `Intercept` updated due to deprecation in INLA - [PR #180](https://github.com/4DModeller/fdmr/pull/180)
+- Replaced use of `INLA::inla.mesh.2d` with updated `fmesher::fm_mesh_2d_inla` which is faster - [PR #182](https://github.com/4DModeller/fdmr/pull/182)
 
 ### Removed
 
