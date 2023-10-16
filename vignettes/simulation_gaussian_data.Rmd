@@ -144,7 +144,7 @@ sp::coordinates(simdf)<- c("LONG","LAT")
 
 ## Define the model formula
 ```{r formula, error=TRUE}
- formula <- datn ~ 0 + Intercept +
+ formula <- datn ~ 0 + Intercept(1) +
    f(main=coordinates,  
      model=spde,
      group=group.index,

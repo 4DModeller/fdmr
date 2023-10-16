@@ -161,7 +161,7 @@ INLA_infer <- function(mesh, prior_range, ps_range,
   n_groups <- base::length(base::unique(data$week))
   sp::coordinates(data) <- c("LONG", "LAT")
 
-  formula <- cases ~ 0 + Intercept + f(
+  formula <- cases ~ 0 + Intercept(1) + f(
     main = coordinates,
     model = spde,
     group = group_index,

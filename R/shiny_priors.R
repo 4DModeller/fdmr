@@ -58,7 +58,7 @@ model_builder_shiny <- function(spatial_data,
     citation_priors <- "Spatial and field prior explanation taken from https://rdrr.io/github/INBO-BMK/INLA/man/inla.spde2.pcmatern.html"
     citation_control_group <- "Prior explanation text modified from https://www.paulamoraga.com/book-geospatial/sec-geostatisticaldataexamplest.html"
 
-    initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
+    initial_equation_val <- "formula <- model_var ~ 0 + Intercept(1)"
     features <- names(measurement_data)
     if (is.null(features)) {
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")

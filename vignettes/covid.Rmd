@@ -203,7 +203,7 @@ sp::coordinates(covid19_data) <- c("LONG", "LAT")
 In order to fit the spatio-temporal model, a model formula needs to be defined, by including the response in the left-hand side and the fixed and random effects in the right-hand side.
 
 ```{r formula, error=TRUE}
-formula <- cases ~ 0 + Intercept + IMD +
+formula <- cases ~ 0 + Intercept(1) + IMD +
   carebeds.ratio + AandETRUE +
   perc.chinese + perc.indian + perc.bangladeshi + perc.pakistani + perc.ba + perc.bc + perc.wb +
   age1 + age2 + age3 + age4 +
