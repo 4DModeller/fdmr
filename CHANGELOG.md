@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Read of `mean` twice from INLA model output instead of reading `sd` - [PR #121](https://github.com/4DModeller/fdmr/pull/121)
+- Issue with the exposure parameter being selectable when using Gaussian data, updated the model builder Shiny app to reflect this fix in its code output tab - [PR #183](https://github.com/4DModeller/fdmr/pull/183)
 - Bug when trying to plot a map of model predictions without having run a model in the model builder Shiny app - [PR #181](https://github.com/4DModeller/fdmr/pull/181)
 
 ### Changed

@@ -105,7 +105,7 @@ model_builder_shiny <- function(spatial_data,
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
-        # Use this function somewhere in UI
+        shinyjs::useShinyjs(),
         busy_spinner,
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
@@ -241,7 +241,7 @@ model_builder_shiny <- function(spatial_data,
         status_value <- shiny::reactiveVal("OK")
 
         run_no <- shiny::reactiveVal(0)
-        model_vals <- shiny::reactiveValues(model_outputs = list(), parsed_outputs = list(), run_params = list())
+        model_vals <- shiny::reactiveValues(model_outputs = list(), parsed_outputs = list(), run_params = list(), exposure_param_str = list(), data_distribution = list())
 
         output$status <- shiny::renderText({
             paste("Status : ", status_value())
@@ -249,6 +249,14 @@ model_builder_shiny <- function(spatial_data,
 
         initial_equation <- shiny::reactive({
             stringr::str_replace(initial_equation_val, "model_var", input$model_var)
+        })
+
+        shiny::observeEvent(input$data_dist, {
+            if (input$data_dist == "Gaussian") {
+                shinyjs::disable("exposure_param")
+            } else {
+                shinyjs::enable("exposure_param")
+            }
         })
 
         run_names <- shiny::reactive({
@@ -338,8 +346,10 @@ model_builder_shiny <- function(spatial_data,
 
             data_dist_local <- data_distribution_internal()
             family_control <- NULL
+            exposure_param <- NULL
             if (data_dist_local == "poisson") {
                 family_control <- list(link = "log")
+                exposure_param <- measurement_data_local[[exposure_param_local]]
             }
 
             promise <- promises::future_promise(
@@ -349,7 +359,7 @@ model_builder_shiny <- function(spatial_data,
                     inlabru::bru(formula_local,
                         data = measurement_data_local,
                         family = data_dist_local,
-                        E = measurement_data_local[[exposure_param_local]],
+                        E = exposure_param,
                         control.family = family_control,
                         options = list(
                             verbose = FALSE
@@ -383,6 +393,8 @@ model_builder_shiny <- function(spatial_data,
                         )
 
                         model_vals$run_params[[run_label]] <- run_params
+                        model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[[", input$exposure_param, "]]")
+                        model_vals$data_distribution[[run_label]] <- data_dist_local
 
                         if (write_logs) {
                             write_parameters(filepath = parameters_filepath, parameters = model_vals$run_params)
@@ -535,10 +547,13 @@ model_builder_shiny <- function(spatial_data,
             }
 
             params <- model_vals$run_params[[input$select_run_code]]
+            data_dist <- model_vals$data_distribution[[input$select_run_code]]
 
             family_control_str <- "NULL"
-            if (data_distribution_internal() == "poisson") {
+            exposure_param_str <- "NULL"
+            if (data_dist == "poisson") {
                 family_control_str <- "list(link = 'log'),"
+                exposure_param_str <- model_vals$exposure_param_str[[input$select_run_code]]
             }
 
             paste0(
@@ -555,9 +570,9 @@ model_builder_shiny <- function(spatial_data,
                     formula_str(), "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
-                        family = '", data_distribution_internal(), "',
-                        E = measurement_data[[", input$exposure_param, "]],
-                        control.family = ", family_control_str, "
+                        family = '", data_dist, "',
+                        E = ", exposure_param_str, ",
+                        control.family = ", family_control_str, ",
                         options = list(
                             verbose = FALSE
                         )
