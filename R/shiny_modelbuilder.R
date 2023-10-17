@@ -104,42 +104,79 @@ model_builder_shiny <- function(spatial_data,
   busy_spinner <- get_busy_spinner()
 
   # Define UI for application that draws a histogram
-  ui <- shiny::fluidPage(
+  ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(bootswatch = "shiny"),
     shinyjs::useShinyjs(),
     busy_spinner,
-    shiny::headerPanel(title = "Investigating priors"),
+    shiny::headerPanel(title = "Model builder"),
     shiny::sidebarLayout(
       shiny::sidebarPanel(
         shiny::h3("Priors"),
         shiny::sliderInput(
           inputId = "prior_range",
-          label = "range0:",
+          label = bslib::tooltip(
+            trigger = list(
+              "range0",
+              bsicons::bs_icon("info-circle")
+            ),
+            "range0 message"
+          ),
           min = 0.05, value = 0.05, max = 1
         ),
         shiny::sliderInput(
           inputId = "ps_range",
-          label = "Prange:",
+          label = bslib::tooltip(
+            trigger = list(
+              "Prange",
+              bsicons::bs_icon("info-circle")
+            ),
+            "Prange message"
+          ),
           min = 0.1, value = 0.1, max = 1
         ),
         shiny::sliderInput(
           inputId = "prior_sigma",
-          label = "sigma0:",
+          label = bslib::tooltip(
+            trigger = list(
+              "sigma0",
+              bsicons::bs_icon("info-circle")
+            ),
+            "Prange message"
+          ),
           min = 0.05, value = 0.05, max = 2
         ),
         shiny::sliderInput(
           inputId = "pg_sigma",
-          label = "Psigma:",
+          label = bslib::tooltip(
+            trigger = list(
+              "Psigma",
+              bsicons::bs_icon("info-circle")
+            ),
+            "Psigma message"
+          ),
           min = 0.1, value = 0.2, max = 1
         ),
         shiny::h3("Temporal priors"),
         shiny::sliderInput(
           inputId = "prior_ar1",
-          label = "prior_alpha:",
+          label = bslib::tooltip(
+            trigger = list(
+              "prior_alpha",
+              bsicons::bs_icon("info-circle")
+            ),
+            "prior_alpha message"
+          ),
           min = -1, value = -0.2, max = 1.0, step = 0.1,
         ),
         shiny::sliderInput(
           inputId = "pg_ar1",
-          label = "pg_alpha:",
+          label = bslib::tooltip(
+            trigger = list(
+              "pg_alpha",
+              bsicons::bs_icon("info-circle")
+            ),
+            "pg_alpha message"
+          ),
           min = 0, value = 0.8, max = 1
         ),
         shiny::textOutput(outputId = "status")
