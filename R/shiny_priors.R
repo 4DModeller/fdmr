@@ -4,40 +4,62 @@
 #' @param measurement_data Measurement data
 #' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
+#' @param data_distribution Data distribution, Poisson or Gaussian
+#' @param log_folder Folder to write out logs
 #'
 #' @importFrom INLA f
 #'
 #' @return shiny::app
 #' @keywords internal
-priors_shiny <- function(spatial_data,
-                         measurement_data,
-                         time_variable,
-                         mesh) {
+model_builder_shiny <- function(spatial_data,
+                                measurement_data,
+                                time_variable,
+                                mesh,
+                                data_distribution = "Poisson",
+                                log_folder = NULL) {
     future::plan(future::multisession())
+
+    if (!(data_distribution %in% c("Poisson", "Gaussian"))) {
+        stop("We only support Poisson and Gaussian data")
+    }
 
     got_coords <- has_coords(spatial_data = spatial_data)
     if (!got_coords) {
         stop("Please make sure you have set coordinates on spatial_data using sp::coordinates.")
     }
 
-    # Text for priors help
-    prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ, where ρ is the spatial range of the random field. The spatial range ρ is defined as the distance at which the spatial correlation between two locations is approximately 0. 
-                         P(ρ < ρ_0)=p_ρ indicates that the probability of ρ smaller than ρ_0 (range0) is p_ρ (Prange). Large values of Prange lead to a greater prior belief on small values of ρ."
+    spatial_crs <- sp::proj4string(spatial_data)
+    mesh_crs <- mesh$crs$input
 
-    prior_sigma_text <- "A length 2 vector, with (sigma0, Psigma) specifying that P(σ > σ_0)=p_σ, 
-                         where σ is the marginal standard deviation of the field. P(σ > σ_0)=p_σ indicates that the probability of σ greater than σ_0 (sigma0) is p_σ (Psigma).
-                         Large values of Psigma lead to a greater prior belief on large values of σ."
+    if ((is.null(mesh_crs) || is.na(mesh_crs)) && (is.na(spatial_crs) || is.null(spatial_crs))) {
+        warning("Cannot read CRS from mesh or spatial_data, using default CRS = +proj=longlat +datum=WGS84")
+        crs <- "+proj=longlat +datum=WGS84"
+    } else if (is.na(mesh_crs) || is.null(mesh_crs)) {
+        crs <- spatial_crs
+    } else {
+        crs <- mesh_crs
+    }
+
+    brewer_palettes <- RColorBrewer::brewer.pal.info
+    default_colours <- rownames(brewer_palettes[brewer_palettes$cat == "seq", ])
+
+    # Text for priors help
+
+    prior_range_text <- "A length 2 vector, with (range0, Prange) specifying that P(ρ < ρ_0)=p_ρ,
+                         where ρ is the spatial range of the random field. P(ρ < ρ_0)=p_ρ indicates that the probability of ρ smaller than ρ_0 (range0) is p_ρ (Prange)."
+
+    prior_sigma_text <- "A length 2 vector, with (sigma0, Psigma) specifying that P(σ > σ_0)=p_σ,
+                         where σ is the marginal standard deviation of the field. P(σ > σ_0)=p_σ indicates that the probability of σ greater than σ_0 (sigma0) is p_σ (Psigma)."
 
     control_group_text <- "Temporal priors for the temporal autocorrelation parameter α are set using prior_alpha and pg_alpha, in the relation that P(α > prior_alpha) = pg_alpha, indicating that the probability of α greater than prior_alpha is pg_alpha.
-                           Large values of pg_alpha lead to a greater prior belief on large values of α.
-                           prior_alpha and pg_alpha are used to create alphaprior, which is then passed to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior).
-                           It specifies that across time, the process evolves according to an AR(1) process where the prior for the autocorrelation parameter α is given by alphaprior. 
+                           These values are used to create alphaprior, which is then passed to the control.group argument, control.group = list(model = 'ar1', hyper = alphaprior).
+                           It specifies that across time, the process evolves according to an AR(1) process where the prior for the autocorrelation parameter α is given by alphaprior.
                            We define alphaprior with the prior 'pccor1', which is a Penalised Complexity (PC) prior for the temporal autocorrelation parameter α, with α = 1 indicating strong temporal dependence, and α = 0 indicating independence across time."
-  
+
     citation_priors <- "Spatial and field prior explanation taken from https://rdrr.io/github/INBO-BMK/INLA/man/inla.spde2.pcmatern.html"
     citation_control_group <- "Prior explanation text modified from https://www.paulamoraga.com/book-geospatial/sec-geostatisticaldataexamplest.html"
 
-    initial_equation_val <- "formula <- model_var ~ 0 + Intercept"
+    initial_equation_val <- "formula <- model_var ~ 0 + Intercept(1)"
     features <- names(measurement_data)
     if (is.null(features)) {
         stop("We require the columns of measurement_data to have the names of the features to use in the model.")
@@ -49,10 +71,27 @@ priors_shiny <- function(spatial_data,
     parameters_file <- paste0("priors_exploration_parameters_", timestamp_str, ".json")
     model_outputs_file <- paste0("priors_exploration_modelout_", timestamp_str, ".rds")
 
-    log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
+    write_logs <- TRUE
+    if (is.null(log_folder)) {
+        log_folder <- fs::path(fs::path_home(), "fdmr", "logs")
+
+        if (!as.numeric(file.access(log_folder)) == 0) {
+            tmpdir <- get_tmpdir()
+            log_folder <- fs::path(tmpdir, "fdmr", "logs")
+
+            if (!as.numeric(file.access(log_folder)) == 0) {
+                warning("We are unable to find a folder to write logs to, please pass a folder path to log_folder")
+                write_logs <- FALSE
+            }
+        }
+    }
+
     if (!fs::dir_exists(log_folder)) {
         fs::dir_create(log_folder)
     }
+
+    log_folder <- fs::path_expand(log_folder)
+    cat("We will write log files to ", log_folder)
 
     log_filepath <- fs::path(log_folder, log_filename)
     parameters_filepath <- fs::path(log_folder, parameters_file)
@@ -62,16 +101,11 @@ priors_shiny <- function(spatial_data,
 
     # TODO - if we modularise the Shiny apps and setup a different directory
     # structure we can remove this
-    got_internet <- curl::has_internet()
-    if (got_internet) {
-        busy_spinner <- shinybusy::add_busy_gif("https://raw.githubusercontent.com/4DModeller/logo/main/4DMlogo_loading.gif", height = 100, width = 100, position = "top-right")
-    } else {
-        busy_spinner <- shinybusy::add_busy_spinner(spin = "folding-cube", margins = c(20, 20))
-    }
+    busy_spinner <- get_busy_spinner()
 
     # Define UI for application that draws a histogram
     ui <- shiny::fluidPage(
-        # Use this function somewhere in UI
+        shinyjs::useShinyjs(),
         busy_spinner,
         shiny::headerPanel(title = "Investigating priors"),
         shiny::sidebarLayout(
@@ -115,8 +149,17 @@ priors_shiny <- function(spatial_data,
                     type = "tabs",
                     shiny::tabPanel(
                         "Features",
-                        shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
-                        shiny::selectInput(inputId = "exposure_param", label = "Exposure param", choices = features),
+                        shiny::fluidRow(
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
+                                shiny::selectInput(inputId = "exposure_param", label = "Exposure (time variable)", choices = features),
+                            ),
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian"), selected = data_distribution),
+                            )
+                        ),
                         shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
                         shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
                         shiny::actionButton(inputId = "clear", label = "Clear"),
@@ -145,8 +188,33 @@ priors_shiny <- function(spatial_data,
                         shiny::plotOutput(outputId = "plot_model_out")
                     ),
                     shiny::tabPanel(
+                        "Map",
+                        shiny::fluidRow(
+                            shiny::column(
+                                6,
+                                shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+                                shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c())
+                            ),
+                            shiny::column(
+                                6,
+                                shiny::selectInput(
+                                    inputId = "colour_category",
+                                    label = "Palette type",
+                                    choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
+                                    selected = "Viridis"
+                                ),
+                                shiny::selectInput(
+                                    inputId = "colour_scheme",
+                                    label = "Colour Scheme",
+                                    choices = default_colours,
+                                ),
+                            )
+                        ),
+                        leaflet::leafletOutput(outputId = "map_out")
+                    ),
+                    shiny::tabPanel(
                         "Code",
-                        shiny::selectInput(inputId = "select_run", label = "Select run:", choices = c()),
+                        shiny::selectInput(inputId = "select_run_code", label = "Select run:", choices = c()),
                         shiny::verbatimTextOutput(outputId = "code_out")
                     ),
                     shiny::tabPanel(
@@ -173,7 +241,7 @@ priors_shiny <- function(spatial_data,
         status_value <- shiny::reactiveVal("OK")
 
         run_no <- shiny::reactiveVal(0)
-        model_vals <- shiny::reactiveValues(model_outputs = list(), parsed_outputs = list(), run_params = list())
+        model_vals <- shiny::reactiveValues(model_outputs = list(), parsed_outputs = list(), run_params = list(), exposure_param_str = list(), data_distribution = list())
 
         output$status <- shiny::renderText({
             paste("Status : ", status_value())
@@ -183,16 +251,23 @@ priors_shiny <- function(spatial_data,
             stringr::str_replace(initial_equation_val, "model_var", input$model_var)
         })
 
+        shiny::observeEvent(input$data_dist, {
+            if (input$data_dist == "Gaussian") {
+                shinyjs::disable("exposure_param")
+            } else {
+                shinyjs::enable("exposure_param")
+            }
+        })
+
         run_names <- shiny::reactive({
             names(model_vals$run_params)
         })
 
         shiny::observe({
-            shiny::updateSelectInput(session = session, inputId = "select_run", choices = run_names())
-        })
-
-        shiny::observeEvent(input$features, {
-            print(paste0("You have chosen: ", input$features))
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
+            shiny::updateSelectInput(session = session, inputId = "select_run_map", choices = run_names())
+            shiny::updateSelectInput(session = session, inputId = "select_run_code", choices = run_names())
+            shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
         })
 
         shiny::observeEvent(input$clear, {
@@ -260,10 +335,22 @@ priors_shiny <- function(spatial_data,
             formula_str()
         })
 
+        data_distribution_internal <- shiny::reactive({
+            tolower(input$data_dist)
+        })
+
         shiny::observeEvent(input$run_model, ignoreNULL = TRUE, {
             exposure_param_local <- input$exposure_param
             formula_local <- inla_formula()
             measurement_data_local <- measurement_data
+
+            data_dist_local <- data_distribution_internal()
+            family_control <- NULL
+            exposure_param <- NULL
+            if (data_dist_local == "poisson") {
+                family_control <- list(link = "log")
+                exposure_param <- measurement_data_local[[exposure_param_local]]
+            }
 
             promise <- promises::future_promise(
                 {
@@ -271,9 +358,9 @@ priors_shiny <- function(spatial_data,
                     require("INLA")
                     inlabru::bru(formula_local,
                         data = measurement_data_local,
-                        family = "poisson",
-                        E = measurement_data_local[[exposure_param_local]],
-                        control.family = list(link = "log"),
+                        family = data_dist_local,
+                        E = exposure_param,
+                        control.family = family_control,
                         options = list(
                             verbose = FALSE
                         )
@@ -287,8 +374,10 @@ priors_shiny <- function(spatial_data,
                     function(model_output) {
                         # Run the model
                         run_no(run_no() + 1)
-                        model_vals$model_outputs[[run_no()]] <- model_output
-                        model_vals$parsed_outputs[[run_no()]] <- parse_model_output(
+                        run_label <- paste0("Run-", run_no())
+
+                        model_vals$model_outputs[[run_label]] <- model_output
+                        model_vals$parsed_outputs[[run_label]] <- parse_model_output(
                             model_output = model_output,
                             measurement_data = measurement_data
                         )
@@ -303,15 +392,18 @@ priors_shiny <- function(spatial_data,
                             "pg_ar1" = input$pg_ar1
                         )
 
-                        run_label <- paste0("Run-", run_no())
                         model_vals$run_params[[run_label]] <- run_params
+                        model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[[", input$exposure_param, "]]")
+                        model_vals$data_distribution[[run_label]] <- data_dist_local
 
-                        write_parameters(logfile = parameters_filepath, parameters = model_vals$run_params)
-                        saveRDS(model_vals$parsed_outputs, file = modeloutputs_filepath)
+                        if (write_logs) {
+                            write_parameters(filepath = parameters_filepath, parameters = model_vals$run_params)
+                            write_rds(modeloutputs_filepath, model_vals$parsed_outputs)
+                        }
                     },
                 onRejected = function(err) {
                     warning("INLA crashed with error: ", err)
-                    write_log(logfile = log_filepath, message = err)
+                    if (write_logs) write_log(filepath = log_filepath, message = err)
                 }
             )
         })
@@ -339,6 +431,74 @@ priors_shiny <- function(spatial_data,
             },
             rownames = TRUE
         )
+
+        category_colours <- shiny::reactive({
+            if (input$colour_category == "Viridis") {
+                colours <- c("viridis", "magma", "inferno", "plasma")
+            } else {
+                palettes_mapping <- list("Sequential" = "seq", "Diverging" = "div", "Qualitative" = "qual")
+                chosen_cat <- palettes_mapping[input$colour_category]
+                colours <- rownames(subset(RColorBrewer::brewer.pal.info, category %in% chosen_cat))
+            }
+            colours
+        })
+
+        colour_scheme <- shiny::reactive({
+            input$colour_scheme
+        })
+
+        prediction_field <- shiny::reactive({
+            if (length(model_vals$parsed_outputs) == 0) {
+                return()
+            }
+
+            data <- model_vals$parsed_outputs[[input$select_run_map]]
+            if (input$map_plot_type == "Predicted mean fields") {
+                create_prediction_field(
+                    mesh = mesh,
+                    plot_type = "predicted_mean_fields",
+                    data_dist = data_distribution_internal(),
+                    var_a = data[["mean_post"]],
+                    var_b = data[["fixed_mean"]]
+                )
+            } else {
+                create_prediction_field(
+                    mesh = mesh,
+                    plot_type = "random_effect_fields",
+                    data_dist = data_distribution_internal(),
+                    var_a = data[["mean_post"]]
+                )
+            }
+        })
+
+        z_values <- shiny::reactive({
+            field <- prediction_field()
+            if (!is.null(field)) {
+                return(field[["z"]])
+            }
+        })
+
+        map_raster <- shiny::reactive({
+            field <- prediction_field()
+            if (!is.null(field)) {
+                raster::rasterFromXYZ(field, crs = crs)
+            }
+        })
+
+        map_colours <- shiny::reactive({
+            leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
+        })
+
+        output$map_out <- leaflet::renderLeaflet({
+            if (is.null(map_raster())) {
+                return()
+            }
+
+            leaflet::leaflet() %>%
+                leaflet::addTiles(group = "OSM") %>%
+                leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
+                leaflet::addLegend(position = "topright", pal = map_colours(), values = z_values())
+        })
 
         model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
             if (length(model_vals$parsed_outputs) == 0) {
@@ -386,7 +546,15 @@ priors_shiny <- function(spatial_data,
                 return()
             }
 
-            params <- model_vals$run_params[[input$select_run]]
+            params <- model_vals$run_params[[input$select_run_code]]
+            data_dist <- model_vals$data_distribution[[input$select_run_code]]
+
+            family_control_str <- "NULL"
+            exposure_param_str <- "NULL"
+            if (data_dist == "poisson") {
+                family_control_str <- "list(link = 'log'),"
+                exposure_param_str <- model_vals$exposure_param_str[[input$select_run_code]]
+            }
 
             paste0(
                 "spde <- INLA::inla.spde2.pcmatern(
@@ -399,11 +567,12 @@ priors_shiny <- function(spatial_data,
                 prior = 'pccor1',
                 param = c(", params[["prior_ar1"]], ",", params[["pg_ar1"]], ")
             )", "\n\n",
+                    formula_str(), "\n\n",
                     paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
-                        family = 'poisson',
-                        E = measurement_data[[", input$exposure_param, "]],
-                        control.family = list(link = 'log'),
+                        family = '", data_dist, "',
+                        E = ", exposure_param_str, ",
+                        control.family = ", family_control_str, ",
                         options = list(
                             verbose = FALSE
                         )
@@ -422,9 +591,10 @@ priors_shiny <- function(spatial_data,
 #' @param measurement_data Measurement data
 #' @param time_variable Time variable in measurement_data
 #' @param mesh INLA mesh
+#' @param log_folder Folder to write logs to
 #'
 #' @return shiny::app
 #' @export
-interactive_priors <- function(spatial_data, measurement_data, time_variable, mesh) {
-    shiny::runApp(priors_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh))
+model_builder <- function(spatial_data, measurement_data, time_variable, mesh, data_distribution = "Poisson", log_folder = NULL) {
+    shiny::runApp(model_builder_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh, data_distribution = data_distribution, log_folder = log_folder))
 }

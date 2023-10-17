@@ -36,8 +36,6 @@ Imports:
     ncdf4,
     raster,
     reshape2,
-    rgdal,
-    rgeos,
     sf,
     sp,
     spam,
@@ -49,13 +47,14 @@ Imports:
     spdep,
     gridExtra,
     leaflet,
-    archive,
     shiny,
     stringr,
     shinybusy,
     curl,
     promises,
-    fmesher
+    fmesher,
+    purrr,
+    shinyjs
 Suggests: 
     bookdown,
     knitr,
@@ -67,4 +66,3 @@ Suggests:
     rcmdcheck
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-

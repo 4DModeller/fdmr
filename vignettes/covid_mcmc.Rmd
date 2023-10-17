@@ -29,13 +29,8 @@ This tutorial requires the [CARBayes package](https://cran.r-project.org/web/pac
 
 ### Retrieving data
 
-The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The infections data are the total reported number of COVID-19 cases in each MSOA from Jan 8, 2022 to March 26, 2022. The shapefile of the study region is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods. 
+The study region is mainland England, which is partitioned into 6789 neighbourhoods at the Middle Layer Super Output Area (MSOA) scale. The infections data are the total reported number of COVID-19 cases in each MSOA from Jan 8, 2022 to March 26, 2022. The shapefile of the study region is a `SpatialPolygonsDataFrame`, which is used to map the data. It stores the location, shape and attributes of geographic features for the neighbourhoods. We'll use `retrieve_tutorial_data` to first retrieve the dataset for this tutorial.
 
-We first load INLA and then retrieve the data from the fdmr example data store. We'll use `retrieve_tutorial_data` to do this.
-
-```{r}
-library(INLA)
-```
 
 ```{r}
 fdmr::retrieve_tutorial_data(dataset = "covid_mcmc")
@@ -135,7 +130,7 @@ Finally, we fit a BHM to the same dataset using the INLA-SPDE approach.
 initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
 max_edge <- initial_range / 8
 
-mesh <- INLA::inla.mesh.2d(
+mesh <- fmesher::fm_mesh_2d_inla(
   loc = sp_data@data[, c("LONG", "LAT")],
   max.edge = c(1, 2) * max_edge,
   offset = c(initial_range / 4, initial_range),
@@ -151,7 +146,7 @@ spde <- inla.spde2.pcmatern(
 
 s_covid_cp <- s_covid
 sp::coordinates(s_covid_cp) <- c("LONG", "LAT")
-cmp <- total.cases ~ 0 + Intercept + f(main = coordinates, model = spde)
+cmp <- total.cases ~ 0 + Intercept(1) + f(main = coordinates, model = spde)
 
 inlabru_model <- inlabru::bru(cmp,
   data = s_covid_cp,
@@ -314,7 +309,7 @@ Next we fit the BHM using the INLA-SPDE approach.
 
 
 ```{r fitspdemodel2, error=TRUE, eval=TRUE}
-cmp <- total.cases ~ 0 + Intercept + f(main = coordinates, model = spde) +
+cmp <- total.cases ~ 0 + Intercept(1) + f(main = coordinates, model = spde) +
   IMD + perc.wb + perc.ba + age1 + pm25
 
 inlabru_model2 <- inlabru::bru(cmp,

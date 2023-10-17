@@ -14,6 +14,7 @@ First we load INLA and then download the data for this tutorial from our [data r
 
 ```{r}
 library(INLA)
+library(magrittr)
 ```
 
 ```{r error=TRUE,message=FALSE,warning=FALSE}
@@ -25,17 +26,11 @@ fdmr::retrieve_tutorial_data(dataset = "hydro")
 First we will look at the location of the dam by making a map and plotting the stream gauges on it.
 
 ```{r error=TRUE,warning=FALSE}
-# TODO : here is a good example for the map function
 norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-norway_polygon <- rgdal::readOGR(norway_polygon_path)
-norway_polygon <- sf::st_as_sf(norway_polygon,
-  coords = c("longitude", "latitude"),
-  crs = "+proj=utm +zone=32"
-)
-
-
+norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
+
 We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map`
 function with the names and positions. We'll create a list for each of the points and then use the (`dplyr::bind_rows`)[https://dplyr.tidyverse.org/reference/bind.html] function to create a 
 `data.frame` from these.
@@ -118,16 +113,7 @@ era5_precip_cropped <- raster::mask(projected_raster, norway_polygon)
 era5_precip_cropped <- terra::crop(era5_precip_cropped, raster::extent(norway_polygon), snap = "near")
 ```
 
-Now we've ensured everything is projected correctly we can use `plot_interactive_map` to plot the `RasterBrick` and the catchment area polygon. This loads a Shiny app that allows the selection of layers
-in the `RasterBrick` using a date slider. It also allows you to update the properties of the objects plotted on the map and the map tiles.
-
-> **_NOTE:_**  The interactive map won't render on the web version of this notebook as it is a Shiny app. We will try and get this fixed as soon as possible.
-
-```{r eval=FALSE}
-fdmr::plot_interactive_map(raster_data = era5_precip_cropped, polygon_data = sfc)
-```
-
-Next we create a data.frame `raster_df` containing precipitation data. We convert the `RasterBrick` of precipitation data we just plotted into a `data.frame`. We then want to get only the day component from the date of each date. If we have a look at the
+Next we create a `data.frame` `raster_df` containing precipitation data. We convert the `RasterBrick` of precipitation data we just plotted into a `data.frame`. We then want to get only the day component from the date of each date. If we have a look at the
 names of each layer in the `RasterBrick` you can see that each is prepended with an X, this is due to `raster` not allowing layer names that start with numbers. First we need to remove the X, which we do with `numbers_only`. Then we convert the 
 strings to `Date` objects using `to_dates` before finally using `lubridate::day` to get just the day component of the date. Finally, we set the names of the columns in the `data.frame`.
 
@@ -197,7 +183,7 @@ get_stream_data <- function(row) {
 pixel_dist_gauge$streamflow <- apply(pixel_dist_gauge, 1, get_stream_data)
 ```
 
-Now we create a new `SpatialPointDataFrame` called `inla_data` for model fitting. The data frame contains the response and predictor data at each spatial location and time point.
+Now we create a new `SpatialPointsDataFrame` called `inla_data` for model fitting. The `data.frame` contains the response and predictor data at each spatial location and time point.
 
 ```{r error=TRUE,inladat}
 inla_data <- merge(pixel_dist_gauge, raster_df, by = c("time", "x", "y"))
@@ -222,25 +208,21 @@ In order to model this with the 4D-Modeller we need to:
 Create the triangulated mesh of the study region and have a quick look at it.
 
 ```{r error=TRUE,warning=FALSE, fig.width=7, fig.height=7}
-# TODO: it would be nice to map the mesh onto the dataset using the mapmaker function i am suggesting
 e <- era5_precip_cropped@extent
 resolution <- raster::res(era5_precip_cropped)
-sr <- "+proj=utm +zone=32"
+crs <- "+proj=utm +zone=32"
 
 xres <- resolution[1] * 2
 yres <- resolution[2] * 2
 
 xy <- sp::coordinates(era5_precip_cropped)
-
-# Maybe this makes the mesh smaller
 xy <- xy[seq(1, nrow(xy), by = 2), ]
+
 colnames(xy) <- c("LONG", "LAT")
-# mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1000, xres*10000), cutoff=2000, crs=sr)
-# mesh <- INLA::inla.mesh.2d(loc=xy, max.edge=c(xres*1, xres*100), cutoff=2000, crs=sr)
 
-mesh <- INLA::inla.mesh.2d(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = sr)
+mesh <- fmesher::fm_mesh_2d_inla(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs=crs)
 
-plot(mesh)
+plot_mesh(mesh)
 ```
 
 ## Priors
@@ -280,13 +262,13 @@ The model below predicts the streamflow given the precipitation as a fixed effec
 Likely unobserved co-variates could be local elevation, temperature, soil permeability, or presence of vegetation.
 
 ```{r error=TRUE}
-formula1 <- streamflow ~ 0 + Intercept + precip
+formula1 <- streamflow ~ 0 + Intercept(1) + precip
 
-formula2 <- streamflow ~ 0 + Intercept + precip +
+formula2 <- streamflow ~ 0 + Intercept(1) + precip +
   f(
     main = coordinates,
     model = spde,
-    group = group.index,
+    group = time,
     ngroup = n_groups,
     control.group = list(
       model = "ar1",
@@ -302,7 +284,7 @@ inlabru_model1 <- inlabru::bru(formula1,
   data = inla_data,
   family = "gaussian",
   options = list(
-    verbose = TRUE
+    verbose = FALSE
   )
 )
 
@@ -310,15 +292,19 @@ inlabru_model2 <- inlabru::bru(formula2,
   data = inla_data,
   family = "gaussian",
   options = list(
-    verbose = TRUE
+    verbose = FALSE
   )
 )
 ```
+Now it's time to see its output, we can use the `fdmr::model_viewer` and pass in our model output, mesh and measurement data. This Shiny app helps analyse model output by automatically creating plots and a map of predictions for your data. Make sure you have a CRS set on your mesh. If no CRS can be read a default of `"+proj=longlat +datum=WGS84"` will be used which may lead to errors with data using UTM as we've done here.
 
-Now it's time to see its output
+```{r eval=FALSE}
+fdmr::model_viewer(model_output = inlabru_model2, mesh = mesh, measurement_data = inla_data, data_distribution = "Gaussian")
+```
+
+We can also view the summary of the model outputs
 
 ```{r error=TRUE}
-# TODO : this could be where the model_eval function I recommend could be used
 summary(inlabru_model1)
 ```
 ```{r error=TRUE}

@@ -90,3 +90,12 @@ clear_caches <- function() {
   fs::dir_delete(tut_path)
   fs::dir_delete(cache_path)
 }
+
+
+#' Get the system temporary directory
+#'
+#' @return NULL
+#' @keywords internal
+get_tmpdir <- function() {
+  fs::path_dir(fs::path_temp())
+}

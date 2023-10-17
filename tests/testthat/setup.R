@@ -28,7 +28,7 @@ local_get_test_datapath <- function(filename, folder_name) {
     extract_tmp_dir <- fs::path(root_tmp_dir, rand_str)
     fs::dir_create(extract_tmp_dir)
 
-    archive::archive_extract(archive = full_filepath, dir = extract_tmp_dir)
+    utils::untar(full_filepath, exdir = extract_tmp_dir)
 
     folder_contents <- fs::dir_ls(extract_tmp_dir)
 

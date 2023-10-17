@@ -2,19 +2,28 @@
 % Please edit documentation in R/plot_mesh.R
 \name{plot_mesh}
 \alias{plot_mesh}
-\title{Plot a mesh}
+\title{Plot a mesh on a Leaflet map}
 \usage{
-plot_mesh(mesh, point_data, point_colour = "blue", cex = 0.1)
+plot_mesh(
+  mesh,
+  spatial_data = NULL,
+  longitude_column = "LONG",
+  latitude_column = "LAT"
+)
 }
 \arguments{
 \item{mesh}{Mesh data}
 
-\item{point_data}{Points data}
+\item{spatial_data}{Spatial data, either a SpatialPolygonsDataFrame, SpatialPointsDataFrame or an object
+that can be converted to a data.frame with longitude and latitude columns}
 
-\item{point_colour}{Colour for points}
+\item{longitude_column}{Longitude column in spatial_data}
 
-\item{cex}{Point size magnifier}
+\item{latitude_column}{Latitude column in spatial_data name}
+}
+\value{
+leaflet::leaflet
 }
 \description{
-Plot a mesh
+Plot a mesh on a Leaflet map
 }

@@ -12,24 +12,45 @@ navbar:
     articles:
       text: Tutorials
       menu:
+        - text: Getting started
+        - text: Installation
+          href: articles/getting_started.html
+        - text: "Data pre-processing"
+          href: articles/data_preprocessing.html
+        - text: ---
+        - text: End to end tutorials
+        - text: How to choose how to model
+          href: articles/decision_tree.html
+        - text: Simulation Tutorial (Gaussian data)
+          href: articles/simulation_gaussian_data.Rmd
+        - text: Simulation Tutorial (Poisson data)
+          href: articles/simulation_poisson_data.Rmd
+        - text: ---
+        - text: Shiny apps
+        - text: "Map plotting"
+          href: articles/mapping.html
+        - text: "Mesh building"
+          href: articles/meshbuilder.html
+        - text: "Model builder"
+          href: articles/priors_app.html
+        - text: ---
+        - text: In depth tutorials
         - text: "COVID-19"
           href: articles/covid.html
         - text: "COVID-19 MCMC"
           href: articles/covid_mcmc.html
         - text: "COVID-19 MCMC (Space-time)"
           href: articles/covid_ST_mcmc.html
-        - text: "Data pre-processing"
-          href: articles/data_preprocessing.html
         - text: "Hydrology"
           href: articles/hydro.html
         - text: "Priors exploration"
           href: articles/priors.html
-        - text: "Interactive priors Shiny app"
-          href: articles/priors_app.html
-        - text: "Map plotting"
-          href: articles/mapping.html
-        - text: "Meshing"
-          href: articles/meshbuilder.html
+        - text: ---
+        - text: "FAQ"
+        - text: INLA Crash FAQ
+          href: articles/inla_FAQ.html
+
+
     hackathon:
       text: Hackathon
       href: https://4dmodeller.github.io/4DM_Hackathon/
@@ -48,13 +69,14 @@ reference:
 - title: Shiny apps
   desc: Interactive tools for building meshes, plotting maps and investigating priors
   contents:
-    - plot_interactive_map
     - mesh_builder
-    - interactive_priors
+    - model_builder
+    - model_viewer
 - title: Parsing model output
   desc: Functions to help parse model output and extract useful information
   contents:
     - parse_model_output
+    - create_prediction_field
 - title: Mesh tools
   desc: Functions to help with creation and investigation of meshes
   contents:
@@ -68,10 +90,11 @@ reference:
 - title: Utility functions
   desc:  These help us handle paths, retrieve data etc
   contents:
-    - get_tutorial_datapath
     - retrieve_tutorial_data
-    - clear_caches
-    - require_packages
+    - get_tutorial_datapath
     - load_tutorial_data
+    - clear_caches
     - numbers_only
+    
+    
 
