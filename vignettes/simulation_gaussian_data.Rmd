@@ -21,71 +21,73 @@ sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_data
 Then we simulate the Gaussian data that exhibit spatio-temporal correlation. These simulated data are finally organized into a data frame named `simdf`, where each row corresponds to an observation at a specific location and time. The variable `ID` is the spatial location identifier. Variable `time` denotes the time point. The variable `datn` represents the simulated response data. The longitude and latitude coordinates for each location are stored in the variables `LONG` and `LAT`, respectively.
 
 ```{r simdat} 
-library(INLA) 
+library(INLA)
 
-n.time<-6
+n.time <- 6
 n <- 55
-locs <- as.matrix(sp_data@data[,c("LONG","LAT")])
+locs <- as.matrix(sp_data@data[, c("LONG", "LAT")])
 
-initial_range <-diff(range(locs[,1]))/3
-max_edge<-initial_range /2
-mesh <- fmesher::fm_mesh_2d(loc=locs,
-                           max.edge = c(1,2)*max_edge,
-                           offset=c(initial_range , initial_range ),
-                           cutoff = max_edge/7
+initial_range <- diff(range(locs[, 1])) / 3
+max_edge <- initial_range / 2
+mesh <- fmesher::fm_mesh_2d(
+  loc = locs,
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range, initial_range),
+  cutoff = max_edge / 7
 )
 
 
 spde <- INLA::inla.spde2.pcmatern(
-  mesh = mesh, 
-  prior.range = c(initial_range , 0.5), 
-  prior.sigma = c(1, 0.01) 
+  mesh = mesh,
+  prior.range = c(initial_range, 0.5),
+  prior.sigma = c(1, 0.01)
 )
 
 sigma0 <- 7
 range0 <- 0.03
 kappa0 <- sqrt(8 / 1) / range0
-tau0 <- 1 / (sqrt(4 * pi) * kappa0 * sigma0) 
-inla.seed <- sample.int(n=1E4, size=n.time)
+tau0 <- 1 / (sqrt(4 * pi) * kappa0 * sigma0)
+inla.seed <- sample.int(n = 1E4, size = n.time)
 
 Q <- INLA::inla.spde.precision(spde, theta = c(log(tau0), log(kappa0)))
-x.mat<-matrix(NA,ncol=n.time,nrow =mesh$n)
-for (co in 1:ncol(x.mat)){
-  x.mat[,co]<-INLA::inla.qsample(n = 1, Q)
-} 
+x.mat <- matrix(NA, ncol = n.time, nrow = mesh$n)
+for (co in 1:ncol(x.mat)) {
+  x.mat[, co] <- INLA::inla.qsample(n = 1, Q)
+}
 
-A <- INLA::inla.spde.make.A(mesh=mesh, loc=locs)
-x.dat<-matrix(NA,ncol=n.time,nrow =n)
-for (t in 1:ncol(x.dat)){
-  x.dat[,t] <- drop(A %*% x.mat[,t]) 
+A <- INLA::inla.spde.make.A(mesh = mesh, loc = locs)
+x.dat <- matrix(NA, ncol = n.time, nrow = n)
+for (t in 1:ncol(x.dat)) {
+  x.dat[, t] <- drop(A %*% x.mat[, t])
 }
 
 
-alpha<-0.9
-sp.mat<-matrix(NA,ncol = n.time,nrow = n)
-sp.mat[,1]<-x.dat[,1]
-for (t in 2:n.time){
-  sp.mat[,t]<-alpha*sp.mat[,t-1]+x.dat[,t]
+alpha <- 0.9
+sp.mat <- matrix(NA, ncol = n.time, nrow = n)
+sp.mat[, 1] <- x.dat[, 1]
+for (t in 2:n.time) {
+  sp.mat[, t] <- alpha * sp.mat[, t - 1] + x.dat[, t]
 }
 
 
-beta0 <- 0.5 
-sigma_e <- 0.1 
+beta0 <- 0.5
+sigma_e <- 0.1
 lin.pred <- beta0 + sp.mat
-y.mat <- lin.pred+matrix(rnorm(n*n.time,0,sigma_e),ncol=n.time)
+y.mat <- lin.pred + matrix(rnorm(n * n.time, 0, sigma_e), ncol = n.time)
 
-simdf<-data.frame(ID=rep(1:n,each=n.time),
-                  time = rep(c(1:n.time),n),
-                  datn = as.numeric(t(y.mat)), 
-                  LONG = rep(locs[,1],each=n.time),
-                  LAT = rep(locs[,2],each=n.time))
-
+simdf <- data.frame(
+  ID = rep(1:n, each = n.time),
+  time = rep(c(1:n.time), n),
+  datn = as.numeric(t(y.mat)),
+  LONG = rep(locs[, 1], each = n.time),
+  LAT = rep(locs[, 2], each = n.time)
+)
 ```
 
 A histogram is created to visualize the distribution of the simulated Gaussian data.
 
 ```{r hist,error=TRUE,fig.cap="A histogram of the simulated Gaussian data.", fig.width=8, fig.height=4, fig.align = "center"}
-hist(simdf$datn,main='', xlab='Data')
+hist(simdf$datn, main = "", xlab = "Data")
 ```
 
 We can also map the simulated data using the `fdmr::plot_map` function. For example, a map of the simulated data at the first time point is given as
@@ -93,14 +95,13 @@ We can also map the simulated data using the `fdmr::plot_map` function. For exam
 ```{r mapsimdat,error=TRUE,fig.cap="A map of the simulated data in Bristol at the first time point.", fig.width=8, fig.height=4, fig.align = "center"}
 fdmr::plot_map(
   polygon_data = sp_data,
-  domain = simdf[simdf$time==1,"datn"],
+  domain = simdf[simdf$time == 1, "datn"],
   palette = "Reds",
   legend_title = "Data",
   add_scale_bar = TRUE,
   polygon_fill_opacity = 1,
   polygon_line_colour = "transparent"
 )
-
 ```
 
 
@@ -112,46 +113,49 @@ With the simulation dataset now prepared, our next step is to implement a Bayesi
 
 ```{r meshSPDE}
 locs <- unique(simdf[, c("LONG", "LAT")])
-initial_range <-diff(range(locs[,1]))/3
-max_edge<-initial_range /2
-mesh <- fmesher::fm_mesh_2d(loc=locs,
-                           max.edge = c(1,2)*max_edge,
-                           offset=c(initial_range , initial_range ),
-                           cutoff = max_edge/5
+initial_range <- diff(range(locs[, 1])) / 3
+max_edge <- initial_range / 2
+mesh <- fmesher::fm_mesh_2d(
+  loc = locs,
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range, initial_range),
+  cutoff = max_edge / 5
 )
 
 spde <- INLA::inla.spde2.pcmatern(
-  mesh = mesh, 
-  prior.range = c(initial_range , 0.5), 
-  prior.sigma = c(1, 0.01) 
+  mesh = mesh,
+  prior.range = c(initial_range, 0.5),
+  prior.sigma = c(1, 0.01)
 )
-
 ```
 
 ## Define how the process evolves over time, set prior for the temporal parameter and define a temporal index
 
 ```{r pccor, error=TRUE}
-rhoprior <- base::list(theta = list(prior = 'pccor1', param = c(0, 0.9)))
-group.index<-simdf$time
-n_groups<-length(unique(simdf$time)) 
+rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+group.index <- simdf$time
+n_groups <- length(unique(simdf$time))
 ```
 
 We will use the function `bru()` of package `inlabru` to fit the model. `bru` expects the coordinates of the data, thus we transform `simdf` data set to a SpatialPointsDataFrame using the function `coordinates()` of the `sp` package.
 
 ```{r, error=TRUE}
-sp::coordinates(simdf)<- c("LONG","LAT")
+sp::coordinates(simdf) <- c("LONG", "LAT")
 ```
 
 ## Define the model formula
 ```{r formula, error=TRUE}
- formula <- datn ~ 0 + Intercept(1) +
-   f(main=coordinates,  
-     model=spde,
-     group=group.index,
-     ngroup=n_groups,
-     control.group=list(model="ar1",
-                        hyper=rhoprior))
-
+formula <- datn ~ 0 + Intercept(1) +
+  f(
+    main = coordinates,
+    model = spde,
+    group = group.index,
+    ngroup = n_groups,
+    control.group = list(
+      model = "ar1",
+      hyper = rhoprior
+    )
+  )
 ```
 
 
@@ -167,7 +171,6 @@ inlabru_model <- inlabru::bru(formula,
     verbose = TRUE
   )
 )
-
 ```
 
 ## Results summary
@@ -175,9 +178,9 @@ inlabru_model <- inlabru::bru(formula,
 After completing the model fitting process, you can examine the main result summaries by typing `summary(inlabru_model)`. Additionally, you can check the parameter estimates for fixed effects, random effects, and hyperparameters as follows.
 
 ```{r summary,eval=FALSE}
-model_summary<-summary(inlabru_model)
+model_summary <- summary(inlabru_model)
 model_fixed <- inlabru_model$summary.fixed
-model_random<-inlabru_model$summary.random
+model_random <- inlabru_model$summary.random
 model_hyperparams <- inlabru_model$summary.hyperpar
 ```
 
@@ -186,23 +189,19 @@ The Deviance Information Criterion (DIC) value, which measures the goodness of m
 
 
 ```{r dicvalue}
-model_dic<-inlabru_model$dic$dic
-
+model_dic <- inlabru_model$dic$dic
 ```
 
 
 You can obtain the model's fitted values and compare them with the observed values as follows.
 
 ```{r fittedvals,eval=TRUE}
-
-fitted_vals<-inlabru_model$summary.fitted.values[1:nrow(simdf),]
-
+fitted_vals <- inlabru_model$summary.fitted.values[1:nrow(simdf), ]
 ```
 
 ```{r plotfitted, error=TRUE,fig.cap="A plot of the fitted and observed values.", fig.width=8, fig.height=4, fig.align = "center"}
-par(pty="s")
-plot(fitted_vals$mean,simdf$datn, xlab='fitted',ylab='observed')
-
+par(pty = "s")
+plot(fitted_vals$mean, simdf$datn, xlab = "fitted", ylab = "observed")
 ```
 
 # Exploring the functionality of the `fdmr` Package
@@ -215,8 +214,7 @@ The `fdmr::plot_mesh` function displays both the mesh and the observation points
 
 
 ```{r meshplot, error=TRUE,fig.cap="A plot of the mesh.", fig.width=8, fig.height=4, fig.align = "center"}
-
-fdmr::plot_mesh(mesh=mesh, spatial_data=simdf@coords)
+fdmr::plot_mesh(mesh = mesh, spatial_data = simdf@coords)
 ```
 
 ## fdmr::mesh_builder
@@ -237,10 +235,12 @@ fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
 `fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::model_builder` function.
 
 ```{r priorapp, eval=FALSE}
-fdmr::model_builder(spatial_data = sp_data, 
-                         measurement_data = simdf, 
-                         mesh=mesh, 
-                         time_variable="time")
+fdmr::model_builder(
+  spatial_data = sp_data,
+  measurement_data = simdf,
+  mesh = mesh,
+  time_variable = "time"
+)
 ```
 
 ## fdmr::plot_map
