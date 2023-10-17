@@ -50,7 +50,7 @@ plot_priors_boxplot <- function(data) {
     names(fitted_mean_post) <- purrr::map(seq(1, length(data)), function(x) paste("Run", x))
 
     post_rate <- cbind.data.frame(fitted_mean_post)
-    graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Rate estimates")
+    graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Fitted values")
 }
 
 #' Plot density function
@@ -63,15 +63,15 @@ plot_priors_boxplot <- function(data) {
 #' @keywords internal
 plot_priors_density <- function(data, measurement_data) {
     # Can this be done in a cleaner way? Just create a dataframe from the lists?
-    rate_estimates <- unlist(purrr::map(data, function(x) x$fitted_mean_post))
+    fitted_values <- unlist(purrr::map(data, function(x) x$fitted_mean_post))
     run_strings <- unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x)))
 
     post_rate <- base::cbind.data.frame(
         "Prior scenario" = rep(run_strings, each = nrow(measurement_data)),
-        "Rate estimates" = rate_estimates
+        "Fitted values" = fitted_values
     )
 
-    ggplot2::ggplot(post_rate, ggplot2::aes(x = `Rate estimates`, color = `Prior scenario`)) +
+    ggplot2::ggplot(post_rate, ggplot2::aes(x = `Fitted values`, color = `Prior scenario`)) +
         ggplot2::geom_density() +
         ggplot2::theme(text = ggplot2::element_text(size = 16))
 }
