@@ -22,8 +22,8 @@ meshbuilder_shiny <- function(
     cutoff = NULL,
     plot_poly = FALSE,
     latitude_column = "LAT",
-    longitude_column = "LONG") {
-  if (!is.data.frame(spatial_data) && !is(spatial_data, "SpatialPolygonsDataFrame") && !is(spatial_data, "SpatialPointsDataFrame")) {
+    longitude_column = "LONG")
+  if (!is.data.frame(spatial_data) && !methods::is(spatial_data, "SpatialPolygonsDataFrame") && !methods::is(spatial_data, "SpatialPointsDataFrame")) {
     stop("spatial_data must be a data.frame or tibble containing columns with latitude and longitude data.")
   }
 

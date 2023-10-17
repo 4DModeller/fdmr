@@ -28,7 +28,7 @@ plot_map <- function(polygon_data = NULL,
   if (is.null(polygon_data) && is.null(raster_data)) {
     stop("Polygon or raster data must be given.")
   }
-  library(leaflet)
+
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
   m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")

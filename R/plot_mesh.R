@@ -36,7 +36,7 @@ plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", lati
     # If we have a SpatialPolygonsDataFrame, we can plot the polygons
     # otherwise if we just have SpatialPoints we can plot the points
     # otherwise we don't plot anything
-    if (is(spatial_data, "SpatialPolygonsDataFrame")) {
+    if (methods::is(spatial_data, "SpatialPolygonsDataFrame")) {
       plot_polygons <- TRUE
     } else {
       plot_points <- TRUE
