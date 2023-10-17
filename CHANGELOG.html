@@ -21,15 +21,29 @@
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-tutorials">Tutorials</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-tutorials">
+    <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
+    <a class="dropdown-item" href="articles/getting_started.html">Installation</a>
+    <a class="dropdown-item" href="articles/data_preprocessing.html">Data pre-processing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6>
+    <a class="dropdown-item" href="articles/decision_tree.html">How to choose how to model</a>
+    <a class="dropdown-item" href="articles/simulation_gaussian_data.Rmd">Simulation Tutorial (Gaussian data)</a>
+    <a class="dropdown-item" href="articles/simulation_poisson_data.Rmd">Simulation Tutorial (Poisson data)</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Shiny apps</h6>
+    <a class="dropdown-item" href="articles/mapping.html">Map plotting</a>
+    <a class="dropdown-item" href="articles/meshbuilder.html">Mesh building</a>
+    <a class="dropdown-item" href="articles/priors_app.html">Model builder</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6>
     <a class="dropdown-item" href="articles/covid.html">COVID-19</a>
     <a class="dropdown-item" href="articles/covid_mcmc.html">COVID-19 MCMC</a>
     <a class="dropdown-item" href="articles/covid_ST_mcmc.html">COVID-19 MCMC (Space-time)</a>
-    <a class="dropdown-item" href="articles/data_preprocessing.html">Data pre-processing</a>
     <a class="dropdown-item" href="articles/hydro.html">Hydrology</a>
     <a class="dropdown-item" href="articles/priors.html">Priors exploration</a>
-    <a class="dropdown-item" href="articles/priors_app.html">Interactive priors Shiny app</a>
-    <a class="dropdown-item" href="articles/mapping.html">Map plotting</a>
-    <a class="dropdown-item" href="articles/meshbuilder.html">Meshing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>FAQ</h6>
+    <a class="dropdown-item" href="articles/inla_FAQ.html">INLA Crash FAQ</a>
   </div>
 </li>
 <li class="nav-item">
@@ -68,16 +82,49 @@
 <h3 id="added">Added<a class="anchor" aria-label="anchor" href="#added"></a></h3>
 <ul><li>This changelog - <a href="https://github.com/4DModeller/fdmr/pull/99" class="external-link">PR #99</a>
 </li>
+<li>Added an INLA FAQ vignette that covers INLA crashes we have encountered in the past - <a href="https://github.com/4DModeller/fdmr/pull/116" class="external-link">PR #116</a>
+</li>
+<li>Building a mesh with the Tibetan lakes data and the <code>mesh_builder</code> Shiny app to the <a href="https://4dmodeller.github.io/fdmr/articles/meshbuilder.html">mesh building tutorial</a> - <a href="https://github.com/4DModeller/fdmr/pull/101" class="external-link">PR #101</a>
+</li>
+<li>Clearer documentation on types expected by the <code>mesh_builder</code> tool - <a href="https://github.com/4DModeller/fdmr/pull/101" class="external-link">PR #101</a>
+</li>
+<li>Checks on the data types being passed into the <code>mesh_builder</code> tool - <a href="https://github.com/4DModeller/fdmr/pull/101" class="external-link">PR #101</a>
+</li>
+<li>Ability to plot either polygon or point data on Leaflet map of <code>mesh_builder</code> tool - <a href="https://github.com/4DModeller/fdmr/pull/101" class="external-link">PR #101</a>
+</li>
+<li>The ability to plot model predictions on a <code>leaflet</code> map in the our <a href="https://4dmodeller.github.io/fdmr/articles/priors_app.html">Interactive priors Shiny app</a> - <a href="https://github.com/4DModeller/fdmr/pull/147" class="external-link">PR #147</a>
+</li>
+<li>A new Shiny app to parse and plot INLA model output, letting users easily view model parameters and predictions on a map - <a href="https://github.com/4DModeller/fdmr/pull/158" class="external-link">PR #158</a>
+</li>
 </ul></div>
 <div class="section level3">
 <h3 id="fixed">Fixed<a class="anchor" aria-label="anchor" href="#fixed"></a></h3>
-</div>
+<ul><li>Read of <code>mean</code> twice from INLA model output instead of reading <code>sd</code> - <a href="https://github.com/4DModeller/fdmr/pull/121" class="external-link">PR #121</a>
+</li>
+<li>Issue with the exposure parameter being selectable when using Gaussian data, updated the model builder Shiny app to reflect this fix in its code output tab - <a href="https://github.com/4DModeller/fdmr/pull/183" class="external-link">PR #183</a>
+</li>
+<li>Bug when trying to plot a map of model predictions without having run a model in the model builder Shiny app - <a href="https://github.com/4DModeller/fdmr/pull/181" class="external-link">PR #181</a>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="changed">Changed<a class="anchor" aria-label="anchor" href="#changed"></a></h3>
-</div>
+<ul><li>Use of <code>rgdal</code> functions migrated to <code>sf</code> equivalents due to <a href="https://r-spatial.org/r/2022/04/12/evolution.html" class="external-link"><code>rgdal</code> retirement</a> - <a href="https://github.com/4DModeller/fdmr/pull/145" class="external-link">PR #145</a>
+</li>
+<li>Move to use <code><a href="https://rdrr.io/r/utils/untar.html" class="external-link">utils::untar</a></code> instead of <code>archive::extract_archive</code> due to issues on some Linux systems - <a href="https://github.com/4DModeller/fdmr/pull/130" class="external-link">PR #101</a>
+</li>
+<li>The <code>plot_mesh</code> function now uses an interactive <a href="https://rstudio.github.io/leaflet/" class="external-link">Leaflet</a> map with the optional to plot spatial data overlaid - <a href="https://github.com/4DModeller/fdmr/pull/162" class="external-link">PR #162</a>
+</li>
+<li>Use of <code>Intercept</code> updated due to deprecation in INLA - <a href="https://github.com/4DModeller/fdmr/pull/180" class="external-link">PR #180</a>
+</li>
+<li>Replaced use of <code><a href="https://rdrr.io/pkg/INLA/man/inla.mesh.2d.html" class="external-link">INLA::inla.mesh.2d</a></code> with updated <code><a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html" class="external-link">fmesher::fm_mesh_2d_inla</a></code> which is faster - <a href="https://github.com/4DModeller/fdmr/pull/182" class="external-link">PR #182</a>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="removed">Removed<a class="anchor" aria-label="anchor" href="#removed"></a></h3>
-</div>
+<ul><li>
+<code>plot_interactive_map</code> Shiny app removed due to limited usefulness - <a href="https://github.com/4DModeller/fdmr/pull/166" class="external-link">PR #166</a>
+</li>
+</ul></div>
 </div>
 </div>
 

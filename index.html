@@ -45,15 +45,29 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-tutorials">Tutorials</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-tutorials">
+    <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
+    <a class="dropdown-item" href="articles/getting_started.html">Installation</a>
+    <a class="dropdown-item" href="articles/data_preprocessing.html">Data pre-processing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6>
+    <a class="dropdown-item" href="articles/decision_tree.html">How to choose how to model</a>
+    <a class="dropdown-item" href="articles/simulation_gaussian_data.Rmd">Simulation Tutorial (Gaussian data)</a>
+    <a class="dropdown-item" href="articles/simulation_poisson_data.Rmd">Simulation Tutorial (Poisson data)</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Shiny apps</h6>
+    <a class="dropdown-item" href="articles/mapping.html">Map plotting</a>
+    <a class="dropdown-item" href="articles/meshbuilder.html">Mesh building</a>
+    <a class="dropdown-item" href="articles/priors_app.html">Model builder</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6>
     <a class="dropdown-item" href="articles/covid.html">COVID-19</a>
     <a class="dropdown-item" href="articles/covid_mcmc.html">COVID-19 MCMC</a>
     <a class="dropdown-item" href="articles/covid_ST_mcmc.html">COVID-19 MCMC (Space-time)</a>
-    <a class="dropdown-item" href="articles/data_preprocessing.html">Data pre-processing</a>
     <a class="dropdown-item" href="articles/hydro.html">Hydrology</a>
     <a class="dropdown-item" href="articles/priors.html">Priors exploration</a>
-    <a class="dropdown-item" href="articles/priors_app.html">Interactive priors Shiny app</a>
-    <a class="dropdown-item" href="articles/mapping.html">Map plotting</a>
-    <a class="dropdown-item" href="articles/meshbuilder.html">Meshing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>FAQ</h6>
+    <a class="dropdown-item" href="articles/inla_FAQ.html">INLA Crash FAQ</a>
   </div>
 </li>
 <li class="nav-item">
@@ -87,22 +101,32 @@
 </h1>
 </div>
 <p><a href="https://github.com/4DModeller/fdmr/actions/workflows/check-standard.yaml" class="external-link"><img src="https://github.com/4DModeller/fdmr/actions/workflows/check-standard.yaml/badge.svg?branch=main" alt="R-CMD-check"></a></p>
-<p>4D-Modeller is a spatio-temporal modeling library that can be applied to problems at any scale from micro to processes that operate at a global scale. It includes data visualization tools, finite element mesh building tools, Bayesian hierarchical modeling based on Bayesian inference packages INLA and inlabru, and model evaluation and assessment tools.</p>
+<p>4DModeller is a spatio-temporal modelling package that can be applied to problems at any scale from micro to processes that operate at a global scale. It includes data visualization tools, finite element mesh building tools, Bayesian hierarchical modelling based on Bayesian inference packages <a href="https://www.r-inla.org/home" class="external-link">INLA</a> and <a href="https://github.com/inlabru-org/inlabru" class="external-link">inlabru</a>, and model evaluation and assessment tools.</p>
 <div class="section level2">
-<h2 id="why-should-i-use-4d-modeller">Why should I use 4d-Modeller?<a class="anchor" aria-label="anchor" href="#why-should-i-use-4d-modeller"></a>
+<h2 id="why-should-i-use-4dmodeller">Why should I use 4DModeller?<a class="anchor" aria-label="anchor" href="#why-should-i-use-4dmodeller"></a>
 </h2>
-<p>4d-Modeller is an R toolbox that has been designed to make it easy to design spatially distributed, temporally dependent statistical models. Typically, 4d-Modeller expects tabular data sets with spatial coordinates, time indices, and the values that change or remain constant over those times. It is designed to be used in the modeling process once data has been sufficiently organized from wherever it was gathered from.</p>
-<p>4d-Modeller has a stack of tools that include shiny apps, vignettes in R-markdown notebooks, and the library itself. These tools are designed to help you easily build finite element meshes that models can be calculated on:</p>
+<p>4DModeller has been designed to make it easy to design spatially distributed, temporally dependent statistical models. Typically, 4DModeller expects tabular data sets with spatial coordinates, time indices, and the values that change or remain constant over those times. It is designed to be used in the modelling process once data has been sufficiently organized from wherever it was gathered from.</p>
+<p>4DModeller has a stack of tools that include <a href="https://4dmodeller.github.io/fdmr/reference/index.html#shiny-apps">Shiny apps</a>, <a href="https://4dmodeller.github.io/fdmr/articles/">tutorials as vignettes</a> in R Markdown notebooks, and the <a href="https://github.com/4DModeller/fdmr" class="external-link">package itself</a>. These tools are designed to help you:</p>
+<div class="section level3">
+<h3 id="id_--easily-build-finite-element-meshes-that-models-can-be-calculated-on">- easily build finite element meshes that models can be calculated on<a class="anchor" aria-label="anchor" href="#id_--easily-build-finite-element-meshes-that-models-can-be-calculated-on"></a>
+</h3>
 <div class="figure">
-<img src="gif" alt=""><p class="caption">fem</p>
+<img src="https://github.com/4DModeller/fdmr/assets/8915182/4c1d188d-3feb-471f-8831-97aa5fab4765" alt=""><p class="caption">meshbuilder</p>
 </div>
-<p>tools for how to specify priors for the model to pick the best model hyperparameters:</p>
-<div class="figure">
-<img src="gif" alt=""><p class="caption">priors</p>
 </div>
-<p>and tools for evaluating the fully trained model output:</p>
+<div class="section level3">
+<h3 id="id_--specify-priors-for-the-model-to-pick-the-best-model-hyperparameters">- specify priors for the model to pick the best model hyperparameters<a class="anchor" aria-label="anchor" href="#id_--specify-priors-for-the-model-to-pick-the-best-model-hyperparameters"></a>
+</h3>
 <div class="figure">
-<img src="gif" alt=""><p class="caption">eval</p>
+<img src="https://github.com/4DModeller/fdmr/assets/8915182/30bfea5e-80d8-42d8-96e7-ff0bce22029a" alt=""><p class="caption">priors</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="id_--evaluate-the-fully-trained-model-output">- evaluate the fully trained model output<a class="anchor" aria-label="anchor" href="#id_--evaluate-the-fully-trained-model-output"></a>
+</h3>
+<div class="figure">
+<img src="https://github.com/4DModeller/fdmr/assets/8915182/fe791f74-c9b4-4db0-a52e-ffa018b12b41" alt=""><p class="caption">modelviewer</p>
+</div>
 </div>
 </div>
 <div class="section level2">

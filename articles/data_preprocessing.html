@@ -45,15 +45,29 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-tutorials">Tutorials</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-tutorials">
+    <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
+    <a class="dropdown-item" href="../articles/getting_started.html">Installation</a>
+    <a class="dropdown-item" href="../articles/data_preprocessing.html">Data pre-processing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6>
+    <a class="dropdown-item" href="../articles/decision_tree.html">How to choose how to model</a>
+    <a class="dropdown-item" href="../articles/simulation_gaussian_data.Rmd">Simulation Tutorial (Gaussian data)</a>
+    <a class="dropdown-item" href="../articles/simulation_poisson_data.Rmd">Simulation Tutorial (Poisson data)</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Shiny apps</h6>
+    <a class="dropdown-item" href="../articles/mapping.html">Map plotting</a>
+    <a class="dropdown-item" href="../articles/meshbuilder.html">Mesh building</a>
+    <a class="dropdown-item" href="../articles/priors_app.html">Model builder</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6>
     <a class="dropdown-item" href="../articles/covid.html">COVID-19</a>
     <a class="dropdown-item" href="../articles/covid_mcmc.html">COVID-19 MCMC</a>
     <a class="dropdown-item" href="../articles/covid_ST_mcmc.html">COVID-19 MCMC (Space-time)</a>
-    <a class="dropdown-item" href="../articles/data_preprocessing.html">Data pre-processing</a>
     <a class="dropdown-item" href="../articles/hydro.html">Hydrology</a>
     <a class="dropdown-item" href="../articles/priors.html">Priors exploration</a>
-    <a class="dropdown-item" href="../articles/priors_app.html">Interactive priors Shiny app</a>
-    <a class="dropdown-item" href="../articles/mapping.html">Map plotting</a>
-    <a class="dropdown-item" href="../articles/meshbuilder.html">Meshing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>FAQ</h6>
+    <a class="dropdown-item" href="../articles/inla_FAQ.html">INLA Crash FAQ</a>
   </div>
 </li>
 <li class="nav-item">
@@ -125,63 +139,39 @@ attributes of geographic features for the MSOAs.</p>
 <span><span class="co">## package maintainers should consider adding sf to Suggests:.</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/preprocessing</span></span></code></pre>
-<p>Then we load in the shapefile into R, and store it in an object named
-<code>sp_data</code>.</p>
+<p>Then we load in the shapefile into R using <a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link"><code>sf::read_sf</code></a>,
+and store it in an object named <code>sp_data</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shapefilepath</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"preprocessing"</span>, filename <span class="op">=</span> <span class="st">"MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp"</span><span class="op">)</span></span>
-<span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">rgdal</span><span class="fu">::</span><span class="fu"><a href="http://rgdal.r-forge.r-project.org/reference/rgdal-deprecated.html" class="external-link">readOGR</a></span><span class="op">(</span>dsn <span class="op">=</span> <span class="va">shapefilepath</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Please note that rgdal will be retired during October 2023,</span></span>
-<span><span class="co">## plan transition to sf/stars/terra functions using GDAL and PROJ</span></span>
-<span><span class="co">## at your earliest convenience.</span></span>
-<span><span class="co">## See https://r-spatial.org/r/2023/05/15/evolution4.html and https://github.com/r-spatial/evolution</span></span>
-<span><span class="co">## rgdal: version: 1.6-7, (SVN revision 1203)</span></span>
-<span><span class="co">## Geospatial Data Abstraction Library extensions to R successfully loaded</span></span>
-<span><span class="co">## Loaded GDAL runtime: GDAL 3.4.1, released 2021/12/27</span></span>
-<span><span class="co">## Path to GDAL shared files: /usr/share/gdal</span></span>
-<span><span class="co">## GDAL binary built with GEOS: TRUE </span></span>
-<span><span class="co">## Loaded PROJ runtime: Rel. 8.2.1, January 1st, 2022, [PJ_VERSION: 821]</span></span>
-<span><span class="co">## Path to PROJ shared files: /home/runner/.local/share/proj:/usr/share/proj</span></span>
-<span><span class="co">## PROJ CDN enabled: FALSE</span></span>
-<span><span class="co">## Linking to sp version:2.1-0</span></span>
-<span><span class="co">## To mute warnings of possible GDAL/OSR exportToProj4() degradation,</span></span>
-<span><span class="co">## use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.</span></span></code></pre>
-<pre><code><span><span class="co">## OGR data source with driver: ESRI Shapefile </span></span>
-<span><span class="co">## Source: "/home/runner/fdmr/tutorial_data/preprocessing/MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp", layer: "MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3"</span></span>
-<span><span class="co">## with 7201 features</span></span>
-<span><span class="co">## It has 11 fields</span></span></code></pre>
-<p>The type of the object <code>sp_data</code> is a
-SpatialPolygonsDataFrame.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span>dsn <span class="op">=</span> <span class="va">shapefilepath</span><span class="op">)</span></span></code></pre></div>
+<p>The type of the object <code>sp_data</code> is <code>sf</code> which
+behind the scenes is a <code>tibble_df</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "SpatialPolygonsDataFrame"</span></span>
-<span><span class="co">## attr(,"package")</span></span>
-<span><span class="co">## [1] "sp"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "sf"         "tbl_df"     "tbl"        "data.frame"</span></span></code></pre>
 <p>Then we retrieve the projection attributes of the shapefile, i.e.,
 <code>sp_data</code>, and transform it from its original coordinate
 reference system (CRS) to a new CRS, which is the World Geodetic System
-1984 (WGS84).</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/is.projected.html" class="external-link">proj4string</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +units=m +no_defs"</span></span></code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/spTransform.html" class="external-link">spTransform</a></span><span class="op">(</span><span class="va">sp_data</span>, <span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/CRS-class.html" class="external-link">CRS</a></span><span class="op">(</span><span class="st">"+proj=longlat +datum=WGS84 +no_defs"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: PROJ support is provided by the sf and terra packages among others</span></span></code></pre>
+1984 (WGS84). Finally, we convert it to a
+<code>SpatialPolygonsDataFrame</code> using <a href="https://r-spatial.github.io/sf/reference/coerce-methods.html" class="external-link"><code>sf::as_Spatial</code></a>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">sp_data</span>, <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="st">"+proj=longlat +datum=WGS84"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>In the COVID-19 tutorial, the raw COVID-19 infections data and the
 related covariate data were obtained from the official UK Government
 COVID-19 dashboard and the Office for National Statistics (ONS). The
 data were initially downloaded, organised and saved in a CSV file
 format. The CSV file can be imported into R using the
 <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.csv()</a></code> function.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covid19_data_filepath</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"preprocessing"</span>, filename <span class="op">=</span> <span class="st">"covid19_data.csv"</span><span class="op">)</span></span>
 <span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">covid19_data_filepath</span><span class="op">)</span></span></code></pre></div>
 <p>The type of the object <code>covid19_data</code> is a data.frame.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "data.frame"</span></span></code></pre>
 <p>The first 6 rows of the data set can be viewed using the following
 code</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    MSOA11CD     date week     LONG      LAT cases Population   IMD</span></span>
 <span><span class="co">## 1 E02002415 1/1/2022    1 -1.54813 53.77558    57       7698 68.39</span></span>

@@ -45,15 +45,29 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-tutorials">Tutorials</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-tutorials">
+    <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
+    <a class="dropdown-item" href="../articles/getting_started.html">Installation</a>
+    <a class="dropdown-item" href="../articles/data_preprocessing.html">Data pre-processing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6>
+    <a class="dropdown-item" href="../articles/decision_tree.html">How to choose how to model</a>
+    <a class="dropdown-item" href="../articles/simulation_gaussian_data.Rmd">Simulation Tutorial (Gaussian data)</a>
+    <a class="dropdown-item" href="../articles/simulation_poisson_data.Rmd">Simulation Tutorial (Poisson data)</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Shiny apps</h6>
+    <a class="dropdown-item" href="../articles/mapping.html">Map plotting</a>
+    <a class="dropdown-item" href="../articles/meshbuilder.html">Mesh building</a>
+    <a class="dropdown-item" href="../articles/priors_app.html">Model builder</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6>
     <a class="dropdown-item" href="../articles/covid.html">COVID-19</a>
     <a class="dropdown-item" href="../articles/covid_mcmc.html">COVID-19 MCMC</a>
     <a class="dropdown-item" href="../articles/covid_ST_mcmc.html">COVID-19 MCMC (Space-time)</a>
-    <a class="dropdown-item" href="../articles/data_preprocessing.html">Data pre-processing</a>
     <a class="dropdown-item" href="../articles/hydro.html">Hydrology</a>
     <a class="dropdown-item" href="../articles/priors.html">Priors exploration</a>
-    <a class="dropdown-item" href="../articles/priors_app.html">Interactive priors Shiny app</a>
-    <a class="dropdown-item" href="../articles/mapping.html">Map plotting</a>
-    <a class="dropdown-item" href="../articles/meshbuilder.html">Meshing</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>FAQ</h6>
+    <a class="dropdown-item" href="../articles/inla_FAQ.html">INLA Crash FAQ</a>
   </div>
 </li>
 <li class="nav-item">
@@ -97,31 +111,451 @@
     
 <p>Here we’ll cover building a mesh from some spatial data, modifying
 its parameters and plotting it and the data on an interactive map.</p>
-<p>We’ll first load in some spatial data to create the mesh. This is the
-same data we previously used in the COVID-19 tutorial.</p>
+<div class="section level2">
+<h2 id="load-in-spatial-data---csv">Load in spatial data - CSV<a class="anchor" aria-label="anchor" href="#load-in-spatial-data---csv"></a>
+</h2>
+<p>To load data into the mesh builder we need to make sure it’s in the
+correct format. This can be in the form of a
+<code>SpatialPolygonsDataFrame</code> or a
+<code>SpatialPointsDataFrame</code> or just a normal
+<code>data.frame</code> or <code>tibble</code>. Let’s load in some data
+that covers the Tibetan plateau from CSV.</p>
+<p>First we download the data from our data repository. And then load in
+the data using <code>read.csv</code></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"tibetan_lakes"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
+<span><span class="co">## which was just loaded, were retired in October 2023.</span></span>
+<span><span class="co">## Please refer to R-spatial evolution reports for details, especially</span></span>
+<span><span class="co">## https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
+<span><span class="co">## It may be desirable to make the sf package available;</span></span>
+<span><span class="co">## package maintainers should consider adding sf to Suggests:.</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/tibetan_lakes</span></span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lakes_data_filepath</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"tibetan_lakes"</span>, filename <span class="op">=</span> <span class="st">"example_lake_data.csv"</span><span class="op">)</span></span>
+<span><span class="va">lakes_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">lakes_data_filepath</span><span class="op">)</span></span></code></pre></div>
+<p>Now let’s have a look at the names of the columns in the
+<code>data.frame</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lakes_data</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##  [1] "X.1"              "X"                "precip"           "year"            </span></span>
+<span><span class="co">##  [5] "HYBAS_ID"         "NEXT_DOWN"        "NEXT_SINK"        "MAIN_BAS"        </span></span>
+<span><span class="co">##  [9] "DIST_SINK"        "DIST_MAIN"        "SUB_AREA"         "UP_AREA"         </span></span>
+<span><span class="co">## [13] "PFAF_ID"          "ENDO"             "COAST"            "ORDER"           </span></span>
+<span><span class="co">## [17] "SORT"             "geometry"         "centroid_lon"     "centroid_lat"    </span></span>
+<span><span class="co">## [21] "Unnamed..0"       "lake_growth"      "lake_decline"     "all"             </span></span>
+<span><span class="co">## [25] "region"           "growth_ratio"     "decline_ratio"    "water_balance"   </span></span>
+<span><span class="co">## [29] "water_balance_m3"</span></span></code></pre>
+<p>To create the mesh we need to pass in the latitude and longitude data
+to the <a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html" class="external-link"><code>fmesher::fmesher::fm_mesh_2d_inla</code></a>
+function. Looking at the column names we can see that
+<code>centroid_long</code> and <code>centroid_lat</code> look like
+likely candidates. Let’s have a quick look at them.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lakes_data</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"centroid_lon"</span>, <span class="st">"centroid_lat"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   centroid_lon centroid_lat</span></span>
+<span><span class="co">## 1     89.01703     42.85078</span></span>
+<span><span class="co">## 2     98.39610     40.92234</span></span>
+<span><span class="co">## 3     77.07896     37.33994</span></span>
+<span><span class="co">## 4     89.62283     31.04314</span></span>
+<span><span class="co">## 5     93.44273     29.92501</span></span>
+<span><span class="co">## 6     76.11543     38.76519</span></span></code></pre>
+<p>That looks correct. By default <code>mesh_builder</code> will look
+for <code>"LAT"</code> and <code>"LONG"</code> columns and raise an
+error if it can’t find them. To avoid this we can either change the
+names of the columns in our data or pass in the names of those columns
+when we call the function.</p>
+<p>Let’s call the <code>mesh_builder</code> function and pass in the
+data and tell it to use <code>centroid_long</code> and
+<code>centroid_lat</code> as the longitude and latitude columns. As we
+only have have a <code>data.frame</code> here we also need to pass in
+the coordinate reference system we want to use. We’ll use the WGS84
+coordinate reference system and pass in a <code>proj4string</code>.
+We’re now ready to launch the mesh builder app.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The mesh builder may take a short
+time (~ 20s) to build this mesh due to its size.</p>
+</blockquote>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">lakes_data</span>, longitude_column <span class="op">=</span> <span class="st">"centroid_lon"</span>, latitude_column <span class="op">=</span> <span class="st">"centroid_lat"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="loading-data---rds-file">Loading data - <code>rds</code> file<a class="anchor" aria-label="anchor" href="#loading-data---rds-file"></a>
+</h2>
+<p>In other cases we may be given an <code>.rds</code> file. Let’s load
+in an example from our COVID-19 dataset. This is the same data we
+previously used in the COVID-19 tutorial.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/covid</span></span></code></pre>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span>
-<span><span class="va">sp_data</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## An object of class "SpatialPolygonsDataFrame"</span></span>
+<span><span class="co">## Slot "data":</span></span>
+<span><span class="co">##    MSOA11CD OBJECTID                 MSOA11NM                MSOA11NMW  BNG_E</span></span>
+<span><span class="co">## 1 E02000002        2 Barking and Dagenham 001 Barking and Dagenham 001 548267</span></span>
+<span><span class="co">## 2 E02000003        3 Barking and Dagenham 002 Barking and Dagenham 002 548259</span></span>
+<span><span class="co">## 3 E02000004        4 Barking and Dagenham 003 Barking and Dagenham 003 551004</span></span>
+<span><span class="co">## 4 E02000005        5 Barking and Dagenham 004 Barking and Dagenham 004 548733</span></span>
+<span><span class="co">## 5 E02000007        6 Barking and Dagenham 006 Barking and Dagenham 006 549697</span></span>
+<span><span class="co">## 6 E02000008        7 Barking and Dagenham 007 Barking and Dagenham 007 548220</span></span>
+<span><span class="co">##    BNG_N     LONG      LAT Shape__Are Shape__Len</span></span>
+<span><span class="co">## 1 189693 0.138759 51.58659    2064081   7071.368</span></span>
+<span><span class="co">## 2 188522 0.138150 51.57607    2226199   7772.531</span></span>
+<span><span class="co">## 3 186418 0.176830 51.55644    2599306   6982.412</span></span>
+<span><span class="co">## 4 186827 0.144269 51.56071    1221861   5599.766</span></span>
+<span><span class="co">## 5 186608 0.158072 51.55849    1593794   5281.386</span></span>
+<span><span class="co">## 6 185920 0.136492 51.55270    1459217   6493.072</span></span>
+<span><span class="co">##                               GlobalID area_sqkm</span></span>
+<span><span class="co">## 1 f0ca54f0-1a1e-4c72-8fcb-85e21be6de79  2.064497</span></span>
+<span><span class="co">## 2 3772a2ec-b052-4000-b62b-2c85ac401a7f  2.226646</span></span>
+<span><span class="co">## 3 3388e1f6-e578-4907-b271-168756f05856  2.599779</span></span>
+<span><span class="co">## 4 1af0aed4-60d0-4fd6-b326-4b868968c12f  1.222105</span></span>
+<span><span class="co">## 5 2b82bb5b-6b32-4d32-9d29-0a06145e0a8d  1.594102</span></span>
+<span><span class="co">## 6 d9cbd087-0359-4f10-9c33-d090764045a5  1.459514</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "polygons":</span></span>
+<span><span class="co">## [[1]]</span></span>
+<span><span class="co">## An object of class "Polygons"</span></span>
+<span><span class="co">## Slot "Polygons":</span></span>
+<span><span class="co">## [[1]]</span></span>
+<span><span class="co">## An object of class "Polygon"</span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1394928 51.5885356</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0002677328</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "hole":</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ringDir":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "coords":</span></span>
+<span><span class="co">##            [,1]     [,2]</span></span>
+<span><span class="co">##  [1,] 0.1498162 51.59700</span></span>
+<span><span class="co">##  [2,] 0.1510833 51.58708</span></span>
+<span><span class="co">##  [3,] 0.1415709 51.58636</span></span>
+<span><span class="co">##  [4,] 0.1402143 51.57835</span></span>
+<span><span class="co">##  [5,] 0.1351997 51.57974</span></span>
+<span><span class="co">##  [6,] 0.1316113 51.57713</span></span>
+<span><span class="co">##  [7,] 0.1329370 51.58090</span></span>
+<span><span class="co">##  [8,] 0.1276388 51.58164</span></span>
+<span><span class="co">##  [9,] 0.1295286 51.59006</span></span>
+<span><span class="co">## [10,] 0.1418993 51.59658</span></span>
+<span><span class="co">## [11,] 0.1481361 51.59905</span></span>
+<span><span class="co">## [12,] 0.1498162 51.59700</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "plotOrder":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1394928 51.5885356</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ID":</span></span>
+<span><span class="co">## [1] "1"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0002677328</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [[2]]</span></span>
+<span><span class="co">## An object of class "Polygons"</span></span>
+<span><span class="co">## Slot "Polygons":</span></span>
+<span><span class="co">## [[1]]</span></span>
+<span><span class="co">## An object of class "Polygon"</span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1412056 51.5749747</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.000288678</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "hole":</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ringDir":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "coords":</span></span>
+<span><span class="co">##            [,1]     [,2]</span></span>
+<span><span class="co">##  [1,] 0.1483820 51.58075</span></span>
+<span><span class="co">##  [2,] 0.1497524 51.56970</span></span>
+<span><span class="co">##  [3,] 0.1466431 51.56941</span></span>
+<span><span class="co">##  [4,] 0.1498781 51.56807</span></span>
+<span><span class="co">##  [5,] 0.1460282 51.56465</span></span>
+<span><span class="co">##  [6,] 0.1433808 51.56752</span></span>
+<span><span class="co">##  [7,] 0.1369271 51.56706</span></span>
+<span><span class="co">##  [8,] 0.1293623 51.56653</span></span>
+<span><span class="co">##  [9,] 0.1296766 51.56810</span></span>
+<span><span class="co">## [10,] 0.1316113 51.57713</span></span>
+<span><span class="co">## [11,] 0.1351997 51.57974</span></span>
+<span><span class="co">## [12,] 0.1402143 51.57835</span></span>
+<span><span class="co">## [13,] 0.1415709 51.58636</span></span>
+<span><span class="co">## [14,] 0.1510833 51.58708</span></span>
+<span><span class="co">## [15,] 0.1483820 51.58075</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "plotOrder":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1412056 51.5749747</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ID":</span></span>
+<span><span class="co">## [1] "2"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.000288678</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [[3]]</span></span>
+<span><span class="co">## An object of class "Polygons"</span></span>
+<span><span class="co">## Slot "Polygons":</span></span>
+<span><span class="co">## [[1]]</span></span>
+<span><span class="co">## An object of class "Polygon"</span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1765196 51.5552779</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0003369077</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "hole":</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ringDir":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "coords":</span></span>
+<span><span class="co">##            [,1]     [,2]</span></span>
+<span><span class="co">##  [1,] 0.1901795 51.55268</span></span>
+<span><span class="co">##  [2,] 0.1859954 51.54754</span></span>
+<span><span class="co">##  [3,] 0.1680182 51.54731</span></span>
+<span><span class="co">##  [4,] 0.1648860 51.54953</span></span>
+<span><span class="co">##  [5,] 0.1697093 51.55062</span></span>
+<span><span class="co">##  [6,] 0.1636815 51.55278</span></span>
+<span><span class="co">##  [7,] 0.1683205 51.56353</span></span>
+<span><span class="co">##  [8,] 0.1850808 51.56480</span></span>
+<span><span class="co">##  [9,] 0.1826189 51.56131</span></span>
+<span><span class="co">## [10,] 0.1901795 51.55268</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "plotOrder":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1765196 51.5552779</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ID":</span></span>
+<span><span class="co">## [1] "3"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0003369077</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [[4]]</span></span>
+<span><span class="co">## An object of class "Polygons"</span></span>
+<span><span class="co">## Slot "Polygons":</span></span>
+<span><span class="co">## [[1]]</span></span>
+<span><span class="co">## An object of class "Polygon"</span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1430805 51.5617140</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0001583977</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "hole":</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ringDir":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "coords":</span></span>
+<span><span class="co">##            [,1]     [,2]</span></span>
+<span><span class="co">##  [1,] 0.1543871 51.56607</span></span>
+<span><span class="co">##  [2,] 0.1478721 51.56108</span></span>
+<span><span class="co">##  [3,] 0.1481942 51.55465</span></span>
+<span><span class="co">##  [4,] 0.1433187 51.55311</span></span>
+<span><span class="co">##  [5,] 0.1452208 51.55581</span></span>
+<span><span class="co">##  [6,] 0.1356112 51.55744</span></span>
+<span><span class="co">##  [7,] 0.1343250 51.56048</span></span>
+<span><span class="co">##  [8,] 0.1369271 51.56706</span></span>
+<span><span class="co">##  [9,] 0.1433808 51.56752</span></span>
+<span><span class="co">## [10,] 0.1460282 51.56465</span></span>
+<span><span class="co">## [11,] 0.1498781 51.56807</span></span>
+<span><span class="co">## [12,] 0.1543871 51.56607</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "plotOrder":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1430805 51.5617140</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ID":</span></span>
+<span><span class="co">## [1] "4"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0001583977</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [[5]]</span></span>
+<span><span class="co">## An object of class "Polygons"</span></span>
+<span><span class="co">## Slot "Polygons":</span></span>
+<span><span class="co">## [[1]]</span></span>
+<span><span class="co">## An object of class "Polygon"</span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1566991 51.5578705</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0002065953</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "hole":</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ringDir":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "coords":</span></span>
+<span><span class="co">##            [,1]     [,2]</span></span>
+<span><span class="co">##  [1,] 0.1683205 51.56353</span></span>
+<span><span class="co">##  [2,] 0.1636815 51.55278</span></span>
+<span><span class="co">##  [3,] 0.1563493 51.55102</span></span>
+<span><span class="co">##  [4,] 0.1496823 51.55128</span></span>
+<span><span class="co">##  [5,] 0.1481942 51.55465</span></span>
+<span><span class="co">##  [6,] 0.1478721 51.56108</span></span>
+<span><span class="co">##  [7,] 0.1543871 51.56607</span></span>
+<span><span class="co">##  [8,] 0.1618527 51.56160</span></span>
+<span><span class="co">##  [9,] 0.1683205 51.56353</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "plotOrder":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1566991 51.5578705</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ID":</span></span>
+<span><span class="co">## [1] "5"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0002065953</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## [[6]]</span></span>
+<span><span class="co">## An object of class "Polygons"</span></span>
+<span><span class="co">## Slot "Polygons":</span></span>
+<span><span class="co">## [[1]]</span></span>
+<span><span class="co">## An object of class "Polygon"</span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1351009 51.5530095</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0001891334</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "hole":</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ringDir":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "coords":</span></span>
+<span><span class="co">##            [,1]     [,2]</span></span>
+<span><span class="co">##  [1,] 0.1481942 51.55465</span></span>
+<span><span class="co">##  [2,] 0.1496823 51.55128</span></span>
+<span><span class="co">##  [3,] 0.1340892 51.54857</span></span>
+<span><span class="co">##  [4,] 0.1308761 51.54506</span></span>
+<span><span class="co">##  [5,] 0.1257157 51.54725</span></span>
+<span><span class="co">##  [6,] 0.1304090 51.55178</span></span>
+<span><span class="co">##  [7,] 0.1243038 51.55144</span></span>
+<span><span class="co">##  [8,] 0.1269643 51.55787</span></span>
+<span><span class="co">##  [9,] 0.1343250 51.56048</span></span>
+<span><span class="co">## [10,] 0.1356112 51.55744</span></span>
+<span><span class="co">## [11,] 0.1452208 51.55581</span></span>
+<span><span class="co">## [12,] 0.1433187 51.55311</span></span>
+<span><span class="co">## [13,] 0.1481942 51.55465</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "plotOrder":</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "labpt":</span></span>
+<span><span class="co">## [1]  0.1351009 51.5530095</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "ID":</span></span>
+<span><span class="co">## [1] "6"</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "area":</span></span>
+<span><span class="co">## [1] 0.0001891334</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "plotOrder":</span></span>
+<span><span class="co">## [1] 3 2 1 5 6 4</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "bbox":</span></span>
+<span><span class="co">##          min        max</span></span>
+<span><span class="co">## x  0.1243038  0.1901795</span></span>
+<span><span class="co">## y 51.5450603 51.5990480</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slot "proj4string":</span></span>
+<span><span class="co">## Coordinate Reference System:</span></span>
+<span><span class="co">## Deprecated Proj.4 representation: +proj=longlat +datum=WGS84 +no_defs </span></span>
+<span><span class="co">## WKT2 2019 representation:</span></span>
+<span><span class="co">## GEOGCRS["unknown",</span></span>
+<span><span class="co">##     DATUM["World Geodetic System 1984",</span></span>
+<span><span class="co">##         ELLIPSOID["WGS 84",6378137,298.257223563,</span></span>
+<span><span class="co">##             LENGTHUNIT["metre",1]],</span></span>
+<span><span class="co">##         ID["EPSG",6326]],</span></span>
+<span><span class="co">##     PRIMEM["Greenwich",0,</span></span>
+<span><span class="co">##         ANGLEUNIT["degree",0.0174532925199433],</span></span>
+<span><span class="co">##         ID["EPSG",8901]],</span></span>
+<span><span class="co">##     CS[ellipsoidal,2],</span></span>
+<span><span class="co">##         AXIS["longitude",east,</span></span>
+<span><span class="co">##             ORDER[1],</span></span>
+<span><span class="co">##             ANGLEUNIT["degree",0.0174532925199433,</span></span>
+<span><span class="co">##                 ID["EPSG",9122]]],</span></span>
+<span><span class="co">##         AXIS["latitude",north,</span></span>
+<span><span class="co">##             ORDER[2],</span></span>
+<span><span class="co">##             ANGLEUNIT["degree",0.0174532925199433,</span></span>
+<span><span class="co">##                 ID["EPSG",9122]]]]</span></span></code></pre>
 <p>The <code>sp_data</code> object is a
 <code>SpatialPolygonsDataFrame</code> containing 6789 features for areas
-of England. We can build a mesh by passing <code>sp_data</code> to the
+of England. This object contains all the contains all the values we We
+can build a mesh by passing <code>sp_data</code> to the
 <code>mesh_builder</code> function.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="customise-initial-parameters">Customise initial parameters<a class="anchor" aria-label="anchor" href="#customise-initial-parameters"></a>
 </h2>
 <p>If you want to customise the initial parameters used to build the
-mesh you can pass in</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+mesh you can pass those values to the <code>mesh_builder</code>
+function. To see what parameters you can pass to the function you can
+use the <code>args</code> function.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/args.html" class="external-link">args</a></span><span class="op">(</span><span class="fu">fdmr</span><span class="fu">::</span><span class="va"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## function (spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, </span></span>
+<span><span class="co">##     offset = NULL, cutoff = NULL, latitude_column = "LAT", longitude_column = "LONG") </span></span>
+<span><span class="co">## NULL</span></span></code></pre>
 <p>Now we have the spatial data loaded we can think about some initial
 parameters for the mesh we’re going to create. We’ll calculate the
 initial range and max edge values from our data and pass them into the
 <code>mesh_builder</code> function. These values will then be used as
 values for the initial mesh that’s created but can be changed within the
 app.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">[</span>, <span class="st">"LONG"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span></span>
 <span><span class="va">max_edge</span> <span class="op">&lt;-</span> <span class="va">initial_range</span> <span class="op">/</span> <span class="fl">8</span></span>
 <span></span>
@@ -129,7 +563,7 @@ app.</p>
 <span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">initial_range</span> <span class="op">/</span> <span class="fl">4</span>, <span class="va">initial_range</span><span class="op">)</span></span>
 <span><span class="va">cutoff</span> <span class="op">&lt;-</span> <span class="va">max_edge</span> <span class="op">/</span> <span class="fl">7</span></span></code></pre></div>
 <p>Now we’re ready to start the app.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, max_edge <span class="op">=</span> <span class="va">max_edge_fin</span>, offset <span class="op">=</span> <span class="va">offset</span>, cutoff <span class="op">=</span> <span class="va">cutoff</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -151,7 +585,7 @@ COVID-19 data. Create a mesh of your design and when you’re finished
 click the “Check mesh” button. This passes the created mesh to the
 <code><a href="../reference/mesh_checker.html">fdmr::mesh_checker</a></code> function and returns a list containing
 any errors found with the mesh.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"covid19_data.rds"</span><span class="op">)</span></span>
 <span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, obs_data <span class="op">=</span> <span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 </div>

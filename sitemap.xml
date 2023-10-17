@@ -10,15 +10,6 @@
     <loc>https://4dmodeller.github.io/fdmr/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/DecisionTree.html</loc>
-  </url>
-  <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/Simulation_GaussianDat.html</loc>
-  </url>
-  <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/Simulation_PoissonDat.html</loc>
-  </url>
-  <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/covid.html</loc>
   </url>
   <url>
@@ -31,16 +22,19 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/data_preprocessing.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/decision_tree.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/getting_started.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/hydro.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/inlaFAQ.html</loc>
-  </url>
-  <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/mapping.html</loc>
+    <loc>https://4dmodeller.github.io/fdmr/articles/inla_FAQ.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/meshbuilder.html</loc>
@@ -50,6 +44,12 @@
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/priors_app.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/simulation_gaussian_data.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/simulation_poisson_data.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/authors.html</loc>
@@ -70,7 +70,16 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/clear_caches.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/create_prediction_field.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/get_archive_cache_datapath.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/get_busy_spinner.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/get_tmpdir.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/get_tutorial_cache_datapath.html</loc>
@@ -79,10 +88,10 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/get_tutorial_datapath.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/reference/index.html</loc>
+    <loc>https://4dmodeller.github.io/fdmr/reference/has_coords.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/reference/interactive_priors.html</loc>
+    <loc>https://4dmodeller.github.io/fdmr/reference/index.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/latlong_to_utm.html</loc>
@@ -101,6 +110,18 @@
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/meshbuilder_shiny.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/model_builder.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/model_builder_shiny.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/model_viewer.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/model_viewer_shiny.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/numbers_only.html</loc>
@@ -124,9 +145,6 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_dic.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/reference/plot_interactive_map.html</loc>
-  </url>
-  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_line_average.html</loc>
   </url>
   <url>
@@ -148,12 +166,6 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_timeseries.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/reference/priors_shiny.html</loc>
-  </url>
-  <url>
-    <loc>https://4dmodeller.github.io/fdmr/reference/raster_mapping_app.html</loc>
-  </url>
-  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/require_packages.html</loc>
   </url>
   <url>
@@ -161,5 +173,14 @@
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/to_dates.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/write_log.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/write_parameters.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/write_rds.html</loc>
   </url>
 </urlset>
