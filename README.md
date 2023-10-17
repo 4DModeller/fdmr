@@ -12,15 +12,15 @@
 
 ### - easily build finite element meshes that models can be calculated on
 
-![meshbuilder](https://github.com/4DModeller/fdmr/assets/8915182/4c1d188d-3feb-471f-8831-97aa5fab4765)
+![](https://github.com/4DModeller/fdmr/assets/8915182/4c1d188d-3feb-471f-8831-97aa5fab4765)
 
 ### - specify priors for the model to pick the best model hyperparameters
 
-![priors](https://github.com/4DModeller/fdmr/assets/8915182/30bfea5e-80d8-42d8-96e7-ff0bce22029a)
+![](https://github.com/4DModeller/fdmr/assets/8915182/30bfea5e-80d8-42d8-96e7-ff0bce22029a)
 
 ### - evaluate the fully trained model output
 
-![modelviewer](https://github.com/4DModeller/fdmr/assets/8915182/fe791f74-c9b4-4db0-a52e-ffa018b12b41)
+![](https://github.com/4DModeller/fdmr/assets/8915182/fe791f74-c9b4-4db0-a52e-ffa018b12b41)
 
 ## Quickstart
 
@@ -33,12 +33,6 @@ Next start an R session and run
 install.packages("devtools")
 library(devtools)
 devtools::install_github("4DModeller/fdmr")
-```
-
-Next we need to install INLA which is not available on CRAN.
-
-```R
-install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
 ```
 
 You should now have `fdmr` and all its dependencies installed and you can continue on [one of our tutorials](https://4dmodeller.github.io/fdmr/articles/).
