@@ -571,7 +571,7 @@ model_builder_shiny <- function(spatial_data,
                         data = measurement_data,
                         family = '", data_dist, "',
                         E = ", exposure_param_str, ",
-                        control.family = ", family_control_str, "
+                        control.family = ", family_control_str, ",
                         options = list(
                             verbose = FALSE
                         )
