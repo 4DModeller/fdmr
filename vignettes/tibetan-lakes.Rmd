@@ -1,0 +1,15 @@
+---
+title: "Tibetan Lakes Example"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Tibetan Lakes Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The Tibetan Plateau and the High Mountain Asia region provide water resources to approximately 1 billion people and provide for their health, economies, and agriculture. These natural “water towers” are highly sensitive to climate change and therefore changes in regional water resources must be understood (@immerzeel2020importance). Indeed, understanding how climate change will alter cold region water resources has been described as a “grand challenge” of hydrology (@twentythreeproblems). Recent changes in lakes in the Tibetan Plateau endorheic basin  have led to increases in lake areas. Conventionally attributed to increases in glacier melt due to climate change, a recent investigation has demonstrated that glacier mass loss contributes only a small fraction (19%) to the lake volume increase (@brun2020limited). Thus, an unresolved question in the Tibetan Plateau endorheic basin lakes is, what physical processes drive lake growth in the region and at what fraction?
