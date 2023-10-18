@@ -1,0 +1,47 @@
+---
+title: "Tibetan Lakes Shiny Example"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Tibetan Lakes Shiny Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Here we will show how to use the shiny apps with the tibetan lakes dataset.
+
+```{r error=TRUE}
+devtools::load_all()
+library(INLA)
+library(inlabru)
+data <- read.csv('~/repos/tblakes/data_for_modeling.csv')
+summary(data)
+```
+
+
+now we will use the mesh builder app:
+
+```{r error=TRUE}
+fdmr::mesh_builder(spatial_data = data, obs_data = data, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+```
+
+using the meshbuilder we have generated the following code:
+
+```{r error=TRUE}
+mesh <- inla.mesh.2d(loc = data[c('LONG', 'LAT')],
+          max.edge = c(1.1, 8.1),
+          cutoff = 0.81,
+          offset=c(1.2, 4.6))
+plot(mesh)
+```
+
+next we will use the model tester app:
+
+```{r error=TRUE}
+sp::coordinates(data) <- c('LONG', 'LAT')
+fdmr::interactive_priors(data, measurement_data = data, time_variable = data$year)
+```
