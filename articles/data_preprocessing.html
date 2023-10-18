@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fdmr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,22 +131,16 @@ attributes of geographic features for the MSOAs.</p>
 <code>preprocessing</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"preprocessing"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
-<span><span class="co">## which was just loaded, were retired in October 2023.</span></span>
-<span><span class="co">## Please refer to R-spatial evolution reports for details, especially</span></span>
-<span><span class="co">## https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
-<span><span class="co">## It may be desirable to make the sf package available;</span></span>
-<span><span class="co">## package maintainers should consider adding sf to Suggests:.</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/preprocessing</span></span></code></pre>
 <p>Then we load in the shapefile into R using <a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link"><code>sf::read_sf</code></a>,
 and store it in an object named <code>sp_data</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shapefilepath</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"preprocessing"</span>, filename <span class="op">=</span> <span class="st">"MSOA_(Dec_2011)_Boundaries_Super_Generalised_Clipped_(BSC)_EW_V3.shp"</span><span class="op">)</span></span>
 <span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span>dsn <span class="op">=</span> <span class="va">shapefilepath</span><span class="op">)</span></span></code></pre></div>
 <p>The type of the object <code>sp_data</code> is <code>sf</code> which
 behind the scenes is a <code>tibble_df</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "sf"         "tbl_df"     "tbl"        "data.frame"</span></span></code></pre>
 <p>Then we retrieve the projection attributes of the shapefile, i.e.,
@@ -154,7 +148,7 @@ behind the scenes is a <code>tibble_df</code>.</p>
 reference system (CRS) to a new CRS, which is the World Geodetic System
 1984 (WGS84). Finally, we convert it to a
 <code>SpatialPolygonsDataFrame</code> using <a href="https://r-spatial.github.io/sf/reference/coerce-methods.html" class="external-link"><code>sf::as_Spatial</code></a>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">sp_data</span>, <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="st">"+proj=longlat +datum=WGS84"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>In the COVID-19 tutorial, the raw COVID-19 infections data and the
 related covariate data were obtained from the official UK Government
@@ -162,16 +156,16 @@ COVID-19 dashboard and the Office for National Statistics (ONS). The
 data were initially downloaded, organised and saved in a CSV file
 format. The CSV file can be imported into R using the
 <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.csv()</a></code> function.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covid19_data_filepath</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"preprocessing"</span>, filename <span class="op">=</span> <span class="st">"covid19_data.csv"</span><span class="op">)</span></span>
 <span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">covid19_data_filepath</span><span class="op">)</span></span></code></pre></div>
 <p>The type of the object <code>covid19_data</code> is a data.frame.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "data.frame"</span></span></code></pre>
 <p>The first 6 rows of the data set can be viewed using the following
 code</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    MSOA11CD     date week     LONG      LAT cases Population   IMD</span></span>
 <span><span class="co">## 1 E02002415 1/1/2022    1 -1.54813 53.77558    57       7698 68.39</span></span>

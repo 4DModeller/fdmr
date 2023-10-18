@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fdmr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,20 +124,14 @@ that covers the Tibetan plateau from CSV.</p>
 the data using <code>read.csv</code></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"tibetan_lakes"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
-<span><span class="co">## which was just loaded, were retired in October 2023.</span></span>
-<span><span class="co">## Please refer to R-spatial evolution reports for details, especially</span></span>
-<span><span class="co">## https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
-<span><span class="co">## It may be desirable to make the sf package available;</span></span>
-<span><span class="co">## package maintainers should consider adding sf to Suggests:.</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/tibetan_lakes</span></span></code></pre>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lakes_data_filepath</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"tibetan_lakes"</span>, filename <span class="op">=</span> <span class="st">"example_lake_data.csv"</span><span class="op">)</span></span>
 <span><span class="va">lakes_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">lakes_data_filepath</span><span class="op">)</span></span></code></pre></div>
 <p>Now let’s have a look at the names of the columns in the
 <code>data.frame</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lakes_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "X.1"              "X"                "precip"           "year"            </span></span>
 <span><span class="co">##  [5] "HYBAS_ID"         "NEXT_DOWN"        "NEXT_SINK"        "MAIN_BAS"        </span></span>
@@ -152,7 +146,7 @@ to the <a href="https://inlabru-org.github.io/fmesher/reference/fm_mesh_2d.html"
 function. Looking at the column names we can see that
 <code>centroid_long</code> and <code>centroid_lat</code> look like
 likely candidates. Let’s have a quick look at them.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lakes_data</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"centroid_lon"</span>, <span class="st">"centroid_lat"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   centroid_lon centroid_lat</span></span>
 <span><span class="co">## 1     89.01703     42.85078</span></span>
@@ -177,7 +171,7 @@ We’re now ready to launch the mesh builder app.</p>
 <p><strong><em>NOTE:</em></strong> The mesh builder may take a short
 time (~ 20s) to build this mesh due to its size.</p>
 </blockquote>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">lakes_data</span>, longitude_column <span class="op">=</span> <span class="st">"centroid_lon"</span>, latitude_column <span class="op">=</span> <span class="st">"centroid_lat"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -186,11 +180,11 @@ time (~ 20s) to build this mesh due to its size.</p>
 <p>In other cases we may be given an <code>.rds</code> file. Let’s load
 in an example from our COVID-19 dataset. This is the same data we
 previously used in the COVID-19 tutorial.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/covid</span></span></code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## An object of class "SpatialPolygonsDataFrame"</span></span>
@@ -534,7 +528,7 @@ previously used in the COVID-19 tutorial.</p>
 of England. This object contains all the contains all the values we We
 can build a mesh by passing <code>sp_data</code> to the
 <code>mesh_builder</code> function.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -544,7 +538,7 @@ can build a mesh by passing <code>sp_data</code> to the
 mesh you can pass those values to the <code>mesh_builder</code>
 function. To see what parameters you can pass to the function you can
 use the <code>args</code> function.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/args.html" class="external-link">args</a></span><span class="op">(</span><span class="fu">fdmr</span><span class="fu">::</span><span class="va"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, </span></span>
 <span><span class="co">##     offset = NULL, cutoff = NULL, latitude_column = "LAT", longitude_column = "LONG") </span></span>
@@ -555,7 +549,7 @@ initial range and max edge values from our data and pass them into the
 <code>mesh_builder</code> function. These values will then be used as
 values for the initial mesh that’s created but can be changed within the
 app.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">[</span>, <span class="st">"LONG"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span></span>
 <span><span class="va">max_edge</span> <span class="op">&lt;-</span> <span class="va">initial_range</span> <span class="op">/</span> <span class="fl">8</span></span>
 <span></span>
@@ -563,7 +557,7 @@ app.</p>
 <span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">initial_range</span> <span class="op">/</span> <span class="fl">4</span>, <span class="va">initial_range</span><span class="op">)</span></span>
 <span><span class="va">cutoff</span> <span class="op">&lt;-</span> <span class="va">max_edge</span> <span class="op">/</span> <span class="fl">7</span></span></code></pre></div>
 <p>Now we’re ready to start the app.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, max_edge <span class="op">=</span> <span class="va">max_edge_fin</span>, offset <span class="op">=</span> <span class="va">offset</span>, cutoff <span class="op">=</span> <span class="va">cutoff</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -585,7 +579,7 @@ COVID-19 data. Create a mesh of your design and when you’re finished
 click the “Check mesh” button. This passes the created mesh to the
 <code><a href="../reference/mesh_checker.html">fdmr::mesh_checker</a></code> function and returns a list containing
 any errors found with the mesh.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"covid19_data.rds"</span><span class="op">)</span></span>
 <span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, obs_data <span class="op">=</span> <span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 </div>
