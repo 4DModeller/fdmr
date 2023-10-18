@@ -20,8 +20,49 @@ devtools::load_all()
 # fdmr::retrieve_tutorial_data(dataset = "tibetan lakes")
 
 # TODO : move this data into the Rdataset repo
-data <- read.csv('~/repos/tblakes/data_for_modeling.csv')
+data <- read.csv('~/repos/tblakes/data_for_4dm.csv')
 summary(data)
 ```
 
-We have compiled a dataset for 20 years of lake growth using the global surface water survey (@pekel2016high), the hydrobasins catchement dataset (@lehner2013global), and ERA5-land precipitation data (@hersbach2020era5).
+We have compiled a dataset for 20 years of lake growth using the global surface water survey (@pekel2016high), the hydrobasins catchment dataset (@lehner2013global), and ERA5-land precipitation data (@hersbach2020era5). The global surface water survey is a data set using LANDSAT data to classify pixels where lakes are annually. We have converted this to a time series by looking at how lakes have changed between years. This is done in Google Earth Engine [using the following codes](https://code.earthengine.google.com/3304560943f796c82f935403dcc54909). We then aggregate data to changes that have occured within a catchment using the hydrobasins catchment definitions (level 6). We do the same for the ERA5-land precipitation data. This is compiled into a CSV that is presented here.
+
+Let's look at this data and see what is going on. First lets look at the overall changes in lake areas.
+
+
+```{r error=TRUE, fig.width=8, fig.height=4, fig.align = "center"}
+library(tidyverse)
+
+# Split data into positive and negative, then summarize
+summary_data <- data %>%
+  mutate(sign = ifelse(water_balance_m3 > 0, "Lake Growth", "Lake Decline")) %>%
+  group_by(year, sign) %>%
+  summarise(total = sum(water_balance_m3, na.rm = TRUE)) %>%
+  ungroup()
+
+# Summarize the data by year
+sums <- data %>%
+  group_by(year) %>%
+  summarise(
+    precip_sum = sum(precip, na.rm = TRUE),
+    growth_ratio_sum = sum(growth_ratio, na.rm = TRUE),
+    decline_ratio_sum = sum(decline_ratio, na.rm = TRUE)
+  )
+
+# Create the combined plot
+ggplot() +
+  geom_col(data = summary_data, aes(x = year, y = total, fill = sign), position = "stack") +
+  geom_line(data = sums, aes(x = year, y = precip_sum * 100), color = 'cyan') +  # Scale to match bar plot magnitude
+  scale_y_continuous(
+    name = "Water Balance (m3) and Precipitation (x100)",
+    sec.axis = sec_axis(~./10, name = "Precipitation")
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(fill = "Sign")
+```
+We can see here that while lakes both grow and decline, the overall trend is that lakes are growing more than they are shrinking in the Tibetan plateau. Why is this? perhaps it is because of the rain. Our ERA5-land data set gives us precipitation per year (after aggregation).
+<!-- Our first step in investigating this data for 4dm should be the meshbuilder app: -->
+
+<!-- ```{r error=TRUE} -->
+<!-- fdmr::mesh_builder(spatial_data = data, obs_data = data, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") -->
+<!-- ``` -->
