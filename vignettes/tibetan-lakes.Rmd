@@ -64,8 +64,7 @@ ggplot(data, aes(x = precip, y = water_balance_m3, color = as.factor(year))) +
   theme_minimal()
 ```
 
-what if we make a map?
-
+Here we can see a clear spatial distinction for regions that have had large lake growth compared to small lake growth.
 ```{r error=TRUE, fig.width=8, fig.height=8, fig.align='center'}
 library(tidyverse)
 library(leaflet)
@@ -74,7 +73,7 @@ library(leaflet)
 summary_data <- data %>%
   group_by(centroid_lon, centroid_lat) %>%
   summarise(
-    total_balance = sum(abs(water_balance_m3), na.rm = TRUE)
+    total_balance = sum(water_balance_m3, na.rm = TRUE)
   )
 
 # Create a map
