@@ -66,6 +66,8 @@ ggplot(data, aes(x = precip, y = water_balance_m3, color = as.factor(year))) +
 
 Here we can see a clear spatial distinction for regions that have had large lake growth compared to small lake growth.
 ```{r error=TRUE, fig.width=8, fig.height=8, fig.align='center'}
+
+# TODO : this should include plotting the polygons of the catchments
 library(tidyverse)
 library(leaflet)
 
@@ -88,6 +90,8 @@ leaflet(summary_data) %>%
     fillOpacity = 0.6
   )
 ```
+
+
 
 <!-- ```{r error=TRUE} -->
 
