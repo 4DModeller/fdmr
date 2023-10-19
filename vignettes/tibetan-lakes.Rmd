@@ -12,7 +12,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The Tibetan Plateau and the High Mountain Asia region provide water resources to approximately 1 billion people and provide for their health, economies, and agriculture. These natural “water towers” are highly sensitive to climate change and therefore changes in regional water resources must be understood (@immerzeel2020importance). Indeed, understanding how climate change will alter cold region water resources has been described as a “grand challenge” of hydrology (@twentythreeproblems). Recent changes in lakes in the Tibetan Plateau endorheic basin  have led to increases in lake areas. Conventionally attributed to increases in glacier melt due to climate change, a recent investigation has demonstrated that glacier mass loss contributes only a small fraction (19%) to the lake volume increase (@brun2020limited). Thus, an unresolved question in the Tibetan Plateau endorheic basin lakes is, what physical processes drive lake growth in the region and at what fraction?
+The Tibetan Plateau and the High Mountain Asia region provide water resources to approximately 1 billion people and provide for their health, economies, and agriculture. These natural "water towers" are highly sensitive to climate change and therefore changes in regional water resources must be understood (@immerzeel2020importance). Indeed, understanding how climate change will alter cold region water resources has been described as a "grand challenge" of hydrology (@twentythreeproblems). Recent changes in lakes in the Tibetan Plateau endorheic basin have led to increases in lake areas. Conventionally attributed to increases in glacier melt due to climate change, a recent investigation has demonstrated that glacier mass loss contributes only a small fraction (19%) to the lake volume increase (@brun2020limited). Thus, an unresolved question in the Tibetan Plateau endorheic basin lakes is, what physical processes drive lake growth in the region and at what fraction?
 
 ```{r error=TRUE}
 library(devtools)
@@ -27,7 +27,6 @@ summary(data)
 We have compiled a dataset for 20 years of lake growth using the global surface water survey (@pekel2016high), the hydrobasins catchment dataset (@lehner2013global), and ERA5-land precipitation data (@hersbach2020era5). The global surface water survey is a data set using LANDSAT data to classify pixels where lakes are annually. We have converted this to a time series by looking at how lakes have changed between years. This is done in Google Earth Engine [using the following codes](https://code.earthengine.google.com/3304560943f796c82f935403dcc54909). We then aggregate data to changes that have occured within a catchment using the hydrobasins catchment definitions (level 6). We do the same for the ERA5-land precipitation data. This is compiled into a CSV that is presented here.
 
 Let's look at this data and see what is going on. First lets look at the overall changes in lake areas.
-
 
 ```{r error=TRUE, fig.width=8, fig.height=4, fig.align = "center"}
 library(tidyverse)
@@ -48,21 +47,51 @@ sums <- data %>%
     decline_ratio_sum = sum(decline_ratio, na.rm = TRUE)
   )
 
-# Create the combined plot
+# TODO : combine these plots
 ggplot() +
-  geom_col(data = summary_data, aes(x = year, y = total, fill = sign), position = "stack") +
-  geom_line(data = sums, aes(x = year, y = precip_sum * 100), color = 'cyan') +  # Scale to match bar plot magnitude
-  scale_y_continuous(
-    name = "Water Balance (m3) and Precipitation (x100)",
-    sec.axis = sec_axis(~./10, name = "Precipitation")
-  ) +
-  theme_minimal(base_size = 15) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  labs(fill = "Sign")
+  geom_col(data = summary_data, aes(x = year, y = total, fill = sign), position = "stack") 
+
+ggplot() +
+  geom_line(data = sums, aes(x = year, y = precip_sum * 100), color = 'cyan')   # Scale 
 ```
-We can see here that while lakes both grow and decline, the overall trend is that lakes are growing more than they are shrinking in the Tibetan plateau. Why is this? perhaps it is because of the rain. Our ERA5-land data set gives us precipitation per year (after aggregation).
-<!-- Our first step in investigating this data for 4dm should be the meshbuilder app: -->
+
+We can see here that while lakes both grow and decline, the overall trend is that lakes are growing more than they are shrinking in the Tibetan plateau. Why is this? perhaps it is because of the rain. Our ERA5-land data set gives us precipitation per year (after aggregation). But we see that the largest year that lakes grow, is not the largest amount of rain. What is going on here?
+
+```{r error=TRUE, fig.width=8, fig.height=8, fig.align = "center"}
+ggplot(data, aes(x = precip, y = water_balance_m3, color = as.factor(year))) +
+  geom_point(alpha = 0.5) +
+  scale_color_viridis_d() +
+  theme_minimal()
+```
+
+what if we make a map?
+
+```{r error=TRUE, fig.width=8, fig.height=8, fig.align='center'}
+library(tidyverse)
+library(leaflet)
+
+# Summarize the data
+summary_data <- data %>%
+  group_by(centroid_lon, centroid_lat) %>%
+  summarise(
+    total_balance = sum(abs(water_balance_m3), na.rm = TRUE)
+  )
+
+# Create a map
+leaflet(summary_data) %>%
+  addTiles() %>%
+  addCircles(
+    lng = ~centroid_lon,
+    lat = ~centroid_lat,
+    radius = ~50*total_balance,
+    color = "blue",
+    stroke = FALSE,
+    fillOpacity = 0.6
+  )
+```
 
 <!-- ```{r error=TRUE} -->
+
 <!-- fdmr::mesh_builder(spatial_data = data, obs_data = data, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") -->
+
 <!-- ``` -->
