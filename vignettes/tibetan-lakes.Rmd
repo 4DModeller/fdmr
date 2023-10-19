@@ -64,7 +64,7 @@ ggplot(data, aes(x = precip, y = water_balance_m3, color = as.factor(year))) +
   theme_minimal()
 ```
 
-Here we can see a clear spatial distinction for regions that have had large lake growth compared to small lake growth.
+Here we can see across the 20 year observation period a clear spatial distinction in lakegrowth however it is not as clear cut for precipitation.
 ```{r error=TRUE, fig.width=8, fig.height=8, fig.align='center'}
 
 # TODO : this should include plotting the polygons of the catchments
@@ -75,7 +75,8 @@ library(leaflet)
 summary_data <- data %>%
   group_by(centroid_lon, centroid_lat) %>%
   summarise(
-    total_balance = sum(water_balance_m3, na.rm = TRUE)
+    total_balance = sum(water_balance_m3, na.rm = TRUE),
+    total_precip = sum(precip, na.rm = TRUE)
   )
 
 # Create a map
@@ -88,13 +89,32 @@ leaflet(summary_data) %>%
     color = "blue",
     stroke = FALSE,
     fillOpacity = 0.6
+  ) %>%
+  addCircles(
+    lng = ~centroid_lon,
+    lat = ~centroid_lat,
+    radius = ~500*total_precip,
+    color = "red",
+    stroke = FALSE,
+    fillOpacity = 0.6
   )
 ```
 
+Let's try and model this. First we will use the meshbuilder to build a reasonable mesh.
 
 
-<!-- ```{r error=TRUE} -->
 
-<!-- fdmr::mesh_builder(spatial_data = data, obs_data = data, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") -->
+```{r error=TRUE}
 
-<!-- ``` -->
+fdmr::mesh_builder(spatial_data = data, obs_data = data, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", longitude_column = "centroid_lon", latitude_column = "centroid_lat")
+
+```
+
+Using the mesh_builder we have the code to build the mesh for the inlabru model:
+
+```{r error=TRUE}
+mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,
+          max.edge = c(3, 7.9),
+          cutoff = 0.9,
+          offset=c(0.2, 4))
+```
