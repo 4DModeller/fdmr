@@ -114,15 +114,20 @@ fdmr::mesh_builder(spatial_data = data, obs_data = data, crs="+proj=longlat +ell
 
 ```
 
-Using the mesh_builder we have the code to build the mesh for the inlabru model:
+Using the mesh_builder we have the code to build the mesh for the inlabru model. Note, we needed to replace `location data` with `data[, c('centroid_lon', 'centroid_lat')]`.
 
 ```{r error=TRUE}
-mesh <- fmesher::fm_mesh_2d_inla(loc = data['centroid_lat', 'centroid_lon'],
+mesh <- fmesher::fm_mesh_2d_inla(loc = data[, c("centroid_lon", "centroid_lat")],
           max.edge = c(3, 7.9),
           cutoff = 0.9,
           offset=c(0.2, 4))
-# plot(mesh)
+plot(mesh)
 mesh
 ```
 
+This mesh now represents where the model will calculate the lake changes for the tibetan lakes region. Now that we have the mesh we can use the priors app to specify the model.
+
+```{r error=TRUE}
+fdmr::model_builder(spatial_data = sp_data, measurement_data = covid19_data, mesh = mesh, time_variable = "week")
+```
 
