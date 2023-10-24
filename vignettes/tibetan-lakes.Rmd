@@ -128,6 +128,6 @@ mesh
 This mesh now represents where the model will calculate the lake changes for the tibetan lakes region. Now that we have the mesh we can use the priors app to specify the model.
 
 ```{r error=TRUE}
-fdmr::model_builder(spatial_data = sp_data, measurement_data = covid19_data, mesh = mesh, time_variable = "week")
+fdmr::model_builder(spatial_data = data, measurement_data = data, mesh = mesh, time_variable = "week")
 ```
 
