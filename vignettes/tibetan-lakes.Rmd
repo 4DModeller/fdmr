@@ -198,3 +198,12 @@ model_output <- inlabru::bru(formula,
                     )
 summary(model_output)
 ```
+
+
+now we can evaluate the model...
+
+```{r error=TRUE}
+fdmr::model_viewer(model_output = model_output, mesh = mesh, measurement_data = data_with_zscores, data_distribution = "Gaussian")
+```
+
+
