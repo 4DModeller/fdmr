@@ -21,6 +21,7 @@ devtools::load_all()
 
 # TODO : move this data into the Rdataset repo
 data <- read.csv('~/repos/tblakes/data_for_4dm.csv')
+# sp::coordinates(data) <- c("centroid_lon", "centroid_lat")
 summary(data)
 ```
 
@@ -122,12 +123,40 @@ mesh <- fmesher::fm_mesh_2d_inla(loc = data[, c("centroid_lon", "centroid_lat")]
           cutoff = 0.9,
           offset=c(0.2, 4))
 plot(mesh)
-mesh
 ```
 
 This mesh now represents where the model will calculate the lake changes for the tibetan lakes region. Now that we have the mesh we can use the priors app to specify the model.
 
 ```{r error=TRUE}
-fdmr::model_builder(spatial_data = data, measurement_data = data, mesh = mesh, time_variable = "week")
+# codes for making stuff work
+
+library(dplyr)
+# Define a function to calculate z-scores, except for specified columns
+calculate_zscore <- function(df, group_col, ignore_cols) {
+  df %>%
+    group_by(across(all_of(group_col))) %>%
+    mutate(across(
+      where(is.numeric) & !all_of(ignore_cols),
+      list(zscore = ~ ( . - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE)),
+      .names = "zscore_{col}"
+    )) %>%
+    ungroup()
+}
+
+# Specify columns to ignore
+ignore_cols <- c("centroid_lon", "centroid_lat", "year")
+
+# Apply the function to the data
+data_with_zscores <- calculate_zscore(data, "HYBAS_ID", ignore_cols)
+```
+moving on
+```{r error=TRUE}
+# needs spatial data
+sp::coordinates(data) <- c("centroid_lon", "centroid_lat")
+```
+moving on
+
+```{r error=TRUE}
+fdmr::model_builder(spatial_data = data, measurement_data = data, mesh = mesh, time_variable = "year")
 ```
 
