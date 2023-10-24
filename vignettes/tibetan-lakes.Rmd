@@ -152,11 +152,49 @@ data_with_zscores <- calculate_zscore(data, "HYBAS_ID", ignore_cols)
 moving on
 ```{r error=TRUE}
 # needs spatial data
-sp::coordinates(data) <- c("centroid_lon", "centroid_lat")
+# sp::coordinates(data) <- c("centroid_lon", "centroid_lat")
+sp::coordinates(data_with_zscores) <- c("centroid_lon", "centroid_lat")
 ```
-moving on
+moving ongi
 
 ```{r error=TRUE}
-fdmr::model_builder(spatial_data = data, measurement_data = data, mesh = mesh, time_variable = "year")
+fdmr::model_builder(spatial_data = data_with_zscores, measurement_data = data_with_zscores, mesh = mesh, time_variable = "year")
 ```
+now we use the code from the model builder app to make the model:
 
+```{r error=TRUE}
+group_index <- data_with_zscores$year
+n_groups <- length(unique(data_with_zscores$year))
+spde <- INLA::inla.spde2.pcmatern(
+                mesh = mesh,
+                prior.range = c(0.05,0.1),
+                prior.sigma = c(0.05,0.2)
+            )
+
+alphaprior <- list(theta = list(
+                prior = 'pccor1',
+                param = c(-0.2,0.8)
+            ))
+
+formula <- zscore_water_balance_m3 ~ 0 + Intercept(1)  +  zscore_precip  +  f(
+                main = coordinates,
+                model = spde,
+                group = group_index,
+                ngroup = n_groups,
+                control.group = list(
+                    model = 'ar1',
+                    hyper = alphaprior)
+                )
+
+model_output <- inlabru::bru(formula,
+                        # data = measurement_data,
+                        data = data_with_zscores,
+                        family = 'gaussian',
+                        E = NULL,
+                        control.family = NULL,
+                        options = list(
+                            verbose = FALSE
+                        )
+                    )
+summary(model_output)
+```
