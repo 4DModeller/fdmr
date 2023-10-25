@@ -224,7 +224,7 @@ formula <- cases ~ 0 + Intercept(1) + IMD +
 
 Finally, we fit the spatio-temporal model using spde approach and AR(1) process by calling the function `bru()` of the package `inlabru`. 
 
-> **_NOTE:_**  Since the data size is quite large the memory requirements of this function call are high. We recommend running on a suitable high memory (HOW MUCH IS ENOUGH?) system. In our case it takes about 13 hours to complete.   
+> **_NOTE:_**  Since the data size is quite large the memory requirements of this function call are high. We recommend running on a suitable high memory system. In our case it takes about 13 hours to complete.   
 
 
 ```{r fitmodel, error=TRUE, eval=FALSE}
