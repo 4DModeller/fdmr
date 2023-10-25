@@ -147,6 +147,7 @@ The dataset `inla_data` contains 5 columns. Column `streamflow` is the outcome v
 Finally, let's look at the structure of the dataset used in the [Priors exploration tutorial](https://4dmodeller.github.io/fdmr/articles/priors.html). In this tutorial, we use the COVID-19 data in Bristol, UK. We load the dataset `covid19_data_bristol` and the object type of it is a `data.frame`. 
 
 ```{r classcovidatBris}
+fdmr::retrieve_tutorial_data(dataset = "priors")
 covid19_data_bristol <- fdmr::load_tutorial_data(dataset = "priors", filename = "covid19_dataBris.rds")
 class(covid19_data_bristol)
 ```
