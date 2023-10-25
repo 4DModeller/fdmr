@@ -24,9 +24,9 @@ navbar:
         - text: How to choose how to model
           href: articles/decision_tree.html
         - text: Simulation Tutorial (Gaussian data)
-          href: articles/simulation_gaussian_data.Rmd
+          href: articles/simulation_gaussian_data.html
         - text: Simulation Tutorial (Poisson data)
-          href: articles/simulation_poisson_data.Rmd
+          href: articles/simulation_poisson_data.html
         - text: ---
         - text: Shiny apps
         - text: "Map plotting"
