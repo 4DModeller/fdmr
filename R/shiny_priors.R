@@ -28,16 +28,10 @@ model_builder_shiny <- function(spatial_data,
     stop("Please make sure you have set coordinates on spatial_data using sp::coordinates.")
   }
 
-  tryCatch(
-    {
-      if (!(time_variable %in% names(measurement_data))) {
-        stop("Please make sure time_variable is a column in measurement_data.")
-      }
-    },
-    error = function(err) {
-      stop("Cannot read the column names for measurement_data, please make sure it is a data.frame or tibble.")
-    }
-  )
+  data_columns <- names(measurement_data)
+  if (is.null(data_columns) || !(time_variable %in% data_columns)) {
+    stop("Please make sure time_variable is a column in measurement_data.")
+  }
 
   spatial_crs <- sp::proj4string(spatial_data)
   mesh_crs <- mesh$crs$input
