@@ -3,8 +3,12 @@
 on:
   push:
     branches: [main, devel]
+    paths-ignore:
+      - "CHANGELOG.md"
   pull_request:
     branches: [main, devel]
+    paths-ignore:
+      - "CHANGELOG.md"
 
 name: R-CMD-check
 
@@ -16,8 +20,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
+          - { os: macos-latest, r: "release" }
+          - { os: ubuntu-latest, r: "release" }
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
