@@ -393,7 +393,7 @@ model_builder_shiny <- function(spatial_data,
             )
 
             model_vals$run_params[[run_label]] <- run_params
-            model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[[", input$exposure_param, "]]")
+            model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[['", input$exposure_param, "']]")
             model_vals$data_distribution[[run_label]] <- data_dist_local
 
             if (write_logs) {
@@ -566,7 +566,7 @@ model_builder_shiny <- function(spatial_data,
           "alphaprior <- list(theta = list(
                 prior = 'pccor1',
                 param = c(", params[["prior_ar1"]], ",", params[["pg_ar1"]], ")
-            )", "\n\n",
+            ))", "\n\n",
           formula_str(), "\n\n",
           paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,
