@@ -30,10 +30,12 @@ utils::head(covid19_data)
 
 You can find that the dataset contains 23 columns. Column `cases` is our outcome variable, which is the weekly reported number of COVID-19 cases in each neighbourhood. Column `date` indicates the start date of each observation week when the COVID-19 infections data for each neighbourhood were reported, while column `week` indicates the week number that the data were collected from. Column `MSOA11CD` represents the neighbourhood code. Columns `LONG` and `LAT` indicate the longitude and latitude for each neighbourhood. Column `Population` indicates the population size. The remaining columns store the data for our covariates, which are related to the socioeconomic, demographic and environmental factors. In summary, in this dataset, we have a column for the outcome variable (`cases`), a column for the time index (`week`, an integer starting at 1), two columns for the geographical coordinates (`LONG`, `LAT`), and a few columns for the covariates of interest.  
 
-Now let's look at the data structure in the [Hydrology tutorial](https://4dmodeller.github.io/fdmr/articles/hydro.html).The dataset used here is called `inla_data`, which is obtained by using the following codes.
+Now let's look at the data structure in the [Hydrology tutorial](https://4dmodeller.github.io/fdmr/articles/hydro.html). The dataset used here is called `inla_data`, which is obtained by using the following codes.
 
 
 ```{r loadhydat}
+library(magrittr)
+
 fdmr::retrieve_tutorial_data(dataset = "hydro")
 norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
 norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
