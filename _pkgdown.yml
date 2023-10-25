@@ -17,6 +17,8 @@ navbar:
           href: articles/getting_started.html
         - text: "Data pre-processing"
           href: articles/data_preprocessing.html
+        - text: Expected data structure
+          href: articles/expected_data_structure.html
         - text: ---
         - text: End to end tutorials
         - text: How to choose how to model

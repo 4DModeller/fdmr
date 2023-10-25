@@ -15,7 +15,7 @@ In this tutorial, we will show the expected data structure for running the Bayes
 
 
 
-In the [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html), we aim to fit a Bayesian spatio-temporal model to predict the COVID-19 infection rates across mainland England over space and time, and investigate the impacts of socioeconomic, demographic and environmental factors on COVID-19 infection. We load the dataset `covid19_data` and the type of this object is a data.frame. 
+In the [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html), we aim to fit a Bayesian spatio-temporal model to predict the COVID-19 infection rates across mainland England over space and time, and investigate the impacts of socioeconomic, demographic and environmental factors on COVID-19 infection. We load the dataset `covid19_data` and the type of this object is a `data.frame`. 
 
 ```{r classcovidat}
 covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_data.rds")
@@ -34,18 +34,10 @@ Now let's look at the data structure in the [Hydrology tutorial](https://4dmodel
 
 
 ```{r loadhydat}
-
 fdmr::retrieve_tutorial_data(dataset = "hydro")
 norway_polygon_path <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "Kvilldal_Catch_Boundary.geojson")
-norway_polygon <- rgdal::readOGR(norway_polygon_path)
-norway_polygon <- sf::st_as_sf(norway_polygon,
-                               coords = c("longitude", "latitude"),
-                               crs = "+proj=utm +zone=32"
-)
-
-
+norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
-
 
 suldalsvatnet_dam <- list(longitude = 6.517174, latitude = 59.490720, label = "Suldalsvatnet Dam")
 stream_gauge_13 <- list(longitude = 6.5395789, latitude = 59.5815849, label = "Stream Gauge 13")
@@ -56,15 +48,14 @@ streamdata_14 <- fdmr::get_tutorial_datapath(dataset = "hydro", filename = "NVEo
 
 data_13 <- read.csv(streamdata_13)
 data_13$date <- as.Date(data_13$time)
-data_13 <-
-  subset(data_13, date >= "2021-10-01" & date <= "2021-10-31")
+data_13 <- subset(data_13, date >= "2021-10-01" & date <= "2021-10-31")
+
 row.names(data_13) <- NULL
 data_13$time_index <- seq(1, 31, 1)
 
 data_14 <- read.csv(streamdata_14)
 data_14$date <- as.Date(data_14$time)
-data_14 <-
-  subset(data_14, date >= "2021-10-01" & date <= "2021-10-31")
+data_14 <- subset(data_14, date >= "2021-10-01" & date <= "2021-10-31")
 row.names(data_14) <- NULL
 data_14$time_index <- seq(1, 31, 1)
 
@@ -81,6 +72,7 @@ era5_precip_cropped <- raster::mask(projected_raster, norway_polygon)
 era5_precip_cropped <- terra::crop(era5_precip_cropped, raster::extent(norway_polygon), snap = "near")
 
 raster_df <- data.frame(raster::rasterToPoints(era5_precip_cropped))
+
 raster_df <- data.table::melt(data.table::setDT(raster_df), id.vars = c("x", "y"), variable.name = "time")
 
 raster_df$time <- lubridate::day(fdmr::to_dates(fdmr::numbers_only(raster_df$time)))
@@ -112,9 +104,9 @@ pixel_dist_gauge <- data.frame(
 
 for (i in seq_len(nrow(pixel_coords))) {
   pixel_dist_gauge$dist_s1[i] <- sqrt((pixel_dist_gauge$x[i] - s13$x)^2 + (pixel_dist_gauge$y[i] - s13$y)^2)
-  
+
   pixel_dist_gauge$dist_s2[i] <- sqrt((pixel_dist_gauge$x[i] - s14$x)^2 + (pixel_dist_gauge$y[i] - s14$y)^2)
-  
+
   pixel_dist_gauge$min_s[i] <- which.min(c(pixel_dist_gauge$dist_s1[i], pixel_dist_gauge$dist_s2[i]))
 }
 
@@ -132,11 +124,12 @@ get_stream_data <- function(row) {
 }
 
 pixel_dist_gauge$streamflow <- apply(pixel_dist_gauge, 1, get_stream_data)
+
 inla_data <- merge(pixel_dist_gauge, raster_df, by = c("time", "x", "y"))
 inla_data <- subset(inla_data, select = c("x", "y", "streamflow", "precip", "time"))
 ```
 
-The type of the object `inla_data` is a data.frame. 
+The type of the object `inla_data` is a `data.frame`. 
 
 ```{r classhydat}
 class(inla_data)
@@ -147,28 +140,25 @@ The first 6 rows of the data set are
 utils::head(inla_data)
 ```
 
-The dataset `inla_Data` contains 5 columns. Column `streamflow` is the outcome variable, column `time` is the time point index for each data observation. Columns `x` and `y` represent the geographical coordinates for each observation. Column `precip` is the covariate of interest, which is the precipitation data at each location and time point. Therefore, similar to the `covid19_data` dataset, `inla_data` has a column for the outcome variable (`streamflow`), a column for the time index (`time`, an integer starting at 1), two columns for the geographical coordinates (`x`, `y`), and a column for the covariate (`precip`).
+The dataset `inla_data` contains 5 columns. Column `streamflow` is the outcome variable, column `time` is the time point index for each data observation. Columns `x` and `y` represent the geographical coordinates for each observation. Column `precip` is the covariate of interest, which is the precipitation data at each location and time point. Therefore, similar to the `covid19_data` dataset, `inla_data` has a column for the outcome variable (`streamflow`), a column for the time index (`time`, an integer starting at 1), two columns for the geographical coordinates (`x`, `y`), and a column for the covariate (`precip`).
 
-Finally, let's look at the structure of the dataset used in the [Priors exploration tutorial](https://4dmodeller.github.io/fdmr/articles/priors.html). In this tutorial, we use the COVID-19 data in Bristol, UK. We load the dataset `covid19_data_Brisol` and the object type of it is a data.frame. 
-
+Finally, let's look at the structure of the dataset used in the [Priors exploration tutorial](https://4dmodeller.github.io/fdmr/articles/priors.html). In this tutorial, we use the COVID-19 data in Bristol, UK. We load the dataset `covid19_data_bristol` and the object type of it is a `data.frame`. 
 
 ```{r classcovidatBris}
-
-covid19_data_Brisol <- fdmr::load_tutorial_data(dataset = "priors", filename = "covid19_dataBris.rds")
-class(covid19_data_Brisol)
-
+covid19_data_bristol <- fdmr::load_tutorial_data(dataset = "priors", filename = "covid19_dataBris.rds")
+class(covid19_data_bristol)
 ```
 
 The first 6 rows of the data set are
 
 ```{r checkdat}
-utils::head(covid19_data_Brisol)
+utils::head(covid19_data_bristol)
 ```
 
-The dataset `covid19_data_Brisol` contains 9 columns. Column `cases` is the outcome variable, which is the weekly reported number of COVID-19 cases in each neighbourhood in Bristol. Column `date` indicates the start date of each observation week, while column `week` indicates the week number that the data were collected from. Column `MSOA11CD` represents the neighbourhood code. Columns `LONG` and `LAT` indicate the longitude and latitude for each neighbourhood. Column `Population` indicates the population size. Column `prevalence` indicates the infection rate in each neighbourhood, computed as the ratio of `cases` to `Population`. Likewise, `covid19_data_Brisol` has a column for the outcome variable (`cases`), a column for the time index (`week`, an integer starting at 1), two columns for the geographical coordinates (`LONG`, `LAT`). Note that there are no covariate columns because we don't use any covariates in this tutorial. 
+The dataset `covid19_data_bristol` contains 9 columns. Column `cases` is the outcome variable, which is the weekly reported number of COVID-19 cases in each neighbourhood in Bristol. Column `date` indicates the start date of each observation week, while column `week` indicates the week number that the data were collected from. Column `MSOA11CD` represents the neighbourhood code. Columns `LONG` and `LAT` indicate the longitude and latitude for each neighbourhood. Column `Population` indicates the population size. Column `prevalence` indicates the infection rate in each neighbourhood, computed as the ratio of `cases` to `Population`. Likewise, `covid19_data_bristol` has a column for the outcome variable (`cases`), a column for the time index (`week`, an integer starting at 1), two columns for the geographical coordinates (`LONG`, `LAT`). Note that there are no covariate columns because we don't use any covariates in this tutorial. 
 
 
-Now we can identify the similarities across the structure of the datasets `covid19_data`, `inla_data` and `covid19_data_Brisol`. Their object type is a data.frame, with each row representing a data observation. The data frame should include a column for the outcome variable, a column for the time point index, indicating when each observation is collected, and two columns for the geographical coordinates of each observation. If the model incorporates covariates, then the covariate data should also be included in the same data frame, and each covariate is stored in one column. Users can use any variable names for the columns, as long as they ensure consistency with those used when defining the model formula and fitting the BHM. In addition, depending on the type of outcome data, e.g., Gaussian or Poisson, other variables may be included in the data frame. For example, in the COVID-19 tutorials where the outcome data follow a Poisson distribution, a separate column named `Population` is added to account for the exposure parameter in the Poisson model. However, in the Hydrology tutorial where the outcome data are assumed to follow a Gaussian distribution, there is no need for a column representing the exposure parameter in the dataset. The following table provides a summary of the expected data structure for running the BHM in the `fdmr` package:
+Now we can identify the similarities across the structure of the datasets `covid19_data`, `inla_data` and `covid19_data_bristol`. Their object type is a `data.frame`, with each row representing a data observation. The data frame should include a column for the outcome variable, a column for the time point index, indicating when each observation is collected, and two columns for the geographical coordinates of each observation. If the model incorporates covariates, then the covariate data should also be included in the same data frame, and each covariate is stored in one column. Users can use any variable names for the columns, as long as they ensure consistency with those used when defining the model formula and fitting the BHM. In addition, depending on the type of outcome data, e.g., Gaussian or Poisson, other variables may be included in the data frame. For example, in the COVID-19 tutorials where the outcome data follow a Poisson distribution, a separate column named `Population` is added to account for the exposure parameter in the Poisson model. However, in the Hydrology tutorial where the outcome data are assumed to follow a Gaussian distribution, there is no need for a column representing the exposure parameter in the dataset. The following table provides a summary of the expected data structure for running the BHM in the `fdmr` package:
 
 | ID | LONG | LAT | Time  | Response Variable| Covariate  1 | Covariate  2 | Covariate...
 | --- | --- | --- |---|---|--- |---|---|
