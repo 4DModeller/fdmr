@@ -251,6 +251,18 @@ fdmr::model_builder(
 
 On the app interface, you can start by choosing the variable to model. In this example we’ll select `datn`, then select `E` for the exposure parameter, and the features to add to the formula. At the bottom of the window you’ll see the formula being constructed. On the left side, you can change the priors for the model parameters. Click on the checkboxes to select your formula and then click the Run Model button to run the model see it’s output plot on the right of the window.
 
+## fdmr::model_viewer
+
+`fdmr` provides a separate Shiny app which allows you to intuitively visualize the model output. You can launch this app by passing the `bru` model object, the mesh, observation data and data distribution as arguments to the `fdmr::model_viewer` function.
+
+```{r modelviewer, eval=FALSE}
+fdmr::model_viewer(model_output = inlabru_model,
+             mesh = mesh,
+             measurement_data = simdf,
+             data_distribution  = "Poisson"
+)
+```
+
 ## fdmr::plot_map
 
 The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.

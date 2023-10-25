@@ -552,7 +552,7 @@ model_builder_shiny <- function(spatial_data,
       family_control_str <- "NULL"
       exposure_param_str <- "NULL"
       if (data_dist == "poisson") {
-        family_control_str <- "list(link = 'log'),"
+        family_control_str <- "list(link = 'log')"
         exposure_param_str <- model_vals$exposure_param_str[[input$select_run_code]]
       }
 
