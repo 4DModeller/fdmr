@@ -277,6 +277,7 @@ model_builder_shiny <- function(spatial_data,
 
     shiny::observeEvent(input$clear, {
       shiny::updateCheckboxGroupInput(session = session, inputId = "features", choices = features, selected = NULL)
+      shiny::updateCheckboxInput(session = session, inputId = "f_func", value = FALSE)
     })
 
     shiny::observeEvent(input$model_var, {
