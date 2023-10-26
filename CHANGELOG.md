@@ -5,7 +5,19 @@ All notable changes to `fdmr` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased](https://github.com/openghg/openghg/compare/0.1.0...HEAD)
+
+### Fixed
+
+- Added check for `time_variable` being passed into model builder Shiny app - [PR #216](https://github.com/4DModeller/fdmr/pull/216)
+- Clear button not clearing all checkboxes in model builder Shiny app - [PR #215](https://github.com/4DModeller/fdmr/pull/215)
+- Corrected code in code pane of model builder Shiny app - [PR #208](https://github.com/4DModeller/fdmr/pull/208)
+
+### Changed
+
+### Removed
+
+## [0.1.0] - 2023-10-17
 
 ### Added
 

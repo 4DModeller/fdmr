@@ -28,6 +28,11 @@ model_builder_shiny <- function(spatial_data,
     stop("Please make sure you have set coordinates on spatial_data using sp::coordinates.")
   }
 
+  data_columns <- names(measurement_data)
+  if (is.null(data_columns) || !(time_variable %in% data_columns)) {
+    stop("Please make sure time_variable is a column in measurement_data.")
+  }
+
   spatial_crs <- sp::proj4string(spatial_data)
   mesh_crs <- mesh$crs$input
 
@@ -309,6 +314,7 @@ model_builder_shiny <- function(spatial_data,
 
     shiny::observeEvent(input$clear, {
       shiny::updateCheckboxGroupInput(session = session, inputId = "features", choices = features, selected = NULL)
+      shiny::updateCheckboxInput(session = session, inputId = "f_func", value = FALSE)
     })
 
     shiny::observeEvent(input$model_var, {
@@ -430,7 +436,7 @@ model_builder_shiny <- function(spatial_data,
             )
 
             model_vals$run_params[[run_label]] <- run_params
-            model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[[", input$exposure_param, "]]")
+            model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[['", input$exposure_param, "']]")
             model_vals$data_distribution[[run_label]] <- data_dist_local
 
             if (write_logs) {
@@ -589,7 +595,7 @@ model_builder_shiny <- function(spatial_data,
       family_control_str <- "NULL"
       exposure_param_str <- "NULL"
       if (data_dist == "poisson") {
-        family_control_str <- "list(link = 'log'),"
+        family_control_str <- "list(link = 'log')"
         exposure_param_str <- model_vals$exposure_param_str[[input$select_run_code]]
       }
 
@@ -603,7 +609,7 @@ model_builder_shiny <- function(spatial_data,
           "alphaprior <- list(theta = list(
                 prior = 'pccor1',
                 param = c(", params[["prior_ar1"]], ",", params[["pg_ar1"]], ")
-            )", "\n\n",
+            ))", "\n\n",
           formula_str(), "\n\n",
           paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,

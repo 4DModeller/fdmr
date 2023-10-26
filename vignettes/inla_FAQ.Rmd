@@ -82,3 +82,33 @@ fit.mod <- inlabru::bru(formula,
   )
 )
 ```
+
+
+## INLA error - Linux - Failed to get good enough initial values
+
+If you're running Linux and encounter an error similar to the one below:
+
+```
+.../INLA/INLA/bin/linux/64bit/inla.mkl: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by .../INLA/INLA/bin/linux/64bit/libmvec.so.1)
+
+ *** inla.core.safe:  inla.program has crashed: rerun to get better initial values. try=1/1 
+Loading required package: INLA
+Warning: package 'INLA' was built under R version 4.3.1
+Loading required package: Matrix
+Loading required package: sp
+This is INLA_23.10.19-1 built 2023-10-19 08:26:30 UTC.
+ - See www.r-inla.org/contact-us for how to get help.
+ - List available models/likelihoods/etc with inla.list.models()
+ - Use inla.doc(<NAME>) to access documentation
+Warning in iinla(model = info[["model"]], lhoods = info[["lhoods"]], options = info[["options"]]) :
+  iinla: Problem in inla: Error in inla.core.safe(formula = formula, family = family, contrasts = contrasts,  : 
+  *** Failed to get good enough initial values. Maybe it is due to something else.
+```
+
+You may need to run a binary install of INLA. This can be done by running the following:
+
+```{r eval=FALSE}
+INLA::inla.binary.install()
+```
+
+For more installation instructions see [the INLA documentation](https://www.r-inla.org/download-install).

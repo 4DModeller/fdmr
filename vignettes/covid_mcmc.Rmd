@@ -79,7 +79,7 @@ where $\phi_i$ now consists of two components. $\phi_i^{(1)}$ is assigned the in
 In order to fit the spatial model, a model formula needs to be defined, by including the response in the left-hand side and the fixed and random effects in the right-hand side. First, we consider the scenario of including no covariates.
 
 ```{r formula, error=TRUE}
-form <- total.cases ~ 1 + stats::offset(log(population))
+form <- total.cases ~ 1 + offset(log(population))
 ```
 
 
