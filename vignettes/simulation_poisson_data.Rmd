@@ -256,10 +256,11 @@ On the app interface, you can start by choosing the variable to model. In this e
 `fdmr` provides a separate Shiny app which allows you to intuitively visualize the model output. You can launch this app by passing the `bru` model object, the mesh, observation data and data distribution as arguments to the `fdmr::model_viewer` function.
 
 ```{r modelviewer, eval=FALSE}
-fdmr::model_viewer(model_output = inlabru_model,
-             mesh = mesh,
-             measurement_data = simdf,
-             data_distribution  = "Poisson"
+fdmr::model_viewer(
+  model_output = inlabru_model,
+  mesh = mesh,
+  measurement_data = simdf,
+  data_distribution = "Poisson"
 )
 ```
 
