@@ -110,7 +110,7 @@ model_builder_shiny <- function(spatial_data,
 
   # Define UI for application that draws a histogram
   ui <- bslib::page_fluid(
-    theme = bslib::bs_theme(bootswatch = "shiny"),
+    theme = bslib::bs_theme(bootswatch = "cosmo"),
     shinyjs::useShinyjs(),
     busy_spinner,
     shiny::headerPanel(title = "Model builder"),
