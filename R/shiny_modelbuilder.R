@@ -108,17 +108,19 @@ model_builder_shiny <- function(spatial_data,
   # structure we can remove this
   busy_spinner <- get_busy_spinner()
 
-
-  tabpanel_padded <- function(...) {
-    shiny::tabPanel(..., class = "p-3 border border-top-0 rounded-bottom")
-  }
+  range0_tooltip <- "some text"
+  Prange_tooltip <- "some text"
+  sigma0_tooltip <- "some text"
+  Psigma_tooltip <- "some text"
+  prior_alpha_tooltip <- "some text"
+  pg_alpha_tooltip <- "some text"
 
   # Define UI for application that draws a histogram
   ui <- bslib::page_fluid(
     theme = bslib::bs_theme(bootswatch = "cosmo"),
     shinyjs::useShinyjs(),
     busy_spinner,
-    shiny::headerPanel(title = "Model builder"),
+    shiny::titlePanel(title = "Model builder"),
     shiny::tabsetPanel(
       type = "tabs",
       shiny::tabPanel(
@@ -134,7 +136,7 @@ model_builder_shiny <- function(spatial_data,
                   "range0",
                   bsicons::bs_icon("info-circle")
                 ),
-                "range0 message"
+                range0_tooltip
               ),
               min = 0.05, value = 0.05, max = 1
             ),
@@ -145,7 +147,7 @@ model_builder_shiny <- function(spatial_data,
                   "Prange",
                   bsicons::bs_icon("info-circle")
                 ),
-                "Prange message"
+                Prange_tooltip
               ),
               min = 0.1, value = 0.1, max = 1
             )
@@ -159,7 +161,7 @@ model_builder_shiny <- function(spatial_data,
                   "sigma0",
                   bsicons::bs_icon("info-circle")
                 ),
-                "Prange message"
+                sigma0_tooltip
               ),
               min = 0.05, value = 0.05, max = 2
             ),
@@ -170,7 +172,7 @@ model_builder_shiny <- function(spatial_data,
                   "Psigma",
                   bsicons::bs_icon("info-circle")
                 ),
-                "Psigma message"
+                Psigma_tooltip
               ),
               min = 0.1, value = 0.2, max = 1
             )
@@ -187,7 +189,7 @@ model_builder_shiny <- function(spatial_data,
                   "prior_alpha",
                   bsicons::bs_icon("info-circle")
                 ),
-                "prior_alpha message"
+                prior_alpha_tooltip
               ),
               min = -1, value = -0.2, max = 1.0, step = 0.1,
             ),
@@ -198,7 +200,7 @@ model_builder_shiny <- function(spatial_data,
                   "pg_alpha",
                   bsicons::bs_icon("info-circle")
                 ),
-                "pg_alpha message"
+                pg_alpha_tooltip
               ),
               min = 0, value = 0.8, max = 1
             ),
