@@ -219,13 +219,18 @@ model_builder_shiny <- function(spatial_data,
             shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian"), selected = data_distribution),
           )
         ),
-        shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
-        shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
-        shiny::actionButton(inputId = "clear", label = "Clear"),
         shiny::fluidRow(
-          shiny::h2("Formula"),
-          shiny::textOutput(outputId = "final_equation"),
-          style = "height:20vh;"
+          shiny::column(
+            6,
+            shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
+            shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
+            shiny::actionButton(inputId = "clear", label = "Clear"),
+          ),
+          shiny::column(
+            6,
+            shiny::h2("Formula"),
+            shiny::textOutput(outputId = "final_equation"),
+          )
         )
       ),
       shiny::tabPanel(
