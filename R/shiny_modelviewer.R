@@ -36,19 +36,22 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
 
   plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
-  ui <- shiny::fluidPage(
+  ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(bootswatch = "cosmo"),
     busy_spinner,
     shiny::headerPanel(title = "Model viewer"),
     shiny::tabsetPanel(
       type = "tabs",
       shiny::tabPanel(
         "Plots",
+        class = "p-3 border",
         shiny::h2("Plot output"),
         shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
         shiny::plotOutput(outputId = "plot_model_out")
       ),
       shiny::tabPanel(
         "Map",
+        class = "p-3 border",
         shiny::fluidRow(
           shiny::column(
             6,
@@ -71,10 +74,6 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
           )
         ),
         leaflet::leafletOutput(outputId = "map_out")
-      ),
-      shiny::tabPanel(
-        "Help",
-        shiny::h3("Help"),
       )
     )
   )
