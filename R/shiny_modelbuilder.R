@@ -108,12 +108,15 @@ model_builder_shiny <- function(spatial_data,
   # structure we can remove this
   busy_spinner <- get_busy_spinner()
 
-  range0_tooltip <- "some text"
-  Prange_tooltip <- "some text"
-  sigma0_tooltip <- "some text"
-  Psigma_tooltip <- "some text"
-  prior_alpha_tooltip <- "some text"
-  pg_alpha_tooltip <- "some text"
+  range0_tooltip <- "range0 and Prange jointly specify the complexity priors for the spatial range parameter ρ, in the relation that P(ρ < range0 ) = Prange. 
+                     The spatial range parameter ρ is defined as the distance at which the spatial correlation between two locations is approximately 0"
+  Prange_tooltip <- "Large values of Prange lead to a greater prior belief on small values of ρ." 
+  
+  sigma0_tooltip <- "sigma0 and Psigma jointly specify the complexity priors for the marginal standard deviation of the field σ, in the relation of P(σ > sigma0) = Psigma."
+  Psigma_tooltip <- "Large values of Psigma lead to a greater prior belief on large values of σ."
+  
+  prior_alpha_tooltip <- "prior_alpha and pg_alpha jointly specify the complexity priors for the temporal autocorrelation parameter α, in the relation that P(α > prior_alpha) = pg_alpha."
+  pg_alpha_tooltip <- "Large values of pg_alpha lead to a greater prior belief on large values of α"
 
   tabpanel_padded <- function(...) {
     ellipsis::check_dots_used()
