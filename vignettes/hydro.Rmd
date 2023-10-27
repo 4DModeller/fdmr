@@ -210,7 +210,7 @@ Create the triangulated mesh of the study region and have a quick look at it.
 ```{r error=TRUE,warning=FALSE, fig.width=7, fig.height=7}
 e <- era5_precip_cropped@extent
 resolution <- raster::res(era5_precip_cropped)
-crs <- "+proj=utm +zone=32"
+crs <- fmesher::fm_crs("+proj=utm +zone=32")
 
 xres <- resolution[1] * 2
 yres <- resolution[2] * 2
@@ -222,7 +222,7 @@ colnames(xy) <- c("LONG", "LAT")
 
 mesh <- fmesher::fm_mesh_2d_inla(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = crs)
 
-plot_mesh(mesh)
+fdmr::plot_mesh(mesh=mesh)
 ```
 
 ## Priors
