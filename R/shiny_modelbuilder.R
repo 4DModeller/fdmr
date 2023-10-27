@@ -132,6 +132,7 @@ model_builder_shiny <- function(spatial_data,
         shiny::fluidRow(
           shiny::column(
             6,
+            shiny::h3("Spatial priors"),
             shiny::sliderInput(
               inputId = "prior_range",
               label = bslib::tooltip(
@@ -157,6 +158,7 @@ model_builder_shiny <- function(spatial_data,
           ),
           shiny::column(
             6,
+            shiny::h3("Field priors"),
             shiny::sliderInput(
               inputId = "prior_sigma",
               label = bslib::tooltip(
