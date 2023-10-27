@@ -89,7 +89,8 @@ meshbuilder_shiny <- function(
 
   busy_spinner <- get_busy_spinner()
 
-  ui <- shiny::fluidPage(
+  ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(bootswatch = "cosmo"),
     busy_spinner,
     shinybusy::add_loading_state(
       "#map",
@@ -118,20 +119,25 @@ meshbuilder_shiny <- function(
           min = 0.005, value = 0.2, max = 0.9
         ),
         shiny::p("Minimum allowed distance between data points."),
-        shiny::actionButton("plot_mesh", label = "Plot mesh"),
-        shiny::actionButton("reset_mesh", label = "Reset"),
-        shiny::actionButton("check_button", "Check mesh"),
+        shiny::column(
+          12,
+          shiny::actionButton("plot_mesh", label = "Plot mesh"),
+          shiny::actionButton("reset_mesh", label = "Reset"),
+        )
+        # shiny::actionButton("check_button", "Check mesh"),
       ),
       shiny::mainPanel(
         shiny::tabsetPanel(
           type = "tabs",
           shiny::tabPanel(
             "Plot",
+            class = "p-3 border",
             shiny::div(id = "map_div", leaflet::leafletOutput("map", height = "80vh"))
           ),
-          shiny::tabPanel("Code", shiny::verbatimTextOutput("mesh_code")),
+          shiny::tabPanel("Code", class = "p-3 border", shiny::verbatimTextOutput("mesh_code")),
           shiny::tabPanel(
             "Help",
+            class = "p-3 border",
             shiny::h3("Help"),
             shiny::h4("Max edge"),
             shiny::p("Determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
