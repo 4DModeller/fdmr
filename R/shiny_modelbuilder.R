@@ -115,6 +115,11 @@ model_builder_shiny <- function(spatial_data,
   prior_alpha_tooltip <- "some text"
   pg_alpha_tooltip <- "some text"
 
+  tabpanel_padded <- function(...) {
+    ellipsis::check_dots_used()
+    shiny::tabPanel(..., class = "p-3 border")
+  }
+
   # Define UI for application that draws a histogram
   ui <- bslib::page_fluid(
     theme = bslib::bs_theme(bootswatch = "cosmo"),
@@ -123,7 +128,7 @@ model_builder_shiny <- function(spatial_data,
     shiny::titlePanel(title = "Model builder"),
     shiny::tabsetPanel(
       type = "tabs",
-      shiny::tabPanel(
+      tabpanel_padded(
         "Priors",
         class = "p-3 border",
         shiny::fluidRow(
@@ -207,7 +212,7 @@ model_builder_shiny <- function(spatial_data,
           )
         )
       ),
-      shiny::tabPanel(
+      tabpanel_padded(
         "Features",
         class = "p-3 border",
         shiny::fluidRow(
@@ -235,7 +240,7 @@ model_builder_shiny <- function(spatial_data,
           )
         )
       ),
-      shiny::tabPanel(
+      tabpanel_padded(
         "Model",
         class = "p-3 border",
         shiny::fluidRow(
@@ -248,14 +253,14 @@ model_builder_shiny <- function(spatial_data,
         ),
         shiny::actionButton(inputId = "run_model", label = "Run"),
       ),
-      shiny::tabPanel(
+      tabpanel_padded(
         "Plot",
         class = "p-3 border",
         shiny::h2("Plot output"),
         shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
         shiny::plotOutput(outputId = "plot_model_out")
       ),
-      shiny::tabPanel(
+      tabpanel_padded(
         "Map",
         class = "p-3 border",
         shiny::fluidRow(
@@ -281,13 +286,13 @@ model_builder_shiny <- function(spatial_data,
         ),
         leaflet::leafletOutput(outputId = "map_out")
       ),
-      shiny::tabPanel(
+      tabpanel_padded(
         "Code",
         class = "p-3 border",
         shiny::selectInput(inputId = "select_run_code", label = "Select run:", choices = c()),
         shiny::verbatimTextOutput(outputId = "code_out")
       ),
-      shiny::tabPanel(
+      tabpanel_padded(
         "Help",
         class = "p-3 border",
         shiny::h3("Help"),
