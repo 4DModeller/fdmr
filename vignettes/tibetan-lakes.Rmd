@@ -207,3 +207,6 @@ fdmr::model_viewer(model_output = model_output, mesh = mesh, measurement_data = 
 ```
 
 
+```{r error=TRUE}
+hist(model_output$summary.fitted.values$mean, breaks=seq(-0.3, 0.3, l=100))
+```
