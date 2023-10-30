@@ -11,6 +11,7 @@
 #' @param polygon_fill_colour Polygon fill colour
 #' @param polygon_line_colour Polygon surrounding line colour
 #' @param polygon_line_weight Polygon surrounding line weight
+#' @param reverse Reverse the colour palette if TRUE
 #'
 #' @return leaflet::leaflet
 #' @export
@@ -24,7 +25,8 @@ plot_map <- function(polygon_data = NULL,
                      polygon_fill_colour = "#E4572E",
                      polygon_line_colour = "grey",
                      polygon_line_weight = 1,
-                     polygon_fill_opacity = 0.6) {
+                     polygon_fill_opacity = 0.6,
+                     reverse = FALSE) {
   if (is.null(polygon_data) && is.null(raster_data)) {
     stop("Polygon or raster data must be given.")
   }
@@ -39,7 +41,7 @@ plot_map <- function(polygon_data = NULL,
 
   if (!is.null(polygon_data)) {
     if (!is.null(domain)) {
-      colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = FALSE)
+      colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = reverse)
       polygon_fill_colour <- ~ colours(domain)
       m <- leaflet::addLegend(m,
         pal = colours,
@@ -61,12 +63,20 @@ plot_map <- function(polygon_data = NULL,
   }
 
   if (!is.null(raster_data)) {
+    colours <- leaflet::colorNumeric(palette = palette, domain = raster::values(raster_data), na.color=rgb(0,0,0,0), reverse = reverse)
     m <- leaflet::addRasterImage(m,
       x = raster_data,
       opacity = 0.75,
       group = "Raster",
       layerId = "raster",
-      colors = palette,
+      colors = colours,
+    )
+    m <- leaflet::addLegend(m,
+                            pal = colours,
+                            values = raster::values(raster_data),
+                            opacity = 0.75,
+                            title = legend_title,
+                            na.label = ""
     )
     layers <- append(layers, "Raster")
   }
