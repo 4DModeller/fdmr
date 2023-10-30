@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Allowed reversal of colour palette and added raster plot legend in map plotter - [PR #229](https://github.com/4DModeller/fdmr/pull/229)
+
 ### Removed
 
 ## [0.1.0] - 2023-10-17
