@@ -63,7 +63,7 @@ plot_map <- function(polygon_data = NULL,
   }
 
   if (!is.null(raster_data)) {
-    colours <- leaflet::colorNumeric(palette = palette, domain = values(raster_data), na.color=rgb(0,0,0,0), reverse = reverse)
+    colours <- leaflet::colorNumeric(palette = palette, domain = raster::values(raster_data), na.color=rgb(0,0,0,0), reverse = reverse)
     m <- leaflet::addRasterImage(m,
       x = raster_data,
       opacity = 0.75,
@@ -73,7 +73,7 @@ plot_map <- function(polygon_data = NULL,
     )
     m <- leaflet::addLegend(m,
                             pal = colours,
-                            values = values(raster_data),
+                            values = raster::values(raster_data),
                             opacity = 0.75,
                             title = legend_title,
                             na.label = ""
