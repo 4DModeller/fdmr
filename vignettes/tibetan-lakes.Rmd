@@ -176,17 +176,41 @@ alphaprior <- list(theta = list(
                 param = c(-0.2,0.8)
             ))
 
-formula <- zscore_water_balance_m3 ~ 0 + Intercept(1)  +  zscore_precip  +  f(
-                main = coordinates,
-                model = spde,
-                group = group_index,
-                ngroup = n_groups,
-                control.group = list(
-                    model = 'ar1',
-                    hyper = alphaprior)
-                )
+# formula <- zscore_water_balance_m3 ~ 0 + Intercept(1)  +  zscore_precip  +  f(
+#                 main = coordinates,
+#                 model = spde,
+#                 group = group_index,
+#                 ngroup = n_groups,
+#                 control.group = list(
+#                     model = 'ar1',
+#                     hyper = alphaprior)
+#                 )
 
-model_output <- inlabru::bru(formula,
+# formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores$zscore_precip, model='linear')
+formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores[, c('centroid_lon', 'centroid_lat')], model='spde', group=group_index, ngroup=n_groups, control.group=list(model='ar1', hyper=alphaprior))
+
+# +  zscore_precip  +  f(
+#                 main = coordinates,
+#                 model = spde,
+#                 group = group_index,
+#                 ngroup = n_groups,
+#                 control.group = list(
+#                     model = 'ar1',
+#                     hyper = alphaprior)
+#                 )
+
+# model_output <- inlabru::bru(formula,
+#                         # data = measurement_data,
+#                         data = data_with_zscores,
+#                         family = 'gaussian',
+#                         E = NULL,
+#                         control.family = NULL,
+#                         options = list(
+#                             verbose = FALSE
+#                         )
+#                     )
+
+model_output <- inlabru::bru(formula2,
                         # data = measurement_data,
                         data = data_with_zscores,
                         family = 'gaussian',
