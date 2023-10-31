@@ -17,6 +17,6 @@ A clear and concise description of what you expected to happen.
 Steps to reproduce the behavior. please provide any codes or traceback you received.
 
 **User Environment (please complete the following information):**
- - OS: [e.g. OSX, windows, ubuntu]
+ - OS: [e.g. macOS, Windows, Ubuntu]
  - Version of R
- - branch of fdmr you are using
+ - Version of fdmr you are using
