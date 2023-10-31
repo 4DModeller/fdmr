@@ -99,10 +99,6 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       colours
     })
 
-    colour_scheme <- shiny::reactive({
-      input$colour_scheme
-    })
-
     shiny::observe({
       shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
     })
@@ -117,7 +113,6 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       shinyjs::toggleState("custom_range_min", condition = input$custom_range)
       shinyjs::toggleState("custom_range_max", condition = input$custom_range)
     })
-
 
     prediction_field <- shiny::reactive({
       data_dist <- tolower(input$map_data_type)
@@ -153,7 +148,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       } else {
         domain <- z_values()
       }
-      leaflet::colorNumeric(palette = colour_scheme(), domain = domain, reverse = FALSE)
+      leaflet::colorNumeric(palette = input$colour_scheme, domain = domain, reverse = FALSE)
     })
 
     legend_values <- shiny::reactive({

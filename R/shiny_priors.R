@@ -196,12 +196,12 @@ model_builder_shiny <- function(spatial_data,
             "Map",
             shiny::fluidRow(
               shiny::column(
-                6,
+                4,
                 shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c())
+                shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_distribution),
               ),
               shiny::column(
-                6,
+                4,
                 shiny::selectInput(
                   inputId = "colour_category",
                   label = "Palette type",
@@ -210,9 +210,15 @@ model_builder_shiny <- function(spatial_data,
                 ),
                 shiny::selectInput(
                   inputId = "colour_scheme",
-                  label = "Colour Scheme",
+                  label = "Color Scheme",
                   choices = default_colours,
                 ),
+                shiny::checkboxInput(inputId = "custom_range", label = "Enable custom range", value = FALSE),
+              ),
+              shiny::column(
+                3,
+                shiny::numericInput(inputId = "custom_range_min", label = "Min", value = 0, step = 0.01),
+                shiny::numericInput(inputId = "custom_range_max", label = "Max", value = 1, step = 0.01),
               )
             ),
             leaflet::leafletOutput(outputId = "map_out")
@@ -282,6 +288,19 @@ model_builder_shiny <- function(spatial_data,
 
     shiny::observeEvent(input$model_var, {
       shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
+    })
+
+    shiny::observe({
+      if (!is.null(z_values())) {
+        step <- diff(z_values()[2] - z_values()[1])
+        shiny::updateNumericInput(session, inputId = "custom_range_min", label = "Min", value = min(z_values()), step = step)
+        shiny::updateNumericInput(session, inputId = "custom_range_max", label = "Max", value = max(z_values()), step = step)
+      }
+    })
+
+    shiny::observeEvent(input$custom_range, {
+      shinyjs::toggleState("custom_range_min", condition = input$custom_range)
+      shinyjs::toggleState("custom_range_max", condition = input$custom_range)
     })
 
     output$gotoutput <- shiny::reactive({
@@ -449,12 +468,8 @@ model_builder_shiny <- function(spatial_data,
       colours
     })
 
-    colour_scheme <- shiny::reactive({
-      input$colour_scheme
-    })
-
     prediction_field <- shiny::reactive({
-      if (length(model_vals$parsed_outputs) == 0) {
+      if (length(model_vals$parsed_outputs) == 0 || is.null(input$select_run_map)) {
         return()
       }
 
@@ -479,6 +494,7 @@ model_builder_shiny <- function(spatial_data,
 
     z_values <- shiny::reactive({
       field <- prediction_field()
+
       if (!is.null(field)) {
         return(field[["z"]])
       }
@@ -492,7 +508,21 @@ model_builder_shiny <- function(spatial_data,
     })
 
     map_colours <- shiny::reactive({
-      leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
+      if (input$custom_range) {
+        domain <- c(input$custom_range_min, input$custom_range_max)
+      } else {
+        domain <- z_values()
+      }
+      leaflet::colorNumeric(palette = input$colour_scheme, domain = domain, reverse = FALSE)
+    })
+
+    legend_values <- shiny::reactive({
+      if (input$custom_range) {
+        vals <- c(input$custom_range_min, input$custom_range_max)
+      } else {
+        vals <- z_values()
+      }
+      vals
     })
 
     output$map_out <- leaflet::renderLeaflet({
@@ -503,7 +533,7 @@ model_builder_shiny <- function(spatial_data,
       leaflet::leaflet() %>%
         leaflet::addTiles(group = "OSM") %>%
         leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
-        leaflet::addLegend(position = "topright", pal = map_colours(), values = z_values())
+        leaflet::addLegend(position = "topright", pal = map_colours(), values = legend_values())
     })
 
     model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
