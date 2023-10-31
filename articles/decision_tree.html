@@ -118,9 +118,10 @@ and how to choose when to use them.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span> <span class="co"># for modeling later</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: Matrix</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
-<pre><code><span><span class="co">## This is INLA_23.10.17 built 2023-10-16 18:20:04 UTC.</span></span>
+<pre><code><span><span class="co">## This is INLA_23.10.28 built 2023-10-28 10:43:31 UTC.</span></span>
 <span><span class="co">##  - See www.r-inla.org/contact-us for how to get help.</span></span>
-<span><span class="co">##  - See ?inla.doc for howto access documentation</span></span></code></pre>
+<span><span class="co">##  - List available models/likelihoods/etc with inla.list.models()</span></span>
+<span><span class="co">##  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span></code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span>  <span class="co"># for true multivariate normal simulation</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
@@ -209,7 +210,7 @@ how these are written into the formula that is then passed to inla.</p>
 <span><span class="co">##    silent = silent, ", " inla.mode = inla.mode, safe = FALSE, debug = </span></span>
 <span><span class="co">##    debug, .parent.frame = .parent.frame)" ) </span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.531, Running = 0.248, Post = 0.023, Total = 0.802 </span></span>
+<span><span class="co">##     Pre = 0.578, Running = 0.263, Post = 0.0259, Total = 0.867 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## (Intercept) -0.301 0.108     -0.514   -0.301     -0.088 -0.301   0</span></span>
@@ -286,7 +287,7 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 <span><span class="co">##    silent = silent, ", " inla.mode = inla.mode, safe = FALSE, debug = </span></span>
 <span><span class="co">##    debug, .parent.frame = .parent.frame)" ) </span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.378, Running = 0.28, Post = 0.0169, Total = 0.675 </span></span>
+<span><span class="co">##     Pre = 0.421, Running = 0.305, Post = 0.0199, Total = 0.746 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## (Intercept) -0.372 0.065     -0.499   -0.372     -0.245 -0.372   0</span></span>
@@ -300,12 +301,12 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 <span><span class="co">## Model hyperparameters:</span></span>
 <span><span class="co">##                                         mean    sd 0.025quant 0.5quant</span></span>
 <span><span class="co">## Precision for the Gaussian observations 2.00 0.090      1.826     2.00</span></span>
-<span><span class="co">## Precision for time                      1.24 0.546      0.465     1.15</span></span>
+<span><span class="co">## Precision for time                      1.24 0.547      0.465     1.15</span></span>
 <span><span class="co">##                                         0.975quant  mode</span></span>
 <span><span class="co">## Precision for the Gaussian observations       2.18 1.993</span></span>
-<span><span class="co">## Precision for time                            2.57 0.969</span></span>
+<span><span class="co">## Precision for time                            2.58 0.968</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  -1137.11 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  -1137.10 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
@@ -331,8 +332,8 @@ cannot be observed directly. For example,</p>
 <span></span>
 <span><span class="co"># Print the model summary</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## inlabru version: 2.9.0</span></span>
-<span><span class="co">## INLA version: 23.10.17</span></span>
+<pre><code><span><span class="co">## inlabru version: 2.10.0</span></span>
+<span><span class="co">## INLA version: 23.10.28</span></span>
 <span><span class="co">## Components:</span></span>
 <span><span class="co">## observed: main = linear(x + y), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">## Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -341,7 +342,7 @@ cannot be observed directly. For example,</p>
 <span><span class="co">##     Data class: 'data.frame'</span></span>
 <span><span class="co">##     Predictor: value ~ .</span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.306, Running = 0.262, Post = 0.0453, Total = 0.614 </span></span>
+<span><span class="co">##     Pre = 0.344, Running = 0.295, Post = 0.0465, Total = 0.686 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## observed   0.004 0.008     -0.011    0.004      0.019  0.004   0</span></span>
