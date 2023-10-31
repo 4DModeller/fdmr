@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Added markers option to mesh plotter - [PR #230](https://github.com/4DModeller/fdmr/pull/230)
+
 ### Removed
 
 ## [0.1.0] - 2023-10-17
