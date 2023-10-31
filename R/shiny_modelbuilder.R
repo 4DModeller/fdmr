@@ -108,13 +108,13 @@ model_builder_shiny <- function(spatial_data,
   # structure we can remove this
   busy_spinner <- get_busy_spinner()
 
-  range0_tooltip <- "range0 and Prange jointly specify the complexity priors for the spatial range parameter ρ, in the relation that P(ρ < range0 ) = Prange.
+  range0_tooltip <- "range0 and Prange jointly specify the complexity priors for the spatial range parameter ρ, in the relation that P(ρ < range0 ) = Prange. 
                      The spatial range parameter ρ is defined as the distance at which the spatial correlation between two locations is approximately 0"
-  Prange_tooltip <- "Large values of Prange lead to a greater prior belief on small values of ρ."
-
+  Prange_tooltip <- "Large values of Prange lead to a greater prior belief on small values of ρ." 
+  
   sigma0_tooltip <- "sigma0 and Psigma jointly specify the complexity priors for the marginal standard deviation of the field σ, in the relation of P(σ > sigma0) = Psigma."
   Psigma_tooltip <- "Large values of Psigma lead to a greater prior belief on large values of σ."
-
+  
   prior_alpha_tooltip <- "prior_alpha and pg_alpha jointly specify the complexity priors for the temporal autocorrelation parameter α, in the relation that P(α > prior_alpha) = pg_alpha."
   pg_alpha_tooltip <- "Large values of pg_alpha lead to a greater prior belief on large values of α"
 
@@ -214,6 +214,7 @@ model_builder_shiny <- function(spatial_data,
       ),
       shiny::tabPanel(
         "Features",
+        class = "p-3 border",
         shiny::fluidRow(
           shiny::column(
             6,
@@ -225,17 +226,23 @@ model_builder_shiny <- function(spatial_data,
             shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian"), selected = data_distribution),
           )
         ),
-        shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
-        shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
-        shiny::actionButton(inputId = "clear", label = "Clear"),
         shiny::fluidRow(
-          shiny::h2("Formula"),
-          shiny::textOutput(outputId = "final_equation"),
-          style = "height:20vh;"
+          shiny::column(
+            6,
+            shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
+            shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
+            shiny::actionButton(inputId = "clear", label = "Clear"),
+          ),
+          shiny::column(
+            6,
+            shiny::h2("Formula"),
+            shiny::textOutput(outputId = "final_equation"),
+          )
         )
       ),
       shiny::tabPanel(
         "Model",
+        class = "p-3 border",
         shiny::fluidRow(
           shiny::h2("Model output"),
           # shiny::conditionalPanel("output.gotoutput", shiny::h3("Hyperparameter summary")),
@@ -248,12 +255,14 @@ model_builder_shiny <- function(spatial_data,
       ),
       shiny::tabPanel(
         "Plot",
+        class = "p-3 border",
         shiny::h2("Plot output"),
         shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
         shiny::plotOutput(outputId = "plot_model_out")
       ),
       shiny::tabPanel(
         "Map",
+        class = "p-3 border",
         shiny::fluidRow(
           shiny::column(
             4,
@@ -286,11 +295,13 @@ model_builder_shiny <- function(spatial_data,
       ),
       shiny::tabPanel(
         "Code",
+        class = "p-3 border",
         shiny::selectInput(inputId = "select_run_code", label = "Select run:", choices = c()),
         shiny::verbatimTextOutput(outputId = "code_out")
       ),
       shiny::tabPanel(
         "Help",
+        class = "p-3 border",
         shiny::h3("Help"),
         shiny::h4("Spatial priors"),
         shiny::p(prior_range_text),

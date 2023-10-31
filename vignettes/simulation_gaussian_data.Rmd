@@ -231,7 +231,7 @@ The interactive map allows you to customise the initial parameters such as `max_
 fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
 ```
 
-## Interactive priors Shiny app
+## Model builder Shiny app
 `fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::model_builder` function.
 
 ```{r priorapp, eval=FALSE}
@@ -248,10 +248,11 @@ fdmr::model_builder(
 `fdmr` provides a separate Shiny app which allows you to intuitively visualize the model output. You can launch this app by passing the `bru` model object, the mesh, observation data and data distribution as arguments to the `fdmr::model_viewer` function.
 
 ```{r modelviewer, eval=FALSE}
-fdmr::model_viewer(model_output = inlabru_model,
-             mesh = mesh,
-             measurement_data = simdf,
-             data_distribution  = "Gaussian"
+fdmr::model_viewer(
+  model_output = inlabru_model,
+  mesh = mesh,
+  measurement_data = simdf,
+  data_distribution = "Gaussian"
 )
 ```
 

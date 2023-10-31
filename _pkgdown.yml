@@ -29,12 +29,10 @@ navbar:
           href: articles/simulation_poisson_data.html
         - text: ---
         - text: Shiny apps
-        - text: "Map plotting"
-          href: articles/mapping.html
         - text: "Mesh building"
           href: articles/meshbuilder.html
         - text: "Model builder"
-          href: articles/priors_app.html
+          href: articles/modelbuilder.html
         - text: ---
         - text: In depth tutorials
         - text: "COVID-19"
