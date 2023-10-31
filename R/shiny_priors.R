@@ -199,6 +199,7 @@ model_builder_shiny <- function(spatial_data,
                 4,
                 shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
                 shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_distribution),
+                shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c()),
               ),
               shiny::column(
                 4,
@@ -469,7 +470,7 @@ model_builder_shiny <- function(spatial_data,
     })
 
     prediction_field <- shiny::reactive({
-      if (length(model_vals$parsed_outputs) == 0 || is.null(input$select_run_map)) {
+      if (length(model_vals$parsed_outputs) == 0 || input$select_run_map == "") {
         return()
       }
 
