@@ -1,8 +1,8 @@
 ---
-title: "Interactive priors Shiny app"
+title: "Model builder"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Interactive priors Shiny app}
+  %\VignetteIndexEntry{Model builder}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

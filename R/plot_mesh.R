@@ -5,10 +5,12 @@
 #' that can be converted to a data.frame with longitude and latitude columns
 #' @param longitude_column Longitude column in spatial_data
 #' @param latitude_column Latitude column in spatial_data name
+#' @param markers Markers to display on top of mesh. A named list with latitude, longitude and label names must be given.
+#' Expects longitude name to be longitude, latitude name to be latitude, label name to be label.
 #'
 #' @return leaflet::leaflet
 #' @export
-plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", latitude_column = "LAT") {
+plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", latitude_column = "LAT", markers = NULL) {
   expected_crs <- "+proj=longlat +datum=WGS84"
   crs_string <- fmesher::fm_proj4string(mesh)
 
@@ -23,7 +25,6 @@ plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", lati
   }
 
   spatial_mesh <- fdmr::mesh_to_spatial(mesh = mesh, crs = expected_crs)
-
 
   plot_polygons <- FALSE
   plot_points <- FALSE
@@ -68,6 +69,11 @@ plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", lati
     overlay_groups <- append(overlay_groups, "Spatial")
   }
 
+  if (!is.null(markers)) {
+    m <- leaflet::addMarkers(m, lng = markers$longitude, lat = markers$latitude, label = markers$label, group = "Markers")
+    overlay_groups <- append(overlay_groups, "Markers")
+  }
+  
   m <- leaflet::addLayersControl(m,
     position = "topright",
     baseGroups = c("OSM"),

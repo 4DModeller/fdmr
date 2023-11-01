@@ -7,10 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 In this tutorial, we'll start by generating some simulated spatio-temporal data, with the city of Bristol as our study region. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
 
 # Data simulation
@@ -237,7 +233,7 @@ The interactive map allows you to customise the initial parameters such as `max_
 fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
 ```
 
-## Interactive priors Shiny app
+## Model builder Shiny app
 `fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::model_builder` function.
 
 ```{r priorapp, eval=FALSE}
@@ -250,6 +246,19 @@ fdmr::model_builder(
 ```
 
 On the app interface, you can start by choosing the variable to model. In this example we’ll select `datn`, then select `E` for the exposure parameter, and the features to add to the formula. At the bottom of the window you’ll see the formula being constructed. On the left side, you can change the priors for the model parameters. Click on the checkboxes to select your formula and then click the Run Model button to run the model see it’s output plot on the right of the window.
+
+## fdmr::model_viewer
+
+`fdmr` provides a separate Shiny app which allows you to intuitively visualize the model output. You can launch this app by passing the `bru` model object, the mesh, observation data and data distribution as arguments to the `fdmr::model_viewer` function.
+
+```{r modelviewer, eval=FALSE}
+fdmr::model_viewer(
+  model_output = inlabru_model,
+  mesh = mesh,
+  measurement_data = simdf,
+  data_distribution = "Poisson"
+)
+```
 
 ## fdmr::plot_map
 

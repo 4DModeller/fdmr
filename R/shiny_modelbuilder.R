@@ -28,6 +28,11 @@ model_builder_shiny <- function(spatial_data,
     stop("Please make sure you have set coordinates on spatial_data using sp::coordinates.")
   }
 
+  data_columns <- names(measurement_data)
+  if (is.null(data_columns) || !(time_variable %in% data_columns)) {
+    stop("Please make sure time_variable is a column in measurement_data.")
+  }
+
   spatial_crs <- sp::proj4string(spatial_data)
   mesh_crs <- mesh$crs$input
 
@@ -103,139 +108,216 @@ model_builder_shiny <- function(spatial_data,
   # structure we can remove this
   busy_spinner <- get_busy_spinner()
 
+  range0_tooltip <- "range0 and Prange jointly specify the complexity priors for the spatial range parameter ρ, in the relation that P(ρ < range0 ) = Prange. 
+                     The spatial range parameter ρ is defined as the distance at which the spatial correlation between two locations is approximately 0"
+  Prange_tooltip <- "Large values of Prange lead to a greater prior belief on small values of ρ." 
+  
+  sigma0_tooltip <- "sigma0 and Psigma jointly specify the complexity priors for the marginal standard deviation of the field σ, in the relation of P(σ > sigma0) = Psigma."
+  Psigma_tooltip <- "Large values of Psigma lead to a greater prior belief on large values of σ."
+  
+  prior_alpha_tooltip <- "prior_alpha and pg_alpha jointly specify the complexity priors for the temporal autocorrelation parameter α, in the relation that P(α > prior_alpha) = pg_alpha."
+  pg_alpha_tooltip <- "Large values of pg_alpha lead to a greater prior belief on large values of α"
+
   # Define UI for application that draws a histogram
-  ui <- shiny::fluidPage(
+  ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(bootswatch = "cosmo"),
     shinyjs::useShinyjs(),
     busy_spinner,
-    shiny::headerPanel(title = "Investigating priors"),
-    shiny::sidebarLayout(
-      shiny::sidebarPanel(
-        shiny::h3("Priors"),
-        shiny::sliderInput(
-          inputId = "prior_range",
-          label = "range0:",
-          min = 0.05, value = 0.05, max = 1
-        ),
-        shiny::sliderInput(
-          inputId = "ps_range",
-          label = "Prange:",
-          min = 0.1, value = 0.1, max = 1
-        ),
-        shiny::sliderInput(
-          inputId = "prior_sigma",
-          label = "sigma0:",
-          min = 0.05, value = 0.05, max = 2
-        ),
-        shiny::sliderInput(
-          inputId = "pg_sigma",
-          label = "Psigma:",
-          min = 0.1, value = 0.2, max = 1
-        ),
-        shiny::h3("Temporal priors"),
-        shiny::sliderInput(
-          inputId = "prior_ar1",
-          label = "prior_alpha:",
-          min = -1, value = -0.2, max = 1.0, step = 0.1,
-        ),
-        shiny::sliderInput(
-          inputId = "pg_ar1",
-          label = "pg_alpha:",
-          min = 0, value = 0.8, max = 1
-        ),
-        shiny::textOutput(outputId = "status")
-      ),
-      shiny::mainPanel(
-        shiny::tabsetPanel(
-          type = "tabs",
-          shiny::tabPanel(
-            "Features",
-            shiny::fluidRow(
-              shiny::column(
-                6,
-                shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
-                shiny::selectInput(inputId = "exposure_param", label = "Exposure (time variable)", choices = features),
+    shiny::titlePanel(title = "Model builder"),
+    shiny::tabsetPanel(
+      type = "tabs",
+      shiny::tabPanel(
+        "Priors",
+        class = "p-3 border",
+        shiny::fluidRow(
+          shiny::column(
+            6,
+            shiny::h3("Spatial priors"),
+            shiny::sliderInput(
+              inputId = "prior_range",
+              label = bslib::tooltip(
+                trigger = list(
+                  "range0",
+                  bsicons::bs_icon("info-circle")
+                ),
+                range0_tooltip
               ),
-              shiny::column(
-                6,
-                shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian"), selected = data_distribution),
-              )
+              min = 0.05, value = 0.05, max = 1
             ),
-            shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
-            shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
-            shiny::actionButton(inputId = "clear", label = "Clear"),
-            shiny::fluidRow(
-              shiny::h2("Formula"),
-              shiny::textOutput(outputId = "final_equation"),
-              style = "height:20vh;"
+            shiny::sliderInput(
+              inputId = "ps_range",
+              label = bslib::tooltip(
+                trigger = list(
+                  "Prange",
+                  bsicons::bs_icon("info-circle")
+                ),
+                Prange_tooltip
+              ),
+              min = 0.1, value = 0.1, max = 1
             )
           ),
-          shiny::tabPanel(
-            "Model",
-            shiny::fluidRow(
-              shiny::h2("Model output"),
-              # shiny::conditionalPanel("output.gotoutput", shiny::h3("Hyperparameter summary")),
-              shiny::tableOutput(outputId = "hyper_param_out"),
-              # shiny::h3("Fixed summary"),
-              shiny::tableOutput(outputId = "fixed_out"),
-              style = "height:70vh;"
-            ),
-            shiny::actionButton(inputId = "run_model", label = "Run"),
-          ),
-          shiny::tabPanel(
-            "Plot",
-            shiny::h2("Plot output"),
-            shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
-            shiny::plotOutput(outputId = "plot_model_out")
-          ),
-          shiny::tabPanel(
-            "Map",
-            shiny::fluidRow(
-              shiny::column(
-                6,
-                shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
-                shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c())
+          shiny::column(
+            6,
+            shiny::h3("Field priors"),
+            shiny::sliderInput(
+              inputId = "prior_sigma",
+              label = bslib::tooltip(
+                trigger = list(
+                  "sigma0",
+                  bsicons::bs_icon("info-circle")
+                ),
+                sigma0_tooltip
               ),
-              shiny::column(
-                6,
-                shiny::selectInput(
-                  inputId = "colour_category",
-                  label = "Palette type",
-                  choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
-                  selected = "Viridis"
-                ),
-                shiny::selectInput(
-                  inputId = "colour_scheme",
-                  label = "Colour Scheme",
-                  choices = default_colours,
-                ),
-              )
+              min = 0.05, value = 0.05, max = 2
             ),
-            leaflet::leafletOutput(outputId = "map_out")
-          ),
-          shiny::tabPanel(
-            "Code",
-            shiny::selectInput(inputId = "select_run_code", label = "Select run:", choices = c()),
-            shiny::verbatimTextOutput(outputId = "code_out")
-          ),
-          shiny::tabPanel(
-            "Help",
-            shiny::h3("Help"),
-            shiny::h4("Spatial priors"),
-            shiny::p(prior_range_text),
-            shiny::h4("Field priors"),
-            shiny::p(prior_sigma_text),
-            shiny::h4("Temporal priors"),
-            shiny::p(control_group_text),
-            shiny::br(),
-            shiny::br(),
-            shiny::h4("Notes"),
-            shiny::p(citation_priors),
-            shiny::p(citation_control_group)
+            shiny::sliderInput(
+              inputId = "pg_sigma",
+              label = bslib::tooltip(
+                trigger = list(
+                  "Psigma",
+                  bsicons::bs_icon("info-circle")
+                ),
+                Psigma_tooltip
+              ),
+              min = 0.1, value = 0.2, max = 1
+            )
+          )
+        ),
+        shiny::fluidRow(
+          shiny::h3("Temporal priors"),
+          shiny::column(
+            12,
+            shiny::sliderInput(
+              inputId = "prior_ar1",
+              label = bslib::tooltip(
+                trigger = list(
+                  "prior_alpha",
+                  bsicons::bs_icon("info-circle")
+                ),
+                prior_alpha_tooltip
+              ),
+              min = -1, value = -0.2, max = 1.0, step = 0.1,
+            ),
+            shiny::sliderInput(
+              inputId = "pg_ar1",
+              label = bslib::tooltip(
+                trigger = list(
+                  "pg_alpha",
+                  bsicons::bs_icon("info-circle")
+                ),
+                pg_alpha_tooltip
+              ),
+              min = 0, value = 0.8, max = 1
+            ),
           )
         )
       ),
+      shiny::tabPanel(
+        "Features",
+        class = "p-3 border",
+        shiny::fluidRow(
+          shiny::column(
+            6,
+            shiny::selectInput(inputId = "model_var", label = "Model variable", choices = features),
+            shiny::selectInput(inputId = "exposure_param", label = "Exposure (time variable)", choices = features),
+          ),
+          shiny::column(
+            6,
+            shiny::selectInput(inputId = "data_dist", label = "Data distribution", choices = c("Poisson", "Gaussian"), selected = data_distribution),
+          )
+        ),
+        shiny::fluidRow(
+          shiny::column(
+            6,
+            shiny::checkboxGroupInput(inputId = "features", label = "Features", choices = features),
+            shiny::checkboxInput(inputId = "f_func", label = "Add f()", value = FALSE),
+            shiny::actionButton(inputId = "clear", label = "Clear"),
+          ),
+          shiny::column(
+            6,
+            shiny::h2("Formula"),
+            shiny::textOutput(outputId = "final_equation"),
+          )
+        )
+      ),
+      shiny::tabPanel(
+        "Model",
+        class = "p-3 border",
+        shiny::fluidRow(
+          shiny::h2("Model output"),
+          # shiny::conditionalPanel("output.gotoutput", shiny::h3("Hyperparameter summary")),
+          shiny::tableOutput(outputId = "hyper_param_out"),
+          # shiny::h3("Fixed summary"),
+          shiny::tableOutput(outputId = "fixed_out"),
+          style = "height:70vh;"
+        ),
+        shiny::actionButton(inputId = "run_model", label = "Run"),
+      ),
+      shiny::tabPanel(
+        "Plot",
+        class = "p-3 border",
+        shiny::h2("Plot output"),
+        shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
+        shiny::plotOutput(outputId = "plot_model_out")
+      ),
+      shiny::tabPanel(
+        "Map",
+        class = "p-3 border",
+        shiny::fluidRow(
+          shiny::column(
+            4,
+            shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+            shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_distribution),
+            shiny::selectInput(inputId = "select_run_map", label = "Select run:", choices = c()),
+          ),
+          shiny::column(
+            4,
+            shiny::selectInput(
+              inputId = "colour_category",
+              label = "Palette type",
+              choices = c("Sequential", "Diverging", "Qualitative", "Viridis"),
+              selected = "Viridis"
+            ),
+            shiny::selectInput(
+              inputId = "colour_scheme",
+              label = "Color Scheme",
+              choices = default_colours,
+            ),
+            shiny::checkboxInput(inputId = "custom_range", label = "Enable custom range", value = FALSE),
+          ),
+          shiny::column(
+            3,
+            shiny::numericInput(inputId = "custom_range_min", label = "Min", value = 0, step = 0.01),
+            shiny::numericInput(inputId = "custom_range_max", label = "Max", value = 1, step = 0.01),
+          )
+        ),
+        leaflet::leafletOutput(outputId = "map_out")
+      ),
+      shiny::tabPanel(
+        "Code",
+        class = "p-3 border",
+        shiny::selectInput(inputId = "select_run_code", label = "Select run:", choices = c()),
+        shiny::verbatimTextOutput(outputId = "code_out")
+      ),
+      shiny::tabPanel(
+        "Help",
+        class = "p-3 border",
+        shiny::h3("Help"),
+        shiny::h4("Spatial priors"),
+        shiny::p(prior_range_text),
+        shiny::h4("Field priors"),
+        shiny::p(prior_sigma_text),
+        shiny::h4("Temporal priors"),
+        shiny::p(control_group_text),
+        shiny::br(),
+        shiny::br(),
+        shiny::h4("Notes"),
+        shiny::p(citation_priors),
+        shiny::p(citation_control_group)
+      )
     )
   )
+
 
   server <- function(input, output, session) {
     status_value <- shiny::reactiveVal("OK")
@@ -272,10 +354,24 @@ model_builder_shiny <- function(spatial_data,
 
     shiny::observeEvent(input$clear, {
       shiny::updateCheckboxGroupInput(session = session, inputId = "features", choices = features, selected = NULL)
+      shiny::updateCheckboxInput(session = session, inputId = "f_func", value = FALSE)
     })
 
     shiny::observeEvent(input$model_var, {
       shiny::updateTextInput(session = session, inputId = initial_equation, value = initial_equation())
+    })
+
+    shiny::observe({
+      if (!is.null(z_values())) {
+        step <- diff(z_values()[2] - z_values()[1])
+        shiny::updateNumericInput(session, inputId = "custom_range_min", label = "Min", value = min(z_values()), step = step)
+        shiny::updateNumericInput(session, inputId = "custom_range_max", label = "Max", value = max(z_values()), step = step)
+      }
+    })
+
+    shiny::observeEvent(input$custom_range, {
+      shinyjs::toggleState("custom_range_min", condition = input$custom_range)
+      shinyjs::toggleState("custom_range_max", condition = input$custom_range)
     })
 
     output$gotoutput <- shiny::reactive({
@@ -393,7 +489,7 @@ model_builder_shiny <- function(spatial_data,
             )
 
             model_vals$run_params[[run_label]] <- run_params
-            model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[[", input$exposure_param, "]]")
+            model_vals$exposure_param_str[[run_label]] <- paste0("measurement_data[['", input$exposure_param, "']]")
             model_vals$data_distribution[[run_label]] <- data_dist_local
 
             if (write_logs) {
@@ -443,12 +539,8 @@ model_builder_shiny <- function(spatial_data,
       colours
     })
 
-    colour_scheme <- shiny::reactive({
-      input$colour_scheme
-    })
-
     prediction_field <- shiny::reactive({
-      if (length(model_vals$parsed_outputs) == 0) {
+      if (length(model_vals$parsed_outputs) == 0 || input$select_run_map == "") {
         return()
       }
 
@@ -473,6 +565,7 @@ model_builder_shiny <- function(spatial_data,
 
     z_values <- shiny::reactive({
       field <- prediction_field()
+
       if (!is.null(field)) {
         return(field[["z"]])
       }
@@ -486,7 +579,21 @@ model_builder_shiny <- function(spatial_data,
     })
 
     map_colours <- shiny::reactive({
-      leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
+      if (input$custom_range) {
+        domain <- c(input$custom_range_min, input$custom_range_max)
+      } else {
+        domain <- z_values()
+      }
+      leaflet::colorNumeric(palette = input$colour_scheme, domain = domain, reverse = FALSE)
+    })
+
+    legend_values <- shiny::reactive({
+      if (input$custom_range) {
+        vals <- c(input$custom_range_min, input$custom_range_max)
+      } else {
+        vals <- z_values()
+      }
+      vals
     })
 
     output$map_out <- leaflet::renderLeaflet({
@@ -497,7 +604,7 @@ model_builder_shiny <- function(spatial_data,
       leaflet::leaflet() %>%
         leaflet::addTiles(group = "OSM") %>%
         leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
-        leaflet::addLegend(position = "topright", pal = map_colours(), values = z_values())
+        leaflet::addLegend(position = "topright", pal = map_colours(), values = legend_values())
     })
 
     model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
@@ -552,7 +659,7 @@ model_builder_shiny <- function(spatial_data,
       family_control_str <- "NULL"
       exposure_param_str <- "NULL"
       if (data_dist == "poisson") {
-        family_control_str <- "list(link = 'log'),"
+        family_control_str <- "list(link = 'log')"
         exposure_param_str <- model_vals$exposure_param_str[[input$select_run_code]]
       }
 
@@ -566,7 +673,7 @@ model_builder_shiny <- function(spatial_data,
           "alphaprior <- list(theta = list(
                 prior = 'pccor1',
                 param = c(", params[["prior_ar1"]], ",", params[["pg_ar1"]], ")
-            )", "\n\n",
+            ))", "\n\n",
           formula_str(), "\n\n",
           paste0("model_output <- inlabru::bru(formula,
                         data = measurement_data,

@@ -36,7 +36,9 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
 
   plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
-  ui <- shiny::fluidPage(
+  ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(bootswatch = "cosmo"),
+    shinyjs::useShinyjs(),
     busy_spinner,
     shiny::headerPanel(title = "Model viewer"),
     shiny::tabsetPanel(
@@ -51,12 +53,12 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
         "Map",
         shiny::fluidRow(
           shiny::column(
-            6,
+            4,
             shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
             shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_distribution),
           ),
           shiny::column(
-            6,
+            4,
             shiny::selectInput(
               inputId = "colour_category",
               label = "Palette type",
@@ -68,6 +70,12 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
               label = "Color Scheme",
               choices = default_colours,
             ),
+            shiny::checkboxInput(inputId = "custom_range", label = "Enable custom range", value = FALSE),
+          ),
+          shiny::column(
+            3,
+            shiny::numericInput(inputId = "custom_range_min", label = "Min", value = 0, step = 0.01),
+            shiny::numericInput(inputId = "custom_range_max", label = "Max", value = 1, step = 0.01),
           )
         ),
         leaflet::leafletOutput(outputId = "map_out")
@@ -92,14 +100,20 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       colours
     })
 
-    colour_scheme <- shiny::reactive({
-      input$colour_scheme
-    })
-
     shiny::observe({
       shiny::updateSelectInput(session, inputId = "colour_scheme", label = "Colours", choices = category_colours())
     })
 
+    shiny::observe({
+      step <- diff(z_values()[2] - z_values()[1])
+      shiny::updateNumericInput(session, inputId = "custom_range_min", label = "Min", value = min(z_values()), step = step)
+      shiny::updateNumericInput(session, inputId = "custom_range_max", label = "Max", value = max(z_values()), step = step)
+    })
+
+    shiny::observeEvent(input$custom_range, {
+      shinyjs::toggleState("custom_range_min", condition = input$custom_range)
+      shinyjs::toggleState("custom_range_max", condition = input$custom_range)
+    })
 
     prediction_field <- shiny::reactive({
       data_dist <- tolower(input$map_data_type)
@@ -130,7 +144,21 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
     })
 
     map_colours <- shiny::reactive({
-      leaflet::colorNumeric(palette = colour_scheme(), domain = z_values(), reverse = FALSE)
+      if (input$custom_range) {
+        domain <- c(input$custom_range_min, input$custom_range_max)
+      } else {
+        domain <- z_values()
+      }
+      leaflet::colorNumeric(palette = input$colour_scheme, domain = domain, reverse = FALSE)
+    })
+
+    legend_values <- shiny::reactive({
+      if (input$custom_range) {
+        vals <- c(input$custom_range_min, input$custom_range_max)
+      } else {
+        vals <- z_values()
+      }
+      vals
     })
 
     output$map_out <- leaflet::renderLeaflet({
@@ -141,7 +169,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       leaflet::leaflet() %>%
         leaflet::addTiles(group = "OSM") %>%
         leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
-        leaflet::addLegend(position = "topright", pal = map_colours(), values = z_values())
+        leaflet::addLegend(position = "topright", pal = map_colours(), values = legend_values())
     })
 
     model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {

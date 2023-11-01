@@ -224,7 +224,7 @@ colnames(xy) <- c("LONG", "LAT")
 
 mesh <- fmesher::fm_mesh_2d_inla(loc = xy, max.edge = c(xres * 1, xres * 100), cutoff = 75, crs = crs)
 
-plot_mesh(mesh)
+fdmr::plot_mesh(mesh)
 ```
 
 ## Priors

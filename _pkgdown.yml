@@ -17,22 +17,22 @@ navbar:
           href: articles/getting_started.html
         - text: "Data pre-processing"
           href: articles/data_preprocessing.html
+        - text: Expected data structure
+          href: articles/expected_data_structure.html
         - text: ---
         - text: End to end tutorials
         - text: How to choose how to model
           href: articles/decision_tree.html
         - text: Simulation Tutorial (Gaussian data)
-          href: articles/simulation_gaussian_data.Rmd
+          href: articles/simulation_gaussian_data.html
         - text: Simulation Tutorial (Poisson data)
-          href: articles/simulation_poisson_data.Rmd
+          href: articles/simulation_poisson_data.html
         - text: ---
         - text: Shiny apps
-        - text: "Map plotting"
-          href: articles/mapping.html
         - text: "Mesh building"
           href: articles/meshbuilder.html
         - text: "Model builder"
-          href: articles/priors_app.html
+          href: articles/modelbuilder.html
         - text: ---
         - text: In depth tutorials
         - text: "COVID-19"
