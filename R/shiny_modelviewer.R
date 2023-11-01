@@ -36,7 +36,8 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
 
   plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
 
-  ui <- shiny::fluidPage(
+  ui <- bslib::page_fluid(
+    theme = bslib::bs_theme(bootswatch = "cosmo"),
     shinyjs::useShinyjs(),
     busy_spinner,
     shiny::headerPanel(title = "Model viewer"),
