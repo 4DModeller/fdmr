@@ -199,6 +199,8 @@ meshbuilder_shiny <- function(
 
     output$mesh_code <- shiny::reactive(
       paste0(
+        "location_data <- spatial_data[, c('", longitude_column, "', '", latitude_column, "')]\n\n",
+        "names(location_data) <- c('LONG', 'LAT')\n\n",
         "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,
           max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
           cutoff = ", input$cutoff, ",
