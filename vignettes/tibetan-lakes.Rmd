@@ -46,10 +46,10 @@ sums <- data %>%
 
 # TODO : combine these plots
 ggplot() +
-  geom_col(data = summary_data, aes(x = year, y = total, fill = sign), position = "stack") 
+  geom_col(data = summary_data, aes(x = year, y = total, fill = sign), position = "stack")
 
 ggplot() +
-  geom_line(data = sums, aes(x = year, y = precip_sum * 100), color = 'cyan')   # Scale 
+  geom_line(data = sums, aes(x = year, y = precip_sum * 100), color = "cyan") # Scale
 ```
 
 We can see here that while lakes both grow and decline, the overall trend is that lakes are growing more than they are shrinking in the Tibetan plateau. Why is this? perhaps it is because of the rain. Our ERA5-land data set gives us precipitation per year (after aggregation). But we see that the largest year that lakes grow, is not the largest amount of rain. What is going on here?
@@ -63,7 +63,6 @@ ggplot(data, aes(x = precip, y = water_balance_m3, color = as.factor(year))) +
 
 Here we can see across the 20 year observation period a clear spatial distinction in lakegrowth however it is not as clear cut for precipitation.
 ```{r error=TRUE, fig.width=8, fig.height=8, fig.align='center'}
-
 # TODO : this should include plotting the polygons of the catchments
 library(tidyverse)
 library(leaflet)
@@ -82,7 +81,7 @@ leaflet(summary_data) %>%
   addCircles(
     lng = ~centroid_lon,
     lat = ~centroid_lat,
-    radius = ~50*total_balance,
+    radius = ~ 50 * total_balance,
     color = "blue",
     stroke = FALSE,
     fillOpacity = 0.6
@@ -90,7 +89,7 @@ leaflet(summary_data) %>%
   addCircles(
     lng = ~centroid_lon,
     lat = ~centroid_lat,
-    radius = ~500*total_precip,
+    radius = ~ 500 * total_precip,
     color = "red",
     stroke = FALSE,
     fillOpacity = 0.6
@@ -106,17 +105,18 @@ Let's try and model this. We will use 4DModeller and inlabru.
 First we will use the mesh_builder to build a reasonable mesh.
 
 ```{r error=TRUE, eval=FALSE}
-fdmr::mesh_builder(spatial_data = data, obs_data = data, crs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", longitude_column = "centroid_lon", latitude_column = "centroid_lat")
-
+fdmr::mesh_builder(spatial_data = data, obs_data = data, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", longitude_column = "centroid_lon", latitude_column = "centroid_lat")
 ```
 
 Using the mesh_builder we have the code to build the mesh for the inlabru model.
 
 ```{r error=TRUE}
-mesh <- fmesher::fm_mesh_2d_inla(loc = data[, c("centroid_lon", "centroid_lat")],
-          max.edge = c(3, 7.9),
-          cutoff = 0.9,
-          offset=c(0.2, 4))
+mesh <- fmesher::fm_mesh_2d_inla(
+  loc = data[, c("centroid_lon", "centroid_lat")],
+  max.edge = c(3, 7.9),
+  cutoff = 0.9,
+  offset = c(0.2, 4)
+)
 
 fdmr::plot_mesh(mesh)
 ```
@@ -131,7 +131,7 @@ calculate_zscore <- function(df, group_col, ignore_cols) {
     group_by(across(all_of(group_col))) %>%
     mutate(across(
       where(is.numeric) & !all_of(ignore_cols),
-      list(zscore = ~ ( . - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE)),
+      list(zscore = ~ (. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE)),
       .names = "zscore_{col}"
     )) %>%
     ungroup()
@@ -157,28 +157,28 @@ Now we use the code from the model builder app to make the model:
 group_index <- data_with_zscores$year
 n_groups <- length(unique(data_with_zscores$year))
 spde <- INLA::inla.spde2.pcmatern(
-                mesh = mesh,
-                prior.range = c(0.05,0.1),
-                prior.sigma = c(0.05,0.2)
-            )
+  mesh = mesh,
+  prior.range = c(0.05, 0.1),
+  prior.sigma = c(0.05, 0.2)
+)
 
 alphaprior <- list(theta = list(
-                prior = 'pccor1',
-                param = c(-0.2,0.8)
-            ))
+  prior = "pccor1",
+  param = c(-0.2, 0.8)
+))
 
-formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores$zscore_precip, model='linear') + temperature(data_with_zscores$zscore_t2m) + residuals(data_with_zscores[, c('centroid_lon', 'centroid_lat')], model='spde', group=group_index, ngroup=n_groups, control.group=list(model='ar1', hyper=alphaprior))
+formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores$zscore_precip, model = "linear") + temperature(data_with_zscores$zscore_t2m) + residuals(data_with_zscores[, c("centroid_lon", "centroid_lat")], model = "spde", group = group_index, ngroup = n_groups, control.group = list(model = "ar1", hyper = alphaprior))
 
 model_output <- inlabru::bru(formula2,
-                        # data = measurement_data,
-                        data = data_with_zscores,
-                        family = 'gaussian',
-                        E = NULL,
-                        control.family = NULL,
-                        options = list(
-                            verbose = FALSE
-                        )
-                    )
+  # data = measurement_data,
+  data = data_with_zscores,
+  family = "gaussian",
+  E = NULL,
+  control.family = NULL,
+  options = list(
+    verbose = FALSE
+  )
+)
 summary(model_output)
 ```
 
@@ -189,5 +189,5 @@ fdmr::model_viewer(model_output = model_output, mesh = mesh, measurement_data = 
 ```
 
 ```{r error=TRUE}
-hist(model_output$summary.fitted.values$mean, breaks=seq(-0.3, 0.3, l=100))
+hist(model_output$summary.fitted.values$mean, breaks = seq(-0.3, 0.3, l = 100))
 ```
