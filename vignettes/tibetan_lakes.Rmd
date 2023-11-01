@@ -17,7 +17,9 @@ The Tibetan Plateau and the High Mountain Asia region provide water resources to
 ```{r error=TRUE}
 fdmr::retrieve_tutorial_data(dataset = "tibetan_lakes")
 
-# sp::coordinates(data) <- c("centroid_lon", "centroid_lat")
+data_filepath <- fdmr::get_tutorial_datapath(dataset = "tibetan_lakes", file = "tibetan_lakes_data.csv")
+data <- read.csv(data_filepath)
+
 summary(data)
 ```
 
@@ -64,7 +66,6 @@ ggplot(data, aes(x = precip, y = water_balance_m3, color = as.factor(year))) +
 Here we can see across the 20 year observation period a clear spatial distinction in lakegrowth however it is not as clear cut for precipitation.
 ```{r error=TRUE, fig.width=8, fig.height=8, fig.align='center'}
 # TODO : this should include plotting the polygons of the catchments
-library(tidyverse)
 library(leaflet)
 
 # Summarize the data
@@ -103,6 +104,8 @@ Let's try and model this. We will use 4DModeller and inlabru.
 4DModeller is designed to make these model design decisions visual, interpretable, and accessible to users who may not have a strong background in R programming or bayesian spatiotemporal modeling. 4DModeller has a set of shiny apps that help the user write the codes necessary to implement the full model and evaluate it's performance.
 
 First we will use the mesh_builder to build a reasonable mesh.
+
+> **_NOTE:_**  Due to the size of the mesh being created the initial load of the app may take some time
 
 ```{r error=TRUE, eval=FALSE}
 fdmr::mesh_builder(spatial_data = data, obs_data = data, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", longitude_column = "centroid_lon", latitude_column = "centroid_lat")
@@ -170,7 +173,6 @@ alphaprior <- list(theta = list(
 formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores$zscore_precip, model = "linear") + temperature(data_with_zscores$zscore_t2m) + residuals(data_with_zscores[, c("centroid_lon", "centroid_lat")], model = "spde", group = group_index, ngroup = n_groups, control.group = list(model = "ar1", hyper = alphaprior))
 
 model_output <- inlabru::bru(formula2,
-  # data = measurement_data,
   data = data_with_zscores,
   family = "gaussian",
   E = NULL,
@@ -179,6 +181,7 @@ model_output <- inlabru::bru(formula2,
     verbose = FALSE
   )
 )
+
 summary(model_output)
 ```
 

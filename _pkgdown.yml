@@ -45,6 +45,8 @@ navbar:
           href: articles/hydro.html
         - text: "Priors exploration"
           href: articles/priors.html
+        - text: Tibetan Lakes
+          href: articles/tibetan_lakes.html
         - text: ---
         - text: "FAQ"
         - text: INLA Crash FAQ
