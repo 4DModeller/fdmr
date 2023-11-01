@@ -20,7 +20,7 @@ devtools::load_all()
 # fdmr::retrieve_tutorial_data(dataset = "tibetan lakes")
 
 # TODO : move this data into the Rdataset repo
-data <- read.csv('~/repos/tblakes/data_for_4dm.csv')
+data <- read.csv('~/repos/tblakes/data_for_4dm_w_temp.csv')
 # sp::coordinates(data) <- c("centroid_lon", "centroid_lat")
 summary(data)
 ```
