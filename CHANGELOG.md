@@ -5,7 +5,9 @@ All notable changes to `fdmr` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/openghg/openghg/compare/0.1.0...HEAD)
+## [Unreleased](https://github.com/openghg/openghg/compare/0.1.1...HEAD)
+
+## [0.1.1] - 2023-11-01
 
 ### Added
 
@@ -23,8 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allowed reversal of colour palette and added raster plot legend in map plotter - [PR #229](https://github.com/4DModeller/fdmr/pull/229)
 - Added markers option to mesh plotter - [PR #230](https://github.com/4DModeller/fdmr/pull/230)
 - Updated the interfaces of the Shiny apps to the use [bslib](https://rstudio.github.io/bslib/index.html) theming - [PR #236](https://github.com/4DModeller/fdmr/pull/236)
-
-### Removed
 
 ## [0.1.0] - 2023-10-17
 
