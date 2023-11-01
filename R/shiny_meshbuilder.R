@@ -121,7 +121,7 @@ meshbuilder_shiny <- function(
         shiny::p("Minimum allowed distance between data points."),
         shiny::actionButton("plot_mesh", label = "Plot mesh"),
         shiny::actionButton("reset_mesh", label = "Reset"),
-        shiny::actionButton("check_button", "Check mesh"),
+        # shiny::actionButton("check_button", "Check mesh"),
       ),
       shiny::mainPanel(
         shiny::tabsetPanel(

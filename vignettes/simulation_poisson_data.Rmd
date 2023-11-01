@@ -7,10 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 In this tutorial, we'll start by generating some simulated spatio-temporal data, with the city of Bristol as our study region. Next, we'll walk you through the steps of running the Bayesian Hierarchical Model (BHM) using the INLA-SPDE approach. Finally, we'll demonstrate the use the key functionality provided by the `fdmr` package.
 
 # Data simulation
