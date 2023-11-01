@@ -13,20 +13,22 @@ In this document we will use the following data for examples:
 
 ```{r, error=TRUE}
 library(INLA) # for modeling later
-library(MASS)  # for true multivariate normal simulation
+library(MASS) # for true multivariate normal simulation
 set.seed(42)
 
-n <- 100  # number of observations
-timesteps <- 10  # number of time steps
+n <- 100 # number of observations
+timesteps <- 10 # number of time steps
 
 # Create a basic time and space grid
-df <- expand.grid(x = seq(1, 10, length.out = sqrt(n)),
-                  y = seq(1, 10, length.out = sqrt(n)),
-                  time = 1:timesteps)
+df <- expand.grid(
+  x = seq(1, 10, length.out = sqrt(n)),
+  y = seq(1, 10, length.out = sqrt(n)),
+  time = 1:timesteps
+)
 
 # Create a covariance matrix
-cov_matrix <- matrix(0.5, nrow = n, ncol = n)  # Example covariance matrix with 0.5 correlation
-diag(cov_matrix) <- 1  # Diagonal should be 1
+cov_matrix <- matrix(0.5, nrow = n, ncol = n) # Example covariance matrix with 0.5 correlation
+diag(cov_matrix) <- 1 # Diagonal should be 1
 
 # Generate spatially and temporally correlated noise for each time step
 for (i in unique(df$time)) {
@@ -40,11 +42,9 @@ library(ggplot2)
 
 ggplot(df, aes(x = x, y = y, color = value)) +
   geom_point() +
-  facet_wrap(~ time) +
+  facet_wrap(~time) +
   scale_color_viridis_c() +
   theme_minimal()
-
-
 ```
 
 ## Fixed Effects

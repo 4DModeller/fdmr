@@ -5,7 +5,28 @@ All notable changes to `fdmr` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased](https://github.com/openghg/openghg/compare/0.1.1...HEAD)
+
+## [0.1.1] - 2023-11-01
+
+### Added
+
+- Added the ability to select a custom range for the colour map - [PR #218](https://github.com/4DModeller/fdmr/pull/218)
+
+### Fixed
+
+- Added check for `time_variable` being passed into model builder Shiny app - [PR #216](https://github.com/4DModeller/fdmr/pull/216)
+- Clear button not clearing all checkboxes in model builder Shiny app - [PR #215](https://github.com/4DModeller/fdmr/pull/215)
+- Corrected code in code pane of model builder Shiny app - [PR #208](https://github.com/4DModeller/fdmr/pull/208)
+- Code displayed in the Code tab of the mesh builder Shiny app couldn't be copied and pasted and used - [PR #233](https://github.com/4DModeller/fdmr/pull/233)
+
+### Changed
+
+- Allowed reversal of colour palette and added raster plot legend in map plotter - [PR #229](https://github.com/4DModeller/fdmr/pull/229)
+- Added markers option to mesh plotter - [PR #230](https://github.com/4DModeller/fdmr/pull/230)
+- Updated the interfaces of the Shiny apps to the use [bslib](https://rstudio.github.io/bslib/index.html) theming - [PR #236](https://github.com/4DModeller/fdmr/pull/236)
+
+## [0.1.0] - 2023-10-17
 
 ### Added
 
@@ -15,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clearer documentation on types expected by the `mesh_builder` tool - [PR #101](https://github.com/4DModeller/fdmr/pull/101)
 - Checks on the data types being passed into the `mesh_builder` tool - [PR #101](https://github.com/4DModeller/fdmr/pull/101)
 - Ability to plot either polygon or point data on Leaflet map of `mesh_builder` tool - [PR #101](https://github.com/4DModeller/fdmr/pull/101)
-- The ability to plot model predictions on a `leaflet` map in the our [Interactive priors Shiny app](https://4dmodeller.github.io/fdmr/articles/priors_app.html) - [PR #147](https://github.com/4DModeller/fdmr/pull/147)
+- The ability to plot model predictions on a `leaflet` map in the our [Model builder Shiny app](https://4dmodeller.github.io/fdmr/articles/modelbuilder.html) - [PR #147](https://github.com/4DModeller/fdmr/pull/147)
 - A new Shiny app to parse and plot INLA model output, letting users easily view model parameters and predictions on a map - [PR #158](https://github.com/4DModeller/fdmr/pull/158)
 
 ### Fixed

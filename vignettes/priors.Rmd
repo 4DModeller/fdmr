@@ -551,5 +551,5 @@ mesh <- fmesher::fm_mesh_2d_inla(
 ```
 
 ```{r eval=FALSE}
-fdmr::model_builder(spatial_data=sp_data, measurement_data = covid19_data, mesh=mesh)
+fdmr::model_builder(spatial_data = sp_data, measurement_data = covid19_data, mesh = mesh, time_variable = "week")
 ```

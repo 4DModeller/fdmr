@@ -6,28 +6,28 @@
 #' @return list
 #' @keywords internal
 parse_model_output_bru <- function(model_output, measurement_data) {
-    fitted_mean_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
-    fitted_sd_post <- model_output$summary.fitted.values$sd[seq_len(nrow(measurement_data))]
+  fitted_mean_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
+  fitted_sd_post <- model_output$summary.fitted.values$sd[seq_len(nrow(measurement_data))]
 
-    random_effect_fields <- model_output$summary.random$f$mean
-    mean_post <- model_output$summary.random$f$mean
-    sd_post <- model_output$summary.random$f$sd
-    fixed_mean <- model_output$summary.fixed$mean
-    dic <- model_output$dic$dic
-    pars <- model_output$marginals.hyperpar
+  random_effect_fields <- model_output$summary.random$f$mean
+  mean_post <- model_output$summary.random$f$mean
+  sd_post <- model_output$summary.random$f$sd
+  fixed_mean <- model_output$summary.fixed$mean
+  dic <- model_output$dic$dic
+  pars <- model_output$marginals.hyperpar
 
-    parsed_output <- list(
-        fitted_mean_post = fitted_mean_post,
-        fitted_sd_post = fitted_sd_post,
-        random_effect_fields = random_effect_fields,
-        mean_post = mean_post,
-        sd_post = sd_post,
-        fixed_mean = fixed_mean,
-        dic = dic,
-        pars = pars
-    )
+  parsed_output <- list(
+    fitted_mean_post = fitted_mean_post,
+    fitted_sd_post = fitted_sd_post,
+    random_effect_fields = random_effect_fields,
+    mean_post = mean_post,
+    sd_post = sd_post,
+    fixed_mean = fixed_mean,
+    dic = dic,
+    pars = pars
+  )
 
-    return(parsed_output)
+  return(parsed_output)
 }
 
 
@@ -40,9 +40,9 @@ parse_model_output_bru <- function(model_output, measurement_data) {
 #' @return list
 #' @export
 parse_model_output <- function(model_output, measurement_data, model_type = "inlabru") {
-    if (model_type == "inlabru") {
-        return(parse_model_output_bru(model_output = model_output, measurement_data = measurement_data))
-    }
+  if (model_type == "inlabru") {
+    return(parse_model_output_bru(model_output = model_output, measurement_data = measurement_data))
+  }
 }
 
 
@@ -61,33 +61,33 @@ create_prediction_field <- function(mesh,
                                     data_dist = "poisson",
                                     var_a = NULL,
                                     var_b = NULL) {
-    valid_plots <- c("predicted_mean_fields", "random_effect_fields")
-    if (!(plot_type %in% valid_plots)) {
-        stop("Invalid plot type, select from ", valid_plots)
-    }
+  valid_plots <- c("predicted_mean_fields", "random_effect_fields")
+  if (!(plot_type %in% valid_plots)) {
+    stop("Invalid plot type, select from ", valid_plots)
+  }
 
-    data_dist <- tolower(data_dist)
-    valid_data_dists <- c("poisson", "gaussian")
-    if (!(data_dist %in% valid_data_dists)) {
-        stop("Invalid data type, select from ", valid_data_dists)
-    }
+  data_dist <- tolower(data_dist)
+  valid_data_dists <- c("poisson", "gaussian")
+  if (!(data_dist %in% valid_data_dists)) {
+    stop("Invalid data type, select from ", valid_data_dists)
+  }
 
-    if (plot_type == "predicted_mean_fields" && is.null(var_b)) {
-        stop("var_b must be provided for predicted_mean_fields plot")
-    }
+  if (plot_type == "predicted_mean_fields" && is.null(var_b)) {
+    stop("var_b must be provided for predicted_mean_fields plot")
+  }
 
-    mod_proj <- fmesher::fm_evaluator(mesh)
-    xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
-    A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
+  mod_proj <- fmesher::fm_evaluator(mesh)
+  xy_grid <- base::expand.grid(mod_proj$x, mod_proj$y)
+  A_proj <- INLA::inla.spde.make.A(mesh = mesh, loc = as.matrix(xy_grid))
 
-    if (plot_type == "predicted_mean_fields") {
-        z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
-        if (data_dist == "poisson") z <- base::exp(z)
-    } else {
-        # We get an error here as we only have 265 items
-        # z <- var_a[1:mesh$n]
-        z <- base::as.numeric(A_proj %*% var_a[1:mesh$n])
-    }
+  if (plot_type == "predicted_mean_fields") {
+    z <- base::as.numeric(A_proj %*% var_a[1:mesh$n]) + base::sum(var_b)
+    if (data_dist == "poisson") z <- base::exp(z)
+  } else {
+    # We get an error here as we only have 265 items
+    # z <- var_a[1:mesh$n]
+    z <- base::as.numeric(A_proj %*% var_a[1:mesh$n])
+  }
 
-    base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
+  base::data.frame(x = xy_grid[, 1], y = xy_grid[, 2], z = z)
 }

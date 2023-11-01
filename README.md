@@ -36,3 +36,26 @@ devtools::install_github("4DModeller/fdmr")
 ```
 
 You should now have `fdmr` and all its dependencies installed and you can continue on [one of our tutorials](https://4dmodeller.github.io/fdmr/articles/).
+
+## Installation
+
+On most systems the commands above should get you up and running. On some Linux systems we've found the need to 
+install some additional libraries before `fdmr`'s dependencies can be installed.
+
+### Ubuntu 20.04
+
+Using a fresh Ubuntu 20.04 install we found we needed to install the C and C++ compilers and some additional libraries.
+To install GCC, the GNU Compiler Collection and related tools run
+
+```console
+sudo apt-get install build-essential
+```
+
+Then install the libraries required by our dependencies
+
+```console
+sudo apt-get install libharfbuzz-dev libfribidi-dev libfreetype6-dev \
+                        libpng-dev libtiff5-dev libjpeg-dev libudunits2-dev libgdal-dev
+```
+
+Note that on other Linux distributions the names of these packages may differ.

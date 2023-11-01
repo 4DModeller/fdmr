@@ -9,7 +9,7 @@ get_tutorial_datapath <- function(dataset, filename) {
   tutorial_datapath <- fs::path(get_tutorial_cache_datapath(), dataset)
 
   if (!fs::dir_exists(tutorial_datapath)) {
-    stop("Invalid dataset, the folder ", toString(tutorial_datapath), " does not exist.")
+    stop("Unable to load data, the folder ", toString(tutorial_datapath), " does not exist. Have you run retrieve_tutorial_data?")
   }
 
   glob_str <- paste0("*/", toString(filename))
