@@ -186,8 +186,8 @@ alphaprior <- list(theta = list(
 #                     hyper = alphaprior)
 #                 )
 
-# formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores$zscore_precip, model='linear')
-formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores[, c('centroid_lon', 'centroid_lat')], model='spde', group=group_index, ngroup=n_groups, control.group=list(model='ar1', hyper=alphaprior))
+formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores$zscore_precip, model='linear') + temperature(data_with_zscores$zscore_t2m) + residuals(data_with_zscores[, c('centroid_lon', 'centroid_lat')], model='spde', group=group_index, ngroup=n_groups, control.group=list(model='ar1', hyper=alphaprior))
+# formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores[, c('centroid_lon', 'centroid_lat')], model='spde', group=group_index, ngroup=n_groups, control.group=list(model='ar1', hyper=alphaprior))
 
 # +  zscore_precip  +  f(
 #                 main = coordinates,
