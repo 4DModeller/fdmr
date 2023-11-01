@@ -44,12 +44,14 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       type = "tabs",
       shiny::tabPanel(
         "Plots",
+        class = "p-3 border",
         shiny::h2("Plot output"),
         shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
         shiny::plotOutput(outputId = "plot_model_out")
       ),
       shiny::tabPanel(
         "Map",
+        class = "p-3 border",
         shiny::fluidRow(
           shiny::column(
             6,
@@ -74,7 +76,13 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
         leaflet::leafletOutput(outputId = "map_out")
       ),
       shiny::tabPanel(
+        "Code",
+        class = "p-3 border",
+        shiny::verbatimTextOutput(outputId = "code_out")
+      ),
+      shiny::tabPanel(
         "Help",
+        class = "p-3 border",
         shiny::h3("Help"),
       )
     )
@@ -174,6 +182,41 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       } else if (input$plot_type == "DIC") {
         return(plot_dic(data = parsed_modeloutput_plots))
       }
+    })
+
+    output$code_out <- shiny::reactive({
+      code_str <- ""
+      parsed_model_str <- "parsed_model_out <- fdmr::parse_model_output(model_output = model_output,
+                                                      measurement_data = measurement_data)"
+      if (input$plot_type == "Range") {
+        code_str <- 'fdmr::plot_line_comparison(
+          data = parsed_model_out,
+          to_plot = "Range for f",
+          title = "Range"
+        )'
+      } else if (input$plot_type == "Stdev") {
+        code_str <- 'fdmr::plot_line_comparison(
+          data = parsed_model_out,
+          to_plot = "Stdev for f",
+          title = "Marginal standard deviation"
+        )'
+      } else if (input$plot_type == "AR(1)") {
+        code_str <- 'fdmr::plot_line_comparison(
+          data = parsed_model_out,
+          to_plot = "GroupRho for f",
+          title = "AR(1)"
+        )'
+      } else if (input$plot_type == "Boxplot") {
+        code_str <- "fdmr::plot_priors_boxplot(data = parsed_model_out)"
+      } else if (input$plot_type == "Density") {
+        code_str <- "plot_priors_density(
+          data = parsed_model_out,
+          measurement_data = measurement_data
+        )"
+      } else if (input$plot_type == "DIC") {
+        code_str <- "fdmr::plot_dic(data = parsed_model_out)"
+      }
+      paste0(parsed_model_str, "\n\n", code_str)
     })
 
     output$plot_model_out <- shiny::renderPlot({
