@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added check for `time_variable` being passed into model builder Shiny app - [PR #216](https://github.com/4DModeller/fdmr/pull/216)
 - Clear button not clearing all checkboxes in model builder Shiny app - [PR #215](https://github.com/4DModeller/fdmr/pull/215)
 - Corrected code in code pane of model builder Shiny app - [PR #208](https://github.com/4DModeller/fdmr/pull/208)
+- Code displayed in the Code tab of the mesh builder Shiny app couldn't be copied and pasted and used - [PR #233](https://github.com/4DModeller/fdmr/pull/233)
 
 ### Changed
 
