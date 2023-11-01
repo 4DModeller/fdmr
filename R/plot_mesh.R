@@ -82,3 +82,10 @@ plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", lati
   )
   m
 }
+
+
+#' Plot a mesh on a Leaflet map
+#' Mock code for example PR video for hackathon
+plot_mesh_leaflet <- function() {
+  return(NULL)
+}
