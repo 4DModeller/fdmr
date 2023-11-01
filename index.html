@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">fdmr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,16 +48,16 @@
     <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
     <a class="dropdown-item" href="articles/getting_started.html">Installation</a>
     <a class="dropdown-item" href="articles/data_preprocessing.html">Data pre-processing</a>
+    <a class="dropdown-item" href="articles/expected_data_structure.html">Expected data structure</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6>
     <a class="dropdown-item" href="articles/decision_tree.html">How to choose how to model</a>
-    <a class="dropdown-item" href="articles/simulation_gaussian_data.Rmd">Simulation Tutorial (Gaussian data)</a>
-    <a class="dropdown-item" href="articles/simulation_poisson_data.Rmd">Simulation Tutorial (Poisson data)</a>
+    <a class="dropdown-item" href="articles/simulation_gaussian_data.html">Simulation Tutorial (Gaussian data)</a>
+    <a class="dropdown-item" href="articles/simulation_poisson_data.html">Simulation Tutorial (Poisson data)</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Shiny apps</h6>
-    <a class="dropdown-item" href="articles/mapping.html">Map plotting</a>
     <a class="dropdown-item" href="articles/meshbuilder.html">Mesh building</a>
-    <a class="dropdown-item" href="articles/priors_app.html">Model builder</a>
+    <a class="dropdown-item" href="articles/modelbuilder.html">Model builder</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6>
     <a class="dropdown-item" href="articles/covid.html">COVID-19</a>
@@ -133,6 +133,21 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"4DModeller/fdmr"</span><span class="op">)</span></span></code></pre></div>
 <p>You should now have <code>fdmr</code> and all its dependencies installed and you can continue on <a href="https://4dmodeller.github.io/fdmr/articles/">one of our tutorials</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>On most systems the commands above should get you up and running. On some Linux systems we’ve found the need to install some additional libraries before <code>fdmr</code>’s dependencies can be installed.</p>
+<div class="section level3">
+<h3 id="ubuntu-2004">Ubuntu 20.04<a class="anchor" aria-label="anchor" href="#ubuntu-2004"></a>
+</h3>
+<p>Using a fresh Ubuntu 20.04 install we found we needed to install the C and C++ compilers and some additional libraries. To install GCC, the GNU Compiler Collection and related tools run</p>
+<pre class="console"><code>sudo apt-get install build-essential</code></pre>
+<p>Then install the libraries required by our dependencies</p>
+<pre class="console"><code>sudo apt-get install libharfbuzz-dev libfribidi-dev libfreetype6-dev \
+                        libpng-dev libtiff5-dev libjpeg-dev libudunits2-dev libgdal-dev</code></pre>
+<p>Note that on other Linux distributions the names of these packages may differ.</p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fdmr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,16 +48,16 @@
     <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
     <a class="dropdown-item" href="../articles/getting_started.html">Installation</a>
     <a class="dropdown-item" href="../articles/data_preprocessing.html">Data pre-processing</a>
+    <a class="dropdown-item" href="../articles/expected_data_structure.html">Expected data structure</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6>
     <a class="dropdown-item" href="../articles/decision_tree.html">How to choose how to model</a>
-    <a class="dropdown-item" href="../articles/simulation_gaussian_data.Rmd">Simulation Tutorial (Gaussian data)</a>
-    <a class="dropdown-item" href="../articles/simulation_poisson_data.Rmd">Simulation Tutorial (Poisson data)</a>
+    <a class="dropdown-item" href="../articles/simulation_gaussian_data.html">Simulation Tutorial (Gaussian data)</a>
+    <a class="dropdown-item" href="../articles/simulation_poisson_data.html">Simulation Tutorial (Poisson data)</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Shiny apps</h6>
-    <a class="dropdown-item" href="../articles/mapping.html">Map plotting</a>
     <a class="dropdown-item" href="../articles/meshbuilder.html">Mesh building</a>
-    <a class="dropdown-item" href="../articles/priors_app.html">Model builder</a>
+    <a class="dropdown-item" href="../articles/modelbuilder.html">Model builder</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6>
     <a class="dropdown-item" href="../articles/covid.html">COVID-19</a>
@@ -118,25 +118,27 @@ and how to choose when to use them.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span> <span class="co"># for modeling later</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: Matrix</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
-<pre><code><span><span class="co">## This is INLA_23.10.28 built 2023-10-28 10:43:31 UTC.</span></span>
+<pre><code><span><span class="co">## This is INLA_23.11.01 built 2023-11-01 19:07:36 UTC.</span></span>
 <span><span class="co">##  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">##  - List available models/likelihoods/etc with inla.list.models()</span></span>
 <span><span class="co">##  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span></code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span>  <span class="co"># for true multivariate normal simulation</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span> <span class="co"># for true multivariate normal simulation</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span>  <span class="co"># number of observations</span></span>
-<span><span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="fl">10</span>  <span class="co"># number of time steps</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="co"># number of observations</span></span>
+<span><span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># number of time steps</span></span>
 <span></span>
 <span><span class="co"># Create a basic time and space grid</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                  time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">timesteps</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  time <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">timesteps</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a covariance matrix</span></span>
-<span><span class="va">cov_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="va">n</span><span class="op">)</span>  <span class="co"># Example covariance matrix with 0.5 correlation</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">cov_matrix</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1</span>  <span class="co"># Diagonal should be 1</span></span>
+<span><span class="va">cov_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="co"># Example covariance matrix with 0.5 correlation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">cov_matrix</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># Diagonal should be 1</span></span>
 <span></span>
 <span><span class="co"># Generate spatially and temporally correlated noise for each time step</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">time</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -157,7 +159,7 @@ and how to choose when to use them.</p>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">time</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">time</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_color_viridis_c</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="decision_tree_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
@@ -210,7 +212,7 @@ how these are written into the formula that is then passed to inla.</p>
 <span><span class="co">##    silent = silent, ", " inla.mode = inla.mode, safe = FALSE, debug = </span></span>
 <span><span class="co">##    debug, .parent.frame = .parent.frame)" ) </span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.578, Running = 0.263, Post = 0.0259, Total = 0.867 </span></span>
+<span><span class="co">##     Pre = 0.426, Running = 0.252, Post = 0.0354, Total = 0.714 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## (Intercept) -0.301 0.108     -0.514   -0.301     -0.088 -0.301   0</span></span>
@@ -287,7 +289,7 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 <span><span class="co">##    silent = silent, ", " inla.mode = inla.mode, safe = FALSE, debug = </span></span>
 <span><span class="co">##    debug, .parent.frame = .parent.frame)" ) </span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.421, Running = 0.305, Post = 0.0199, Total = 0.746 </span></span>
+<span><span class="co">##     Pre = 0.228, Running = 0.277, Post = 0.0161, Total = 0.521 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## (Intercept) -0.372 0.065     -0.499   -0.372     -0.245 -0.372   0</span></span>
@@ -301,12 +303,12 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 <span><span class="co">## Model hyperparameters:</span></span>
 <span><span class="co">##                                         mean    sd 0.025quant 0.5quant</span></span>
 <span><span class="co">## Precision for the Gaussian observations 2.00 0.090      1.826     2.00</span></span>
-<span><span class="co">## Precision for time                      1.24 0.547      0.465     1.15</span></span>
-<span><span class="co">##                                         0.975quant  mode</span></span>
-<span><span class="co">## Precision for the Gaussian observations       2.18 1.993</span></span>
-<span><span class="co">## Precision for time                            2.58 0.968</span></span>
+<span><span class="co">## Precision for time                      1.24 0.546      0.465     1.15</span></span>
+<span><span class="co">##                                         0.975quant mode</span></span>
+<span><span class="co">## Precision for the Gaussian observations       2.18 1.99</span></span>
+<span><span class="co">## Precision for time                            2.57 0.97</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  -1137.10 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  -1137.11 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
@@ -333,7 +335,7 @@ cannot be observed directly. For example,</p>
 <span><span class="co"># Print the model summary</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## inlabru version: 2.10.0</span></span>
-<span><span class="co">## INLA version: 23.10.28</span></span>
+<span><span class="co">## INLA version: 23.11.01</span></span>
 <span><span class="co">## Components:</span></span>
 <span><span class="co">## observed: main = linear(x + y), group = exchangeable(1L), replicate = iid(1L)</span></span>
 <span><span class="co">## Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
@@ -342,7 +344,7 @@ cannot be observed directly. For example,</p>
 <span><span class="co">##     Data class: 'data.frame'</span></span>
 <span><span class="co">##     Predictor: value ~ .</span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.344, Running = 0.295, Post = 0.0465, Total = 0.686 </span></span>
+<span><span class="co">##     Pre = 0.22, Running = 0.258, Post = 0.0389, Total = 0.517 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## observed   0.004 0.008     -0.011    0.004      0.019  0.004   0</span></span>

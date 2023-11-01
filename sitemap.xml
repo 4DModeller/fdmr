@@ -25,6 +25,9 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/decision_tree.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/expected_data_structure.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/getting_started.html</loc>
   </url>
   <url>
@@ -40,10 +43,10 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/meshbuilder.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/priors.html</loc>
+    <loc>https://4dmodeller.github.io/fdmr/articles/modelbuilder.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/priors_app.html</loc>
+    <loc>https://4dmodeller.github.io/fdmr/articles/priors.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/simulation_gaussian_data.html</loc>
