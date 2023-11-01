@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/openghg/openghg/compare/0.1.0...HEAD)
 
+### Added
+
+- Added the ability to select a custom range for the colour map - [PR #218](https://github.com/4DModeller/fdmr/pull/218)
+
 ### Fixed
 
 - Added check for `time_variable` being passed into model builder Shiny app - [PR #216](https://github.com/4DModeller/fdmr/pull/216)
