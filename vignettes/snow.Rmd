@@ -9,7 +9,7 @@ vignette: >
 
 # Spatial distribution of snow
 
-This tutorial explores whether 4Dmodeller can be used to model the spatial distribution of snow in the Bayelva area on Svalbard, based on once-a-year point-based manual snow depth measurements for several years and snow cover duration derived from time lapse camera imagery (Aalstad et al., 2020). This data has been used before for snow data assimilation (Aalstad et al., 2018) and permafrost modeling (Zweigel et al., 2021) using modeling and data assimilation methods (see references). Additionally, we included elevation and other derived topographic parameters (slope, aspect, topographic position index) as these are known to influence the snow depth distribution. These topographic parameters were derived from a high resolution digital elevation model (Boike et al., 2018). The dataset used in this tutorial has been prepared by Kristoffer Aalstad as a netCDF by combining and processing the following publicly available datasets that have been used in several studies (see literature references):
+This tutorial explores whether 4Dmodeller can be used to model the spatial distribution of snow in the Bayelva area on Svalbard, based on once-a-year point-based manual snow depth measurements for several years and snow cover duration derived from time lapse camera imagery (Aalstad et al., 2020). This data has been used before for snow data assimilation (Aalstad et al., 2018) and permafrost modeling (Zweigel et al., 2021) using modeling and data assimilation methods (see references). Additionally, we included elevation and other derived topographic parameters (slope, aspect, topographic position index) as these are known to influence the snow depth distribution. These topographic parameters were derived from a high resolution digital elevation model (Boike et al., 2019). The dataset used in this tutorial has been prepared by Kristoffer Aalstad as a netCDF by combining and processing the following publicly available datasets that have been used in several studies (see literature references):
 
 Westermann, S. (2020).Snow depth and ground surface temperature at Bayelva research site, Svalbard [Data set]. Norstore. https://doi.org/10.11582/2020.00024
 
@@ -22,6 +22,8 @@ The dataset is originally projected (UTM zone 33X) and available in the data sub
 ### Literature references 
 
 Aalstad, K., Westermann, S., Schuler, T. V., Boike, J., and Bertino, L. (2018). Ensemble-based assimilation of fractional snow-covered area satellite retrievals to estimate the snow distribution at Arctic sites. The Cryosphere, 12, 247–270, https://doi.org/10.5194/tc-12-247-2018  
+
+Boike, J., Nitzbon, J., Anders, K., Grigoriev, M., Bolshiyanov, D., Langer, M., Lange, S., Bornemann, N., Morgenstern, A., Schreiber, P., Wille, C., Chadburn, S., Gouttevin, I., Burke, E., and Kutzbach, L.: A 16-year record (2002–2017) of permafrost, active-layer, and meteorological conditions at the Samoylov Island Arctic permafrost research site, Lena River delta, northern Siberia: an opportunity to validate remote-sensing data and land surface, snow, and permafrost models, Earth Syst. Sci. Data, 11, 261–299, https://doi.org/10.5194/essd-11-261-2019, 2019. 
 
 Aalstad, K., Westermann, S., and Bertino, L. (2020). Evaluating satellite retrieved fractional snow-covered area at a high-Arctic site using terrestrial photography. Remote Sensing of Environment, 239, https://doi.org/10.1016/j.rse.2019.111618 
 
