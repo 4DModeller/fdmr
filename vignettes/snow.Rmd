@@ -63,7 +63,8 @@ head(df)
 
 ## Build the mesh
 
-When trying this whit our UTM projected dataset, we don't get a result: 
+When trying this whit our UTM projected dataset, we don't get a result:
+
 ```{r plotmeshutm}
 fdmr::mesh_builder(spatial_data = df)
 ```
@@ -89,3 +90,71 @@ We would like to also show our data points and see this in a geographical contex
 
 fdmr::plot_mesh(mesh=mesh, spatial_data = df[,c(1,2)])
 ```
+
+The plot_mesh function seems to assume lat/lon coordinates and thus zooms out to max.
+
+## Redo this with geographical coordinates
+
+Let's see whether this works if our data is in geographical coordinates instead. Redo all the steps from above:
+
+```{r latlonload}
+ncname_ll <- "Bayelva_snow_geo"
+ncfname_ll <- paste(ncpath, '/data/', ncname_ll, ".nc", sep="")
+# Open data
+ncin_ll <- nc_open(ncfname_ll)
+
+# Create a data frame with the  first year of snow depth (ds)
+df_ll <- data.frame(LONG = ncvar_get(ncin_ll,"lons"),
+                 LAT = ncvar_get(ncin_ll,"lats"),
+                 DS = ncvar_get(ncin_ll,"ds")[,1])
+
+## Store the point locations in a separate data frame:
+location_data_ll = df_ll[,c(1,2)]
+```
+
+```{r latlonmesh}
+# Try with the interactive mesh_builder
+fdmr::mesh_builder(location_data_ll)
+```
+
+The mesh_builder loads the shiny widget and creates a mesh, however there are several issues: 
+
+- the map part of the window covers the entire window, so the rulers disappear 
+
+- the mesh is far too coarse for the small area we are looking at (1km2) 
+
+- closing the widget window doesn't stop the underlying processes to run, consequently RStudio is blocked and needs to be restarted, as ctrl + c or interrupting by clicking the STOP button don't have any effect.
+
+Let's try to specify the mesh manually using values for max.edge and cutoff that are reasonable for our domain and length scales.
+
+```{r latlonmesh_manually}
+# look at the range of the data to derive the mesh parameters
+initial_range <- diff(range(location_data_ll[, "LONG"])) / 5
+max_edge <- initial_range / 8
+offset <- initial_range/2
+
+# make the mesh from the locations
+mesh <- fmesher::fm_mesh_2d(loc = location_data_ll[, c("LONG", "LAT")],
+                                 max.edge = c(1, 2) * max_edge,
+                                 offset = c(1,1.5)*offset,
+                                 cutoff = max_edge/10
+                                 )
+fdmr::plot_mesh(mesh,spatial_data = location_data_ll) 
+```
+
+This mesh is already a better starting point. There are two things we are not happy about: 
+
+- The mesh is obviously distorted in N/S direction: With latitude/longitude units representing substantially different spatial distances at polar latitudes, edge lengths should be defined differently in E/W and N/S. Or one could simply use UTM (which is currently not supported for the visualisation tools). 
+
+- Is the mesh dense enough to represent snow depth variability between the measurement points, and is the mesh in physically useful locations? Terrain and derivatives are strong drivers of spatial snow depth distribution, and they should thus ideally be considered for the mesh generation.
+
+
+# TO DO part
+
+## Get the rasters in and use that information to build the mesh
+
+## Spatial covariance, and how we could use that
+
+## Get model results considering some or all data and predictors
+
+## How to deal with real zeros? (Zero snow depth)
