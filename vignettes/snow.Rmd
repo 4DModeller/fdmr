@@ -148,12 +148,30 @@ This mesh is already a better starting point. There are two things we are not ha
 
 - Is the mesh dense enough to represent snow depth variability between the measurement points, and is the mesh in physically useful locations? Terrain and derivatives are strong drivers of spatial snow depth distribution, and they should thus ideally be considered for the mesh generation.
 
+## Design the prior and the model
+
+We create a prior with the Matérn function, a penalized complexity prior defined by range and standard deviation [cite Finn].
+The range parameter defines the lenght of the influence of each observation.
+
+In this small experiment, we have experimented by creating two different priors with two different range.
+The model is a stochastic partial differential equation (SPDE).
+
+```{prior creation}
+#julia add code for creating the two models
+```
+
+## Fitting the model
+
+
+
+## Spatial covariance, and how we could use that
+
+A future development we would like to work on, is to design the prior to be anisotropic. What we mean, is that the correlations should be allowed to behave differently in each dimension of the feature space where we define distances between points.
+
 
 # TO DO part
 
 ## Get the rasters in and use that information to build the mesh
-
-## Spatial covariance, and how we could use that
 
 ## Get model results considering some or all data and predictors
 
