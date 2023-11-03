@@ -9,21 +9,23 @@ vignette: >
 
 # Spatial distribution of snow
 
-This tutorial explores whether 4Dmodeller can be used to model the spatial distribution of snow in the Bayelva area on Svalbard, based on once-a-year point-based manual snow depth measurements for several years and snow cover duration derived from time lapse camera imagery. This data has been used before to estimate snow depth and permafrost using data assimilation methods (see literature references). Additionally, we included topography and topographic parameters as these are known to correlate with snow depth distribution. The dataset used in this tutorial has been prepared by Kristoffer Aalstad based on the following publicly available data:
+This tutorial explores whether 4Dmodeller can be used to model the spatial distribution of snow in the Bayelva area on Svalbard, based on once-a-year point-based manual snow depth measurements for several years and snow cover duration derived from time lapse camera imagery (Aalstad et al., 2020). This data has been used before for snow data assimilation (Aalstad et al., 2018) and permafrost modeling (Zweigel et al., 2021) using modeling and data assimilation methods (see references). Additionally, we included elevation and other derived topographic parameters (slope, aspect, topographic position index) as these are known to influence the snow depth distribution. These topographic parameters were derived from a high resolution digital elevation model (Boike et al., 2018). The dataset used in this tutorial has been prepared by Kristoffer Aalstad as a netCDF by combining and processing the following publicly available datasets that have been used in several studies (see literature references):
 
-**XXX ADD dois for the datasets**
+Westermann, S. (2020).Snow depth and ground surface temperature at Bayelva research site, Svalbard [Data set]. Norstore. https://doi.org/10.11582/2020.00024
+
+Aalstad, K., and Westermann. S. (2021). ACS_Bayelva_class: 302 high-resolution snow cover maps covering the 2012-2017 snowmelt seasons in the Bayelva catchment (Svalbard, Norway) (2.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.5010944
+
+Boike, J., Juszak, I., Lange, S., Chadburn, S., Burke, E., Overduin, P. P., Roth, K., Ippisch, O., Bornemann, N., Stern, L., Gouttevin, I., Hauber, E., & Westermann, S. (2018). HRSC-AX data products (DEM and multi channel) from aerial overflights in 2008 over Bayelva (Brøggerhalvøya peninsula, Spitsbergen). (Version 1) [Data set]. Zenodo. https://doi.org/10.1594/PANGAEA.884730
 
 The dataset is originally projected (UTM zone 33X) and available in the data sub-folder in this repository. As UTM was not supported for all steps we anticipated while developing this tutorial (see below), we also created also a lat/lon version of the same data.
 
-### Literature references
+### Literature references 
 
-Aalstad, K. et al. (2018). <doi:10.5194/tc-12-247-2018>. TC.
+Aalstad, K., Westermann, S., Schuler, T. V., Boike, J., and Bertino, L. (2018). Ensemble-based assimilation of fractional snow-covered area satellite retrievals to estimate the snow distribution at Arctic sites. The Cryosphere, 12, 247–270, https://doi.org/10.5194/tc-12-247-2018  
 
-Aalstad, K. et al. (2020). doi: 10.1016/j.rse.2019.111618. RSE.
+Aalstad, K., Westermann, S., and Bertino, L. (2020). Evaluating satellite retrieved fractional snow-covered area at a high-Arctic site using terrestrial photography. Remote Sensing of Environment, 239, https://doi.org/10.1016/j.rse.2019.111618 
 
-Boike, J. et al. (2018). <doi:10.5194/essd-10-355-2018>. ESSD.
-
-Zweigel, R. et al. (2021). <doi:10.1029/2020JF005673>.
+Zweigel, R. B., Westermann, S., Nitzbon, J., Langer, M., Boike, J., Etzelmüller, B., and Vikhamar Schuler, T. (2021). Simulating snow redistribution and its effect on ground surface temperature at a high-Arctic site on Svalbard. Journal of Geophysical Research: Earth Surface, 126, e2020JF005673. https://doi.org/10.1029/2020JF005673 
 
 ## Import and load the data
 
