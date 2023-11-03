@@ -65,7 +65,7 @@ head(df)
 
 When trying this whit our UTM projected dataset, we don't get a result:
 
-```{r plotmeshutm}
+```{r, eval = FALSE}
 fdmr::mesh_builder(spatial_data = df)
 ```
 
@@ -86,7 +86,7 @@ plot(mesh)
 
 We would like to also show our data points and see this in a geographical context to check whether everything is looking OK. This is causing problems - fdmr seems not to be able to deal with our UTM coordinates.
 
-```{r plotmeshandpoints}
+```{r, eval = FALSE}
 
 fdmr::plot_mesh(mesh=mesh, spatial_data = df[,c(1,2)])
 ```
@@ -112,7 +112,7 @@ df_ll <- data.frame(LONG = ncvar_get(ncin_ll,"lons"),
 location_data_ll = df_ll[,c(1,2)]
 ```
 
-```{r latlonmesh}
+```{r, eval = FALSE}
 # Try with the interactive mesh_builder
 fdmr::mesh_builder(location_data_ll)
 ```
