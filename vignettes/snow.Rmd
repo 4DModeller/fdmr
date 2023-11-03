@@ -106,7 +106,9 @@ ncin_ll <- nc_open(ncfname_ll)
 # Create a data frame with the  first year of snow depth (ds)
 df_ll <- data.frame(LONG = ncvar_get(ncin_ll,"lons"),
                  LAT = ncvar_get(ncin_ll,"lats"),
-                 DS = ncvar_get(ncin_ll,"ds")[,1])
+                 #elev = ncvar_get(ncin_ll,"zs"),
+                 DS = ncvar_get(ncin_ll,"ds")[,1],
+                 DS_log = log(ncvar_get(ncin_ll,"ds")[,1]))
 
 ## Store the point locations in a separate data frame:
 location_data_ll = df_ll[,c(1,2)]
@@ -148,6 +150,117 @@ This mesh is already a better starting point. There are two things we are not ha
 
 - Is the mesh dense enough to represent snow depth variability between the measurement points, and is the mesh in physically useful locations? Terrain and derivatives are strong drivers of spatial snow depth distribution, and they should thus ideally be considered for the mesh generation.
 
+
+## Start defining the priors
+Let's try to predict a spatially distributed snow depth map from our data points.
+
+```{r}
+# The prior range is the distance that the process should stop effecting, so in this case it is currently 20km away from the node center (initial_range defined above).
+
+spde1 <- INLA::inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(initial_range, 0.5),
+  prior.sigma = c(1, 0.01)
+)
+
+# Try with a different prior range - the entire initial_range
+spde2 <- INLA::inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(initial_range*5, 0.5),
+  prior.sigma = c(1, 0.01)
+)
+
+```
+
+We need to convert our data frame into a SpatialPointsDataFrame.
+```{r}
+sp::coordinates(df_ll) <- c("LONG", "LAT")
+```
+
+Define two models (for the two spde versions defined above, respectively):
+```{r}
+
+# Model 1 is linear and uses the gaussian model 1 defined above:
+formula1 <- DS ~ 0 + Intercept(1)+
+  f(
+    main = df_ll,
+    model = spde1
+  )
+
+inlabru_model1 <- inlabru::bru(formula1,
+                               data = df_ll,
+                               family = "gaussian",
+                               options = list(
+                                 verbose = FALSE
+                               )
+)
+
+# The only difference for Model 2 is the different initial prior range set above (spde2):
+
+formula2 <- DS ~ 0 + Intercept(1)   +
+  f(
+    main = df_ll,
+    model = spde2
+  )
+
+inlabru_model2 <- inlabru::bru(formula2,
+                               data = df_ll,
+                               family = "gaussian",
+                               options = list(
+                                 verbose = FALSE
+                               )
+)
+```
+
+
+Show the output of the first model, and plot the fit:
+```{r inlabruoutput1}
+summary(inlabru_model1)
+
+
+plot(exp(inlabru_model1$summary.fitted.values$mean[1:nrow(df_ll@data)]),exp(df_ll@data$DS))
+
+
+plot(exp(inlabru_model1$summary.fitted.values$mean[1:nrow(df_ll@data)]),exp(df_ll@data$DS))
+
+```
+
+In the environment where this tutorial was rendered, the model_viewer widget window unfortunately crashes RStudio.
+```{r modelviewer1, eval=FALSE}
+
+fdmr::model_viewer(
+  model_output = inlabru_model1,
+  mesh = mesh,
+  measurement_data = df_ll,
+  data_distribution = "Gaussian"
+)
+
+
+```
+
+Show the output of the second model, and plot the fit:
+```{r inlabruoutput2}
+summary(inlabru_model2)
+
+plot(exp(inlabru_model2$summary.fitted.values$mean[1:nrow(df_ll@data)]),exp(df_ll@data$DS))
+
+plot(exp(inlabru_model2$summary.fitted.values$mean[1:nrow(df_ll@data)]),exp(df_ll@data$DS))
+```
+
+```{r modelviewer2, eval=FALSE}
+
+fdmr::model_viewer(
+  model_output = inlabru_model2,
+  mesh = mesh,
+  measurement_data = df_ll,
+  data_distribution = "Gaussian"
+)
+
+
+```
+# TO DO part
+
+
 ## Design the prior and the model
 
 We create a prior with the Matérn function, a penalized complexity prior defined by range and standard deviation [cite Finn].
@@ -169,7 +282,6 @@ The model is a stochastic partial differential equation (SPDE).
 A future development we would like to work on, is to design the prior to be anisotropic. What we mean, is that the correlations should be allowed to behave differently in each dimension of the feature space where we define distances between points.
 
 
-# TO DO part
 
 ## Get the rasters in and use that information to build the mesh
 
@@ -177,121 +289,4 @@ A future development we would like to work on, is to design the prior to be anis
 
 ## How to deal with real zeros? (Zero snow depth)
 
-
-```{r}
-library(ncdf4)
-library(ggplot2)
-
-# Import the data
-ncpath <- "~/"
-ncname <- "Bayelva_snow_geo"  
-ncfname <- paste(ncpath, ncname, ".nc", sep="")
-
-# Open data 
-ncin <- nc_open(ncfname)
-
-
-
-
-# Create a data frame with the  first year of snow depth (ds)
-df <- data.frame(LONG = ncvar_get(ncin,"lons"),
-                 LAT = ncvar_get(ncin,"lats"),
-                 #elev = ncvar_get(ncin,"zs"),
-                 DS = ncvar_get(ncin,"ds")[,1],
-                 DS_log = log(ncvar_get(ncin,"ds")[,1]))
-
-## Ready for modelling!
-
-
-# look at the range of the data
-initial_range <- diff(range(df[, "LONG"])) / 5
-max_edge <- initial_range / 4
-offset <- initial_range/2
-
-mesh <- fmesher::fm_mesh_2d(
-  loc = location_data[, c("LONG", "LAT")],
-  max.edge = c(1, 2) * max_edge,
-  offset = c(1,1.5)*offset,
-  cutoff = max_edge/10 
-)
-
-fdmr::plot_mesh(mesh,spatial_data = location_data)
-
-## Start defining the priors
-# the prior range is the distance that the process should stop effecting, so in this case it is currently 20km away from the node center
-
-spde1 <- INLA::inla.spde2.pcmatern(
-  mesh = mesh,
-  prior.range = c(initial_range, 0.5),
-  prior.sigma = c(1, 0.01)
-)
-
-spde2 <- INLA::inla.spde2.pcmatern(
-  mesh = mesh,
-  prior.range = c(initial_range*5, 0.5),
-  prior.sigma = c(1, 0.01)
-)
-
-## Creating our data frame into a SpatialPointsDataFrame ()
-
-sp::coordinates(df) <- c("LONG", "LAT")
-
-formula1 <- DS ~ 0 + Intercept(1)+
-  f(
-    main = df,
-    model = spde1
-  )
-
-
-formula2 <- DS ~ 0 + Intercept(1)   +
-  f(
-    main = df,
-    model = spde2
-  )
-
-
-inlabru_model1 <- inlabru::bru(formula1,
-                               data = df,
-                               family = "gaussian",
-                               options = list(
-                                 verbose = FALSE
-                               )
-)
-
-inlabru_model2 <- inlabru::bru(formula2,
-                               data = df,
-                               family = "gaussian",
-                               options = list(
-                                 verbose = FALSE
-                               )
-)
-
-summary(inlabru_model1)
-summary(inlabru_model2)
-
-
-plot(exp(inlabru_model1$summary.fitted.values$mean[1:nrow(df@data)]),exp(df@data$DS))
-plot(exp(inlabru_model2$summary.fitted.values$mean[1:nrow(df@data)]),exp(df@data$DS))
-
-
-plot(exp(inlabru_model1$summary.fitted.values$mean[1:nrow(df@data)]),exp(df@data$DS))
-plot(exp(inlabru_model2$summary.fitted.values$mean[1:nrow(df@data)]),exp(df@data$DS))
-
-
-fdmr::model_viewer(
-  model_output = inlabru_model1,
-  mesh = mesh,
-  measurement_data = df,
-  data_distribution = "Gaussian"
-)
-
-fdmr::model_viewer(
-  model_output = inlabru_model2,
-  mesh = mesh,
-  measurement_data = df,
-  data_distribution = "Gaussian"
-)
-
-
-```
 
