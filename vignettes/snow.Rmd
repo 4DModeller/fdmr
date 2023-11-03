@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Spatial distribution of snow
+## Introduction
 
 This tutorial explores whether 4Dmodeller can be used to model the spatial distribution of snow in the Bayelva area on Svalbard, based on once-a-year point-based manual snow depth measurements for several years and snow cover duration derived from time lapse camera imagery (Aalstad et al., 2020). This data has been used before for snow data assimilation (Aalstad et al., 2018) and permafrost modeling (Zweigel et al., 2021) using modeling and data assimilation methods (see references). Additionally, we included elevation and other derived topographic parameters (slope, aspect, topographic position index) as these are known to influence the snow depth distribution. These topographic parameters were derived from a high resolution digital elevation model (Boike et al., 2019). The dataset used in this tutorial has been prepared by Kristoffer Aalstad as a netCDF by combining and processing the following publicly available datasets that have been used in several studies (see literature references):
 
@@ -156,7 +156,14 @@ This mesh is already a better starting point. There are two things we are not ha
 
 
 ## Start defining the priors
+
 Let's try to predict a spatially distributed snow depth map from our data points.
+
+We create a prior with the Matérn function, a penalized complexity prior defined by range and standard deviation [cite Finn].
+The range parameter defines the lenght of the influence of each observation.
+
+In this small experiment, we have experimented by creating two different priors with two different range.
+The model is a stochastic partial differential equation (SPDE).
 
 ```{r}
 # The prior range is the distance that the process should stop effecting, so in this case it is currently 20km away from the node center (initial_range defined above).
@@ -267,11 +274,7 @@ fdmr::model_viewer(
 
 ## Design the prior and the model
 
-We create a prior with the Matérn function, a penalized complexity prior defined by range and standard deviation [cite Finn].
-The range parameter defines the lenght of the influence of each observation.
-
-In this small experiment, we have experimented by creating two different priors with two different range.
-The model is a stochastic partial differential equation (SPDE).
+Add the rasters
 
 ```{prior creation}
 #julia add code for creating the two models
