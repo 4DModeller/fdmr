@@ -1,33 +1,52 @@
 ---
-editor_options: 
-  markdown: 
-    wrap: 72
+title: "Spatial distribution of snow - exploratory tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Spatial distribution of snow - exploratory tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
+# Spatial distribution of snow
+
+This tutorial explores whether 4Dmodeller can be used to model the spatial distribution of snow in the Bayelva area on Svalbard, based on once-a-year point-based manual snow depth measurements for several years and snow cover duration derived from timelapse camera imagery. This data has been used before to estimate snow depth and permafrost using data assimilation methods (see literature references). Additionally, we included topography and topographic parameters as these are known to correlate with snow depth distribution. The dataset used in this tutorial has been prepared by Kristoffer Aalstad based on the following publicly available data:
+
+**XXX ADD dois for the datasets**
+
+The dataset is originally projected (UTM zone 33X) and available in the data sub-folder in this repository. As UTM was not supported for all steps we anticipated while developing this tutorial (see below), there is also a lat/lon version of the same data.
+
+### Literature references
+
+Aalstad, K. et al. (2018). <doi:10.5194/tc-12-247-2018>. TC.
+
+Aalstad, K. et al. (2020). doi: 10.1016/j.rse.2019.111618. RSE.
+
+Boike, J. et al. (2018). <doi:10.5194/essd-10-355-2018>. ESSD.
+
+Zweigel, R. et al. (2021). <doi:10.1029/2020JF005673>.
+
+## Import and load the data
+
 ```{r modules}
+# load modules used in this tutorial
 library(ncdf4)
-library(tidyverse)
+#library(tidyverse)
 ```
 
-# Import and load the data
-
 ```{r dataload}
-# specify where your data is stored locally
+# Specify where your data is stored locally
 ncpath <- "N:/courses_conferences/2023_4DM_hackathon/fdmr/vignettes/data/" 
 ncname <- "Bayelva_snow" 
 ncfname <- paste(ncpath, ncname, ".nc", sep="")
 
 #open data 
 ncin <- nc_open(ncfname) 
-print(ncin)
+head(ncin)
 ```
 
-# Get relevant features
+## Get relevant features
 
-The netcdf file has both point measurements of snow depth (ds, or
-translated into SWE: Ds) for several years, and continuous raster data
-with snow depth duration for several years and topographic features. We
-start with the snow depth points only:
+The netcdf file has both point measurements of snow depth (ds, or translated into SWE: Ds) for several years, and continuous raster data with snow depth duration for several years and topographic features. We start with the snow depth points only:
 
 ```{r dataselect}
 # specify the longitude and latitude columns. Note that the coordinates are utm!
@@ -42,10 +61,9 @@ df <- data.frame(LONG = longitude,LAT = latitude,ds)
 head(df)
 ```
 
-# Build the mesh
+## Build the mesh
 
-The shiny app doesn't work with UTM, so we need to do this
-non-interactively.
+The shiny app doesn't work with UTM, so we need to do this non-interactively.
 
 ```{r plotmesh}
 # This doesn't work with UTM:
