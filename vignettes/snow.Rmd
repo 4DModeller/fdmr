@@ -17,7 +17,7 @@ Aalstad, K., and Westermann. S. (2021). ACS_Bayelva_class: 302 high-resolution s
 
 Boike, J., Juszak, I., Lange, S., Chadburn, S., Burke, E., Overduin, P. P., Roth, K., Ippisch, O., Bornemann, N., Stern, L., Gouttevin, I., Hauber, E., & Westermann, S. (2018). HRSC-AX data products (DEM and multi channel) from aerial overflights in 2008 over Bayelva (Brøggerhalvøya peninsula, Spitsbergen). (Version 1) [Data set]. Zenodo. https://doi.org/10.1594/PANGAEA.884730
 
-The dataset is originally projected (UTM zone 33X) and available in the data sub-folder in this repository. As UTM was not supported for all steps we anticipated while developing this tutorial (see below), we also created also a lat/lon version of the same data.
+The dataset is originally projected (UTM zone 33X) and available in the data sub-folder in this repository (data/Bayelva_snow.nc). As UTM was not supported for all steps we anticipated while developing this tutorial (see below), we also created also a lat/lon version of the same data (data/Bayelva_snow_geo.nc).
 
 ### Literature references 
 
@@ -30,11 +30,11 @@ Aalstad, K., Westermann, S., and Bertino, L. (2020). Evaluating satellite retrie
 Zweigel, R. B., Westermann, S., Nitzbon, J., Langer, M., Boike, J., Etzelmüller, B., and Vikhamar Schuler, T. (2021). Simulating snow redistribution and its effect on ground surface temperature at a high-Arctic site on Svalbard. Journal of Geophysical Research: Earth Surface, 126, e2020JF005673. https://doi.org/10.1029/2020JF005673 
 
 ## Import and load the data
+We use the library ncdf4 to open the snow dataset:
 
 ```{r modules}
 # load modules used in this tutorial
 library(ncdf4)
-#library(tidyverse)
 ```
 
 ```{r dataload}
@@ -48,7 +48,7 @@ ncin <- nc_open(ncfname)
 #head(ncin)
 ```
 
-## Get relevant features
+### Get relevant features
 
 The netcdf file has both point measurements of snow depth (ds, or translated into SWE: Ds) for several years, and continuous raster data with snow depth duration for several years and topographic features. We start with the snow depth points only:
 
@@ -65,15 +65,14 @@ df <- data.frame(LONG = longitude,LAT = latitude,ds)
 head(df)
 ```
 
-## Build the mesh
-
-When trying this whit our UTM projected dataset, we don't get a result:
+### Build the mesh
+When trying to build a mesh whit our UTM projected dataset, we don't get a result as the shiny app does not seem to work with UTM:
 
 ```{r, eval = FALSE}
 fdmr::mesh_builder(spatial_data = df)
 ```
 
-The shiny app seems not to work with UTM, so we when working with UTM we need to try and do this non-interactively.
+Using fmesher directly (non-interactively, without the fdmr app added functionalities) works and we can plot the resulting mesh outside the geographical context that would have been provided by mesh_builder.
 
 ```{r plotmesh}
 # Define a proj string for our UTM zone
@@ -87,19 +86,19 @@ mesh <- fmesher::fm_mesh_2d_inla(loc = df[,c(1,2)],
 # plot the result
 plot(mesh)
 ```
-
-We would like to also show our data points and see this in a geographical context to check whether everything is looking OK. This is causing problems - fdmr seems not to be able to deal with our UTM coordinates.
+When trying to plot the mesh with fdmr::plot_mesh, we run into the same problem as above: The plot_mesh function seems to assume lat/lon coordinates and thus zooms out to max.
 
 ```{r, eval = FALSE}
 
 fdmr::plot_mesh(mesh=mesh, spatial_data = df[,c(1,2)])
 ```
 
-The plot_mesh function seems to assume lat/lon coordinates and thus zooms out to max.
+***TO DO:*** *We would like to also show our data points and see this in a geographical context to check whether everything is looking OK. mesh_builder and plot_mesh suffer from the same problem and can't deal with UTM coordinates. fdmr should be updated to beable to deal with our UTM coordinates. This is especially important in the Arctic, where geographical coordinates result in highly distorted maps in most map grids. (Issue created: https://github.com/4DModeller/fdmr/issues/248#issue-1974643323)*
+
 
 ## Redo this with geographical coordinates
 
-Let's see whether this works if our data is in geographical coordinates instead. Redo all the steps from above:
+Let's see whether our approach works if our data is in geographical coordinates instead. Redo all the steps from above:
 
 ```{r latlonload}
 ncname_ll <- "Bayelva_snow_geo"
@@ -125,11 +124,11 @@ fdmr::mesh_builder(location_data_ll)
 
 The mesh_builder loads the shiny widget and creates a mesh, however there are several issues: 
 
-- the map part of the window covers the entire window, so the rulers disappear 
+- On several machines where we tried this and the covid tutorial, the map part of the window covers the entire window, so the rulers disappear. ***TO DO:*** *fix this bug (Issue created: https://github.com/4DModeller/fdmr/issues/243#issue-1974424767)*
 
-- the mesh is far too coarse for the small area we are looking at (1km2) 
+- The mesh is far too coarse for the small area we are looking at (1km2). ***TO DO:*** *Make standard mesh size dependent on area.* 
 
-- closing the widget window doesn't stop the underlying processes to run, consequently RStudio is blocked and needs to be restarted, as ctrl + c or interrupting by clicking the STOP button don't have any effect.
+- On one machine, closing the widget window doesn't stop the underlying processes to run, consequently RStudio is blocked and needs to be restarted, as ctrl + c or interrupting by clicking the STOP button don't have any effect. *Bug report filed: https://github.com/4DModeller/fdmr/issues/255#issue-1976392121)
 
 Let's try to specify the mesh manually using values for max.edge and cutoff that are reasonable for our domain and length scales.
 
