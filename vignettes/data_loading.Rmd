@@ -96,6 +96,35 @@ Then the first 6 rows of the data frame can be viewed using the following code.
 utils::head(tmp_df)
 ```
 
+Here we give another example of importing the netCDF file named `oisst-sst.nc`, which is available at [https://github.com/rstudio/leaflet/tree/main/docs/nc](https://github.com/rstudio/leaflet/tree/main/docs/nc), into R. We first download it from the above link, and then save it to the computer. Likewise, we use the `nc_open()` function from the `ncdf4` package to open and import this netCDF file into R. Ensure that the R working directory is set to the location of `oisst-sst.nc`, and then pass in the filename (including the extension) of the netCDF file as the first argument to the `nc_open()` function. 
+ 
+
+```{r imporoisst, eval=FALSE}
+oisst<-nc_open('oisst-sst.nc')
+```
+
+A summary of `oisst` is 
+```{r, eval=FALSE}
+print(oisst)
+```
+
+`oisst` is a `ncdf4` object, which contains one variable named `Daily.sea.surface.temperature` and two dimensions, i.e., longitude and latitude. Now we can read the values, and store them in a data frame with a structure that is expected by `fdmr`.
+
+```{r, eval=FALSE}
+Daily_sea_surface_temperature <- as.vector(ncvar_get(oisst,"Daily.sea.surface.temperature"))
+lon <- ncvar_get(oisst, "longitude")
+lat <- ncvar_get(oisst, "latitude")
+lonlat <- as.matrix(expand.grid(lon,lat))
+tmp_df <- data.frame(cbind(lonlat,Daily_sea_surface_temperature))
+colnames(tmp_df)<-c('lon', 'lat', 'Daily.sea.surface.temperature')
+```
+
+The first 6 rows of the data frame can be viewed using the following code.
+
+```{r headoisst, eval=FALSE}
+utils::head(tmp_df)
+```
+
 # Import raster data and prepare for fdmr
 
 In this section we'll demonstrate how to import raster data into R. Now we create a raster file which stores the temperature values at a number of geographical locations provided with longitude and latitude information, at 3 time points.    
