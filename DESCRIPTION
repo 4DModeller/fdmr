@@ -55,7 +55,8 @@ Imports:
     fmesher,
     purrr,
     shinyjs,
-    bslib
+    bslib,
+    leafem
 Suggests: 
     bookdown,
     knitr,
