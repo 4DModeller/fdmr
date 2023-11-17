@@ -34,6 +34,7 @@ plot_map <- function(polygon_data = NULL,
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
   m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
+  m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
 
   # Store a vector of layers we add to the map,
   # used later to create the layers control object
@@ -97,5 +98,7 @@ plot_map <- function(polygon_data = NULL,
     m <- leaflet::addScaleBar(m, position = "bottomleft")
   }
 
+  m <- leaflet::addMeasure(m, position = "bottomleft", primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
+  
   return(m)
 }
