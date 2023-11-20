@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/openghg/openghg/compare/0.1.1...HEAD)
 
+### Added
+
+- Added a new tutorial on loading data from different sources - [PR #266](https://github.com/4DModeller/fdmr/pull/266/)
+- Added new geophysical processes tutorial thanks to Alexander Minakov (4minakov) - [PR #257](https://github.com/4DModeller/fdmr/pull/257)
+- Added mouse pointer coordinates header and standard measurement tool - [PR #260](https://github.com/4DModeller/fdmr/pull/260)
+
 ## [0.1.1] - 2023-11-01
 
 ### Added
