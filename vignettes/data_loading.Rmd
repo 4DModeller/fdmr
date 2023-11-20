@@ -18,34 +18,36 @@ To begin, we'll demonstrate how to import netCDF data into R. Now we create a ne
 
 ```{r createNetCDF}
 library(ncdf4)
-filename="temp.nc"
+filename <- "temp.nc"
 xvals <- seq(-177.5, 177.5, 10)
-yvals <- seq(-87.5, 87.5, 10) 
+yvals <- seq(-87.5, 87.5, 10)
 nx <- length(xvals)
 ny <- length(yvals)
 lon <- ncdim_def("longitude", "degrees_east", xvals)
 lat <- ncdim_def("latitude", "degrees_north", yvals)
 
-time <- ncdim_def("Time","months", 1:5, unlim=TRUE)
-var_temp <- ncvar_def("temperature", "celsius", 
-                      list(lon, lat, time), 
-                      longname="value") 
+time <- ncdim_def("Time", "months", 1:5, unlim = TRUE)
+var_temp <- ncvar_def("temperature", "celsius",
+  list(lon, lat, time),
+  longname = "value"
+)
 
 ncnew <- nc_create(filename, list(var_temp))
-data <- runif(nx*ny*5, 0,1)
-ncvar_put(nc=ncnew, 
-          varid=var_temp,
-          data,
-          start=c(1,1,1),count=c(nx,ny,5))
-
+data <- runif(nx * ny * 5, 0, 1)
+ncvar_put(
+  nc = ncnew,
+  varid = var_temp,
+  data,
+  start = c(1, 1, 1), count = c(nx, ny, 5)
+)
 ```
 
 `ncnew` is a netCDF file, whose class is `ncdf4`. This file has 1 variable (temperature), and 3 dimensions (longitude, latitude and time).
 
 ```{r}
 class(ncnew)
-print(paste("The file has", ncnew$nvars,"variables"))
-print(paste("The file has", ncnew$ndim,"dimensions"))
+print(paste("The file has", ncnew$nvars, "variables"))
+print(paste("The file has", ncnew$ndim, "dimensions"))
 ```
 
 A summary of `ncnew` is 
@@ -60,34 +62,37 @@ nc_close(ncnew)
 Now the netCDF file `ncnew` with the name `temp.nc` is created, and we can read the values we put in.
 
 ```{r opennetCDF}
-ncnew <- nc_open('temp.nc')
-time <- ncvar_get(ncnew,"Time")
+ncnew <- nc_open("temp.nc")
+time <- ncvar_get(ncnew, "Time")
 nt <- dim(time)
-tmp_vec_long <- as.vector(ncvar_get(ncnew,"temperature"))
-tmp_mat <- matrix(tmp_vec_long, ncol=nt)
+tmp_vec_long <- as.vector(ncvar_get(ncnew, "temperature"))
+tmp_mat <- matrix(tmp_vec_long, ncol = nt)
 lon <- ncvar_get(ncnew, "longitude")
 lat <- ncvar_get(ncnew, "latitude")
-lonlat <- as.matrix(expand.grid(lon,lat))
-
+lonlat <- as.matrix(expand.grid(lon, lat))
 ```
 
 We store the data in a data frame with a structure that is expected by `fdmr`.
 
 ```{r storedat}
-tmp_df <- data.frame(cbind(lonlat,tmp_mat))
-names(tmp_df) <- c("lon","lat","tmp_time1","tmp_time2","tmp_time3",
-                   "tmp_time4","tmp_time5")
+tmp_df <- data.frame(cbind(lonlat, tmp_mat))
+names(tmp_df) <- c(
+  "lon", "lat", "tmp_time1", "tmp_time2", "tmp_time3",
+  "tmp_time4", "tmp_time5"
+)
 
-tmp_df<-reshape(tmp_df, 
-              varying = c("tmp_time1","tmp_time2","tmp_time3",
-                          "tmp_time4","tmp_time5"), 
-              v.names = "temperature value",
-              timevar = "time", 
-              times = c("1", "2", "3","4","5"), 
-              idvar= 'location ID',
-              new.row.names = 1:(nx*ny*nt),
-              direction = "long")
-
+tmp_df <- reshape(tmp_df,
+  varying = c(
+    "tmp_time1", "tmp_time2", "tmp_time3",
+    "tmp_time4", "tmp_time5"
+  ),
+  v.names = "temperature value",
+  timevar = "time",
+  times = c("1", "2", "3", "4", "5"),
+  idvar = "location ID",
+  new.row.names = 1:(nx * ny * nt),
+  direction = "long"
+)
 ```
 
 Then the first 6 rows of the data frame can be viewed using the following code.
@@ -100,7 +105,7 @@ Here we give another example of importing the netCDF file named `oisst-sst.nc`, 
  
 
 ```{r imporoisst, eval=FALSE}
-oisst<-nc_open('oisst-sst.nc')
+oisst <- nc_open("oisst-sst.nc")
 ```
 
 A summary of `oisst` is 
@@ -111,12 +116,12 @@ print(oisst)
 `oisst` is a `ncdf4` object, which contains one variable named `Daily.sea.surface.temperature` and two dimensions, i.e., longitude and latitude. Now we can read the values, and store them in a data frame with a structure that is expected by `fdmr`.
 
 ```{r, eval=FALSE}
-Daily_sea_surface_temperature <- as.vector(ncvar_get(oisst,"Daily.sea.surface.temperature"))
+Daily_sea_surface_temperature <- as.vector(ncvar_get(oisst, "Daily.sea.surface.temperature"))
 lon <- ncvar_get(oisst, "longitude")
 lat <- ncvar_get(oisst, "latitude")
-lonlat <- as.matrix(expand.grid(lon,lat))
-tmp_df <- data.frame(cbind(lonlat,Daily_sea_surface_temperature))
-colnames(tmp_df)<-c('lon', 'lat', 'Daily.sea.surface.temperature')
+lonlat <- as.matrix(expand.grid(lon, lat))
+tmp_df <- data.frame(cbind(lonlat, Daily_sea_surface_temperature))
+colnames(tmp_df) <- c("lon", "lat", "Daily.sea.surface.temperature")
 ```
 
 The first 6 rows of the data frame can be viewed using the following code.
@@ -132,20 +137,19 @@ In this section we'll demonstrate how to import raster data into R. Now we creat
 
 ```{r createRaster}
 library(raster)
-r1 <- raster(ncol=30, nrow=30, xmn=-180, xmx=180, ymn=-90, ymx=90)
+r1 <- raster(ncol = 30, nrow = 30, xmn = -180, xmx = 180, ymn = -90, ymx = 90)
 projection(r1) <- "+proj=longlat +datum=WGS84"
-values(r1) <- runif(length(values(r1)),0,1)
+values(r1) <- runif(length(values(r1)), 0, 1)
 
-r2 <- raster(ncol=30, nrow=30, xmn=-180, xmx=180, ymn=-90, ymx=90)
+r2 <- raster(ncol = 30, nrow = 30, xmn = -180, xmx = 180, ymn = -90, ymx = 90)
 projection(r2) <- "+proj=longlat +datum=WGS84"
-values(r2) <- runif( length(values(r2)),0,1)
+values(r2) <- runif(length(values(r2)), 0, 1)
 
 
-r3 <- raster(ncol=30, nrow=30, xmn=-180, xmx=180, ymn=-90, ymx=90)
+r3 <- raster(ncol = 30, nrow = 30, xmn = -180, xmx = 180, ymn = -90, ymx = 90)
 projection(r3) <- "+proj=longlat +datum=WGS84"
-values(r3) <- runif( length(values(r3)),0,1)
-r_stack = stack(list(r1=r1, r2=r2, r3=r3))
-
+values(r3) <- runif(length(values(r3)), 0, 1)
+r_stack <- stack(list(r1 = r1, r2 = r2, r3 = r3))
 ```
 
 
@@ -158,31 +162,28 @@ class(r_stack)
 Note that here we create a raster object directly in the R environment, but raster files are most easily read into R with the `raster()` function from the `raster` package. You simply pass in the filename (including the extension) of the raster file as the first argument. For example, if the raster file is a netCDF file, it can be loaded into R by 
 
 ```{r importraster, eval=FALSE}
-r_stack <- raster::raster('filename.nc')
-
+r_stack <- raster::raster("filename.nc")
 ```
 
 We can plot the raster data at each time point.
 
 ```{r plotraster, fig.cap="Plots of the raster data at each time point.", fig.width=8, fig.height=4, fig.align='center'}
-
 plot(r_stack)
-
 ```
 
 Then we extract the data values in `r_stack`, and save them in a data frame with a structure that is expected by `fdmr`.
 
 ```{r storedata}
-r_df <-data.frame(raster::rasterToPoints(r_stack))
-r_df<-reshape(r_df, 
-        varying = c("r1", "r2", "r3"), 
-        v.names = "temperature value",
-        timevar = "time", 
-        times = c("1", "2", "3"), 
-        idvar= 'location ID',
-        new.row.names = 1:(nx*ny*nt),
-        direction = "long")
-
+r_df <- data.frame(raster::rasterToPoints(r_stack))
+r_df <- reshape(r_df,
+  varying = c("r1", "r2", "r3"),
+  v.names = "temperature value",
+  timevar = "time",
+  times = c("1", "2", "3"),
+  idvar = "location ID",
+  new.row.names = 1:(nx * ny * nt),
+  direction = "long"
+)
 ```
 
 Then the first 6 rows of the data frame can be viewed using the following code.
