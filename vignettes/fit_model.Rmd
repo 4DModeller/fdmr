@@ -23,21 +23,33 @@ custom analysis.
 
 ## Example
 
-We've got some data
+Let's create some example data for our model.
 
 ```{r}
-fitted_model <- fdmr::fit_model(location_data, exposure_parameter, spatial_data)
+location_data <- inlabru::spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)))
 ```
 
 ```{r}
-fit_model <- function(location_data = NULL, exposure_parameter, spatial_data, mesh = NULL, formula = NULL, mesh_params = NULL, formula_params = NULL, model_params = NULL) {
-  if (is.null(mesh)) {
-    mesh <- fdmr::create_mesh(location_data, spatial_data, mesh_params)
-  }
-  if (is.null(formula)) {
-    formula <- fdmr::create_formula(exposure_parameter, mesh, formula_params)
-  }
-  fdmr::model_fit(formula, data = location_data, model_params)
+n <- 200
+spatial_data <- sf::st_as_sf(
+  data.frame(easting = runif(n, 0, 10), northing = runif(n, 0, 10)),
+  coords = c("easting", "northing")
+)
+```
+
+Now we can pass the data to the `fit_model` function and it will create a mesh and fit the model.
+
+```{r}
+fitted_model <- fit_model(location_data = location_data, spatial_data = spatial_data, family = "gaussian")
+```
+
+```{r}
+fit_model <- function(location_data, exposure_parameter = NULL, spatial_data, family="gaussian", mesh = NULL, formula = NULL, mesh_params = NULL, formula_params = NULL, model_params = NULL) {
+ mesh <- create_mesh(location_data)
+
+  formula <- create_formula(mesh)
+
+  model_fit(formula, family=family, spatial_data = spatial_data)
 }
 ```
 
@@ -54,14 +66,7 @@ fit_model <- function(location_data = NULL, exposure_parameter, spatial_data, me
 #' @return inla.mesh object
 #' @export
 create_mesh <- function(location_data, max_edge = NULL, offset = NULL, cutoff = NULL, ...) {
-    # What's a good default value of initial_range
-
-    # initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
-    # initial_range <- 0.1
-    # if(!is.null(mesh_params)) {
-    #     fmesher::fm_mesh_2d_inla(loc=location_data, max.edge=max_edge, offset=offset, cutoff=cutoff, )
-
-    # }
+    fmesher::fm_mesh_2d_inla(loc=location_data, max.edge=max_edge, offset=offset, cutoff=cutoff, ...)
 }
 ```
 
@@ -70,24 +75,26 @@ create_mesh <- function(location_data, max_edge = NULL, offset = NULL, cutoff = 
 TODO - John
 
 ```{r}
-formula <- function(...) {
-  inlabru::sweet_function()
-  inlabru::sweet_function()
-  inlabru::sweet_function()
+create_formula <- function(mesh) {
+    matern <- INLA::inla.spde2.pcmatern(mesh,
+                                    prior.sigma = c(10, 0.01),
+                                    prior.range = c(1, 0.01)
+                                )
+    cmp <- observed ~ field(geometry, model = matern) + Intercept(1)
+    cmp
 }
 ```
 
 ## Model fitting
 
 ```{r}
-model_fit <- function(formula, data, ...) {
-  inlabru::bru(...)
+model_fit <- function(formula, spatial_data, family = "gaussian") {
+  inlabru::bru(formula, family=family, data=spatial_data)
 }
 ```
 
 ```{r}
 print_formula <- function() {
-    print a sweet formula
-    it's going to look great
+    # Can we nicely print 
 }
 ```
