@@ -1,0 +1,196 @@
+---
+title: "Tibetan Lakes Example"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Tibetan Lakes Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The Tibetan Plateau and the High Mountain Asia region provide water resources to approximately 1 billion people and provide for their health, economies, and agriculture. These natural "water towers" are highly sensitive to climate change and therefore changes in regional water resources must be understood (@immerzeel2020importance). Indeed, understanding how climate change will alter cold region water resources has been described as a "grand challenge" of hydrology (@twentythreeproblems). Recent changes in lakes in the Tibetan Plateau endorheic basin have led to increases in lake areas. Conventionally attributed to increases in glacier melt due to climate change, a recent investigation has demonstrated that glacier mass loss contributes only a small fraction (19%) to the lake volume increase (@brun2020limited). Thus, an unresolved question in the Tibetan Plateau endorheic basin lakes is, what physical processes drive lake growth in the region and at what fraction?
+
+```{r error=TRUE}
+fdmr::retrieve_tutorial_data(dataset = "tibetan_lakes")
+
+data_filepath <- fdmr::get_tutorial_datapath(dataset = "tibetan_lakes", file = "tibetan_lakes_data.csv")
+data <- read.csv(data_filepath)
+
+summary(data)
+```
+
+We have compiled a dataset for 20 years of lake growth using the global surface water survey (@pekel2016high), the hydrobasins catchment dataset (@lehner2013global), and ERA5-land precipitation data (@hersbach2020era5). The global surface water survey is a data set using LANDSAT data to classify pixels where lakes are annually. We have converted this to a time series by looking at how lakes have changed between years. This is done in Google Earth Engine [using the following codes](https://code.earthengine.google.com/3304560943f796c82f935403dcc54909). We then aggregate data to changes that have occured within a catchment using the hydrobasins catchment definitions (level 6). We do the same for the ERA5-land precipitation data. This is compiled into a CSV that is presented here.
+
+Let's look at this data and see what is going on. First lets look at the overall changes in lake areas.
+
+```{r error=TRUE, fig.width=8, fig.height=4, fig.align = "center"}
+library(tidyverse)
+
+# Split data into positive and negative, then summarize
+summary_data <- data %>%
+  mutate(sign = ifelse(water_balance_m3 > 0, "Lake Growth", "Lake Decline")) %>%
+  group_by(year, sign) %>%
+  summarise(total = sum(water_balance_m3, na.rm = TRUE)) %>%
+  ungroup()
+
+# Summarize the data by year
+sums <- data %>%
+  group_by(year) %>%
+  summarise(
+    precip_sum = sum(precip, na.rm = TRUE),
+    growth_ratio_sum = sum(growth_ratio, na.rm = TRUE),
+    decline_ratio_sum = sum(decline_ratio, na.rm = TRUE)
+  )
+
+# TODO : combine these plots
+ggplot() +
+  geom_col(data = summary_data, aes(x = year, y = total, fill = sign), position = "stack")
+
+ggplot() +
+  geom_line(data = sums, aes(x = year, y = precip_sum * 100), color = "cyan") # Scale
+```
+
+We can see here that while lakes both grow and decline, the overall trend is that lakes are growing more than they are shrinking in the Tibetan plateau. Why is this? perhaps it is because of the rain. Our ERA5-land data set gives us precipitation per year (after aggregation). But we see that the largest year that lakes grow, is not the largest amount of rain. What is going on here?
+
+```{r error=TRUE, fig.width=8, fig.height=8, fig.align = "center"}
+ggplot(data, aes(x = precip, y = water_balance_m3, color = as.factor(year))) +
+  geom_point(alpha = 0.5) +
+  scale_color_viridis_d() +
+  theme_minimal()
+```
+
+Here we can see across the 20 year observation period a clear spatial distinction in lakegrowth however it is not as clear cut for precipitation.
+```{r error=TRUE, fig.width=8, fig.height=8, fig.align='center'}
+# TODO : this should include plotting the polygons of the catchments
+library(leaflet)
+
+# Summarize the data
+summary_data <- data %>%
+  group_by(centroid_lon, centroid_lat) %>%
+  summarise(
+    total_balance = sum(water_balance_m3, na.rm = TRUE),
+    total_precip = sum(precip, na.rm = TRUE)
+  )
+
+# Create a map
+leaflet(summary_data) %>%
+  addTiles() %>%
+  addCircles(
+    lng = ~centroid_lon,
+    lat = ~centroid_lat,
+    radius = ~ 50 * total_balance,
+    color = "blue",
+    stroke = FALSE,
+    fillOpacity = 0.6
+  ) %>%
+  addCircles(
+    lng = ~centroid_lon,
+    lat = ~centroid_lat,
+    radius = ~ 500 * total_precip,
+    color = "red",
+    stroke = FALSE,
+    fillOpacity = 0.6
+  )
+```
+
+Let's try and model this. We will use 4DModeller and inlabru.
+
+[inlabru](https://inlabru-org.github.io/inlabru/index.html) is designed to calculate fixed and random effects as well as continuous spatially and temporally distributed processes using SPDEs. In order to make these computationally solveable, the continous processes are discretized on a finite element mesh. This mesh represents the spatial distribution of the process under study. At each node of the mesh, the model is used to calculate the outcome variable (in this case lake area changes). The mesh provides the spatial awareness to the model. Different processes can have different length scales, i.e., how far away does a process need to occur before it has no effect on the occurence of the process at my current location. These are controlled by priors (see below). One major assumption in this method is that the process being modeled is continuous. This has the benefit that the spatial field being modeled can be calculated for regions where there is no data.
+
+4DModeller is designed to make these model design decisions visual, interpretable, and accessible to users who may not have a strong background in R programming or bayesian spatiotemporal modeling. 4DModeller has a set of shiny apps that help the user write the codes necessary to implement the full model and evaluate it's performance.
+
+First we will use the mesh_builder to build a reasonable mesh.
+
+> **_NOTE:_**  Due to the size of the mesh being created the initial load of the app may take some time
+
+```{r error=TRUE, eval=FALSE}
+fdmr::mesh_builder(spatial_data = data, obs_data = data, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs", longitude_column = "centroid_lon", latitude_column = "centroid_lat")
+```
+
+Using the mesh_builder we have the code to build the mesh for the inlabru model.
+
+```{r error=TRUE}
+mesh <- fmesher::fm_mesh_2d_inla(
+  loc = data[, c("centroid_lon", "centroid_lat")],
+  max.edge = c(3, 7.9),
+  cutoff = 0.9,
+  offset = c(0.2, 4)
+)
+
+fdmr::plot_mesh(mesh)
+```
+
+This mesh now represents where the model will calculate the lake changes for the tibetan lakes region. Now that we have the mesh we can use the priors app to specify the model.
+
+```{r error=TRUE}
+library(dplyr)
+# Define a function to calculate z-scores, except for specified columns
+calculate_zscore <- function(df, group_col, ignore_cols) {
+  df %>%
+    group_by(across(all_of(group_col))) %>%
+    mutate(across(
+      where(is.numeric) & !all_of(ignore_cols),
+      list(zscore = ~ (. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE)),
+      .names = "zscore_{col}"
+    )) %>%
+    ungroup()
+}
+
+# Specify columns to ignore
+ignore_cols <- c("centroid_lon", "centroid_lat", "year")
+
+# Apply the function to the data
+data_with_zscores <- calculate_zscore(data, "HYBAS_ID", ignore_cols)
+sp::coordinates(data_with_zscores) <- c("centroid_lon", "centroid_lat")
+```
+
+Now we're ready to use `model_builder` to investigate how changing priors affects model predictions.
+
+```{r error=TRUE, eval=FALSE}
+fdmr::model_builder(spatial_data = data_with_zscores, measurement_data = data_with_zscores, mesh = mesh, time_variable = "year")
+```
+
+Now we use the code from the model builder app to make the model:
+
+```{r error=TRUE}
+group_index <- data_with_zscores$year
+n_groups <- length(unique(data_with_zscores$year))
+spde <- INLA::inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(0.05, 0.1),
+  prior.sigma = c(0.05, 0.2)
+)
+
+alphaprior <- list(theta = list(
+  prior = "pccor1",
+  param = c(-0.2, 0.8)
+))
+
+formula2 <- zscore_water_balance_m3 ~ 0 + Intercept(1) + precipitation(data_with_zscores$zscore_precip, model = "linear") + temperature(data_with_zscores$zscore_t2m) + residuals(data_with_zscores[, c("centroid_lon", "centroid_lat")], model = "spde", group = group_index, ngroup = n_groups, control.group = list(model = "ar1", hyper = alphaprior))
+
+model_output <- inlabru::bru(formula2,
+  data = data_with_zscores,
+  family = "gaussian",
+  E = NULL,
+  control.family = NULL,
+  options = list(
+    verbose = FALSE
+  )
+)
+
+summary(model_output)
+```
+
+now we can use the model viewer to view the output of the model and create some plots
+
+```{r error=TRUE, eval=FALSE}
+fdmr::model_viewer(model_output = model_output, mesh = mesh, measurement_data = data_with_zscores, data_distribution = "Gaussian")
+```
+
+```{r error=TRUE}
+hist(model_output$summary.fitted.values$mean, breaks = seq(-0.3, 0.3, l = 100))
+```
