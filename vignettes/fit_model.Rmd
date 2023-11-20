@@ -30,14 +30,14 @@ fitted_model <- fdmr::fit_model(location_data, exposure_parameter, spatial_data)
 ```
 
 ```{r}
-fit_model <- function(location_data = NULL, exposure_parameter, spatial_data, mesh = NULL, formula = NULL, mesh_params = NULL, function_params = NULL, model_params = NULL) {
+fit_model <- function(location_data = NULL, exposure_parameter, spatial_data, mesh = NULL, formula = NULL, mesh_params = NULL, formula_params = NULL, model_params = NULL) {
   if (is.null(mesh)) {
-    mesh <- fdmr::create_mesh(location_data, spatial_data)
+    mesh <- fdmr::create_mesh(location_data, spatial_data, mesh_params)
   }
   if (is.null(formula)) {
-    formula <- fdmr::create_formula(exposure_parameter, mesh)
+    formula <- fdmr::create_formula(exposure_parameter, mesh, formula_params)
   }
-  fdmr::model_fit(formula, data = location_data, ...)
+  fdmr::model_fit(formula, data = location_data, model_params)
 }
 ```
 
@@ -48,17 +48,20 @@ fit_model <- function(location_data = NULL, exposure_parameter, spatial_data, me
 #'
 #' @param location_data Location data as data.frame
 #' @param max_edge Max edge value(s) - optional
-#' @param offset 
+#' @param offset Offset value(s) - optional
+#' @param cutoff Cutoff value(s) - optional
 #'
-#' @return
+#' @return inla.mesh object
 #' @export
-create_mesh <- function(location_data, max_edge = NULL, offset = NULL, cutoff = NULL) {
+create_mesh <- function(location_data, max_edge = NULL, offset = NULL, cutoff = NULL, ...) {
     # What's a good default value of initial_range
 
     # initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
     # initial_range <- 0.1
+    # if(!is.null(mesh_params)) {
+    #     fmesher::fm_mesh_2d_inla(loc=location_data, max.edge=max_edge, offset=offset, cutoff=cutoff, )
 
-    fmesher::fm_mesh_2d_inla(loc=location_data, max.edge=max_edge, offset=offset, cutoff=cutoff)
+    # }
 }
 ```
 
@@ -68,7 +71,7 @@ TODO - John
 
 ```{r}
 formula <- function(...) {
-  inlabru::sweet_function
+  inlabru::sweet_function()
   inlabru::sweet_function()
   inlabru::sweet_function()
 }
@@ -79,5 +82,12 @@ formula <- function(...) {
 ```{r}
 model_fit <- function(formula, data, ...) {
   inlabru::bru(...)
+}
+```
+
+```{r}
+print_formula <- function() {
+    print a sweet formula
+    it's going to look great
 }
 ```
