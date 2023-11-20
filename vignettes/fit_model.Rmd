@@ -1,0 +1,83 @@
+---
+title: "Fitting a model"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Fitting a model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+We hope to simplify the use of `inlabru` through the `fit_model` function. This function will:
+
+1. Automatically create a mesh from your data
+2. Create the formula for your
+3. Fit the model
+
+It will then return the fitted model object for use with the `fdmr::model_viewer` Shiny app or your own
+custom analysis.
+
+## Example
+
+We've got some data
+
+```{r}
+fitted_model <- fdmr::fit_model(location_data, exposure_parameter, spatial_data)
+```
+
+```{r}
+fit_model <- function(location_data = NULL, exposure_parameter, spatial_data, mesh = NULL, formula = NULL, mesh_params = NULL, function_params = NULL, model_params = NULL) {
+  if (is.null(mesh)) {
+    mesh <- fdmr::create_mesh(location_data, spatial_data)
+  }
+  if (is.null(formula)) {
+    formula <- fdmr::create_formula(exposure_parameter, mesh)
+  }
+  fdmr::model_fit(formula, data = location_data, ...)
+}
+```
+
+## Mesh creation
+
+```{r}
+#' Title
+#'
+#' @param location_data Location data as data.frame
+#' @param max_edge Max edge value(s) - optional
+#' @param offset 
+#'
+#' @return
+#' @export
+create_mesh <- function(location_data, max_edge = NULL, offset = NULL, cutoff = NULL) {
+    # What's a good default value of initial_range
+
+    # initial_range <- diff(range(sp_data@data[, "LONG"])) / 5
+    # initial_range <- 0.1
+
+    fmesher::fm_mesh_2d_inla(loc=location_data, max.edge=max_edge, offset=offset, cutoff=cutoff)
+}
+```
+
+## Formula creation
+
+TODO - John
+
+```{r}
+formula <- function(...) {
+  inlabru::sweet_function
+  inlabru::sweet_function()
+  inlabru::sweet_function()
+}
+```
+
+## Model fitting
+
+```{r}
+model_fit <- function(formula, data, ...) {
+  inlabru::bru(...)
+}
+```
