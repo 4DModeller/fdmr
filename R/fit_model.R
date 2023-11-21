@@ -6,11 +6,22 @@
 #' @param process_coords list of coordinates associated with process
 #' @param data data.frame of data
 #' @param family gaussian or poisson
+#' @param latitude_col name of latitude column
+#' @param longitude_col name of longitude column
 #'
 #' @export
-fit_model <- function(y, fixed_x, process_x, process_coords, data, time_variable = "time", family = "gaussian") {
-    loadNamespace("inlabru")
-    loadNamespace("INLA")
+fit_model <- function(
+    y,
+    fixed_x,
+    process_x,
+    process_coords,
+    measurement_data,
+    time_variable = "time",
+    family = "gaussian",
+    latitude_col = "LAT",
+    longitude_col = "LONG") {
+    library("inlabru")
+    library("INLA")
     # y : str - outcome variable name
     # fixed_x : list - list of fixed effects variable names
     # process_x : list - list of process effects variable names
@@ -21,61 +32,64 @@ fit_model <- function(y, fixed_x, process_x, process_coords, data, time_variable
 
     # TODO : make process effects formula string
     # If it's not a list then we create one so we can iterate over it
-    if (!is.list(process_x)) {
-        process_x <- list(process_x)
-    }
+    # if (!is.list(process_x)) {
+    #     process_x <- list(process_x)
+    # }
 
-    pe_effects <- list()
-    for (process in process_x) {
-        # TODO - can add more params to the function signature and unpack them here
-        # We want the equivalent of **mesh_params here
-        initial_range <- 0.1
-        mesh <- fmesher::fm_mesh_2d_inla(loc = process_coords)
+    fe_formula <- stringr::str_c(fixed_x, collapse = " + ")
 
-        group_index <- data[[time_variable]]
-        n_groups <- length(unique(group_index))
-        # Create the spde
-        spde <- INLA::inla.spde2.pcmatern(
-            mesh = mesh,
-            prior.range = c(initial_range, 0.5),
-            prior.sigma = c(1, 0.01)
+    # Give it a default value and try and update it from the location data
+    initial_range <- 0.5
+    tryCatch({
+        initial_range <- diff(range(process_coords[, longitude_col])) / 5
+    })
+
+    max_edge <- initial_range / 8
+
+    mesh <- fmesher::fm_mesh_2d_inla(
+        loc = process_coords,
+        # max.edge = c(1, 2) * max_edge,
+        # offset = c(initial_range / 4, initial_range),
+        # cutoff = max_edge / 7
+    )
+
+    prior_range <- initial_range
+    spde <- INLA::inla.spde2.pcmatern(
+        mesh = mesh,
+        prior.range = c(prior_range, 0.5),
+        prior.sigma = c(1, 0.01)
+    )
+
+    rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+    group_index <- measurement_data[[time_variable]]
+    n_groups <- length(unique(measurement_data[[time_variable]]))
+
+    sp::coordinates(measurement_data) <- c(longitude_col, latitude_col)
+
+    # formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1)"))) +
+    #     f(
+    #         main = coordinates,
+    #         model = spde,
+    #         group = group_index,
+    #         ngroup = n_groups,
+    #         control.group = list(
+    #             model = "ar1",
+    #             hyper = rhoprior
+    #         )
+    #     )
+
+    formula <- cases ~ 0 + Intercept(1) + f(main = coordinates, model = spde, group = group_index, ngroup = n_groups, control.group = list(model = "ar1", hyper = rhoprior))
+
+
+    inlabru_model <- inlabru::bru(formula,
+        data = measurement_data,
+        family = "poisson",
+        E = measurement_data[[process_x]],
+        control.family = list(link = "log"),
+        options = list(
+            verbose = TRUE
         )
+    )
 
-        rhoprior <- list(theta = list(prior = "pccor1", param = c(0, 0.9)))
-
-        tryCatch({
-            sp::coordinates(process_coords) <- c("LONG", "LAT")
-        })
-
-        # Coordinates here is just read magically, it's not an object
-        effect_str <- f(
-            main = coordinates,
-            model = spde,
-            family = family,
-            E = process,
-            group = group_index,
-            ngroup = n_groups,
-            control.group = list(
-                model = 'ar1',
-                hyper = rhoprior
-            )
-        )
-
-        effect_str
-    }
-
-    # TODO : make process mesh for specific process
-
-    # TODO : make spde using mesh for specific process
-
-    # TODO : make specific formula string for this specific process
-
-    # TODO : combine all formula strings to make main formula string
-    formula <- "y ~ 1 +"
-    formula <- paste(formula, fe_effects, sep = "")
-    formula <- paste(formula, pe_effects, sep = "")
-    # print created formula for user inspection
-    print(formula)
-
-    inlabru::bru(formula, data, family = family)
+    inlabru_model
 }
