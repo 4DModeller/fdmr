@@ -15,7 +15,7 @@ fit_model <- function(
     fixed_x,
     process_x,
     process_coords,
-    measurement_data,
+    data,
     time_variable = "time",
     family = "gaussian",
     latitude_col = "LAT",
@@ -36,21 +36,27 @@ fit_model <- function(
     #     process_x <- list(process_x)
     # }
 
-    fe_formula <- stringr::str_c(fixed_x, collapse = " + ")
+    fe_formula <- ""
+    if (!is.null(fixed_x)) {
+        fe_formula <- stringr::str_c(fixed_x, collapse = " + ")
+    }
 
     # Give it a default value and try and update it from the location data
     initial_range <- 0.5
-    tryCatch({
-        initial_range <- diff(range(process_coords[, longitude_col])) / 5
-    })
+
+    # <- tryCatch({
+    #     diff(range(process_coords[, longitude_col])) / 5
+    # }, error = function(e) {
+    #     0.5
+    # })
 
     max_edge <- initial_range / 8
 
     mesh <- fmesher::fm_mesh_2d_inla(
         loc = process_coords,
-        # max.edge = c(1, 2) * max_edge,
-        # offset = c(initial_range / 4, initial_range),
-        # cutoff = max_edge / 7
+        max.edge = c(1, 2) * max_edge,
+        offset = c(initial_range / 4, initial_range),
+        cutoff = max_edge / 7
     )
 
     prior_range <- initial_range
@@ -61,30 +67,17 @@ fit_model <- function(
     )
 
     rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
-    group_index <- measurement_data[[time_variable]]
-    n_groups <- length(unique(measurement_data[[time_variable]]))
+    group_index <- data[[time_variable]]
+    n_groups <- length(unique(data[[time_variable]]))
 
-    sp::coordinates(measurement_data) <- c(longitude_col, latitude_col)
+    sp::coordinates(data) <- c(longitude_col, latitude_col)
 
-    # formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1)"))) +
-    #     f(
-    #         main = coordinates,
-    #         model = spde,
-    #         group = group_index,
-    #         ngroup = n_groups,
-    #         control.group = list(
-    #             model = "ar1",
-    #             hyper = rhoprior
-    #         )
-    #     )
-
-    formula <- cases ~ 0 + Intercept(1) + f(main = coordinates, model = spde, group = group_index, ngroup = n_groups, control.group = list(model = "ar1", hyper = rhoprior))
-
+    formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1) + f(main = coordinates, model = spde, group = group_index, ngroup = n_groups, control.group = list(model = 'ar1', hyper = rhoprior))")))
 
     inlabru_model <- inlabru::bru(formula,
-        data = measurement_data,
+        data = data,
         family = "poisson",
-        E = measurement_data[[process_x]],
+        E = data[[process_x]],
         control.family = list(link = "log"),
         options = list(
             verbose = TRUE
