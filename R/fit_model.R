@@ -19,7 +19,11 @@ fit_model <- function(y, fixed_x, process_x, process_coords, data) {
     # TODO : make specific formula string for this specific process
 
 # TODO : combine all formula strings to make main formula string
-formula <- 'y ~ 1 + everything'
+formula <- 'y ~ 1 +'
+formula <- paste(formula, fe_effects, sep = "")
+formula <- paste(formula, pe_effects, sep = "")
+# print created formula for user inspection
+print(formula)
 
 bru(formula, data, family='gaussian')
 }
