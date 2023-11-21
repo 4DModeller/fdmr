@@ -9,6 +9,14 @@ fit_model <- function(y, fixed_x, process_x, process_coords, data) {
 # data : data.frame - data.frame of data
 
 # TODO : make fixed effects formula string
+fe_formula <- ""
+for (i in 1:length(fixed_x)) {
+    fe_formula <- paste(fe_formula, fixed_x[i], sep = "")
+
+    if (i < length(fixed_x)) {
+        fe_formula <- paste(fe_formula, " + ", sep= "")
+    }
+}
 
 # TODO : make process effects formula string
 
