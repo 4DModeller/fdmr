@@ -1,5 +1,5 @@
 ---
-title: "Fitting a model"
+title: "Using the fit_model function to quickly build models"
 output: 
   bookdown::html_document2:
     base_format: rmarkdown::html_vignette
@@ -12,14 +12,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-We hope to simplify the use of `inlabru` through the `fit_model` function. This function will:
+The `fit_model` function is built to automatically build an inlabru model that has data constrained latent processes as well as fixed effects on an automatically generated mesh.
 
-1. Automatically create a mesh from your data
-2. Create the formula for your
-3. Fit the model
-
-It will then return the fitted model object for use with the `fdmr::model_viewer` Shiny app or your own
-custom analysis.
+It will then return a fitted model `bru` object for use with the `fdmr::model_viewer` Shiny app or your own custom analysis.
 
 ## Example
 
