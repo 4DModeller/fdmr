@@ -28,13 +28,6 @@ fit_model <- function(
     # process_coords : list - list of coordinates associated with process
     # data : data.frame - data.frame of data
 
-    # TODO : make fixed effects formula string
-
-    # TODO : make process effects formula string
-    # If it's not a list then we create one so we can iterate over it
-    # if (!is.list(process_x)) {
-    #     process_x <- list(process_x)
-    # }
 
     fe_formula <- ""
     if (!is.null(fixed_x)) {
@@ -72,7 +65,9 @@ fit_model <- function(
 
     sp::coordinates(data) <- c(longitude_col, latitude_col)
 
-    formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1) + f(main = coordinates, model = spde, group = group_index, ngroup = n_groups, control.group = list(model = 'ar1', hyper = rhoprior))")))
+    formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1) +
+                    f(main = coordinates, model = spde, group = group_index,
+                    ngroup = n_groups, control.group = list(model = 'ar1', hyper = rhoprior))")))
 
     inlabru_model <- inlabru::bru(formula,
         data = data,

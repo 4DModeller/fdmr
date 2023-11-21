@@ -11,90 +11,28 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+---
+title: "R Notebook"
+output: html_notebook
+---
 
-We hope to simplify the use of `inlabru` through the `fit_model` function. This function will:
-
-1. Automatically create a mesh from your data
-2. Create the formula for your
-3. Fit the model
-
-It will then return the fitted model object for use with the `fdmr::model_viewer` Shiny app or your own
-custom analysis.
-
-## Example
-
-Let's create some example data for our model.
 
 ```{r}
-location_data <- inlabru::spoly(data.frame(easting = c(0, 10, 10, 0), northing = c(0, 0, 10, 10)))
+sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_dataBris.rds")
+covid19_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "covid19_dataBris.rds")
+```
+
+
+```{r}
+location_data = sp_data@data[,c("LONG", "LAT")]
 ```
 
 ```{r}
-n <- 200
-spatial_data <- sf::st_as_sf(
-  data.frame(easting = runif(n, 0, 10), northing = runif(n, 0, 10)),
-  coords = c("easting", "northing")
-)
+fdmr::fit_model(y="cases", fixed_x = "IMD", process_x = "Population", process_coords = location_data, data=covid19_data, time_variable="week" )
 ```
 
-Now we can pass the data to the `fit_model` function and it will create a mesh and fit the model.
+Then we can pass in a list of fixed effects
+
 
 ```{r}
-fitted_model <- fit_model(location_data = location_data, spatial_data = spatial_data, family = "gaussian")
-```
-
-```{r}
-fit_model <- function(location_data, exposure_parameter = NULL, spatial_data, family="gaussian", mesh = NULL, formula = NULL, mesh_params = NULL, formula_params = NULL, model_params = NULL) {
- mesh <- create_mesh(location_data)
-
-  formula <- create_formula(mesh)
-
-  model_fit(formula, family=family, spatial_data = spatial_data)
-}
-```
-
-## Mesh creation
-
-```{r}
-#' Title
-#'
-#' @param location_data Location data as data.frame
-#' @param max_edge Max edge value(s) - optional
-#' @param offset Offset value(s) - optional
-#' @param cutoff Cutoff value(s) - optional
-#'
-#' @return inla.mesh object
-#' @export
-create_mesh <- function(location_data, max_edge = NULL, offset = NULL, cutoff = NULL, ...) {
-    fmesher::fm_mesh_2d_inla(loc=location_data, max.edge=max_edge, offset=offset, cutoff=cutoff, ...)
-}
-```
-
-## Formula creation
-
-TODO - John
-
-```{r}
-create_formula <- function(mesh) {
-    matern <- INLA::inla.spde2.pcmatern(mesh,
-                                    prior.sigma = c(10, 0.01),
-                                    prior.range = c(1, 0.01)
-                                )
-    cmp <- observed ~ field(geometry, model = matern) + Intercept(1)
-    cmp
-}
-```
-
-## Model fitting
-
-```{r}
-model_fit <- function(formula, spatial_data, family = "gaussian") {
-  inlabru::bru(formula, family=family, data=spatial_data)
-}
-```
-
-```{r}
-print_formula <- function() {
-    # Can we nicely print 
-}
-```
+fixed_effects = c("carebeds.ratio", "AandETRUE")
