@@ -1,0 +1,53 @@
+---
+title: "Using mapview"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Using mapview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Here we'll use mapview to create some plots of things and then use the plotting code in the 
+Shiny apps (maybe).
+
+```{r}
+library(mapview)
+```
+
+Let's get some of the UTM data they wanted to load in.
+
+```{r}
+filepath = "/Users/gar/Documents/Devel/global_mass/fdmr/vignettes/data/Bayelva_snow.nc"
+```
+
+```{r}
+ncin <- ncdf4::nc_open(filepath) 
+longitude <- ncdf4::ncvar_get(ncin,"xs") 
+latitude <-ncdf4::ncvar_get(ncin,"ys")
+
+# Get the first year of snow depth (ds)
+ds <- ncdf4::ncvar_get(ncin,"ds")[,1]
+
+# Create a data frame
+df <- data.frame(LONG = longitude,LAT = latitude,ds) 
+head(df)
+```
+
+```{r}
+locations <- sf::st_as_sf(
+  df,
+  coords = c("LONG","LAT"),
+  crs = "+proj=utm +zone=33"
+)
+```
+
+Now let's plot the map
+
+```{r}
+mapview::mapview(locations)
+```
