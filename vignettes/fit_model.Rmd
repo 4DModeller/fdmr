@@ -36,3 +36,5 @@ Then we can pass in a list of fixed effects
 
 ```{r}
 fixed_effects = c("carebeds.ratio", "AandETRUE")
+fdmr::fit_model(y="cases", fixed_x = "IMD", process_x = "Population", process_coords = location_data, data=covid19_data, time_variable="week" )
+
