@@ -28,67 +28,54 @@ fit_model <- function(
     # process_coords : list - list of coordinates associated with process
     # data : data.frame - data.frame of data
 
-    # TODO : make fixed effects formula string
-
-    # TODO : make process effects formula string
-    # If it's not a list then we create one so we can iterate over it
-    # if (!is.list(process_x)) {
-    #     process_x <- list(process_x)
-    # }
-
-    if(!is.list(fixed_x)) {
-        fixed_x <- list(fixed_x)
-    }
-
-    fe_formula <- ""
-    if (!is.null(fixed_x)) {
-        fe_formula <- stringr::str_c(fixed_x, collapse = " + ")
-    }
-
-    # Give it a default value and try and update it from the location data
-    initial_range <- 0.5
-
-    # <- tryCatch({
-    #     diff(range(process_coords[, longitude_col])) / 5
-    # }, error = function(e) {
-    #     0.5
-    # })
-
+    initial_range <- 0.1
     max_edge <- initial_range / 8
 
-    mesh <- fmesher::fm_mesh_2d_inla(
-        loc = process_coords,
-        max.edge = c(1, 2) * max_edge,
-        offset = c(initial_range / 4, initial_range),
-        cutoff = max_edge / 7
+    # Create another mesh
+    mesh_space <- fmesher::fm_mesh_2d_inla(
+        loc = process_coords
     )
 
-    prior_range <- initial_range
-    spde <- INLA::inla.spde2.pcmatern(
-        mesh = mesh,
-        prior.range = c(prior_range, 0.5),
+    space_values <- data
+    spacetime_values <- data
+
+    mesh_spacetime <- fmesher::fm_mesh_2d_inla(
+        loc = process_coords
+    )
+
+    # Build the two SPDEs / whatever you want
+    space_spde <- INLA::inla.spde2.pcmatern(
+        mesh = mesh_space,
+        prior.range = c(initial_range, 0.5),
         prior.sigma = c(1, 0.01)
     )
 
+    # spde <- INLA::inla.spde2.pcmatern(
+    #     mesh = mesh_spacetime,
+    #     prior.range = c(initial_range, 0.5),
+    #     prior.sigma = c(1, 0.01)
+    # )
+
     rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
-    group_index <- data[[time_variable]]
-    n_groups <- length(unique(data[[time_variable]]))
+    time_mesh <- mesh_space
 
-    sp::coordinates(data) <- c(longitude_col, latitude_col)
 
-    formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1) + ", fe_formula, " +
-                    f(main = coordinates, model = spde, group = group_index, 
-                    ngroup = n_groups, control.group = list(model = 'ar1', hyper = rhoprior))")))
-
-    inlabru_model <- inlabru::bru(formula,
-        data = data,
-        family = "poisson",
-        E = data[[process_x]],
-        control.family = list(link = "log"),
-        options = list(
-            verbose = TRUE
-        )
+    model_out <- inlabru::bru(
+        components = ~ space(geometry, model = space_spde) +
+            spacetime(
+                geometry,
+                model = space_spde,
+                group = time,
+                control.group = list(
+                    model = "ar1",
+                    hyper = rhoprior
+                ),
+                group_mapper = bru_mapper(time_mesh)
+            ) +
+            beta_u(1, prec.linear = 1, marginal = bru_mapper_marginal(qexp, rate = 1)),
+        like(formula = space_values ~ space, family = "gaussian"),
+        like(formula = spacetime_values ~ beta_u * space + spacetime, family = "gaussian")
     )
 
-    inlabru_model
+    model_out
 }
