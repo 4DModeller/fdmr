@@ -87,127 +87,31 @@ group.index <- simdf$time
 n_groups <- length(unique(simdf$time))
 
 
-```{r, error=TRUE}
 sp::coordinates(simdf) <- c("LONG", "LAT")
-```
 
-## Define the model formula
-```{r formula, error=TRUE}
-formula <- datn ~ 0 + Intercept(1) +
-  f(
-    main = coordinates,
-    model = spde,
-    group = group.index,
-    ngroup = n_groups,
-    control.group = list(
-      model = "ar1",
-      hyper = rhoprior
+bru(
+  components = ~ u(geometry, model=space_spde)
+      + v(
+        # list(
+          geometry
+          , model=space_spde
+          , group = time
+          , control.group=list(...)
+          , group_mapper = bru_mapper(time_mesh)
+      )
+          # ) +
+      # beta_u(
+      + beta_u(
+        1
+        , prec.linear = 1
+        , marginal = bru_mapper_marginal(qexp, rate = 1)
+        )
+  ,like(
+    formula = geographyvalues ~ u
+    , family="gaussian"
     )
-  )
-```
-
-
-## Fit the model
-
-Finally, we fit the spatio-temporal model using SPDE approach and AR(1) process by calling the function `bru()` of the package `inlabru`.
-
-```{r fitmodel}
-inlabru_model <- inlabru::bru(formula,
-  data = simdf,
-  family = "gaussian",
-  options = list(
-    verbose = TRUE
-  )
+  ,like(
+    formula = hydrologyvalues ~ beta_u * u + v
+    , family="gaussian"
+    )
 )
-```
-
-## Results summary
-
-After completing the model fitting process, you can examine the main result summaries by typing `summary(inlabru_model)`. Additionally, you can check the parameter estimates for fixed effects, random effects, and hyperparameters as follows.
-
-```{r summary,eval=FALSE}
-model_summary <- summary(inlabru_model)
-model_fixed <- inlabru_model$summary.fixed
-model_random <- inlabru_model$summary.random
-model_hyperparams <- inlabru_model$summary.hyperpar
-```
-
-
-The Deviance Information Criterion (DIC) value, which measures the goodness of model fit, can be examined as follows.
-
-
-```{r dicvalue}
-model_dic <- inlabru_model$dic$dic
-```
-
-
-You can obtain the model's fitted values and compare them with the observed values as follows.
-
-```{r fittedvals,eval=TRUE}
-fitted_vals <- inlabru_model$summary.fitted.values[1:nrow(simdf), ]
-```
-
-```{r plotfitted, error=TRUE,fig.cap="A plot of the fitted and observed values.", fig.width=8, fig.height=4, fig.align = "center"}
-par(pty = "s")
-plot(fitted_vals$mean, simdf$datn, xlab = "fitted", ylab = "observed")
-```
-
-# Exploring the functionality of the `fdmr` Package
-
-Next, we'll demonstrate the key functionality offered by the `fdmr` package.
-
-## fdmr::plot_mesh 
-
-The `fdmr::plot_mesh` function displays both the mesh and the observation points overlaid on the mesh.
-
-
-```{r meshplot, error=TRUE,fig.cap="A plot of the mesh.", fig.width=8, fig.height=4, fig.align = "center"}
-fdmr::plot_mesh(mesh = mesh, spatial_data = simdf@coords)
-```
-
-## fdmr::mesh_builder
-
-`fdmr` provides an interactive mesh builder tool called `fdmr::mesh_builder`. It allows you to build a mesh from some spatial data, modify its parameters and plot it and the data on an interactive map. To build a mesh, we need to pass `sp_data` to the `mesh_builder` function.
-
-```{r meshbuilder,eval=FALSE}
-fdmr::mesh_builder(spatial_data = sp_data)
-```
-
-The interactive map allows you to customise the initial parameters such as `max_edge`, `offset` and `cutoff` to change the shape and size of the mesh. We also provide a simple function to check if there are any errors with the meshes created using the mesh builder tool. To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Specifically, create a mesh of your design using the meshbuilder tool. When you’re finished, click the “Check mesh” button on the user interface. This passes the created mesh to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
-
-```{r meshchecking,eval=FALSE}
-fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
-```
-
-## Model builder Shiny app
-`fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::model_builder` function.
-
-```{r priorapp, eval=FALSE}
-fdmr::model_builder(
-  spatial_data = sp_data,
-  measurement_data = simdf,
-  mesh = mesh,
-  time_variable = "time"
-)
-```
-
-## fdmr::model_viewer
-
-`fdmr` provides a separate Shiny app which allows you to intuitively visualize the model output. You can launch this app by passing the `bru` model object, the mesh, observation data and data distribution as arguments to the `fdmr::model_viewer` function.
-
-```{r modelviewer, eval=FALSE}
-fdmr::model_viewer(
-  model_output = inlabru_model,
-  mesh = mesh,
-  measurement_data = simdf,
-  data_distribution = "Gaussian"
-)
-```
-
-## fdmr::plot_map
-
-The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.
-
-```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align = "center"}
-fdmr::plot_map(polygon_data = sp_data)
-```
