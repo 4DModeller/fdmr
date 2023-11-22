@@ -36,6 +36,10 @@ fit_model <- function(
     #     process_x <- list(process_x)
     # }
 
+    if(!is.list(fixed_x)) {
+        fixed_x <- list(fixed_x)
+    }
+
     fe_formula <- ""
     if (!is.null(fixed_x)) {
         fe_formula <- stringr::str_c(fixed_x, collapse = " + ")
@@ -72,7 +76,7 @@ fit_model <- function(
 
     sp::coordinates(data) <- c(longitude_col, latitude_col)
 
-    formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1) + 
+    formula <- eval(parse(text = paste0(y, "~ 0 + Intercept(1) + ", fe_formula, " +
                     f(main = coordinates, model = spde, group = group_index, 
                     ngroup = n_groups, control.group = list(model = 'ar1', hyper = rhoprior))")))
 
