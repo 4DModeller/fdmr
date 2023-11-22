@@ -1,0 +1,109 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_dataBris.rds")
+covid19_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "covid19_dataBris.rds")
+```
+
+```{r}
+library(INLA)
+library(inlabru)
+
+n.time <- 6
+n <- 55
+locs <- as.matrix(sp_data@data[, c("LONG", "LAT")])
+
+initial_range <- diff(range(locs[, 1])) / 3
+max_edge <- initial_range / 2
+mesh <- fmesher::fm_mesh_2d(
+  loc = locs,
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range, initial_range),
+  cutoff = max_edge / 7
+)
+
+
+spde <- INLA::inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(initial_range, 0.5),
+  prior.sigma = c(1, 0.01)
+)
+
+sigma0 <- 7
+range0 <- 0.03
+kappa0 <- sqrt(8 / 1) / range0
+tau0 <- 1 / (sqrt(4 * pi) * kappa0 * sigma0)
+inla.seed <- sample.int(n = 1E4, size = n.time)
+
+Q <- INLA::inla.spde.precision(spde, theta = c(log(tau0), log(kappa0)))
+x.mat <- matrix(NA, ncol = n.time, nrow = mesh$n)
+for (co in 1:ncol(x.mat)) {
+  x.mat[, co] <- INLA::inla.qsample(n = 1, Q)
+}
+
+A <- INLA::inla.spde.make.A(mesh = mesh, loc = locs)
+x.dat <- matrix(NA, ncol = n.time, nrow = n)
+for (t in 1:ncol(x.dat)) {
+  x.dat[, t] <- drop(A %*% x.mat[, t])
+}
+
+
+alpha <- 0.9
+sp.mat <- matrix(NA, ncol = n.time, nrow = n)
+sp.mat[, 1] <- x.dat[, 1]
+for (t in 2:n.time) {
+  sp.mat[, t] <- alpha * sp.mat[, t - 1] + x.dat[, t]
+}
+
+beta0 <- 0.5
+sigma_e <- 0.1
+lin.pred <- beta0 + sp.mat
+y.mat <- lin.pred + matrix(rnorm(n * n.time, 0, sigma_e), ncol = n.time)
+
+simdf_space <- data.frame(
+  ID = 1:n,
+  datn = as.numeric(t(y.mat)),
+  LONG = locs[, 1],
+  LAT = locs[, 2]
+)
+
+simdf_time <- data.frame(
+  ID = rep(1:n, each = n.time),
+  time = rep(c(1:n.time), n),
+  datn = as.numeric(t(y.mat)),
+  LONG = rep(locs[, 1], each = n.time),
+  LAT = rep(locs[, 2], each = n.time)
+)
+
+```
+
+
+```{r}
+rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+sp::coordinates(simdf) <- c("LONG", "LAT")
+```
+
+
+```{r}
+model_out <- inlabru::bru(
+    data=simdf,
+    components = ~ space(geometry, model = spde) +
+        spacetime(
+            geometry,
+            model = spde,
+            group = time,
+            control.group = list(
+                model = "ar1",
+                hyper = rhoprior
+            ),
+            group_mapper = bru_mapper(mesh)
+        ) +
+        beta_u(1, prec.linear = 1, marginal = bru_mapper_marginal(qexp, rate = 1)),
+    like(formula = datn ~ space, family = "gaussian"),
+    like(formula = datn ~ beta_u * space + spacetime, family = "gaussian")
+)
+```
