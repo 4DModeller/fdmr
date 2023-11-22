@@ -1,0 +1,213 @@
+
+library(INLA)
+
+n.time <- 6
+n <- 55
+locs <- as.matrix(sp_data@data[, c("LONG", "LAT")])
+
+initial_range <- diff(range(locs[, 1])) / 3
+max_edge <- initial_range / 2
+mesh <- fmesher::fm_mesh_2d(
+  loc = locs,
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range, initial_range),
+  cutoff = max_edge / 7
+)
+
+
+spde <- INLA::inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(initial_range, 0.5),
+  prior.sigma = c(1, 0.01)
+)
+
+sigma0 <- 7
+range0 <- 0.03
+kappa0 <- sqrt(8 / 1) / range0
+tau0 <- 1 / (sqrt(4 * pi) * kappa0 * sigma0)
+inla.seed <- sample.int(n = 1E4, size = n.time)
+
+Q <- INLA::inla.spde.precision(spde, theta = c(log(tau0), log(kappa0)))
+x.mat <- matrix(NA, ncol = n.time, nrow = mesh$n)
+for (co in 1:ncol(x.mat)) {
+  x.mat[, co] <- INLA::inla.qsample(n = 1, Q)
+}
+
+A <- INLA::inla.spde.make.A(mesh = mesh, loc = locs)
+x.dat <- matrix(NA, ncol = n.time, nrow = n)
+for (t in 1:ncol(x.dat)) {
+  x.dat[, t] <- drop(A %*% x.mat[, t])
+}
+
+
+alpha <- 0.9
+sp.mat <- matrix(NA, ncol = n.time, nrow = n)
+sp.mat[, 1] <- x.dat[, 1]
+for (t in 2:n.time) {
+  sp.mat[, t] <- alpha * sp.mat[, t - 1] + x.dat[, t]
+}
+
+
+beta0 <- 0.5
+sigma_e <- 0.1
+lin.pred <- beta0 + sp.mat
+y.mat <- lin.pred + matrix(rnorm(n * n.time, 0, sigma_e), ncol = n.time)
+
+simdf <- data.frame(
+  ID = rep(1:n, each = n.time),
+  time = rep(c(1:n.time), n),
+  datn = as.numeric(t(y.mat)),
+  LONG = rep(locs[, 1], each = n.time),
+  LAT = rep(locs[, 2], each = n.time)
+)
+
+# make the mesh
+locs <- unique(simdf[, c("LONG", "LAT")])
+initial_range <- diff(range(locs[, 1])) / 3
+max_edge <- initial_range / 2
+mesh <- fmesher::fm_mesh_2d(
+  loc = locs,
+  max.edge = c(1, 2) * max_edge,
+  offset = c(initial_range, initial_range),
+  cutoff = max_edge / 5
+)
+
+# make the spde
+spde <- INLA::inla.spde2.pcmatern(
+  mesh = mesh,
+  prior.range = c(initial_range, 0.5),
+  prior.sigma = c(1, 0.01)
+)
+
+## Define how the process evolves over time
+## set prior for the temporal parameter and define a temporal index
+
+rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+group.index <- simdf$time
+n_groups <- length(unique(simdf$time))
+
+
+```{r, error=TRUE}
+sp::coordinates(simdf) <- c("LONG", "LAT")
+```
+
+## Define the model formula
+```{r formula, error=TRUE}
+formula <- datn ~ 0 + Intercept(1) +
+  f(
+    main = coordinates,
+    model = spde,
+    group = group.index,
+    ngroup = n_groups,
+    control.group = list(
+      model = "ar1",
+      hyper = rhoprior
+    )
+  )
+```
+
+
+## Fit the model
+
+Finally, we fit the spatio-temporal model using SPDE approach and AR(1) process by calling the function `bru()` of the package `inlabru`.
+
+```{r fitmodel}
+inlabru_model <- inlabru::bru(formula,
+  data = simdf,
+  family = "gaussian",
+  options = list(
+    verbose = TRUE
+  )
+)
+```
+
+## Results summary
+
+After completing the model fitting process, you can examine the main result summaries by typing `summary(inlabru_model)`. Additionally, you can check the parameter estimates for fixed effects, random effects, and hyperparameters as follows.
+
+```{r summary,eval=FALSE}
+model_summary <- summary(inlabru_model)
+model_fixed <- inlabru_model$summary.fixed
+model_random <- inlabru_model$summary.random
+model_hyperparams <- inlabru_model$summary.hyperpar
+```
+
+
+The Deviance Information Criterion (DIC) value, which measures the goodness of model fit, can be examined as follows.
+
+
+```{r dicvalue}
+model_dic <- inlabru_model$dic$dic
+```
+
+
+You can obtain the model's fitted values and compare them with the observed values as follows.
+
+```{r fittedvals,eval=TRUE}
+fitted_vals <- inlabru_model$summary.fitted.values[1:nrow(simdf), ]
+```
+
+```{r plotfitted, error=TRUE,fig.cap="A plot of the fitted and observed values.", fig.width=8, fig.height=4, fig.align = "center"}
+par(pty = "s")
+plot(fitted_vals$mean, simdf$datn, xlab = "fitted", ylab = "observed")
+```
+
+# Exploring the functionality of the `fdmr` Package
+
+Next, we'll demonstrate the key functionality offered by the `fdmr` package.
+
+## fdmr::plot_mesh 
+
+The `fdmr::plot_mesh` function displays both the mesh and the observation points overlaid on the mesh.
+
+
+```{r meshplot, error=TRUE,fig.cap="A plot of the mesh.", fig.width=8, fig.height=4, fig.align = "center"}
+fdmr::plot_mesh(mesh = mesh, spatial_data = simdf@coords)
+```
+
+## fdmr::mesh_builder
+
+`fdmr` provides an interactive mesh builder tool called `fdmr::mesh_builder`. It allows you to build a mesh from some spatial data, modify its parameters and plot it and the data on an interactive map. To build a mesh, we need to pass `sp_data` to the `mesh_builder` function.
+
+```{r meshbuilder,eval=FALSE}
+fdmr::mesh_builder(spatial_data = sp_data)
+```
+
+The interactive map allows you to customise the initial parameters such as `max_edge`, `offset` and `cutoff` to change the shape and size of the mesh. We also provide a simple function to check if there are any errors with the meshes created using the mesh builder tool. To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Specifically, create a mesh of your design using the meshbuilder tool. When you’re finished, click the “Check mesh” button on the user interface. This passes the created mesh to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
+
+```{r meshchecking,eval=FALSE}
+fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
+```
+
+## Model builder Shiny app
+`fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::model_builder` function.
+
+```{r priorapp, eval=FALSE}
+fdmr::model_builder(
+  spatial_data = sp_data,
+  measurement_data = simdf,
+  mesh = mesh,
+  time_variable = "time"
+)
+```
+
+## fdmr::model_viewer
+
+`fdmr` provides a separate Shiny app which allows you to intuitively visualize the model output. You can launch this app by passing the `bru` model object, the mesh, observation data and data distribution as arguments to the `fdmr::model_viewer` function.
+
+```{r modelviewer, eval=FALSE}
+fdmr::model_viewer(
+  model_output = inlabru_model,
+  mesh = mesh,
+  measurement_data = simdf,
+  data_distribution = "Gaussian"
+)
+```
+
+## fdmr::plot_map
+
+The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.
+
+```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align = "center"}
+fdmr::plot_map(polygon_data = sp_data)
+```
