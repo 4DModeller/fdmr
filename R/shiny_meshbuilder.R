@@ -89,8 +89,7 @@ meshbuilder_shiny <- function(
 
   busy_spinner <- get_busy_spinner()
 
-  ui <- bslib::page_fluid(
-    theme = bslib::bs_theme(bootswatch = "cosmo"),
+  ui <- shiny::fluidPage(
     busy_spinner,
     shinybusy::add_loading_state(
       "#map",

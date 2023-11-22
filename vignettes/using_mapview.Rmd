@@ -76,3 +76,34 @@ We'll try the fmesher plotting functions
 ```{r}
 inlabru::gg(mesh)
 ```
+
+```{r}
+library(shiny)
+library(leaflet)
+
+coords_only = df[, c("LONG", "LAT")]
+crs = "+proj=utm +zone=33"
+mesh <- fmesher::fm_mesh_2d(coords_only, crs=crs)
+spatial_mesh = fdmr::mesh_to_spatial(mesh, crs=crs)
+# mapview::mapview(spatial_mesh)
+
+ui <- fluidPage(
+  leafletOutput("mymap"),
+  p(),
+  actionButton("recalc", "New points")
+)
+
+server <- function(input, output, session) {
+
+  points <- eventReactive(input$recalc, {
+    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+  }, ignoreNULL = FALSE)
+
+  output$mymap <- renderLeaflet({
+    m <- mapview::mapview(spatial_mesh)
+    m@map
+  })
+}
+
+shinyApp(ui, server)
+```
