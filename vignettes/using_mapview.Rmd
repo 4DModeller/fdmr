@@ -46,8 +46,33 @@ locations <- sf::st_as_sf(
 )
 ```
 
+```{r}
+fdmr::mesh_builder(spatial_data=df, crs= "+proj=utm +zone=33")
+```
+
 Now let's plot the map
 
 ```{r}
 mapview::mapview(locations)
+```
+
+Now let's create a mesh from the spatial data and plot that
+
+```{r}
+coords_only = df[, c("LONG", "LAT")]
+crs = "+proj=utm +zone=33"
+mesh <- fmesher::fm_mesh_2d(coords_only, crs=crs)
+```
+
+Now let's plot it
+
+```{r}
+spatial_mesh = fdmr::mesh_to_spatial(mesh, crs=crs)
+mapview::mapview(spatial_mesh)
+```
+
+We'll try the fmesher plotting functions
+
+```{r}
+inlabru::gg(mesh)
 ```

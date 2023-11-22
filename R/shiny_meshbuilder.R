@@ -180,23 +180,31 @@ meshbuilder_shiny <- function(
     )
 
     output$map <- leaflet::renderLeaflet({
-      m <- leaflet::leaflet()
-      m <- leaflet::addTiles(m, group = "OSM")
-      m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
-      m <- leaflet::addMeasure(position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
-      m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
-      if (plot_polygons) {
-        m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
-      } else if (plot_points) {
-        m <- leaflet::addCircles(m, data = spatial_points, group = "Spatial", fillColor = "#b9220b", color = "#b9220b")
-      }
-
-      m <- leaflet::addLayersControl(m,
-        position = "topright",
-        baseGroups = c("OSM"),
-        overlayGroups = c("Mesh", "Spatial"),
-        options = leaflet::layersControlOptions(collapsed = FALSE)
+      spatial <- sf::st_as_sf(
+        spatial_data,
+        coords = c("LONG", "LAT"),
+        crs = "+proj=utm +zone=33"
       )
+
+      m <- mapview::mapview(spatial)
+      m@map
+      # m <- leaflet::leaflet()
+      # m <- leaflet::addTiles(m, group = "OSM")
+      # m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
+      # m <- leaflet::addMeasure(position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
+      # m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
+      # if (plot_polygons) {
+      #   m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
+      # } else if (plot_points) {
+      #   m <- leaflet::addCircles(m, data = spatial_points, group = "Spatial", fillColor = "#b9220b", color = "#b9220b")
+      # }
+
+      # m <- leaflet::addLayersControl(m,
+      #   position = "topright",
+      #   baseGroups = c("OSM"),
+      #   overlayGroups = c("Mesh", "Spatial"),
+      #   options = leaflet::layersControlOptions(collapsed = FALSE)
+      # )
     })
 
     output$mesh_code <- shiny::reactive(
