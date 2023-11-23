@@ -11,30 +11,21 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
----
-title: "R Notebook"
-output: html_notebook
----
+
+John to add some text here about getting datasets etc and creating objects for the locations
+
+
+## Fit the model
+
+Now we're ready to fit the model
 
 
 ```{r}
-sp_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "spatial_dataBris.rds")
-covid19_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "covid19_dataBris.rds")
-```
-
-
-```{r}
-location_data = sp_data@data[,c("LONG", "LAT")]
+?fdmr::fit_model
 ```
 
 ```{r}
-fdmr::fit_model(y="cases", fixed_x = "IMD", process_x = "Population", process_coords = location_data, data=covid19_data, time_variable="week" )
+model_output <- fdmr::fit_model(y="datn", data=dataset, process_coords=locations, time_variable="time")
 ```
 
-Then we can pass in a list of fixed effects
-
-
-```{r}
-fixed_effects = c("carebeds.ratio", "AandETRUE")
-fdmr::fit_model(y="cases", fixed_x = "IMD", process_x = "Population", process_coords = location_data, data=covid19_data, time_variable="week" )
-
+Now we can have a look at some of the model output

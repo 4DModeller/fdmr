@@ -1,8 +1,7 @@
 #' Fit a model using inlabru::bru
 #'
 #' @param y outcome variable name
-#' @param fixed_x  list of fixed effects variable names
-#' @param process_x  list of process effects variable names
+#' @param data Spatial data
 #' @param process_coords list of coordinates associated with process
 #' @param data data.frame of data
 #' @param family gaussian or poisson
@@ -12,70 +11,52 @@
 #' @export
 fit_model <- function(
     y,
-    fixed_x,
-    process_x,
-    process_coords,
     data,
+    process_coords,
     time_variable = "time",
     family = "gaussian",
     latitude_col = "LAT",
     longitude_col = "LONG") {
     library("inlabru")
     library("INLA")
-    # y : str - outcome variable name
-    # fixed_x : list - list of fixed effects variable names
-    # process_x : list - list of process effects variable names
-    # process_coords : list - list of coordinates associated with process
-    # data : data.frame - data.frame of data
 
-    initial_range <- 0.1
-    max_edge <- initial_range / 8
+    initial_range <- diff(range(process_coords[, longitude_col])) / 3
+    max_edge <- initial_range / 2
 
-    # Create another mesh
-    mesh_space <- fmesher::fm_mesh_2d_inla(
-        loc = process_coords
+    print("Creating mesh...")
+    mesh <- fmesher::fm_mesh_2d(
+        loc = process_coords,
+        max.edge = c(1, 2) * max_edge,
+        offset = c(initial_range, initial_range),
+        cutoff = max_edge / 7
     )
 
-    space_values <- data
-    spacetime_values <- data
-
-    mesh_spacetime <- fmesher::fm_mesh_2d_inla(
-        loc = process_coords
-    )
-
-    # Build the two SPDEs / whatever you want
-    space_spde <- INLA::inla.spde2.pcmatern(
-        mesh = mesh_space,
+    print("Creating SPDE...")
+    spde <- INLA::inla.spde2.pcmatern(
+        mesh = mesh,
         prior.range = c(initial_range, 0.5),
         prior.sigma = c(1, 0.01)
     )
 
-    # spde <- INLA::inla.spde2.pcmatern(
-    #     mesh = mesh_spacetime,
-    #     prior.range = c(initial_range, 0.5),
-    #     prior.sigma = c(1, 0.01)
-    # )
-
     rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
-    time_mesh <- mesh_space
 
-
+    print("Running model...")
     model_out <- inlabru::bru(
-        components = ~ space(geometry, model = space_spde) +
+        components = ~ space(coordinates, model = spde) +
             spacetime(
-                geometry,
-                model = space_spde,
+                coordinates,
+                model = spde,
                 group = time,
                 control.group = list(
                     model = "ar1",
                     hyper = rhoprior
-                ),
-                group_mapper = bru_mapper(time_mesh)
+                )
             ) +
-            beta_u(1, prec.linear = 1, marginal = bru_mapper_marginal(qexp, rate = 1)),
-        like(formula = space_values ~ space, family = "gaussian"),
-        like(formula = spacetime_values ~ beta_u * space + spacetime, family = "gaussian")
+            beta_u(1, prec.linear = 1),
+        inlabru::like(formula = data[[y]] ~ space, family = "gaussian", data = data),
+        inlabru::like(formula = data[[y]] ~ beta_u * space + spacetime, family = "gaussian", data = data)
     )
 
+    print("Model run complete.")
     model_out
 }
