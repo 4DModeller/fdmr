@@ -42,6 +42,9 @@ fit_model <- function(
         prior.sigma = c(1, 0.01)
     )
 
+    space_variables <- append(space_variables, y)
+    spacetime_variables <- append(spacetime_variables, y)
+
     rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
 
     print("Running model...")
