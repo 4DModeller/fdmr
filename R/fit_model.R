@@ -29,10 +29,7 @@ fit_model <- function(
 
     print("Creating mesh...")
     mesh <- fmesher::fm_mesh_2d_inla(
-        loc = process_coords,
-        max.edge = c(1, 2) * max_edge_mesh,
-        offset = c(initial_range_mesh / 4, initial_range_mesh),
-        cutoff = max_edge_mesh / 7
+        loc = process_coords
     )
 
     print("Creating SPDE...")
@@ -60,8 +57,8 @@ fit_model <- function(
         inlabru::like(formula = data[[y]] ~ space, family = "gaussian", data = data),
         inlabru::like(formula = data[[y]] ~ beta_u * space + spacetime, family = "gaussian", data = data),
         options = list(
-              verbose = verbose
-            )
+            verbose = verbose
+        )
     )
 
     print("Model run complete.")
