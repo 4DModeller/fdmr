@@ -41,14 +41,15 @@ devtools::load_all()
 fdmr::retrieve_tutorial_data(dataset = "priors")
 covid19_data <- fdmr::load_tutorial_data(dataset = "priors", filename = "covid19_dataBris.rds")
 sp::coordinates(covid19_data) <- c("LONG", "LAT")
-fdmr::fit_model(y = 'cases'
+run_output <- fdmr::fit_model(y = 'cases'
                 ,locations=covid19_data
                 ,time_variable = 'week'
                 ,latitude_col = 'LAT'
                 ,longitude_col = 'LONG'
                 ,data = covid19_data
-                ,space_variables = c('Population',)
-                ,spacetime_variables = c('prevalence',))
+                ,space_variables = c('Population')
+                ,spacetime_variables = c('prevalence'))
+summary(run_output$model_output)
 ```
 
 
@@ -58,6 +59,16 @@ fdmr::retrieve_tutorial_data(dataset = "tibetan_lakes")
 lakes_data_filepath <- fdmr::get_tutorial_datapath(dataset = "tibetan_lakes", filename = "example_lake_data.csv")
 lakes_data <- read.csv(lakes_data_filepath)
 head(lakes_data)
+sp::coordinates(lakes_data) <- c("centroid_lon", "centroid_lat")
+run_output <- fdmr::fit_model(y = 'water_balance_m3'
+                ,locations=lakes_data
+                ,time_variable = 'year'
+                ,latitude_col = 'centroid_lat'
+                ,longitude_col = 'centroid_lon'
+                ,data = lakes_data
+                ,space_variables = c('SUB_AREA')
+                ,spacetime_variables = c('precip'))
+summary(run_output$model_output)
 ```
 
 
