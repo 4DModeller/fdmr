@@ -38,6 +38,7 @@ Now we're ready to fit the model
 
 ```{r}
 run_output <- fdmr::fit_model(y="Rain", data=raindata, process_coords = raindata, time_variable="Time_Index", latitude_col = "Latitude", longitude_col = "Longitude")
+# barbara streisand
 ```
 
 Here `run_output` is a list containing the mesh created and the model output.
