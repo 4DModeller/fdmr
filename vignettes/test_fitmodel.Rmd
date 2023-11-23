@@ -90,12 +90,6 @@ sp::coordinates(simdf_space) <- c("LONG", "LAT")
 ```
 
 ```{r}
-rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
-sp::coordinates(simdf_time) <- c("LONG", "LAT")
-```
-
-```{r}
-p <- rep(1:length(simdf_space))
 model_out <- inlabru::bru(
  components = ~ space(coordinates, model = spde) +
    spacetime(
