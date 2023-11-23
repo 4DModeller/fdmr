@@ -95,27 +95,6 @@ sp::coordinates(simdf_time) <- c("LONG", "LAT")
 ```
 
 ```{r}
-model_out <- inlabru::bru(
-  options = list(
-              verbose = FALSE
-            ),
- components = ~ space(coordinates, model = spde) +
-   spacetime(
-     coordinates,
-     model = spde,
-     group = time,
-     control.group = list(
-       model = "ar1",
-       hyper = rhoprior
-     )
-   ) +
-  beta_u(1, prec.linear = 1),
- inlabru::like(formula = datn ~ space, family = "gaussian", data=simdf_time),
- inlabru::like(formula = datn ~ beta_u * space + spacetime, family = "gaussian", data=simdf_time)
-)
-```
-
-```{r}
 p <- rep(1:length(simdf_space))
 model_out <- inlabru::bru(
  components = ~ space(coordinates, model = spde) +
