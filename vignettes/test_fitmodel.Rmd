@@ -96,6 +96,8 @@ sp::coordinates(simdf_time) <- c("LONG", "LAT")
 
 
 ```{r}
+p <- rep(1:length(simdf_space))
+qexp <- stats::qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
 model_out <- inlabru::bru(
     data=simdf_time,
     components = ~ space(geometry, model = spde) +
