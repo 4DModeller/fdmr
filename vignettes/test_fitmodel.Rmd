@@ -63,7 +63,9 @@ beta0 <- 0.5
 sigma_e <- 0.1
 lin.pred <- beta0 + sp.mat
 y.mat <- lin.pred + matrix(rnorm(n * n.time, 0, sigma_e), ncol = n.time)
+```
 
+```{r}
 simdf_space <- data.frame(
   ID = 1:n,
   datn = as.numeric(t(y.mat)),
@@ -84,13 +86,18 @@ simdf_time <- data.frame(
 
 ```{r}
 rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
-sp::coordinates(simdf) <- c("LONG", "LAT")
+sp::coordinates(simdf_space) <- c("LONG", "LAT")
+```
+
+```{r}
+rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
+sp::coordinates(simdf_time) <- c("LONG", "LAT")
 ```
 
 
 ```{r}
 model_out <- inlabru::bru(
-    data=simdf,
+    data=simdf_time,
     components = ~ space(geometry, model = spde) +
         spacetime(
             geometry,
@@ -102,8 +109,8 @@ model_out <- inlabru::bru(
             ),
             group_mapper = bru_mapper(mesh)
         ) +
-        beta_u(1, prec.linear = 1, marginal = bru_mapper_marginal(qexp, rate = 1)),
-    like(formula = datn ~ space, family = "gaussian"),
-    like(formula = datn ~ beta_u * space + spacetime, family = "gaussian")
+        beta_u(1, prec.linear = 1, marginal = bru_mapper_marginal(qexp, rate = 1))
+    ,like(formula = datn ~ space, family = "gaussian")
+    ,like(formula = datn ~ beta_u * space + spacetime, family = "gaussian")
 )
 ```
