@@ -2,8 +2,9 @@
 #'
 #' @param y outcome variable name
 #' @param data Spatial data
-#' @param process_coords list of coordinates associated with process
-#' @param data data.frame of data
+#' @param locations list of coordinates associated with process
+#' @param space_variables list of spatial variables
+#' @param spacetime_variables list of spacetime variables
 #' @param family gaussian or poisson
 #' @param latitude_col name of latitude column
 #' @param longitude_col name of longitude column
@@ -16,7 +17,9 @@
 fit_model <- function(
     y,
     data,
-    process_coords,
+    locations,
+    space_variables,
+    spacetime_variables,
     time_variable = "time",
     family = "gaussian",
     latitude_col = "LAT",
@@ -29,7 +32,7 @@ fit_model <- function(
 
     print("Creating mesh...")
     mesh <- fmesher::fm_mesh_2d_inla(
-        loc = process_coords
+        loc = locations
     )
 
     print("Creating SPDE...")
@@ -54,8 +57,8 @@ fit_model <- function(
                 )
             ) +
             beta_u(1, prec.linear = 1),
-        inlabru::like(formula = data[[y]] ~ space, family = "gaussian", data = data),
-        inlabru::like(formula = data[[y]] ~ beta_u * space + spacetime, family = "gaussian", data = data),
+        inlabru::like(formula = data[[y]] ~ space, family = "gaussian", data = data[space_variables]),
+        inlabru::like(formula = data[[y]] ~ beta_u * space + spacetime, family = "gaussian", data = data[spacetime_variables]),
         options = list(
             verbose = verbose
         )
