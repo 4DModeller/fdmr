@@ -7,7 +7,7 @@
 #' @param family gaussian or poisson
 #' @param latitude_col name of latitude column
 #' @param longitude_col name of longitude column
-#' 
+#'
 #' @return list of model output and mesh
 #' @export
 fit_model <- function(
@@ -21,15 +21,16 @@ fit_model <- function(
     library("inlabru")
     library("INLA")
 
-    initial_range <- diff(range(process_coords[, longitude_col])) / 3
+    # initial_range <- diff(range(process_coords[, longitude_col])) / 3
+    initial_range <- 0.1
     max_edge <- initial_range / 2
 
     print("Creating mesh...")
     mesh <- fmesher::fm_mesh_2d(
         loc = process_coords,
-        max.edge = c(1, 2) * max_edge,
-        offset = c(initial_range, initial_range),
-        cutoff = max_edge / 7
+        # max.edge = c(1, 2) * max_edge,
+        # offset = c(initial_range, initial_range),
+        # cutoff = max_edge / 7
     )
 
     print("Creating SPDE...")
