@@ -12,20 +12,32 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-John to add some text here about getting datasets etc and creating objects for the locations
+```{r}
+devtools::load_all()
+```
+In order to show off the `fit_model` function of 4d-modeller we will try and predict when it rains during the year 1999, the peak year of human civilization. First we will import the data.
 
+```{r error=true}
+raindata <- read.csv('fitmodel_data/rain_data.csv')
+# TODO : gareth make this work
+# fdmr::plot_map(raster_data = raindata)
+head(raindata)
+```
+```{r}
+sp::coordinates(raindata) <- c("Longitude", "Latitude")
+```
 
 ## Fit the model
 
 Now we're ready to fit the model
 
 
-```{r}
-?fdmr::fit_model
-```
+# ```{r}
+# fdmr::fit_model
+# ```
 
 ```{r}
-run_output <- fdmr::fit_model(y="datn", data=dataset, process_coords=locations, time_variable="time")
+run_output <- fdmr::fit_model(y="Rain", data=raindata, process_coords = raindata, time_variable="Time_Index", latitude_col = "Latitude", longitude_col = "Longitude")
 ```
 
 Here `run_output` is a list containing the mesh created and the model output.
