@@ -97,22 +97,20 @@ sp::coordinates(simdf_time) <- c("LONG", "LAT")
 
 ```{r}
 p <- rep(1:length(simdf_space))
-qexp <- stats::qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
 model_out <- inlabru::bru(
-    data=simdf_time,
-    components = ~ space(geometry, model = spde) +
-        spacetime(
-            geometry,
-            model = spde,
-            group = time,
-            control.group = list(
-                model = "ar1",
-                hyper = rhoprior
-            ),
-            group_mapper = bru_mapper(mesh)
-        ) +
-        beta_u(1, prec.linear = 1, marginal = bru_mapper_marginal(qexp, rate = 1))
-    ,like(formula = datn ~ space, family = "gaussian")
-    ,like(formula = datn ~ beta_u * space + spacetime, family = "gaussian")
+ components = ~ space(coordinates, model = spde) +
+   spacetime(
+     coordinates,
+     model = spde,
+     group = time,
+     control.group = list(
+       model = "ar1",
+       hyper = rhoprior
+     )
+   ) +
+  beta_u(1, prec.linear = 1),
+ inlabru::like(formula = datn ~ space, family = "gaussian", data=simdf_time),
+ inlabru::like(formula = datn ~ beta_u * space + spacetime, family = "gaussian", data=simdf_time)
 )
+
 ```
