@@ -7,7 +7,8 @@
 #' @param family gaussian or poisson
 #' @param latitude_col name of latitude column
 #' @param longitude_col name of longitude column
-#'
+#' 
+#' @return list of model output and mesh
 #' @export
 fit_model <- function(
     y,
@@ -41,7 +42,7 @@ fit_model <- function(
     rhoprior <- base::list(theta = list(prior = "pccor1", param = c(0, 0.9)))
 
     print("Running model...")
-    model_out <- inlabru::bru(
+    model_output <- inlabru::bru(
         components = ~ space(coordinates, model = spde) +
             spacetime(
                 coordinates,
@@ -58,5 +59,5 @@ fit_model <- function(
     )
 
     print("Model run complete.")
-    model_out
+    list(model_output = model_output, mesh = mesh)
 }

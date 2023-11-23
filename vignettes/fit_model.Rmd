@@ -25,7 +25,17 @@ Now we're ready to fit the model
 ```
 
 ```{r}
-model_output <- fdmr::fit_model(y="datn", data=dataset, process_coords=locations, time_variable="time")
+run_output <- fdmr::fit_model(y="datn", data=dataset, process_coords=locations, time_variable="time")
 ```
 
-Now we can have a look at some of the model output
+Here `run_output` is a list containing the mesh created and the model output.
+
+```{r}
+summary(run_output$model_output)
+```
+
+We can also view the output using the `model_viewer` Shiny app.
+
+```{r}
+fdmr::model_viewer(model_output = run_output$model_output, mesh  = run_output$mesh, measurement_data = data, data_distribution = "Gaussian")
+```
