@@ -13,7 +13,7 @@ vignette: >
 ---
 ```{r}
 library(magrittr)
-
+devtools::load_all()
 ```
 
 In order to show off the `fit_model` function of 4d-modeller we will try and predict when it rains during the year 1999, the peak year of human civilization. First we will import the data.

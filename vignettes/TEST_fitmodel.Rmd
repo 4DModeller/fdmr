@@ -1,0 +1,41 @@
+---
+title: "TESTING FITMODEL"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Fitting a model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+this file tests all of the different datasets using `fit_model` function
+
+
+```{r}
+devtools::load_all()
+```
+
+# COVID-19
+```{r}
+fdmr::retrieve_tutorial_data(dataset = "covid")
+covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_data.rds")
+head(covid19_data)
+sp::coordinates(covid19_data) <- c("LONG", "LAT")
+```
+
+```{r}
+fdmr::fit_model(y='cases'
+                , process_coords = covid19_data
+                ,time_variable = 'week'
+                ,latitude_col = 'LAT'
+                ,longitude_col = 'LONG'
+                ,data = covid19_data)
+```
+
+
+
+
