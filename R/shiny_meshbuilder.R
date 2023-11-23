@@ -123,27 +123,27 @@ meshbuilder_shiny <- function(
         # shiny::actionButton("check_button", "Check mesh"),
       ),
       shiny::mainPanel(
-        shiny::tabsetPanel(
-          type = "tabs",
-          shiny::tabPanel(
-            "Plot",
-            class = "p-3 border",
-            shiny::div(id = "map_div", leaflet::leafletOutput("map", height = "80vh"))
-          ),
-          shiny::tabPanel("Code", class = "p-3 border", shiny::verbatimTextOutput("mesh_code")),
-          shiny::tabPanel(
-            "Help",
-            class = "p-3 border",
-            shiny::h3("Help"),
-            shiny::h4("Max edge"),
-            shiny::p("Determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
-                      or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect."),
-            shiny::h4("Offset"),
-            shiny::p("Specifies the size of the inner and outer extensions around data locations."),
-            shiny::h4("Cutoff"),
-            shiny::p("Minimum allowed distance between data points."),
-          )
-        )
+        shiny::div(leaflet::leafletOutput("map", height = "80vh"))
+        # shiny::tabsetPanel(
+        #   type = "tabs",
+        #   shiny::tabPanel(
+        #     "Plot",
+        #     class = "p-3 border",
+        #   ),
+        #   shiny::tabPanel("Code", class = "p-3 border", shiny::verbatimTextOutput("mesh_code")),
+        #   shiny::tabPanel(
+        #     "Help",
+        #     class = "p-3 border",
+        #     shiny::h3("Help"),
+        #     shiny::h4("Max edge"),
+        #     shiny::p("Determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
+        #               or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect."),
+        #     shiny::h4("Offset"),
+        #     shiny::p("Specifies the size of the inner and outer extensions around data locations."),
+        #     shiny::h4("Cutoff"),
+        #     shiny::p("Minimum allowed distance between data points."),
+        #   )
+        # )
       )
     )
   )
