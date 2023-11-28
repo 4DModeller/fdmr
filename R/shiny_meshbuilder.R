@@ -183,7 +183,7 @@ meshbuilder_shiny <- function(
       m <- leaflet::leaflet()
       m <- leaflet::addTiles(m, group = "OSM")
       m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
-      m <- leaflet::addMeasure(position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
+      m <- leaflet::addMeasure(m, position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
       m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
       if (plot_polygons) {
         m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
