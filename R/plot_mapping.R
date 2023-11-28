@@ -44,7 +44,7 @@ plot_map <- function(polygon_data = NULL,
 
   if (!is.null(polygon_data)) {
     if (isTRUE(wrapping)) {
-      polygon_data <- fdmr::antimeridian_wrapping(polygon_data, crs = "+proj=longlat +datum=WGS84", unique_inst = FALSE, to_sp = FALSE)
+      polygon_data <- fdmr::antimeridian_wrapping(polygon_data, crs = "+proj=longlat +datum=WGS84", unique_inst = TRUE, to_sp = FALSE)
       }
     if (!is.null(domain)) {
       colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = reverse)
