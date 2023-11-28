@@ -138,7 +138,7 @@ antimeridian_wrapping <- function(polygon_data, crs = 4326, unique_inst = TRUE, 
   }
   
   # Apply the function
-  sf_split <- sf::st_wrap_dateline(sf_data)
+  sf_split <- sf::st_wrap_dateline(sf_data, options = c("WRAPDATELINE=YES", "DATELINEOFFSET=90"))
   
   # Revert sf objects back to sp
   if (base::isTRUE(to_sp)) {
