@@ -174,17 +174,15 @@ meshbuilder_shiny <- function(
     mesh_spatial <- shiny::reactive(
       suppressMessages(
         suppressWarnings(
-          fdmr::mesh_to_spatial(mesh = mesh(), crs = crs)
+          fdmr::antimeridian_wrapping(fdmr::mesh_to_spatial(mesh = mesh(), crs = crs), crs = crs, unique_inst = FALSE, to_sp = FALSE)
         )
       )
     )
 
-    spatial_mesh <- fdmr::antimeridian_wrapping(mesh_spatial(), crs = crs, unique_inst = FALSE, to_sp = FALSE)   
-
     output$map <- leaflet::renderLeaflet({
       m <- leaflet::leaflet()
       m <- leaflet::addTiles(m, group = "OSM")
-      m <- leaflet::addPolygons(m, data = spatial_mesh, weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
+      m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
       m <- leaflet::addMeasure(position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
       m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
       if (plot_polygons) {
