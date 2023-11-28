@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/openghg/openghg/compare/0.1.1...HEAD)
 
+### Fixed
+- Added a function to ensure correct polygon display across the dateline - [PR #225](https://github.com/4DModeller/fdmr/pull/225)
+
 ### Added
 
 - Added mouse pointer coordinates header and standard measurement tool - [PR #260](https://github.com/4DModeller/fdmr/pull/260)
