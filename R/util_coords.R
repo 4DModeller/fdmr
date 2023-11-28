@@ -42,10 +42,14 @@ has_coords <- function(spatial_data) {
 }
 
 #' Convert longitudes from 0 to 360 degrees to -180 to 180 degrees
+#'
 #' @param sf_data An sf object; does not accept SpatialPolygon* objects
 #' @param crs CRS as a proj4string or EPSG code
 #' @param add_data Select if data associated with the object are carried forward by the transformed version, defaults to FALSE
 #' @param longitude_column Name of longitude, defaults to LONG
+#'
+#' @return polygons with converted coordinates
+#' @export
 convert_from_lon_360 <- function(sf_data, crs = 4326, add_data = TRUE, longitude_column = "LONG") {
   # Get polygon coordinates
   coords <- sf::st_coordinates(sf_data)
@@ -101,16 +105,17 @@ convert_from_lon_360 <- function(sf_data, crs = 4326, add_data = TRUE, longitude
 
 #' Split polygons into two if crossing the dateline (antimeridian)
 #' 
-#' @param sp_data SpatialPolygon or SpatialPolygonDataFrame object
+#' @param polygon_data SpatialPolygon or SpatialPolygonDataFrame object
 #' @param crs CRS as a proj4string or EPSG code, default EPSG:4326 (datum=WGS84)
 #' @param unique_inst Option to remove duplicate polygons (with the same coordinates), default TRUE
 #' @param to_sp Option to convert POLYGON object into SpatialPolygon*, default TRUE
-#' @return SpatialPolygon or SpatialPolygonDataFrame split along the antimeridian 
+
+#' @return SpatialPolygon or SpatialPolygonDataFrame split along the antimeridian
 #' @export
 antimeridian_wrapping <- function(polygon_data, crs = 4326, unique_inst = TRUE, to_sp = TRUE) {
   # Convert to sf object if needed
   if (!is(polygon_data, 'sf')) {
-    if (isTRUE(unique_inst)) {
+    if (base::isTRUE(unique_inst)) {
       all_coords <- base::lapply(polygon_data@polygons, function(x) {
         base::lapply(x@Polygons, function(x) {
           sp::coordinates(x)
@@ -136,7 +141,7 @@ antimeridian_wrapping <- function(polygon_data, crs = 4326, unique_inst = TRUE, 
   sf_split <- sf::st_wrap_dateline(sf_data)
   
   # Revert sf objects back to sp
-  if (isTRUE(to_sp)) {
+  if (base::isTRUE(to_sp)) {
     polygon_data_conv <- sf::as_Spatial(sf_split)
   } else {
     polygon_data_conv <- sf_split
