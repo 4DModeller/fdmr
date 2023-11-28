@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/openghg/openghg/compare/0.1.1...HEAD)
 
+### Fixed
+- Added a function to ensure correct polygon display across the dateline - [PR #285](https://github.com/4DModeller/fdmr/pull/285)
+
 ### Added
 
 - Added a new tutorial on loading data from different sources - [PR #266](https://github.com/4DModeller/fdmr/pull/266/)

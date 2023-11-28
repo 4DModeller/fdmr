@@ -12,6 +12,7 @@
 #' @param polygon_line_colour Polygon surrounding line colour
 #' @param polygon_line_weight Polygon surrounding line weight
 #' @param reverse Reverse the colour palette if TRUE
+#' @param wrapping Split polygons along the antimeridian (-180/180 boundary) if TRUE
 #'
 #' @return leaflet::leaflet
 #' @export
@@ -26,7 +27,8 @@ plot_map <- function(polygon_data = NULL,
                      polygon_line_colour = "grey",
                      polygon_line_weight = 1,
                      polygon_fill_opacity = 0.6,
-                     reverse = FALSE) {
+                     reverse = FALSE,
+                     wrapping = FALSE) {
   if (is.null(polygon_data) && is.null(raster_data)) {
     stop("Polygon or raster data must be given.")
   }
@@ -41,6 +43,9 @@ plot_map <- function(polygon_data = NULL,
   layers <- c()
 
   if (!is.null(polygon_data)) {
+    if (isTRUE(wrapping)) {
+      polygon_data <- fdmr::antimeridian_wrapping(polygon_data, crs = "+proj=longlat +datum=WGS84", unique_inst = TRUE, to_sp = FALSE)
+      }
     if (!is.null(domain)) {
       colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = reverse)
       polygon_fill_colour <- ~ colours(domain)

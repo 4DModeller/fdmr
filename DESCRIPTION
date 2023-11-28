@@ -58,7 +58,8 @@ Imports:
     bslib,
     bsicons,
     future,
-    leafem
+    leafem,
+    sfheaders
 Suggests: 
     bookdown,
     knitr,
