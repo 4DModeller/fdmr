@@ -24,7 +24,9 @@ plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", lati
     )
   }
 
-  spatial_mesh <- fdmr::mesh_to_spatial(mesh = mesh, crs = expected_crs)
+  spatial_mesh_original <- fdmr::mesh_to_spatial(mesh = mesh, crs = expected_crs)
+
+  spatial_mesh <- fdmr::antimeridian_wrapping(spatial_mesh_original, crs = expected_crs, unique_inst = FALSE, to_sp = FALSE)
 
   plot_polygons <- FALSE
   plot_points <- FALSE
