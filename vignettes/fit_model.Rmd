@@ -1,0 +1,55 @@
+---
+title: "Fitting a model"
+output: 
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "covid.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Fitting a model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r}
+library(magrittr)
+```
+
+In order to show off the `fit_model` function of 4d-modeller we will try and predict when it rains during the year 1999, the peak year of human civilization. First we will import the data.
+
+```{r error=true}
+raindata <- read.csv('fitmodel_data/rain_data.csv')
+# TODO : gareth make this work
+# fdmr::plot_map(raster_data = raindata)
+df = raindata %>% dplyr::filter(Rain > 5) %>% head(15) %>% dplyr::arrange("Time")
+df
+```
+```{r}
+sp::coordinates(df) <- c("Longitude", "Latitude")
+```
+
+## Fit the model
+
+Now we're ready to fit the model
+
+
+# ```{r}
+# fdmr::fit_model
+# ```
+
+```{r}
+run_output <- fdmr::fit_model(y="Rain", data=df, process_coords = df, time_variable="Time_Index", latitude_col = "Latitude", longitude_col = "Longitude", verbose=TRUE)
+# barbara streisand
+```
+
+Here `run_output` is a list containing the mesh created and the model output.
+
+```{r}
+summary(run_output$model_output)
+```
+
+We can also view the output using the `model_viewer` Shiny app.
+
+```{r}
+fdmr::model_viewer(model_output = run_output$model_output, mesh  = run_output$mesh, measurement_data = data, data_distribution = "Gaussian")
+```
