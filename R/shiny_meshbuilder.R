@@ -178,8 +178,20 @@ meshbuilder_shiny <- function(
       )
     )
 
+    spatial <- shiny::reactive({
+      if (is.data.frame(spatial_data)) {
+        sf::st_as_sf(
+          spatial_data,
+          coords = c(x_coord, y_coord),
+          crs = crs
+        )
+      } else {
+        spatial_data
+      }
+    })
+
     output$map <- leaflet::renderLeaflet({
-      m <- mapview::mapview(list(spatial_data, mesh_spatial()), layer.name = (c("Spatial data", "Mesh")))
+      m <- mapview::mapview(list(spatial(), mesh_spatial()), layer.name = (c("Spatial data", "Mesh")))
       m@map
     })
 
