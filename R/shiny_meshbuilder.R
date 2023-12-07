@@ -52,9 +52,6 @@ meshbuilder_shiny <- function(
     stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
 
-  # The number of nodes we count as being a big mesh
-  n_nodes_big_mesh <- 10000
-
   default_max_edge <- c(0.1, 0.3)
   default_offset <- c(0.2, 0.7)
   default_cutoff <- 0.2
@@ -91,12 +88,6 @@ meshbuilder_shiny <- function(
 
   ui <- shiny::fluidPage(
     busy_spinner,
-    shinybusy::add_loading_state(
-      "#map",
-      timeout = 600,
-      text = "Calculating mesh...",
-      svgColor = "steelblue"
-    ),
     shiny::headerPanel(title = "Creating a mesh"),
     shiny::sidebarLayout(
       shiny::sidebarPanel(
@@ -123,27 +114,27 @@ meshbuilder_shiny <- function(
         # shiny::actionButton("check_button", "Check mesh"),
       ),
       shiny::mainPanel(
-        shiny::div(leaflet::leafletOutput("map", height = "80vh"))
-        # shiny::tabsetPanel(
-        #   type = "tabs",
-        #   shiny::tabPanel(
-        #     "Plot",
-        #     class = "p-3 border",
-        #   ),
-        #   shiny::tabPanel("Code", class = "p-3 border", shiny::verbatimTextOutput("mesh_code")),
-        #   shiny::tabPanel(
-        #     "Help",
-        #     class = "p-3 border",
-        #     shiny::h3("Help"),
-        #     shiny::h4("Max edge"),
-        #     shiny::p("Determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
-        #               or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect."),
-        #     shiny::h4("Offset"),
-        #     shiny::p("Specifies the size of the inner and outer extensions around data locations."),
-        #     shiny::h4("Cutoff"),
-        #     shiny::p("Minimum allowed distance between data points."),
-        #   )
-        # )
+        shiny::tabsetPanel(
+          type = "tabs",
+          shiny::tabPanel(
+            "Plot",
+            class = "p-3 border",
+            shiny::div(leaflet::leafletOutput("map", height = "80vh"))
+          ),
+          shiny::tabPanel("Code", class = "p-3 border", shiny::verbatimTextOutput("mesh_code")),
+          shiny::tabPanel(
+            "Help",
+            class = "p-3 border",
+            shiny::h3("Help"),
+            shiny::h4("Max edge"),
+            shiny::p("Determines the maximum permitted length for a triangle (lower values for max.edge result in higher mesh resolution). This parameter can take either a scalar value, which controls the triangle edge lengths in the inner domain,
+                      or a length-two vector that controls edge lengths both in the inner domain and in the outer extension to avoid the boundary effect."),
+            shiny::h4("Offset"),
+            shiny::p("Specifies the size of the inner and outer extensions around data locations."),
+            shiny::h4("Cutoff"),
+            shiny::p("Minimum allowed distance between data points."),
+          )
+        )
       )
     )
   )
@@ -185,7 +176,15 @@ meshbuilder_shiny <- function(
         crs = "+proj=utm +zone=33"
       )
 
-      m <- mapview::mapview(spatial)
+      layers <- list(spatial)
+      layer_names <- c("Spatial")
+      if (!is.null(mesh_spatial())) {
+        layers <- list(spatial, mesh_spatial())
+        layer_names <- list("Spatial", "Mesh")
+      }
+
+      m <- mapview::mapview(layers, layer.names = layer_names, legend = TRUE, map.types = "OpenStreetMap")
+
       m@map
       # m <- leaflet::leaflet()
       # m <- leaflet::addTiles(m, group = "OSM")
