@@ -59,7 +59,8 @@ Imports:
     bsicons,
     future,
     leafem,
-    sfheaders
+    sfheaders,
+    mapview
 Suggests: 
     bookdown,
     knitr,
