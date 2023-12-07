@@ -20,7 +20,7 @@
 
 ### - evaluate the fully trained model output
 
-![](https://github.com/4DModeller/fdmr/assets/8915182/fe791f74-c9b4-4db0-a52e-ffa018b12b41)
+![](https://github.com/4DModeller/fdmr/assets/8915182/f2b68ccc-cfba-4393-b2f4-6cecdad332c0)
 
 ## Quickstart
 
