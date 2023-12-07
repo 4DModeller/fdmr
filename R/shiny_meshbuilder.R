@@ -6,8 +6,8 @@
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla
 #' @param cutoff The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla
-#' @param latitude_column Name of the latitude column in the spatial data
-#' @param longitude_column Name of the longitude column in the spatial data
+#' @param y_coord Name of the y coordinate (for example latitude) column in the spatial data
+#' @param x_coord Name of the  x coordinate (for example longitude) column in the spatial data
 #'
 #' @importFrom magrittr %>%
 #'
@@ -21,8 +21,8 @@ meshbuilder_shiny <- function(
     offset = NULL,
     cutoff = NULL,
     plot_poly = FALSE,
-    latitude_column = "LAT",
-    longitude_column = "LONG") {
+    y_coord = "LAT",
+    x_coord = "LONG") {
   if (!is.data.frame(spatial_data) && !is(spatial_data, "SpatialPolygonsDataFrame") && !is(spatial_data, "SpatialPointsDataFrame")) {
     stop("spatial_data must be a data.frame or tibble containing columns with latitude and longitude data.")
   }
@@ -50,7 +50,7 @@ meshbuilder_shiny <- function(
   # If the user passes in any of these then we enable the sliders
   enable_inputs <- (!is.null(max_edge) || !is.null(offset) || !is.null(cutoff))
 
-  got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data))
+  got_lat_long <- all(c(x_coord, y_coord) %in% names(spatial_data))
   if (!got_lat_long) {
     stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
@@ -64,7 +64,7 @@ meshbuilder_shiny <- function(
   if (is.null(cutoff)) cutoff <- default_cutoff
 
   # Make sure we have our own internal correctly formatted version of the data
-  coords_only <- spatial_data[, c(longitude_column, latitude_column)]
+  coords_only <- spatial_data[, c(x_coord, y_coord)]
   names(coords_only) <- c("LONG", "LAT")
 
 
@@ -179,13 +179,7 @@ meshbuilder_shiny <- function(
     )
 
     output$map <- leaflet::renderLeaflet({
-      spatial <- sf::st_as_sf(
-        spatial_data,
-        coords = c("LONG", "LAT"),
-        crs = "+proj=utm +zone=33"
-      )
-
-      m <- mapview::mapview(list(spatial, mesh_spatial()), layer.name = (c("Spatial data", "Mesh")))
+      m <- mapview::mapview(list(spatial_data, mesh_spatial()), layer.name = (c("Spatial data", "Mesh")))
       m@map
     })
 
@@ -201,7 +195,7 @@ meshbuilder_shiny <- function(
       }
 
       paste0(
-        "location_data <- spatial_data[, c('", longitude_column, "', '", latitude_column, "')],\n",
+        "location_data <- spatial_data[, c('", x_coord, "', '", y_coord, "')],\n",
         "names(location_data) <- c('LONG', 'LAT')\n",
         "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,\n\t",
         max_edge_str, "\n\t",
@@ -224,12 +218,12 @@ meshbuilder_shiny <- function(
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla
 #' @param cutoff The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla
-#' @param latitude_column Name of the latitude column in the spatial data
-#' @param longitude_column Name of the longitude column in the spatial data
+#' @param y_coord Name of the latitude column in the spatial data
+#' @param x_coord Name of the longitude column in the spatial data
 #'
 #' @return shiny::app
 #' @export
-mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL, latitude_column = "LAT", longitude_column = "LONG") {
+mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL, y_coord = "LAT", x_coord = "LONG") {
   shiny::runApp(meshbuilder_shiny(
     spatial_data = spatial_data,
     obs_data = obs_data,
@@ -237,7 +231,7 @@ mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = N
     max_edge = max_edge,
     offset = offset,
     cutoff = cutoff,
-    latitude_column = latitude_column,
-    longitude_column = longitude_column
+    y_coord = y_coord,
+    x_coord = x_coord
   ))
 }

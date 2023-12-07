@@ -47,7 +47,7 @@ locations <- sf::st_as_sf(
 ```
 
 ```{r}
-fdmr::mesh_builder(spatial_data=df, crs= "+proj=utm +zone=33")
+fdmr::mesh_builder(spatial_data=locations, crs= "+proj=utm +zone=33")
 ```
 
 Now let's plot the map
