@@ -47,14 +47,17 @@ meshbuilder_shiny <- function(
     )
   }
 
+  # If the user passes in any of these then we enable the sliders
+  enable_inputs <- (!is.null(max_edge) || !is.null(offset) || !is.null(cutoff))
+
   got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data))
   if (!got_lat_long) {
     stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
 
-  default_max_edge <- c(0.1, 0.3)
-  default_offset <- c(0.2, 0.7)
-  default_cutoff <- 0.2
+  default_max_edge <- c(0.01, 0.3)
+  default_offset <- c(0.02, 0.7)
+  default_cutoff <- 0.02
   # TODO - these defaults need changing?
   if (is.null(max_edge)) max_edge <- default_max_edge
   if (is.null(offset)) offset <- default_offset
@@ -73,7 +76,7 @@ meshbuilder_shiny <- function(
     shiny::headerPanel(title = "Creating a mesh"),
     shiny::sidebarLayout(
       shiny::sidebarPanel(
-        shiny::checkboxInput(inputId = "enable_inputs", label = "Enable customisation", value = FALSE),
+        shiny::checkboxInput(inputId = "enable_inputs", label = "Enable customisation", value = enable_inputs),
         shiny::sliderInput(
           inputId = "max_edge",
           label = "Max edge:",
@@ -180,16 +183,26 @@ meshbuilder_shiny <- function(
       m@map
     })
 
-    output$mesh_code <- shiny::reactive(
+    output$mesh_code <- shiny::reactive({
+      if (input$enable_inputs) {
+        max_edge_str <- paste0("max.edge = c(", paste0(input$max_edge, collapse = ","), "),")
+        offset_str <- paste0("offset = c(", paste0(input$offset, collapse = ", "), "),")
+        cutoff_str <- paste0("cutoff = ", input$cutoff, ",")
+      } else {
+        max_edge_str <- "max.edge = NULL,"
+        offset_str <- "offset = NULL,"
+        cutoff_str <- "cutoff = NULL,"
+      }
+
       paste0(
-        "location_data <- spatial_data[, c('", longitude_column, "', '", latitude_column, "')]\n\n",
-        "names(location_data) <- c('LONG', 'LAT')\n\n",
-        "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,
-          max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
-          cutoff = ", input$cutoff, ",
-          offset=c(", paste0(input$offset, collapse = ", "), "))\n"
+        "location_data <- spatial_data[, c('", longitude_column, "', '", latitude_column, "')],\n",
+                      "names(location_data) <- c('LONG', 'LAT')\n",
+                      "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,\n\t",
+                      max_edge_str, "\n\t",
+                      cutoff_str, "\n\t",
+                      offset_str, ")\n"
       )
-    )
+    })
   }
 
   # Run the application
