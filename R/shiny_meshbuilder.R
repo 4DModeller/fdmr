@@ -6,8 +6,8 @@
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla
 #' @param cutoff The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla
-#' @param latitude_column Name of the latitude column in the spatial data
-#' @param longitude_column Name of the longitude column in the spatial data
+#' @param y_coord Name of the y coordinate (for example latitude) column in the spatial data
+#' @param x_coord Name of the  x coordinate (for example longitude) column in the spatial data
 #'
 #' @importFrom magrittr %>%
 #'
@@ -21,8 +21,8 @@ meshbuilder_shiny <- function(
     offset = NULL,
     cutoff = NULL,
     plot_poly = FALSE,
-    latitude_column = "LAT",
-    longitude_column = "LONG") {
+    y_coord = "LAT",
+    x_coord = "LONG") {
   if (!is.data.frame(spatial_data) && !is(spatial_data, "SpatialPolygonsDataFrame") && !is(spatial_data, "SpatialPointsDataFrame")) {
     stop("spatial_data must be a data.frame or tibble containing columns with latitude and longitude data.")
   }
@@ -47,81 +47,56 @@ meshbuilder_shiny <- function(
     )
   }
 
-  got_lat_long <- all(c(longitude_column, latitude_column) %in% names(spatial_data))
+  # If the user passes in any of these then we enable the sliders
+  enable_inputs <- (!is.null(max_edge) || !is.null(offset) || !is.null(cutoff))
+
+  got_lat_long <- all(c(x_coord, y_coord) %in% names(spatial_data))
   if (!got_lat_long) {
     stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
 
-  # The number of nodes we count as being a big mesh
-  n_nodes_big_mesh <- 10000
-
-  default_max_edge <- c(0.1, 0.3)
-  default_offset <- c(0.2, 0.7)
-  default_cutoff <- 0.2
+  default_max_edge <- c(0.01, 0.3)
+  default_offset <- c(0.02, 0.7)
+  default_cutoff <- 0.02
   # TODO - these defaults need changing?
   if (is.null(max_edge)) max_edge <- default_max_edge
   if (is.null(offset)) offset <- default_offset
   if (is.null(cutoff)) cutoff <- default_cutoff
 
   # Make sure we have our own internal correctly formatted version of the data
-  coords_only <- spatial_data[, c(longitude_column, latitude_column)]
+  coords_only <- spatial_data[, c(x_coord, y_coord)]
   names(coords_only) <- c("LONG", "LAT")
 
-  plot_polygons <- FALSE
-  plot_points <- FALSE
-  # We may not use this
-  spatial_points <- NULL
-  # Do some checks to see what kind of data we have
-  # If we have a SpatialPolygonsDataFrame, we can plot the polygons
-  # otherwise if we just have SpatialPoints we can plot the points
-  # otherwise we don't plot anything
-  if (class(spatial_data) == "SpatialPolygonsDataFrame") {
-    plot_polygons <- TRUE
-  } else {
-    plot_points <- TRUE
-
-    spatial_points <- sp::SpatialPointsDataFrame(
-      coords = coords_only,
-      data = spatial_data,
-      proj4string = sp::CRS(crs)
-    )
-  }
 
   busy_spinner <- get_busy_spinner()
 
-  ui <- bslib::page_fluid(
-    theme = bslib::bs_theme(bootswatch = "cosmo"),
+  ui <- shiny::fluidPage(
     busy_spinner,
-    shinybusy::add_loading_state(
-      "#map",
-      timeout = 600,
-      text = "Calculating mesh...",
-      svgColor = "steelblue"
-    ),
+    shinyjs::useShinyjs(),
     shiny::headerPanel(title = "Creating a mesh"),
     shiny::sidebarLayout(
       shiny::sidebarPanel(
+        shiny::checkboxInput(inputId = "enable_inputs", label = "Enable customisation", value = enable_inputs),
         shiny::sliderInput(
           inputId = "max_edge",
           label = "Max edge:",
-          min = 0.02, value = c(0.1, 0.3), max = 10
+          min = 0.02, value = 0.1, max = 10
         ),
         shiny::p("Max permitted edge length for a triangle"),
         shiny::sliderInput(
           inputId = "offset",
           label = "Offset:",
-          min = 0.02, value = c(0.2, 0.7), max = 10
+          min = 0.02, value = 0.1, max = 10
         ),
         shiny::p("Specifies the size of the inner and outer extensions around data locations."),
         shiny::sliderInput(
           inputId = "cutoff",
           label = "Cutoff:",
-          min = 0.005, value = 0.2, max = 0.9
+          min = 0.005, value = 0.1, max = 0.9
         ),
         shiny::p("Minimum allowed distance between data points."),
         shiny::actionButton("plot_mesh", label = "Plot mesh"),
         shiny::actionButton("reset_mesh", label = "Reset"),
-        # shiny::actionButton("check_button", "Check mesh"),
       ),
       shiny::mainPanel(
         shiny::tabsetPanel(
@@ -129,7 +104,9 @@ meshbuilder_shiny <- function(
           shiny::tabPanel(
             "Plot",
             class = "p-3 border",
-            shiny::div(id = "map_div", leaflet::leafletOutput("map", height = "80vh"))
+            shiny::div(leaflet::leafletOutput("map", height = "80vh")),
+            shiny::br(),
+            shiny::textOutput(outputId = "mesh_crs")
           ),
           shiny::tabPanel("Code", class = "p-3 border", shiny::verbatimTextOutput("mesh_code")),
           shiny::tabPanel(
@@ -151,25 +128,47 @@ meshbuilder_shiny <- function(
 
   # Define server logic required to draw a histogram
   server <- function(input, output, session) {
+    shiny::observeEvent(input$enable_inputs, {
+      if (input$enable_inputs) {
+        shinyjs::enable("max_edge")
+        shinyjs::enable("offset")
+        shinyjs::enable("cutoff")
+      } else {
+        shinyjs::disable("max_edge")
+        shinyjs::disable("offset")
+        shinyjs::disable("cutoff")
+      }
+    })
+
     shiny::observeEvent(input$reset_mesh, {
       shiny::updateSliderInput(session, inputId = "max_edge", value = default_max_edge)
       shiny::updateSliderInput(session, inputId = "offset", value = default_offset)
       shiny::updateSliderInput(session, inputId = "cutoff", value = default_cutoff)
     })
 
+    output$mesh_crs <- shiny::renderText({
+      paste("Mesh CRS: ", crs)
+    })
+
     mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
+      if (input$enable_inputs) {
+        max_edge <- input$max_edge
+        offset <- input$offset
+        cutoff <- input$cutoff
+      } else {
+        max_edge <- NULL
+        offset <- NULL
+        cutoff <- NULL
+      }
+
       fmesher::fm_mesh_2d_inla(
         loc = coords_only,
-        max.edge = input$max_edge,
-        cutoff = input$cutoff,
-        offset = input$offset,
+        max.edge = max_edge,
+        cutoff = cutoff,
+        offset = offset,
         crs = crs,
       )
     })
-
-    # large_mesh <- shiny::reactive({
-    #   mesh()$n > n_nodes_big_mesh
-    # })
 
     mesh_spatial <- shiny::reactive(
       suppressMessages(
@@ -179,66 +178,43 @@ meshbuilder_shiny <- function(
       )
     )
 
-    output$map <- leaflet::renderLeaflet({
-      m <- leaflet::leaflet()
-      m <- leaflet::addTiles(m, group = "OSM")
-      m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
-      m <- leaflet::addMeasure(position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
-      m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
-      if (plot_polygons) {
-        m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
-      } else if (plot_points) {
-        m <- leaflet::addCircles(m, data = spatial_points, group = "Spatial", fillColor = "#b9220b", color = "#b9220b")
+    spatial <- shiny::reactive({
+      if (is.data.frame(spatial_data)) {
+        sf::st_as_sf(
+          spatial_data,
+          coords = c(x_coord, y_coord),
+          crs = crs
+        )
+      } else {
+        spatial_data
       }
-
-      m <- leaflet::addLayersControl(m,
-        position = "topright",
-        baseGroups = c("OSM"),
-        overlayGroups = c("Mesh", "Spatial"),
-        options = leaflet::layersControlOptions(collapsed = FALSE)
-      )
     })
 
-    output$mesh_code <- shiny::reactive(
-      paste0(
-        "location_data <- spatial_data[, c('", longitude_column, "', '", latitude_column, "')]\n\n",
-        "names(location_data) <- c('LONG', 'LAT')\n\n",
-        "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,
-          max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
-          cutoff = ", input$cutoff, ",
-          offset=c(", paste0(input$offset, collapse = ", "), "))\n"
-      )
-    )
+    output$map <- leaflet::renderLeaflet({
+      map_tiles <- c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
+      m <-  mapview::mapview(mesh_spatial(), layer.name = "Mesh", col.regions = "#548C2F", map.types = map_tiles) + mapview::mapview(spatial(), layer.name = "Spatial")
+      m@map
+    })
 
-    # shiny::observe({
-    #   if (large_mesh() && !modal_shown()) {
-    #     shiny::showModal(shiny::modalDialog(
-    #       "Mesh is large, plotting may be slow.",
-    #       title = "Mesh warning",
-    #       easyClose = TRUE,
-    #       footer = NULL
-    #     ))
-    #   }
-    #   modal_shown(TRUE)
-    # })
-
-
-    shiny::observeEvent(input$check_button, {
-      if (is.null(obs_data) || is.null(mesh())) {
-        errors <- "No observation data. Cannot check mesh."
+    output$mesh_code <- shiny::reactive({
+      if (input$enable_inputs) {
+        max_edge_str <- paste0("max.edge = c(", paste0(input$max_edge, collapse = ","), "),")
+        offset_str <- paste0("offset = c(", paste0(input$offset, collapse = ", "), "),")
+        cutoff_str <- paste0("cutoff = ", input$cutoff, ",")
       } else {
-        errors <- fdmr::mesh_checker(mesh = mesh(), observations = obs_data)
-        if (!length(errors)) {
-          errors <- "No errors found."
-        }
+        max_edge_str <- "max.edge = NULL,"
+        offset_str <- "offset = NULL,"
+        cutoff_str <- "cutoff = NULL,"
       }
 
-      shiny::showModal(shiny::modalDialog(
-        stringr::str_flatten(errors, collapse = "\n"),
-        title = "Mesh check",
-        easyClose = TRUE,
-        footer = NULL
-      ))
+      paste0(
+        "location_data <- spatial_data[, c('", x_coord, "', '", y_coord, "')],\n",
+        "names(location_data) <- c('LONG', 'LAT')\n",
+        "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,\n\t",
+        max_edge_str, "\n\t",
+        cutoff_str, "\n\t",
+        offset_str, ")\n"
+      )
     })
   }
 
@@ -255,12 +231,12 @@ meshbuilder_shiny <- function(
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
 #' @param max_edge The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla
 #' @param cutoff The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla
-#' @param latitude_column Name of the latitude column in the spatial data
-#' @param longitude_column Name of the longitude column in the spatial data
+#' @param y_coord Name of the latitude column in the spatial data
+#' @param x_coord Name of the longitude column in the spatial data
 #'
 #' @return shiny::app
 #' @export
-mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL, latitude_column = "LAT", longitude_column = "LONG") {
+mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL, y_coord = "LAT", x_coord = "LONG") {
   shiny::runApp(meshbuilder_shiny(
     spatial_data = spatial_data,
     obs_data = obs_data,
@@ -268,7 +244,7 @@ mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = N
     max_edge = max_edge,
     offset = offset,
     cutoff = cutoff,
-    latitude_column = latitude_column,
-    longitude_column = longitude_column
+    y_coord = y_coord,
+    x_coord = x_coord
   ))
 }
