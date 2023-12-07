@@ -191,7 +191,8 @@ meshbuilder_shiny <- function(
     })
 
     output$map <- leaflet::renderLeaflet({
-      m <- mapview::mapview(list(spatial(), mesh_spatial()), layer.name = (c("Spatial data", "Mesh")))
+      map_tiles <- c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
+      m <-  mapview::mapview(mesh_spatial(), layer.name = "Mesh", col.regions = "#548C2F", map.types = map_tiles) + mapview::mapview(spatial(), layer.name = "Spatial")
       m@map
     })
 
