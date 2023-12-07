@@ -104,7 +104,9 @@ meshbuilder_shiny <- function(
           shiny::tabPanel(
             "Plot",
             class = "p-3 border",
-            shiny::div(leaflet::leafletOutput("map", height = "80vh"))
+            shiny::div(leaflet::leafletOutput("map", height = "80vh")),
+            shiny::br(),
+            shiny::textOutput(outputId = "mesh_crs")
           ),
           shiny::tabPanel("Code", class = "p-3 border", shiny::verbatimTextOutput("mesh_code")),
           shiny::tabPanel(
@@ -142,6 +144,10 @@ meshbuilder_shiny <- function(
       shiny::updateSliderInput(session, inputId = "max_edge", value = default_max_edge)
       shiny::updateSliderInput(session, inputId = "offset", value = default_offset)
       shiny::updateSliderInput(session, inputId = "cutoff", value = default_cutoff)
+    })
+
+    output$mesh_crs <- shiny::renderText({
+      paste("Mesh CRS: ", crs)
     })
 
     mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
@@ -196,11 +202,11 @@ meshbuilder_shiny <- function(
 
       paste0(
         "location_data <- spatial_data[, c('", longitude_column, "', '", latitude_column, "')],\n",
-                      "names(location_data) <- c('LONG', 'LAT')\n",
-                      "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,\n\t",
-                      max_edge_str, "\n\t",
-                      cutoff_str, "\n\t",
-                      offset_str, ")\n"
+        "names(location_data) <- c('LONG', 'LAT')\n",
+        "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,\n\t",
+        max_edge_str, "\n\t",
+        cutoff_str, "\n\t",
+        offset_str, ")\n"
       )
     })
   }
