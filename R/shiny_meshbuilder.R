@@ -173,7 +173,7 @@ meshbuilder_shiny <- function(
     mesh_spatial <- shiny::reactive(
       suppressMessages(
         suppressWarnings(
-          fdmr::mesh_to_spatial(mesh = mesh(), crs = crs)
+          fdmr::antimeridian_wrapping(fdmr::mesh_to_spatial(mesh = mesh(), crs = crs), crs = crs, unique_inst = FALSE, to_sp = FALSE)
         )
       )
     )

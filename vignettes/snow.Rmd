@@ -68,10 +68,10 @@ head(df)
 
 ### Build the mesh
 
-When trying to build a mesh whit our UTM projected dataset, we don't get a result as the shiny app does not seem to work with UTM:
+We'll use the `mesh_builder` Shiny app to help us create a mesh.
 
 ```{r, eval = FALSE}
-fdmr::mesh_builder(spatial_data = df)
+fdmr::mesh_builder(spatial_data = df, crs="+proj=utm +zone=33")
 ```
 
 Using fmesher directly (non-interactively, without the fdmr app added functionalities) works and we can plot the resulting mesh outside the geographical context that would have been provided by mesh_builder.

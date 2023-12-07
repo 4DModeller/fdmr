@@ -14,6 +14,8 @@ The spatiotemporal evolution of the field is governed by wave equation. The smal
 
 ## Pre-processing and Import data
 
+Geophysical data can come in lots of different formats but here will will start with a csv.
+
 ```{r}
 # Set the path to the CSV file
 data_path <- "data/MT_Svalbard_Z.csv"
@@ -28,11 +30,14 @@ print(head(d, 30))
 plot(d$X, d$Y, pch = 20, main = "Svalbard MT sites", xlab = "X", ylab = "Y")
 ```
 
+Here we create the locations of the data for the mesh creation. This is the locations of the data, not the locations of the mesh nodes.
 ```{r}
 locations <- d[, c("Lon", "Lat")]
 locations <- unique(locations)
 names(locations) <- c("LONG", "LAT")
 ```
+
+Here we use the locations to help specify the best fit mesh to our data.
 
 ## Meshing
 ```{r}
@@ -48,7 +53,10 @@ points(locations, col = "red")
 fdmr::plot_mesh(mesh)
 ```
 
-## Stochastic modeling
+## Stochastic modeling with INLA
+
+Now we can create a model that is solved on the mesh.
+
 ```{r}
 library(INLA)
 
