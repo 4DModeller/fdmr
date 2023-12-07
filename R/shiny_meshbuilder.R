@@ -64,54 +64,36 @@ meshbuilder_shiny <- function(
   coords_only <- spatial_data[, c(longitude_column, latitude_column)]
   names(coords_only) <- c("LONG", "LAT")
 
-  plot_polygons <- FALSE
-  plot_points <- FALSE
-  # We may not use this
-  spatial_points <- NULL
-  # Do some checks to see what kind of data we have
-  # If we have a SpatialPolygonsDataFrame, we can plot the polygons
-  # otherwise if we just have SpatialPoints we can plot the points
-  # otherwise we don't plot anything
-  if (class(spatial_data) == "SpatialPolygonsDataFrame") {
-    plot_polygons <- TRUE
-  } else {
-    plot_points <- TRUE
-
-    spatial_points <- sp::SpatialPointsDataFrame(
-      coords = coords_only,
-      data = spatial_data,
-      proj4string = sp::CRS(crs)
-    )
-  }
 
   busy_spinner <- get_busy_spinner()
 
   ui <- shiny::fluidPage(
     busy_spinner,
+    shinyjs::useShinyjs(),
     shiny::headerPanel(title = "Creating a mesh"),
     shiny::sidebarLayout(
       shiny::sidebarPanel(
+        shiny::checkboxInput(inputId = "enable_inputs", label = "Enable customisation", value = FALSE),
         shiny::sliderInput(
           inputId = "max_edge",
           label = "Max edge:",
-          min = 0.02, value = c(0.1, 0.3), max = 10
+          min = 0.02, value = 0.1, max = 10
         ),
         shiny::p("Max permitted edge length for a triangle"),
         shiny::sliderInput(
           inputId = "offset",
           label = "Offset:",
-          min = 0.02, value = c(0.2, 0.7), max = 10
+          min = 0.02, value = 0.1, max = 10
         ),
         shiny::p("Specifies the size of the inner and outer extensions around data locations."),
         shiny::sliderInput(
           inputId = "cutoff",
           label = "Cutoff:",
-          min = 0.005, value = 0.2, max = 0.9
+          min = 0.005, value = 0.1, max = 0.9
         ),
         shiny::p("Minimum allowed distance between data points."),
         shiny::actionButton("plot_mesh", label = "Plot mesh"),
         shiny::actionButton("reset_mesh", label = "Reset"),
-        # shiny::actionButton("check_button", "Check mesh"),
       ),
       shiny::mainPanel(
         shiny::tabsetPanel(
@@ -141,6 +123,18 @@ meshbuilder_shiny <- function(
 
   # Define server logic required to draw a histogram
   server <- function(input, output, session) {
+    shiny::observeEvent(input$enable_inputs, {
+      if (input$enable_inputs) {
+        shinyjs::enable("max_edge")
+        shinyjs::enable("offset")
+        shinyjs::enable("cutoff")
+      } else {
+        shinyjs::disable("max_edge")
+        shinyjs::disable("offset")
+        shinyjs::disable("cutoff")
+      }
+    })
+
     shiny::observeEvent(input$reset_mesh, {
       shiny::updateSliderInput(session, inputId = "max_edge", value = default_max_edge)
       shiny::updateSliderInput(session, inputId = "offset", value = default_offset)
@@ -148,18 +142,24 @@ meshbuilder_shiny <- function(
     })
 
     mesh <- shiny::eventReactive(input$plot_mesh, ignoreNULL = FALSE, {
+      if (input$enable_inputs) {
+        max_edge <- input$max_edge
+        offset <- input$offset
+        cutoff <- input$cutoff
+      } else {
+        max_edge <- NULL
+        offset <- NULL
+        cutoff <- NULL
+      }
+
       fmesher::fm_mesh_2d_inla(
         loc = coords_only,
-        max.edge = input$max_edge,
-        cutoff = input$cutoff,
-        offset = input$offset,
+        max.edge = max_edge,
+        cutoff = cutoff,
+        offset = offset,
         crs = crs,
       )
     })
-
-    # large_mesh <- shiny::reactive({
-    #   mesh()$n > n_nodes_big_mesh
-    # })
 
     mesh_spatial <- shiny::reactive(
       suppressMessages(
@@ -176,33 +176,8 @@ meshbuilder_shiny <- function(
         crs = "+proj=utm +zone=33"
       )
 
-      layers <- list(spatial)
-      layer_names <- c("Spatial")
-      if (!is.null(mesh_spatial())) {
-        layers <- list(spatial, mesh_spatial())
-        layer_names <- list("Spatial", "Mesh")
-      }
-
-      m <- mapview::mapview(layers, layer.names = layer_names, legend = TRUE, map.types = "OpenStreetMap")
-
+      m <- mapview::mapview(list(spatial, mesh_spatial()), layer.name = (c("Spatial data", "Mesh")))
       m@map
-      # m <- leaflet::leaflet()
-      # m <- leaflet::addTiles(m, group = "OSM")
-      # m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
-      # m <- leaflet::addMeasure(position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
-      # m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
-      # if (plot_polygons) {
-      #   m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
-      # } else if (plot_points) {
-      #   m <- leaflet::addCircles(m, data = spatial_points, group = "Spatial", fillColor = "#b9220b", color = "#b9220b")
-      # }
-
-      # m <- leaflet::addLayersControl(m,
-      #   position = "topright",
-      #   baseGroups = c("OSM"),
-      #   overlayGroups = c("Mesh", "Spatial"),
-      #   options = leaflet::layersControlOptions(collapsed = FALSE)
-      # )
     })
 
     output$mesh_code <- shiny::reactive(
@@ -215,37 +190,6 @@ meshbuilder_shiny <- function(
           offset=c(", paste0(input$offset, collapse = ", "), "))\n"
       )
     )
-
-    # shiny::observe({
-    #   if (large_mesh() && !modal_shown()) {
-    #     shiny::showModal(shiny::modalDialog(
-    #       "Mesh is large, plotting may be slow.",
-    #       title = "Mesh warning",
-    #       easyClose = TRUE,
-    #       footer = NULL
-    #     ))
-    #   }
-    #   modal_shown(TRUE)
-    # })
-
-
-    shiny::observeEvent(input$check_button, {
-      if (is.null(obs_data) || is.null(mesh())) {
-        errors <- "No observation data. Cannot check mesh."
-      } else {
-        errors <- fdmr::mesh_checker(mesh = mesh(), observations = obs_data)
-        if (!length(errors)) {
-          errors <- "No errors found."
-        }
-      }
-
-      shiny::showModal(shiny::modalDialog(
-        stringr::str_flatten(errors, collapse = "\n"),
-        title = "Mesh check",
-        easyClose = TRUE,
-        footer = NULL
-      ))
-    })
   }
 
   # Run the application
