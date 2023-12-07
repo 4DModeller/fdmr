@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased](https://github.com/openghg/openghg/compare/0.1.1...HEAD)
 
 ### Fixed
+
 - Added a function to ensure correct polygon display across the dateline - [PR #285](https://github.com/4DModeller/fdmr/pull/285)
 
 ### Added
@@ -15,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a new tutorial on loading data from different sources - [PR #266](https://github.com/4DModeller/fdmr/pull/266/)
 - Added new geophysical processes tutorial thanks to Alexander Minakov (4minakov) - [PR #257](https://github.com/4DModeller/fdmr/pull/257)
 - Added mouse pointer coordinates header and standard measurement tool - [PR #260](https://github.com/4DModeller/fdmr/pull/260)
+- New plotting function `plot_map_mapview` to use `mapview` to plot raster and spatial data - [#291](https://github.com/4DModeller/fdmr/pull/291)
+
+### Changed
+
+- Renamed `plot_map` to `plot_map_leaflet` with the addition of `plot_map_mapview` - [#291](https://github.com/4DModeller/fdmr/pull/291)
 
 ## [0.1.1] - 2023-11-01
 
