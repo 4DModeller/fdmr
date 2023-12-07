@@ -16,26 +16,26 @@
 #'
 #' @return leaflet::leaflet
 #' @export
-plot_map <- function(polygon_data = NULL,
-                     raster_data = NULL,
-                     domain = NULL,
-                     markers = NULL,
-                     palette = "viridis",
-                     legend_title = NULL,
-                     add_scale_bar = FALSE,
-                     polygon_fill_colour = "#E4572E",
-                     polygon_line_colour = "grey",
-                     polygon_line_weight = 1,
-                     polygon_fill_opacity = 0.6,
-                     reverse = FALSE,
-                     wrapping = FALSE) {
+plot_map_leaflet <- function(polygon_data = NULL,
+                             raster_data = NULL,
+                             domain = NULL,
+                             markers = NULL,
+                             palette = "viridis",
+                             legend_title = NULL,
+                             add_scale_bar = FALSE,
+                             polygon_fill_colour = "#E4572E",
+                             polygon_line_colour = "grey",
+                             polygon_line_weight = 1,
+                             polygon_fill_opacity = 0.6,
+                             reverse = FALSE,
+                             wrapping = FALSE) {
   if (is.null(polygon_data) && is.null(raster_data)) {
     stop("Polygon or raster data must be given.")
   }
   library(leaflet)
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
-  m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
+  m <- leaflet::addProviderTiles(m, leaflet::providers$Openstreetmap, group = "Satellite")
   m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
 
   # Store a vector of layers we add to the map,
@@ -45,7 +45,7 @@ plot_map <- function(polygon_data = NULL,
   if (!is.null(polygon_data)) {
     if (isTRUE(wrapping)) {
       polygon_data <- fdmr::antimeridian_wrapping(polygon_data, crs = "+proj=longlat +datum=WGS84", unique_inst = TRUE, to_sp = FALSE)
-      }
+    }
     if (!is.null(domain)) {
       colours <- leaflet::colorNumeric(palette = palette, domain = domain, reverse = reverse)
       polygon_fill_colour <- ~ colours(domain)
@@ -69,7 +69,7 @@ plot_map <- function(polygon_data = NULL,
   }
 
   if (!is.null(raster_data)) {
-    colours <- leaflet::colorNumeric(palette = palette, domain = raster::values(raster_data), na.color=rgb(0,0,0,0), reverse = reverse)
+    colours <- leaflet::colorNumeric(palette = palette, domain = raster::values(raster_data), na.color = rgb(0, 0, 0, 0), reverse = reverse)
     m <- leaflet::addRasterImage(m,
       x = raster_data,
       opacity = 0.75,
@@ -78,11 +78,11 @@ plot_map <- function(polygon_data = NULL,
       colors = colours,
     )
     m <- leaflet::addLegend(m,
-                            pal = colours,
-                            values = raster::values(raster_data),
-                            opacity = 0.75,
-                            title = legend_title,
-                            na.label = ""
+      pal = colours,
+      values = raster::values(raster_data),
+      opacity = 0.75,
+      title = legend_title,
+      na.label = ""
     )
     layers <- append(layers, "Raster")
   }
@@ -103,7 +103,32 @@ plot_map <- function(polygon_data = NULL,
     m <- leaflet::addScaleBar(m, position = "bottomleft")
   }
 
-  m <- leaflet::addMeasure(m, position = "bottomleft", primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
-  
+  m <- leaflet::addMeasure(m, position = "bottomleft", primaryLengthUnit = "kilometers", primaryAreaUnit = "sqmeters")
+
+  return(m)
+}
+
+
+#' A simple map plotter using mapview. This is only intended for very quick viewing of data.
+#'
+#' @param spatial_data Spatial data to plot
+#' @param raster_data Raster data to plot
+#'
+#' @return mapview::mapview
+#' @export
+plot_map_mapview <- function(spatial_data = NULL, raster_data = NULL) {
+  if (is.null(spatial_data) && is.null(raster_data)) {
+    stop("Spatial or raster data must be given.")
+  }
+
+  map_types <- c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
+
+  m <- mapview::mapview(map.types = map_types)
+  if (!is.null(spatial_data)) {
+    m <- m + mapview::mapview(spatial_data)
+  }
+  if (!is.null(raster_data)) {
+    m <- m + mapview::mapview(raster_data)
+  }
   return(m)
 }

@@ -31,7 +31,7 @@ norway_polygon <- sf::read_sf(norway_polygon_path) %>% sf::st_zm()
 sfc <- sf::st_transform(norway_polygon, crs = "+proj=longlat +datum=WGS84")
 ```
 
-We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map`
+We want to mark the position of the dam and the stream gauges on the map so we'll create a `data.frame` to pass into the `plot_map_leaflet`
 function with the names and positions. We'll create a list for each of the points and then use the (`dplyr::bind_rows`)[https://dplyr.tidyverse.org/reference/bind.html] function to create a 
 `data.frame` from these.
 
@@ -47,7 +47,7 @@ markers <- dplyr::bind_rows(points)
 We're now ready to plot the map, passing in the polygon data, markers and optionally the fill opacity.
 
 ```{r}
-fdmr::plot_map(polygon_data = sfc, markers = markers, polygon_fill_opacity = 0.5)
+fdmr::plot_map_leaflet(polygon_data = sfc, markers = markers, polygon_fill_opacity = 0.5)
 ```
 
 On the map you can see the dam, the resevoir, the catchment area, and the two stream gauges.

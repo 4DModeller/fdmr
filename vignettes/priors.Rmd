@@ -39,7 +39,7 @@ Now we make a map of the study region.
 ```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align='center'}
 sp_data@data$mapp <- 0
 domain <- sp_data@data$mapp
-fdmr::plot_map(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, palette = "YlOrRd")
+fdmr::plot_map_leaflet(polygon_data = sp_data, domain = domain, add_scale_bar = TRUE, polygon_fill_opacity = 0.5, palette = "YlOrRd")
 ```
 
 
