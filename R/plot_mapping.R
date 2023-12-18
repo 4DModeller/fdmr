@@ -3,6 +3,9 @@
 #' NOTE that the mapview backend is only intended for quick viewing of data,
 #' most of the customisation arguments are not available.
 #'
+#' The leaflet backend will work for most use cases and is recommended.
+#' For plotting of maps with UTM coordinates, the mapview backend is recommended.
+#'
 #' @param polygon_data Polygon data
 #' @param raster_data Raster datas
 #' @param domain Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend
@@ -35,6 +38,10 @@ plot_map <- function(polygon_data = NULL,
                      reverse = FALSE,
                      wrapping = FALSE,
                      backend = "leaflet") {
+  if (is.null(polygon_data) && is.null(raster_data)) {
+    stop("Polygon or raster data must be given.")
+  }
+
   if (backend == "leaflet") {
     plot_map_leaflet(
       polygon_data = polygon_data,
@@ -93,10 +100,6 @@ plot_map_leaflet <- function(polygon_data = NULL,
                              polygon_fill_opacity = 0.6,
                              reverse = FALSE,
                              wrapping = FALSE) {
-  if (is.null(polygon_data) && is.null(raster_data)) {
-    stop("Polygon or raster data must be given.")
-  }
-  library(leaflet)
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
   m <- leaflet::addProviderTiles(m, leaflet::providers$Openstreetmap, group = "Satellite")
@@ -181,10 +184,6 @@ plot_map_leaflet <- function(polygon_data = NULL,
 #' @return mapview::mapview
 #' @keywords internal
 plot_map_mapview <- function(polygon_data = NULL, raster_data = NULL) {
-  if (is.null(polygon_data) && is.null(raster_data)) {
-    stop("Spatial or raster data must be given.")
-  }
-
   map_types <- c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
 
   m <- mapview::mapview(map.types = map_types)
