@@ -15,7 +15,9 @@ plot_map(
   polygon_fill_colour = "#E4572E",
   polygon_line_colour = "grey",
   polygon_line_weight = 1,
-  polygon_fill_opacity = 0.6
+  polygon_fill_opacity = 0.6,
+  reverse = FALSE,
+  wrapping = FALSE
 )
 }
 \arguments{
@@ -40,6 +42,10 @@ plot_map(
 \item{polygon_line_weight}{Polygon surrounding line weight}
 
 \item{polygon_fill_opacity}{Leaflet polygon fill opacity, float from 0 to 1.0, passed to fillOpacity of leaflet::addPolygons}
+
+\item{reverse}{Reverse the colour palette if TRUE}
+
+\item{wrapping}{Split polygons along the antimeridian (-180/180 boundary) if TRUE}
 }
 \value{
 leaflet::leaflet
