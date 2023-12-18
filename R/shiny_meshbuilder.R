@@ -89,29 +89,41 @@ meshbuilder_shiny <- function(
         shiny::checkboxInput(inputId = "enable_inputs", label = "Enable customisation", value = enable_inputs),
         shiny::h4("Max edge"),
         shiny::fluidRow(
-          shiny::numericInput(
-            inputId = "max_edge_min",
-            label = "Min:",
-            value = default_max_edge_min
+          shiny::column(
+            6,
+            shiny::numericInput(
+              inputId = "max_edge_min",
+              label = "Min:",
+              value = default_max_edge_min
+            )
           ),
-          shiny::numericInput(
-            inputId = "max_edge_max",
-            label = "Max:",
-            value = default_max_edge_max
+          shiny::column(
+            6,
+            shiny::numericInput(
+              inputId = "max_edge_max",
+              label = "Max:",
+              value = default_max_edge_max
+            )
           )
         ),
         shiny::p("Max permitted edge length for a triangle"),
         shiny::h4("Offset"),
         shiny::fluidRow(
-          shiny::numericInput(
-            inputId = "offset_min",
-            label = "Min:",
-            value = default_offset_min
+          shiny::column(
+            6,
+            shiny::numericInput(
+              inputId = "offset_min",
+              label = "Min:",
+              value = default_offset_min
+            ),
           ),
-          shiny::numericInput(
-            inputId = "offset_max",
-            label = "Max:",
-            value = default_offset_max
+          shiny::column(
+            6,
+            shiny::numericInput(
+              inputId = "offset_max",
+              label = "Max:",
+              value = default_offset_max
+            )
           )
         ),
         shiny::p("Specifies the size of the inner and outer extensions around data locations."),
@@ -231,13 +243,13 @@ meshbuilder_shiny <- function(
 
     output$mesh_code <- shiny::reactive({
       if (input$enable_inputs) {
-        max_edge_str <- paste0("max.edge = c(", paste0(input$max_edge, collapse = ","), "),")
-        offset_str <- paste0("offset = c(", paste0(input$offset, collapse = ", "), "),")
+        max_edge_str <- paste0("max.edge = c(", input$max_edge_min, ",", input$max_edge_max, "),")
         cutoff_str <- paste0("cutoff = ", input$cutoff, ",")
+        offset_str <- paste0("offset = c(", input$offset_min, ",", input$max_edge_max, ")")
       } else {
         max_edge_str <- "max.edge = NULL,"
-        offset_str <- "offset = NULL,"
         cutoff_str <- "cutoff = NULL,"
+        offset_str <- "offset = NULL"
       }
 
       paste0(
