@@ -77,22 +77,22 @@ meshbuilder_shiny <- function(
     shiny::sidebarLayout(
       shiny::sidebarPanel(
         shiny::checkboxInput(inputId = "enable_inputs", label = "Enable customisation", value = enable_inputs),
-        shiny::sliderInput(
+        shiny::numericInput(
           inputId = "max_edge",
           label = "Max edge:",
-          min = 0.02, value = 0.1, max = 10
+          value = 0.1
         ),
         shiny::p("Max permitted edge length for a triangle"),
-        shiny::sliderInput(
+        shiny::numericInput(
           inputId = "offset",
           label = "Offset:",
-          min = 0.02, value = 0.1, max = 10
+          value = 0.1
         ),
         shiny::p("Specifies the size of the inner and outer extensions around data locations."),
-        shiny::sliderInput(
+        shiny::numericInput(
           inputId = "cutoff",
           label = "Cutoff:",
-          min = 0.005, value = 0.1, max = 0.9
+          value = 0.1
         ),
         shiny::p("Minimum allowed distance between data points."),
         shiny::actionButton("plot_mesh", label = "Plot mesh"),
@@ -192,7 +192,7 @@ meshbuilder_shiny <- function(
 
     output$map <- leaflet::renderLeaflet({
       map_tiles <- c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
-      m <-  mapview::mapview(mesh_spatial(), layer.name = "Mesh", col.regions = "#548C2F", map.types = map_tiles) + mapview::mapview(spatial(), layer.name = "Spatial")
+      m <- mapview::mapview(mesh_spatial(), layer.name = "Mesh", col.regions = "#548C2F", map.types = map_tiles) + mapview::mapview(spatial(), layer.name = "Spatial")
       m@map
     })
 
