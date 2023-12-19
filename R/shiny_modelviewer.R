@@ -90,7 +90,21 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       shiny::tabPanel(
         "Help",
         class = "p-3 border",
-        shiny::h3("Help"),
+        shiny::h4("Range"),
+        shiny::p("The Range plot provides a plot of the posterior distribution of the spatial range parameter ρ, the distance at which the correlation between two points is approximately 0."),
+        shiny::h4("Stdev"),
+        shiny::p("The Stdev plot provides a plot of the posterior distribution of the marginal standard deviation σ of the spatial field."),
+        shiny::h4("AR(1)"),
+        shiny::p("The AR(1) plot provides a plot of the posterior distribution of the temporal autocorrelation α. A value close to 1 indicates strong positive temporal dependence, a value of 0 indicates independence across time, and a value close to -1 indicates strong negative temporal dependence."),
+        shiny::h4("Boxplot"),
+        shiny::p("The Boxplot displays the predicted (or fitted) values across the observed locations and time points, showing how the predictions are distributed."),
+        shiny::h4("Density"),
+        shiny::p("The Density plot displays the density curve of the predicted (or fitted) values across the observed locations and time points."),
+        shiny::h4("DIC"),
+        shiny::p("The DIC plot displays the Deviance Information Criterion (DIC) value for the model. DIC is a model selection criterion, with lower values indicating better model fit."),
+        shiny::h4("Map"),
+        shiny::p("The plot of predicted mean fields maps the predicted values across a number of grid locations that cover the study region. It helps to identify areas with high predictions and those with low predictions. The predicted values at observed locations and time points can be obtained by using the syntax model_output$summary.fitted.values$mean[1:nrow(observed_data)]. The predicted values at the grid locations are calculated using the method described in the priors tutorial "),
+        shiny::p("The plot of random effect fields maps the random effect values (the f() values) across a number of grid locations that cover the study region. The random effect values at the mesh nodes and time points can be obtained by using the syntax model_output$summary.random$f$mean.")
       )
     )
   )
