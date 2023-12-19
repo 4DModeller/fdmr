@@ -5,8 +5,8 @@
 #'
 #' @return ggplot2::ggplot
 plot_line_comparison <- function(data, to_plot, title) {
-  ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars[[to_plot]]))
-  single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
+  parsed_data <- purrr::map(data, function(x) as.data.frame(x$pars[[to_plot]]))
+  single_df <- dplyr::bind_rows(parsed_data, .id = "Run")
   if (nrow(single_df) == 0) {
     return("No pars data.")
   }
@@ -14,25 +14,6 @@ plot_line_comparison <- function(data, to_plot, title) {
   ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
     ggplot2::geom_line() +
     ggplot2::ggtitle(title) +
-    ggplot2::theme(text = ggplot2::element_text(size = 16))
-}
-
-
-#' Plot AR(1)
-#'
-#' @param data Parsed model output
-#' @param to_plot Type of data to plot, "Range for f" etc
-#'
-#' @return ggplot2::ggplot
-plot_ar1 <- function(data) {
-  ar1_data <- purrr::map(data, function(x) as.data.frame(x$pars$`GroupRho for f`))
-  single_df <- dplyr::bind_rows(ar1_data, .id = "Run")
-  if (nrow(single_df) == 0) {
-    return("No pars data.")
-  }
-
-  ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
-    ggplot2::geom_line() +
     ggplot2::theme(text = ggplot2::element_text(size = 16))
 }
 
