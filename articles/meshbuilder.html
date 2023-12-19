@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Mesh building">
 <meta property="og:description" content="fdmr">
@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fdmr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -172,7 +172,7 @@ We’re now ready to launch the mesh builder app.</p>
 time (~ 20s) to build this mesh due to its size.</p>
 </blockquote>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">lakes_data</span>, longitude_column <span class="op">=</span> <span class="st">"centroid_lon"</span>, latitude_column <span class="op">=</span> <span class="st">"centroid_lat"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">lakes_data</span>, x_coord <span class="op">=</span> <span class="st">"centroid_lon"</span>, y_coord <span class="op">=</span> <span class="st">"centroid_lat"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="loading-data---rds-file">Loading data - <code>rds</code> file<a class="anchor" aria-label="anchor" href="#loading-data---rds-file"></a>
@@ -541,7 +541,7 @@ use the <code>args</code> function.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/args.html" class="external-link">args</a></span><span class="op">(</span><span class="fu">fdmr</span><span class="fu">::</span><span class="va"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, </span></span>
-<span><span class="co">##     offset = NULL, cutoff = NULL, latitude_column = "LAT", longitude_column = "LONG") </span></span>
+<span><span class="co">##     offset = NULL, cutoff = NULL, y_coord = "LAT", x_coord = "LONG") </span></span>
 <span><span class="co">## NULL</span></span></code></pre>
 <p>Now we have the spatial data loaded we can think about some initial
 parameters for the mesh we’re going to create. We’ll calculate the
@@ -556,32 +556,15 @@ app.</p>
 <span><span class="va">max_edge_fin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="va">max_edge</span></span>
 <span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">initial_range</span> <span class="op">/</span> <span class="fl">4</span>, <span class="va">initial_range</span><span class="op">)</span></span>
 <span><span class="va">cutoff</span> <span class="op">&lt;-</span> <span class="va">max_edge</span> <span class="op">/</span> <span class="fl">7</span></span></code></pre></div>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> By default we let
+<code>fmesher</code> select the defaults for these values itself. If you
+encounter long mesh build times try using the <code>meshbuilder</code>
+defaults of NULL values for <code>max_edge</code> etc.</p>
+</blockquote>
 <p>Now we’re ready to start the app.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, max_edge <span class="op">=</span> <span class="va">max_edge_fin</span>, offset <span class="op">=</span> <span class="va">offset</span>, cutoff <span class="op">=</span> <span class="va">cutoff</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="run-checks-on-mesh">Run checks on mesh<a class="anchor" aria-label="anchor" href="#run-checks-on-mesh"></a>
-</h2>
-<p>We provide a simple function to check meshes created using the mesh
-builder tool. From with the user interface click “Check mesh” to run a
-number of tests on the mesh. Currently these are:</p>
-<ol style="list-style-type: decimal">
-<li>Check that the number of mesh nodes isn’t greater than the number of
-measurments</li>
-<li>Check that the number of triangles isn’t greater than the number of
-measurements</li>
-<li>Check that there are no isolated triangles</li>
-</ol>
-<p>To use the mesh checking functionality you must pass your measuremnet
-data to the <code><a href="../reference/mesh_builder.html">fdmr::mesh_builder</a></code> function. Here we use the
-COVID-19 data. Create a mesh of your design and when you’re finished
-click the “Check mesh” button. This passes the created mesh to the
-<code><a href="../reference/mesh_checker.html">fdmr::mesh_checker</a></code> function and returns a list containing
-any errors found with the mesh.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"covid19_data.rds"</span><span class="op">)</span></span>
-<span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, obs_data <span class="op">=</span> <span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="exporting-your-mesh">Exporting your mesh<a class="anchor" aria-label="anchor" href="#exporting-your-mesh"></a>

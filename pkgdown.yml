@@ -5,7 +5,6 @@ articles:
   covid: covid.html
   covid_ST_mcmc: covid_ST_mcmc.html
   covid_mcmc: covid_mcmc.html
-  data_loading: data_loading.html
   data_preprocessing: data_preprocessing.html
   decision_tree: decision_tree.html
   expected_data_structure: expected_data_structure.html
@@ -17,7 +16,8 @@ articles:
   priors: priors.html
   simulation_gaussian_data: simulation_gaussian_data.html
   simulation_poisson_data: simulation_poisson_data.html
-last_built: 2023-11-20T12:41Z
+  tutorial_geophysics: tutorial_geophysics.html
+last_built: 2023-12-19T15:49Z
 urls:
   reference: https://4dmodeller.github.io/fdmr/reference
   article: https://4dmodeller.github.io/fdmr/articles

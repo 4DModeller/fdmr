@@ -19,9 +19,6 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/covid_mcmc.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/articles/data_loading.html</loc>
-  </url>
-  <url>
     <loc>https://4dmodeller.github.io/fdmr/articles/data_preprocessing.html</loc>
   </url>
   <url>
@@ -58,6 +55,9 @@
     <loc>https://4dmodeller.github.io/fdmr/articles/simulation_poisson_data.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/articles/tutorial_geophysics.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/authors.html</loc>
   </url>
   <url>
@@ -70,10 +70,16 @@
     <loc>https://4dmodeller.github.io/fdmr/pull_request_template.html</loc>
   </url>
   <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/antimeridian_wrapping.html</loc>
+  </url>
+  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/clean_path.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/clear_caches.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/convert_from_lon_360.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/create_prediction_field.html</loc>
@@ -139,9 +145,6 @@
     <loc>https://4dmodeller.github.io/fdmr/reference/parse_model_output_bru.html</loc>
   </url>
   <url>
-    <loc>https://4dmodeller.github.io/fdmr/reference/plot_ar1.html</loc>
-  </url>
-  <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_barchart.html</loc>
   </url>
   <url>
@@ -158,6 +161,12 @@
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_map.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_map_leaflet.html</loc>
+  </url>
+  <url>
+    <loc>https://4dmodeller.github.io/fdmr/reference/plot_map_mapview.html</loc>
   </url>
   <url>
     <loc>https://4dmodeller.github.io/fdmr/reference/plot_mesh.html</loc>
