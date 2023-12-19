@@ -4,7 +4,7 @@ output:
   bookdown::html_document2:
     base_format: rmarkdown::html_vignette
     fig_caption: yes
-bibliography: "covid.bib"
+bibliography: "references.bib"
 link-citations: yes
 vignette: >
   %\VignetteIndexEntry{COVID-19 MCMC}
@@ -218,7 +218,7 @@ sp_data@data$est.rate.mcmc <- mcmc_fitted_prev
 domain <- sp_data@data$est.rate.mcmc
 legend_values <- sp_data@data$est.rate.mcmc
 
-fdmr::plot_map(
+fdmr::plot_map_leaflet(
   polygon_data = sp_data,
   domain = domain,
   palette = "Reds",
@@ -236,7 +236,7 @@ sp_data@data$est.rate.inlabym <- INLA_model$summary.fitted.values$mean
 domain <- sp_data@data$est.rate.inlabym
 legend_values <- sp_data@data$est.rate.inlabym
 
-fdmr::plot_map(
+fdmr::plot_map_leaflet(
   polygon_data = sp_data,
   domain = domain,
   palette = "Reds",
@@ -254,7 +254,7 @@ sp_data@data$est.rate.inlaspde <- inlabru_model$summary.fitted.values$mean[1:nro
 domain <- sp_data@data$est.rate.inlaspde
 legend_values <- sp_data@data$est.rate.inlaspde
 
-fdmr::plot_map(
+fdmr::plot_map_leaflet(
   polygon_data = sp_data,
   domain = domain,
   palette = "Reds",
