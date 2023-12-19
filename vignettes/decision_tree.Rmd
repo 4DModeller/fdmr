@@ -107,11 +107,3 @@ fit <- bru(value ~ 1 + observed(x + y, model = "linear"), data = df)
 # Print the model summary
 print(summary(fit))
 ```
-
-### Comparing the output
-
-Finally, we can compare the output of all the models using the DIC. This is important as we would like to know the fittedness of each model even if we have some theoretical belief that a model should be specificied in a certain way.
-
-```{r error=TRUE}
-plot(DICs)
-```
