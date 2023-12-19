@@ -41,7 +41,7 @@ Let's call the `mesh_builder` function and pass in the data and tell it to use `
 > **_NOTE:_**  The mesh builder may take a short time (~ 20s) to build this mesh due to its size. 
 
 ```{r eval=FALSE}
-fdmr::mesh_builder(spatial_data = lakes_data, longitude_column = "centroid_lon", latitude_column = "centroid_lat")
+fdmr::mesh_builder(spatial_data = lakes_data, x_coord = "centroid_lon", y_coord = "centroid_lat")
 ``` 
 
 ## Loading data - `rds` file
@@ -81,27 +81,12 @@ offset <- c(initial_range / 4, initial_range)
 cutoff <- max_edge / 7
 ```
 
+> **_NOTE:_** By default we let `fmesher` select the defaults for these values itself. If you encounter long mesh build times try using the `meshbuilder` defaults of NULL values for `max_edge` etc. 
+
 Now we're ready to start the app.
 
 ```{r eval=FALSE}
 fdmr::mesh_builder(spatial_data = sp_data, max_edge = max_edge_fin, offset = offset, cutoff = cutoff)
-```
-
-## Run checks on mesh
-
-We provide a simple function to check meshes created using the mesh builder tool. From with the user interface click "Check mesh" to run a number of tests on the mesh.
-Currently these are:
-
-1. Check that the number of mesh nodes isn't greater than the number of measurments
-2. Check that the number of triangles isn't greater than the number of measurements
-3. Check that there are no isolated triangles
-
-To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Here we use the COVID-19 data. Create a mesh of your design and when you're finished click the "Check mesh" button. This passes the created mesh
-to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
-
-```{r eval=FALSE}
-covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_data.rds")
-fdmr::mesh_builder(spatial_data = sp_data, obs_data = covid19_data)
 ```
 
 ## Exporting your mesh

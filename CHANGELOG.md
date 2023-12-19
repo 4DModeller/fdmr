@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated `plot_map` to allow use of both `leaflet` and `mapview` packages - [#291](https://github.com/4DModeller/fdmr/pull/291)
 
+### Changed
+
+- Moved from using `leaflet` to using (`mapview`)[https://r-spatial.github.io/mapview/index.html] for plotting the mesh and spatial data in the `mesh_builder` Shiny app. This enables use of UTM coordinates - [PR #288](https://github.com/4DModeller/fdmr/pull/288)
+
 ## [0.1.1] - 2023-11-01
 
 ### Added
