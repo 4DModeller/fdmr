@@ -86,10 +86,12 @@ reference:
   desc: Functions to help convert coordinates and units
   contents:
     - latlong_to_utm
-    - to_dates
+    - antimeridian_wrapping
+    - convert_from_lon_360
 - title: Utility functions
   desc:  These help us handle paths, retrieve data etc
   contents:
+    - to_dates
     - retrieve_tutorial_data
     - get_tutorial_datapath
     - load_tutorial_data

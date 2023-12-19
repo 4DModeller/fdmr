@@ -8,7 +8,8 @@ plot_mesh(
   mesh,
   spatial_data = NULL,
   longitude_column = "LONG",
-  latitude_column = "LAT"
+  latitude_column = "LAT",
+  markers = NULL
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ that can be converted to a data.frame with longitude and latitude columns}
 \item{longitude_column}{Longitude column in spatial_data}
 
 \item{latitude_column}{Latitude column in spatial_data name}
+
+\item{markers}{Markers to display on top of mesh. A named list with latitude, longitude and label names must be given.
+Expects longitude name to be longitude, latitude name to be latitude, label name to be label.}
 }
 \value{
 leaflet::leaflet

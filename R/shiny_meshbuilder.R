@@ -174,7 +174,7 @@ meshbuilder_shiny <- function(
     mesh_spatial <- shiny::reactive(
       suppressMessages(
         suppressWarnings(
-          fdmr::mesh_to_spatial(mesh = mesh(), crs = crs)
+          fdmr::antimeridian_wrapping(fdmr::mesh_to_spatial(mesh = mesh(), crs = crs), crs = crs, unique_inst = FALSE, to_sp = FALSE)
         )
       )
     )
@@ -183,6 +183,8 @@ meshbuilder_shiny <- function(
       m <- leaflet::leaflet()
       m <- leaflet::addTiles(m, group = "OSM")
       m <- leaflet::addPolygons(m, data = mesh_spatial(), weight = 0.5, fillOpacity = 0.2, fillColor = "#5252ca", group = "Mesh")
+      m <- leaflet::addMeasure(m, position = 'bottomleft', primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters')
+      m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
       if (plot_polygons) {
         m <- leaflet::addPolygons(m, data = spatial_data, fillColor = "#d66363", color = "green", weight = 1, group = "Spatial")
       } else if (plot_points) {
@@ -199,6 +201,8 @@ meshbuilder_shiny <- function(
 
     output$mesh_code <- shiny::reactive(
       paste0(
+        "location_data <- spatial_data[, c('", longitude_column, "', '", latitude_column, "')]\n\n",
+        "names(location_data) <- c('LONG', 'LAT')\n\n",
         "mesh <- fmesher::fm_mesh_2d_inla(loc = location_data,
           max.edge = c(", paste0(input$max_edge, collapse = ", "), "),
           cutoff = ", input$cutoff, ",
