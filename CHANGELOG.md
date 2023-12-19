@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Renamed `plot_map` to `plot_map_leaflet` with the addition of `plot_map_mapview` - [#291](https://github.com/4DModeller/fdmr/pull/291)
+- Updated `plot_map` to allow use of both `leaflet` and `mapview` packages - [#291](https://github.com/4DModeller/fdmr/pull/291)
 
 ## [0.1.1] - 2023-11-01
 

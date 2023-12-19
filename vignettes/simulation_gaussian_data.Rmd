@@ -90,10 +90,10 @@ A histogram is created to visualize the distribution of the simulated Gaussian d
 hist(simdf$datn, main = "", xlab = "Data")
 ```
 
-We can also map the simulated data using the `fdmr::plot_map_leaflet` function. For example, a map of the simulated data at the first time point is given as
+We can also map the simulated data using the `fdmr::plot_map` function. For example, a map of the simulated data at the first time point is given as
 
 ```{r mapsimdat,error=TRUE,fig.cap="A map of the simulated data in Bristol at the first time point.", fig.width=8, fig.height=4, fig.align = "center"}
-fdmr::plot_map_leaflet(
+fdmr::plot_map(
   polygon_data = sp_data,
   domain = simdf[simdf$time == 1, "datn"],
   palette = "Reds",
@@ -256,10 +256,10 @@ fdmr::model_viewer(
 )
 ```
 
-## fdmr::plot_map_leaflet
+## fdmr::plot_map
 
-The `fdmr::plot_map_leaflet` function generates a map of the region based on the provided SpatialPolygonDataFrame.
+The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.
 
 ```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align = "center"}
-fdmr::plot_map_leaflet(polygon_data = sp_data)
+fdmr::plot_map(polygon_data = sp_data)
 ```

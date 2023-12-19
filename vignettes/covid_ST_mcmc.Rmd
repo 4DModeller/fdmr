@@ -251,7 +251,7 @@ mcmc_mean_rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
 sp_data@data$mcmc_mean_rate <- mcmc_mean_rate$mean.rate
 domain <- sp_data@data$mcmc_mean_rate
 
-fdmr::plot_map_leaflet(
+fdmr::plot_map(
   polygon_data = sp_data,
   domain = domain,
   palette = "Reds",
@@ -270,7 +270,7 @@ INLA_mean_rate <- dplyr::group_by(mergedat, MSOA11CD) %>% dplyr::summarize(
 sp_data@data$INLA_mean_rate <- INLA_mean_rate$mean.rate
 domain <- sp_data@data$INLA_mean_rate
 
-fdmr::plot_map_leaflet(
+fdmr::plot_map(
   polygon_data = sp_data,
   domain = domain,
   palette = "Reds",

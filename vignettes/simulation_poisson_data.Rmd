@@ -95,11 +95,11 @@ A histogram is created to visualize the distribution of the simulated data.
 hist(simdf$datn, main = "", xlab = "Data")
 ```
 
-We can also map the simulated data using the `fdmr::plot_map_leaflet` function.
+We can also map the simulated data using the `fdmr::plot_map` function.
 .
 ```{r mapsimdat,error=TRUE,fig.cap="A map of the simulated data in Bristol over all time periods.", fig.width=8, fig.height=4, fig.align = "center"}
 dat_by_ID <- dplyr::group_by(simdf, ID) %>% dplyr::summarize(sum.dat = sum(datn))
-fdmr::plot_map_leaflet(
+fdmr::plot_map(
   polygon_data = sp_data,
   domain = dat_by_ID$sum.dat,
   palette = "Reds",
@@ -260,10 +260,10 @@ fdmr::model_viewer(
 )
 ```
 
-## fdmr::plot_map_leaflet
+## fdmr::plot_map
 
-The `fdmr::plot_map_leaflet` function generates a map of the region based on the provided SpatialPolygonDataFrame.
+The `fdmr::plot_map` function generates a map of the region based on the provided SpatialPolygonDataFrame.
 
 ```{r rmap, error=TRUE,fig.cap="A map of the study region.", fig.width=8, fig.height=4, fig.align = "center"}
-fdmr::plot_map_leaflet(polygon_data = sp_data)
+fdmr::plot_map(polygon_data = sp_data)
 ```
