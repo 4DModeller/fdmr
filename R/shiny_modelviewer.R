@@ -45,12 +45,14 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       type = "tabs",
       shiny::tabPanel(
         "Plots",
+        class = "p-3 border",
         shiny::h2("Plot output"),
         shiny::selectInput(inputId = "plot_type", label = "Plot type:", choices = plot_choices, selected = plot_choices[1]),
         shiny::plotOutput(outputId = "plot_model_out")
       ),
       shiny::tabPanel(
         "Map",
+        class = "p-3 border",
         shiny::fluidRow(
           shiny::column(
             4,
@@ -81,7 +83,13 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
         leaflet::leafletOutput(outputId = "map_out")
       ),
       shiny::tabPanel(
+        "Code",
+        class = "p-3 border",
+        shiny::verbatimTextOutput(outputId = "code_out")
+      ),
+      shiny::tabPanel(
         "Help",
+        class = "p-3 border",
         shiny::h3("Help"),
       )
     )
@@ -201,6 +209,63 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
       } else if (input$plot_type == "DIC") {
         return(plot_dic(data = parsed_modeloutput_plots))
       }
+    })
+
+    output$code_out <- shiny::reactive({
+      code_str <- ""
+      parsed_model_str <- "parsed_model_out <- fdmr::parse_model_output(model_output = model_output,
+                                                      measurement_data = measurement_data)"
+
+      if (input$plot_type %in% c("Range", "Stdev", "AR(1)")) {
+        if (input$plot_type == "Range") {
+          to_plot <- "Range for f"
+          title <- "Range"
+        } else if (input$plot_type == "Stdev") {
+          to_plot <- "Stdev for f"
+          title <- "Marginal standard deviation"
+        } else if (input$plot_type == "AR(1)") {
+          to_plot <- "GroupRho for f"
+          title <- "AR(1)"
+        }
+
+        code_str <- paste0('parsed_data <- purrr::map(parsed_model_out, function(x) as.data.frame(x$pars[["', to_plot, '"]]))
+        single_df <- dplyr::bind_rows(parsed_data, .id = "Run")
+
+        ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
+        ggplot2::geom_line() +
+        ggplot2::ggtitle("', title, '") +
+        ggplot2::theme(text = ggplot2::element_text(size = 16))')
+      } else if (input$plot_type == "Boxplot") {
+        code_str <- 'fitted_mean_post <- purrr::map(parsed_model_out, function(x) x$fitted_mean_post)
+        names(fitted_mean_post) <- purrr::map(seq(1, length(parsed_model_out)), function(x) paste("Run", x))
+        post_rate <- cbind.data.frame(fitted_mean_post)
+        graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Fitted values")'
+      } else if (input$plot_type == "Density") {
+        code_str <- 'fitted_values <- unlist(purrr::map(parsed_model_out, function(x) x$fitted_mean_post))
+          run_strings <- unlist(purrr::map(seq(1, length(parsed_model_out)), function(x) paste("Run", x)))
+
+          post_rate <- base::cbind.data.frame(
+            "Prior scenario" = rep(run_strings, each = nrow(measurement_data)),
+            "Fitted values" = fitted_values
+          )
+
+          ggplot2::ggplot(post_rate, ggplot2::aes(x = `Fitted values`, color = `Prior scenario`)) +
+            ggplot2::geom_density() +
+            ggplot2::theme(text = ggplot2::element_text(size = 16))'
+      } else if (input$plot_type == "DIC") {
+        code_str <- 'infocri <- base::cbind.data.frame(
+        priors = unlist(purrr::map(seq(1, length(parsed_model_out)), function(x) paste("Run", x))),
+        DIC = unlist(purrr::map(parsed_model_out, function(x) x$dic))
+      )
+
+      infocri$priors <- base::as.factor(infocri$priors)
+
+      ggplot2::ggplot(infocri, ggplot2::aes(x = priors, y = DIC)) +
+        ggplot2::geom_point() +
+        ggplot2::theme(text = ggplot2::element_text(size = 16))'
+      }
+
+      paste0(parsed_model_str, "\n\n", code_str)
     })
 
     output$plot_model_out <- shiny::renderPlot({

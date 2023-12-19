@@ -15,4 +15,3 @@ graphics::boxplot
 \description{
 Create boxplots from priors run data
 }
-\keyword{internal}
