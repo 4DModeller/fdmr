@@ -227,11 +227,7 @@ fdmr::plot_mesh(mesh = mesh, spatial_data = simdf@coords)
 ```{r meshbuilder,eval=FALSE}
 fdmr::mesh_builder(spatial_data = sp_data)
 ```
-The interactive map allows you to customise the initial parameters such as `max_edge`, `offset` and `cutoff` to change the shape and size of the mesh. We also provide a simple function to check if there are any errors with the meshes created using the mesh builder tool. To use the mesh checking functionality you must pass your measuremnet data to the `fdmr::mesh_builder` function. Specifically, create a mesh of your design using the meshbuilder tool. When you’re finished, click the “Check mesh” button on the user interface. This passes the created mesh to the `fdmr::mesh_checker` function and returns a list containing any errors found with the mesh.
-
-```{r meshchecking,eval=FALSE}
-fdmr::mesh_builder(spatial_data = sp_data, obs_data = simdf)
-```
+The interactive map allows you to customise the initial parameters such as `max_edge`, `offset` and `cutoff` to change the shape and size of the mesh. 
 
 ## Model builder Shiny app
 `fdmr` provides a Priors Shiny app which allows you to interactively set and see the model fitting results of different priors. You can launch this app by passing the spatial and observation data to the `fdmr::model_builder` function.

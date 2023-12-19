@@ -20,7 +20,7 @@
 
 ### - evaluate the fully trained model output
 
-![](https://github.com/4DModeller/fdmr/assets/8915182/fe791f74-c9b4-4db0-a52e-ffa018b12b41)
+![](https://github.com/4DModeller/fdmr/assets/8915182/f2b68ccc-cfba-4393-b2f4-6cecdad332c0)
 
 ## Quickstart
 
@@ -59,3 +59,13 @@ sudo apt-get install libharfbuzz-dev libfribidi-dev libfreetype6-dev \
 ```
 
 Note that on other Linux distributions the names of these packages may differ.
+
+## Want to contribute?
+
+You can contribute to 4DModeller in a variety of ways including: responding to issues, introducing new features such as new tutorials or core functionality, or helping to plan a future 4DModeller hackathon. See below how to do each:
+
+1. *Issues:* Please [checkout our issues page](https://github.com/4DModeller/fdmr/issues). If you see something you can solve then [fork the repo, make the changes, then make a pull request](https://stackoverflow.com/questions/14587045/how-to-merge-branch-of-forked-repo-into-master-branch-of-original-repo#14587354). If you have an issue with 4DModeller, please open an issue instead.
+2. *New Features:* new features can be handled in two ways. First, you can suggest new features [using the GitHub issue tracker](https://github.com/4DModeller/fdmr/issues). Second, you can contribute new features by [forking the repo, creating the new tutorial or core functionality, then making a pull request](https://github.com/4DModeller/fdmr/issues).
+3. *Hackathon Planning:* If you would like to help organize a 4DModeller hackathon either by helping organize a core hackathon or by organizing one yourself at your institution, then please reach out to one of the 4DModeller developers.
+
+If you make regular contributions through issues and new features then we would be happy to include you in the core group as a developer of 4DModeller.

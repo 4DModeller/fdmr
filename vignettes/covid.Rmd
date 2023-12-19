@@ -4,7 +4,7 @@ output:
   bookdown::html_document2:
     base_format: rmarkdown::html_vignette
     fig_caption: yes
-bibliography: "covid.bib"
+bibliography: "references.bib"
 link-citations: yes
 vignette: >
   %\VignetteIndexEntry{COVID-19}
