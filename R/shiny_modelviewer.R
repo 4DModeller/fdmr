@@ -228,13 +228,13 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
           title <- "AR(1)"
         }
 
-        code_str <- paste0("parsed_data <- purrr::map(parsed_model_out, function(x) as.data.frame(x$pars[[", to_plot, ']]))
+        code_str <- paste0('parsed_data <- purrr::map(parsed_model_out, function(x) as.data.frame(x$pars[["', to_plot, '"]]))
         single_df <- dplyr::bind_rows(parsed_data, .id = "Run")
 
         ggplot2::ggplot(single_df, ggplot2::aes(x = x, y = y, color = Run)) +
         ggplot2::geom_line() +
-        ggplot2::ggtitle(', title, ") +
-        ggplot2::theme(text = ggplot2::element_text(size = 16))")
+        ggplot2::ggtitle("', title, '") +
+        ggplot2::theme(text = ggplot2::element_text(size = 16))')
       } else if (input$plot_type == "Boxplot") {
         code_str <- 'fitted_mean_post <- purrr::map(parsed_model_out, function(x) x$fitted_mean_post)
         names(fitted_mean_post) <- purrr::map(seq(1, length(parsed_model_out)), function(x) paste("Run", x))
@@ -242,7 +242,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
         graphics::boxplot(post_rate, xlab = "Prior scenario", ylab = "Fitted values")'
       } else if (input$plot_type == "Density") {
         code_str <- 'fitted_values <- unlist(purrr::map(parsed_model_out, function(x) x$fitted_mean_post))
-          run_strings <- unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x)))
+          run_strings <- unlist(purrr::map(seq(1, length(parsed_model_out)), function(x) paste("Run", x)))
 
           post_rate <- base::cbind.data.frame(
             "Prior scenario" = rep(run_strings, each = nrow(measurement_data)),
@@ -254,8 +254,8 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
             ggplot2::theme(text = ggplot2::element_text(size = 16))'
       } else if (input$plot_type == "DIC") {
         code_str <- 'infocri <- base::cbind.data.frame(
-        priors = unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x))),
-        DIC = unlist(purrr::map(data, function(x) x$dic))
+        priors = unlist(purrr::map(seq(1, length(parsed_model_out)), function(x) paste("Run", x))),
+        DIC = unlist(purrr::map(parsed_model_out, function(x) x$dic))
       )
 
       infocri$priors <- base::as.factor(infocri$priors)
