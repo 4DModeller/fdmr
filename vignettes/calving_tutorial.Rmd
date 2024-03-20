@@ -1,11 +1,16 @@
 ---
-title: "Simple Linear Regression with fdmr"
+title: "Glacier Calving in Svalbard with fdmr"
 author: "Tian Li, Amin Shn, Ruitang Yang, Wenxue Cao"
-date: "`r Sys.Date()`"
 output: 
-  html_document:
-    toc: true
-    toc_float: true
+  bookdown::html_document2:
+    base_format: rmarkdown::html_vignette
+    fig_caption: yes
+bibliography: "references.bib"
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Simple Linear Regression with fdmr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
@@ -37,15 +42,15 @@ glacierNames <- unique(calving_data[c("glacierName")])
 lats <- unique(calving_data[c("latitude")])
 lons <- unique(calving_data[c("longitude")])
 
-glac1 <- list(longitude = lons[0,], latitude = lats[0,], label = glacierNames[0,])
-glac2 <- list(longitude = lons[1,], latitude = lats[1,], label = glacierNames[1,])
-glac3 <- list(longitude = lons[2,], latitude = lats[2,], label = glacierNames[2,])
-glac4 <- list(longitude = lons[3,], latitude = lats[3,], label = glacierNames[3,])
-glac5 <- list(longitude = lons[4,], latitude = lats[4,], label = glacierNames[4,])
+glac1 <- list(longitude = lons[0, ], latitude = lats[0, ], label = glacierNames[0, ])
+glac2 <- list(longitude = lons[1, ], latitude = lats[1, ], label = glacierNames[1, ])
+glac3 <- list(longitude = lons[2, ], latitude = lats[2, ], label = glacierNames[2, ])
+glac4 <- list(longitude = lons[3, ], latitude = lats[3, ], label = glacierNames[3, ])
+glac5 <- list(longitude = lons[4, ], latitude = lats[4, ], label = glacierNames[4, ])
 
-glac6 <- list(longitude = lons[5,], latitude = lats[5,], label = glacierNames[5,])
+glac6 <- list(longitude = lons[5, ], latitude = lats[5, ], label = glacierNames[5, ])
 
-points <- list(glac1, glac2, glac3,glac4, glac5, glac6)
+points <- list(glac1, glac2, glac3, glac4, glac5, glac6)
 markers <- dplyr::bind_rows(points)
 
 fdmr::retrieve_tutorial_data(dataset = "hydro")
@@ -64,14 +69,14 @@ We will model Calving's front change using three important factors namely: surfa
 We specify the model using a formula and the inla function.
 
 ```{r, eval = F}
-formula <- fc ~ 0 + 
-                f(id.loc0, model = "iid") + 
-                f(id.loc0, RU, model = "iid") + 
-                f(id.loc0, AT, model = "iid") +
-                f(id.loc0, SST, model = "iid") 
+formula <- fc ~ 0 +
+  f(id.loc0, model = "iid") +
+  f(id.loc0, RU, model = "iid") +
+  f(id.loc0, AT, model = "iid") +
+  f(id.loc0, SST, model = "iid")
 
 # Fitting INLA
-inla_fit <- inla(formula, family = "gaussian", data = calving_data , control.predictor = list(compute = TRUE))
+inla_fit <- inla(formula, family = "gaussian", data = calving_data, control.predictor = list(compute = TRUE))
 ```
 
 # Results
