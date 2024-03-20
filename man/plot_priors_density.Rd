@@ -17,4 +17,3 @@ ggplot2::ggplot
 \description{
 Plot density function
 }
-\keyword{internal}

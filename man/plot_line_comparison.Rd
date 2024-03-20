@@ -17,4 +17,3 @@ ggplot2::ggplot
 \description{
 Plot line comparison for stdev etc
 }
-\keyword{internal}
