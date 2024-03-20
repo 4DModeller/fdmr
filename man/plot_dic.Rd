@@ -15,4 +15,3 @@ ggplot2::ggplot
 \description{
 Plot Deviance Information Criterion (DIC) values
 }
-\keyword{internal}

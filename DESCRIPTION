@@ -1,6 +1,6 @@
 Package: fdmr
 Title: 4D Modeller project
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: 
     c(person("Gareth", "Jones", , "g.m.jones@bristol.ac.uk", role = c("aut", "cre"),
             comment = ""),
@@ -55,7 +55,12 @@ Imports:
     fmesher,
     purrr,
     shinyjs,
-    bslib
+    bslib,
+    bsicons,
+    future,
+    leafem,
+    sfheaders,
+    mapview
 Suggests: 
     bookdown,
     knitr,

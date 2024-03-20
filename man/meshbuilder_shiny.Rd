@@ -8,30 +8,30 @@ meshbuilder_shiny(
   spatial_data,
   obs_data = NULL,
   crs = NULL,
-  max_edge = NULL,
   offset = NULL,
+  max_edge = NULL,
   cutoff = NULL,
   plot_poly = FALSE,
-  latitude_column = "LAT",
-  longitude_column = "LONG"
+  y_coord = "LAT",
+  x_coord = "LONG"
 )
 }
 \arguments{
-\item{spatial_data}{a data.frame or tibble containing spatial data}
+\item{spatial_data}{Spatial data}
+
+\item{obs_data}{Measurement data}
 
 \item{crs}{CRS as a proj4string}
 
-\item{max_edge}{The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla}
-
 \item{offset}{Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla}
+
+\item{max_edge}{The largest allowed triangle edge length. One or two values, passed to fmesher::fm_mesh_2d_inla}
 
 \item{cutoff}{The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla}
 
-\item{latitude_column}{Name of the latitude column in the spatial data}
+\item{y_coord}{Name of the latitude column in the spatial data}
 
-\item{longitude_column}{Name of the longitude column in the spatial data}
-
-\item{data}{Observations data, for use with the check_mesh functionality}
+\item{x_coord}{Name of the longitude column in the spatial data}
 }
 \value{
 shiny::app

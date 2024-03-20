@@ -11,8 +11,8 @@ mesh_builder(
   max_edge = NULL,
   offset = NULL,
   cutoff = NULL,
-  latitude_column = "LAT",
-  longitude_column = "LONG"
+  y_coord = "LAT",
+  x_coord = "LONG"
 )
 }
 \arguments{
@@ -28,9 +28,9 @@ mesh_builder(
 
 \item{cutoff}{The minimum allowed distance between points, passed to fmesher::fm_mesh_2d_inla}
 
-\item{latitude_column}{Name of the latitude column in the spatial data}
+\item{y_coord}{Name of the latitude column in the spatial data}
 
-\item{longitude_column}{Name of the longitude column in the spatial data}
+\item{x_coord}{Name of the longitude column in the spatial data}
 }
 \value{
 shiny::app

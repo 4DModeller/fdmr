@@ -1,0 +1,106 @@
+---
+title: "4DModeller for geophysical signals"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{4DModeller for geophysical signals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+This is a tutorial to apply R-INLA to modeling geophysical data. The data represent time-series at some locations distributed over a line or over an area. There are two possible case studies one is seismic data with seismic stations located along a line. Each station record 4 components of acoustic signal X-Y-Z particle displacement on geophone and presure component on hydrophone sensor. The second case is magnteotelluric data with stations distrubuted over some area. The signal has 4 channels: 2 magnetic and 2 electric field channels. In the dataset only 2-3 stations measure at the same. The spatiotemporal evolution of the field is governed by Maxwell equations. The source of EM field is disturbance of ionosphere due to solar activity, electrical structure of the crust and noise component (cultural EM noise, wind, rain, local conductors). The goal is to describe the source signal components in space in time.  
+The spatiotemporal evolution of the field is governed by wave equation. The small-scale heterogenetities in earth crust produce multiply scattered wavefield, getting more expressed at a later times and called coda wave. The goal is to learn about correlations between signals at diffent stations and from this predict distribution of heterogeneities.     
+
+## Pre-processing and Import data
+
+Geophysical data can come in lots of different formats but here will will start with a csv.
+
+```{r}
+# Set the path to the CSV file
+data_path <- "data/MT_Svalbard_Z.csv"
+
+# Read the CSV file into a data frame
+d <- read.csv(data_path)
+
+# Display the first 30 rows of the data frame
+print(head(d, 30))
+
+# Create a scatter plot
+plot(d$X, d$Y, pch = 20, main = "Svalbard MT sites", xlab = "X", ylab = "Y")
+```
+
+Here we create the locations of the data for the mesh creation. This is the locations of the data, not the locations of the mesh nodes.
+```{r}
+locations <- d[, c("Lon", "Lat")]
+locations <- unique(locations)
+names(locations) <- c("LONG", "LAT")
+```
+
+Here we use the locations to help specify the best fit mesh to our data.
+
+## Meshing
+```{r}
+mesh <- fmesher::fm_mesh_2d(
+  loc.domain = locations,
+  max.edge = 0.05,
+  cutoff = 1e-3,
+  offset = 0.1
+)
+plot(mesh)
+points(locations, col = "red")
+
+fdmr::plot_mesh(mesh)
+```
+
+## Stochastic modeling with INLA
+
+Now we can create a model that is solved on the mesh.
+
+```{r}
+library(INLA)
+
+# Synthetic data generation
+set.seed(123) # For reproducibility
+n <- 100 # Number of time points
+stations <- 12 # Number of stations
+
+# Generate time index
+time_index <- 1:n
+
+# Generate spatial index (station IDs)
+space_index <- rep(1:stations, each = n)
+
+# Simulate some harmonic signals with noise for three stations
+harmonic_data <- data.frame(
+  station = factor(space_index),
+  time = rep(time_index, stations),
+  observation = sin(rep(time_index, stations) * 2 * pi / 50) +
+    rnorm(n * stations, sd = 0.5) +
+    rep(rnorm(stations, sd = 3), each = n) # Station-specific offset
+)
+
+# Define the model with harmonic terms for time and spatial correlation
+formula <- observation ~ f(station, model = "iid") +
+  f(time, model = "rw1", cyclic = TRUE)
+
+# Fit the model using INLA
+result <- inla(formula, family = "gaussian", data = harmonic_data)
+
+# Display the summary of the results
+summary(result)
+
+# Visualize the fitted values
+plot(harmonic_data$time, harmonic_data$observation, col = harmonic_data$station, pch = 19, cex = 0.5, xlab = "Time", ylab = "Observation", main = "MT signals at 12 stations")
+points(harmonic_data$time, result$summary.fitted.values$mean, pch = 4, cex = 0.7, col = "blue")
+legend("topright", legend = c("Observations", "Fitted"), col = c("black", "blue"), pch = c(19, 4))
+
+
+# Extract the hyperparameters of the spatial field
+spatial_hyperparams <- result$summary.hyperpar
+
+# Print the hyperparameters
+print(spatial_hyperparams)
+```
+
+## Observed time series will be added soon

@@ -5,7 +5,25 @@ All notable changes to `fdmr` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/openghg/openghg/compare/0.1.1...HEAD)
+## [Unreleased](https://github.com/openghg/openghg/compare/0.2.0...HEAD)
+
+## [0.2.0] - 2023-12-19
+
+### Fixed
+
+- Added a function to ensure correct polygon display across the dateline - [PR #285](https://github.com/4DModeller/fdmr/pull/285)
+
+### Added
+
+- Added a new tutorial on loading data from different sources - [PR #266](https://github.com/4DModeller/fdmr/pull/266/)
+- Added new geophysical processes tutorial thanks to Alexander Minakov (4minakov) - [PR #257](https://github.com/4DModeller/fdmr/pull/257)
+- Added mouse pointer coordinates header and standard measurement tool - [PR #260](https://github.com/4DModeller/fdmr/pull/260)
+- Added new help explainer to the `Help` tab of the `model_viewer` Shiny app - [PR #295](https://github.com/4DModeller/fdmr/pull/295)
+
+### Changed
+
+- Updated `plot_map` to allow use of both `leaflet` and `mapview` packages - [#291](https://github.com/4DModeller/fdmr/pull/291)
+- Moved from using `leaflet` to using (`mapview`)[https://r-spatial.github.io/mapview/index.html] for plotting the mesh and spatial data in the `mesh_builder` Shiny app. This enables use of UTM coordinates - [PR #288](https://github.com/4DModeller/fdmr/pull/288)
 
 ## [0.1.1] - 2023-11-01
 
@@ -25,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allowed reversal of colour palette and added raster plot legend in map plotter - [PR #229](https://github.com/4DModeller/fdmr/pull/229)
 - Added markers option to mesh plotter - [PR #230](https://github.com/4DModeller/fdmr/pull/230)
 - Updated the interfaces of the Shiny apps to the use [bslib](https://rstudio.github.io/bslib/index.html) theming - [PR #236](https://github.com/4DModeller/fdmr/pull/236)
+- Code tab added to `fdmr::model_viewer` so the user can easily reproduce plots - [PR #237](https://github.com/4DModeller/fdmr/pull/237)
 
 ## [0.1.0] - 2023-10-17
 

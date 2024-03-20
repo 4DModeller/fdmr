@@ -604,7 +604,9 @@ model_builder_shiny <- function(spatial_data,
       leaflet::leaflet() %>%
         leaflet::addTiles(group = "OSM") %>%
         leaflet::addRasterImage(map_raster(), colors = map_colours(), opacity = 0.9, group = "Raster") %>%
-        leaflet::addLegend(position = "topright", pal = map_colours(), values = legend_values())
+        leaflet::addLegend(position = "topright", pal = map_colours(), values = legend_values()) %>%
+        leaflet::addMeasure(position = "bottomleft", primaryLengthUnit = 'kilometers', primaryAreaUnit = 'sqmeters') %>%
+        leafem::addMouseCoordinates(native.crs = TRUE)
     })
 
     model_plot <- shiny::eventReactive(input$plot_type, ignoreNULL = FALSE, {
