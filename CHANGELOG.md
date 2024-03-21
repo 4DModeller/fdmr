@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/openghg/openghg/compare/0.2.0...HEAD)
 
+### Fixed
+
+- Updated `plot_map_leaflet` to feature the same selection of basemap tiles as `mapview` and fix features not appearing - [PR #310](https://github.com/4DModeller/fdmr/pull/310)
+
 ## [0.2.0] - 2023-12-19
 
 ### Fixed
