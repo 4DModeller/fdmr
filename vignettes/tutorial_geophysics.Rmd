@@ -17,9 +17,6 @@ The spatiotemporal evolution of the field is governed by wave equation. The smal
 Geophysical data can come in lots of different formats but here will will start with a csv.
 
 ```{r}
-library(devtools)
-devtools::load_all(path='~/repos/fdmr-dmz/fdmr/')
-install.packages("MatrixModels", type = "source")
 # Set the path to the CSV file
 data_path <- "data/MT_Svalbard_Z.csv"
 
