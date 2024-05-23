@@ -60,7 +60,8 @@ Imports:
     future,
     leafem,
     sfheaders,
-    mapview
+    mapview,
+    tidyverse
 Suggests: 
     bookdown,
     knitr,
