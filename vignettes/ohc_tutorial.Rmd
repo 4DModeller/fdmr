@@ -219,7 +219,7 @@ pred <- fdmr::load_tutorial_data(dataset = "ohc", filename = "prediction_2005_L1
 ## Spatial fields
 
 First, we prepare the results for plotting.
-```{r spatial_processing, error=TRUE}
+```{r spatial_processing, error=TRUE, message=FALSE, warning=FALSE}
 # Add month to predictor
 ## Number of mesh nodes
 mn <- mesh$n
@@ -262,7 +262,7 @@ title_diff <- bquote("dDOHC" ~ (TJ ~ m^-2))
 
 Then we plot the mean field for March and October.
 
-```{r meanPlots, error = FALSE, eval=FALSE, fig.id=TRUE, fig.cap="Mean field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
+```{r meanPlots, error = FALSE, fig.id=TRUE, fig.cap="Mean field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
 mean_median <- stats::median(c(Predictor$mean[Predictor$month == 3], Predictor$mean[Predictor$month == 10]), na.rm = TRUE)
 mean_min <- base::min(c(Predictor$mean[Predictor$month == 3], Predictor$mean[Predictor$month == 10]), na.rm = TRUE)
 mean_max <- base::max(c(Predictor$mean[Predictor$month == 3], Predictor$mean[Predictor$month == 10]), na.rm = TRUE)
@@ -343,7 +343,7 @@ The map reproduces main features of ocean circulation, including the Subantarcti
 The differences between March and October are especially different in Arabian Sea. The western part of the basin and also at the Indian coast has a lower OHC in March compared to October. Similarly, in Bay of Bengal higher OHC appears in the central for October and western part in March. As expected, the heat content is relatively low due to weaker mixing during inter-monsoon [@dandapat2021mld]. The difference between March and October could also be explained by increased riverine freshwater influx as well as precipitation and cloudiness [@ali2018nio] in October compared to March [@sandeep2018freshwater], which causes a reduction in the OHC storage immediately at the plume area due to higher heat capcity of freshwater [@dandapat2020runoff] and also where freshwater is advected [@zhang2023bengal; @jaishree2023seasdyn] along the coastline.
 
 Similarly we show the standard deviation for March and October.
-```{r stdevPlots, error = FALSE, eval=FALSE, fig.id=TRUE, fig.cap="Standard deviation field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
+```{r stdevPlots, error = FALSE, fig.id=TRUE, fig.cap="Standard deviation field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
 stdev_median <- stats::median(c(Predictor$sd[Predictor$month == 3], Predictor$sd[Predictor$month == 10]), na.rm = TRUE)
 stdev_max <- base::max(c(Predictor$sd[Predictor$month == 3], Predictor$sd[Predictor$month == 10]), na.rm = TRUE)
 n_march <- base::nrow(df[df$time == 3, ])
@@ -433,7 +433,7 @@ gridExtra::grid.arrange(plot_march, plot_october, ncol=2)
 The standard deviation is higher in areas with low number of profiles; especially, if there are no profiles in the vicinity like during March in Great Australian Bight. Despite the number of profiles being larger in October than March, the standard deviations over the whole field remained similar. This can be explained by the distribution of those extra profiles--mostly in a close proximity to other profiles.
 
 We also further explore the resampled posterior standard deviation.
-```{r sterrPlots, error = FALSE, eval=FALSE, fig.id=TRUE, fig.cap="Resampled standard deviation of mean field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
+```{r sterrPlots, error = FALSE, fig.id=TRUE, fig.cap="Resampled standard deviation of mean field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
 
 mc_serr_median <- stats::median(c(Predictor$mean.mc_std_err[Predictor$month == 3], Predictor$mean.mc_std_err[Predictor$month == 10]), na.rm = TRUE)
 mc_serr_max <- base::max(c(Predictor$mean.mc_std_err[Predictor$month == 3], Predictor$mean.mc_std_err[Predictor$month == 10]), na.rm = TRUE)
