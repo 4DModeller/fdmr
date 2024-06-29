@@ -26,7 +26,7 @@ systems.
 The world's oceans have a huge volume so even small changes in temperature can correspond 
 to large changes in energy. 90% of the excess energy trapped in the earth system by 
 anthropogenic greenhouse gas emissions goes into the oceans [@trenberth2014inbalance].
-The Indian Ocean serves as a significant reservoir of this extra energy, despite its small relatively small area [@duan2023storage]. @desbruyeres2017trends found that a half of the global top-layer (<700 m) heat uptake is in the Indian Ocean.
+The Indian Ocean serves as a significant reservoir of this extra energy, despite its relatively small area [@duan2023storage]. @desbruyeres2017trends found that half of the global top-layer (<700 m) heat uptake is in the Indian Ocean.
 
 ## Measuring Ocean Heat Content
 
@@ -47,7 +47,7 @@ sub-sampled to real world observed locations. While the synthetic profile data a
 intended to be used to benchmark ocean heat mapping methods, the data are used in this
 tutorial as a case study for application of 4DModeller to map ocean heat content.
 
-In this tutorial we will use  point data of ocean heat for upper layers of the ocean 
+In this tutorial, we will use  point data of ocean heat for the upper layers of the ocean 
 provided in the ME4OH data files (integrated temperature profiles from the surface down 
 to a depth of 306.25 m, multiplied by water density and heat capacity).
 
@@ -64,7 +64,7 @@ library(scales)
 ```
 
 ## Loading Data
-Here we load the Indian ocean shapefile and dataset. We smooth the boundary to make the mesh creation easier. 
+Here we load the Indian Ocean shapefile and dataset. We smooth the boundary to make the mesh creation easier. 
 ```{r loadData, error=TRUE, message=FALSE, warning=FALSE}
 fdmr::retrieve_tutorial_data(dataset = "ohc", force_update = TRUE)
 
@@ -82,7 +82,7 @@ fmesher::fm_crs(ocean_sf) <- NULL
 ocean_sf2 <- sf::st_union(sf::st_buffer(ocean_sf, 1.05))
 ```
 
-We plot the smoothed Indian ocean polygon to check if there are any issues. 
+We plot the smoothed Indian Ocean polygon to check if there are any issues. 
 ```{r polygonPlot, error=TRUE, fig.id=TRUE, fig.cap="Smoothed polygon", fig.align='center'}
 ggplot2::ggplot() + 
   ggplot2::geom_sf(data=ocean_sf2)
@@ -119,7 +119,7 @@ ocean_bnd <- sf::st_cast(
 )
 ```
 
-We create the mesh for the Indian ocean with the outer boundary.
+We create the mesh for the Indian Ocean with the outer boundary.
 We remove Sri Lanka and keep Madagascar in the cutoff. 
 ```{r mesh, error=TRUE, fig.id=TRUE, fig.cap="Mesh with original polygon and all datapoints", fig.align='center'}
 boundary <- fmesher::fm_as_segm_list(base::list(ocean_sf2, ocean_bnd))
@@ -151,9 +151,9 @@ n_time <- base::as.integer(base::length(base::unique(df_f@data$time)))
 ```
 ## Prior selection
 
-To implement the SPDE approach, we define the range un uncertainty priors. We assume that the probability of process spatial range (physically, a distance where correlation between two observations falls to 0.1) being under 25 degrees in latitude is 0.2. We also set the probability to 0.01 that the marginal standard deviation of the process exceeds 1.
+To implement the SPDE approach, we define the range un uncertainty priors. We assume that the probability of process spatial range (physically, a distance where the correlation between two observations falls to 0.1) being under 25 degrees in latitude is 0.2. We also set the probability to 0.01 that the marginal standard deviation of the process exceeds 1.
 
-The process is assumed to be evolving temporally as an autoregressive process of the first order (AR1) with the probability of the temporal autocorrelation parameter to be over 0 at 0.9.
+The process is assumed to be evolving temporally as an autoregressive process of the first order (AR1) with the probability of the temporal autocorrelation parameter being over 0 at 0.9.
 
 ```{r spde_setup, error=FALSE}
 prior_range <- 25
@@ -197,15 +197,15 @@ bru_model <-
 ```
 
 # Output
-The `model_viewer` of 4Dmodeller interactively shows the hyperparameters and predicted random field from the `INLA` model fit. In further sections we also plot the mean and standard deviation of the predicted field for March and October as well as the measures of temporal evolution.
+The `model_viewer` of 4Dmodeller interactively shows the hyperparameters and predicted random field from the `INLA` model fit. In further sections, we also plot the mean and standard deviation of the predicted field for March and October as well as the measures of temporal evolution.
 
 ```{r modelviewer, eval=FALSE}
 model_viewer(model_output = bru_model, mesh = mesh, measurement_data = df_f, data_distribution = "Gaussian")
 ```
 
-To estimate posterior statistics from resampled model. We only use a small number of samples -- 100 (the default) -- to reduce the computational expanse. It is possible to use this function to also re-estimate the model fit with a new set of values.
+To estimate posterior statistics from the resampled model. We only use a small number of samples -- 100 (the default) -- to reduce the computational expanse. It is possible to use this function to also re-estimate the model fit with a new set of values.
 
-> ***NOTE:*** It takes approximately 20 min (depending on hardware) to run the prediction. You can instead run the consecutive cell to load the prediction already calculated by us.
+> ***NOTE:*** It takes approximately 20 min (depending on the hardware) to run the prediction. You can instead run the consecutive cell to load the prediction already calculated by us.
 
 ```{r eval=FALSE}
 pred <- predict(bru_model, n.samples = 100)
@@ -214,6 +214,7 @@ pred <- predict(bru_model, n.samples = 100)
 If you decided to run the cell above, you do not need to run the cell below.
 ```{r error=TRUE}
 pred <- fdmr::load_tutorial_data(dataset = "ohc", filename = "prediction_2005_L1.rds")
+mesh <- fdmr::load_tutorial_data(dataset = "ohc", filename = "mesh.rds")
 ```
 
 ## Spatial fields
@@ -338,11 +339,11 @@ plot_october <-
 gridExtra::grid.arrange(plot_march, plot_october, ncol=2)
 ```
 
-The map reproduces main features of ocean circulation, including the Subantarctic front (around 45--50$^\circ$S where transition between blue and violet occurs) [@orsi1995acc; @giglio2016subantarctic], Agulhas Current near southern African coast and Agulhas Return Current emanating from it eastwards at 40$^\circ$S [@hood2024io]. It also shows a region of increased OHC between 12$^\circ$ and 26$^\circ$S, coinciding with the subtropical gyre [@phillips2024circulation]. The maps show decreased upper-level OHC between 5$^\circ$ and 10$^\circ$S, in particular, at the Seychelles-Chagos thermocline ridge (SCTR) [@hood2024io]. Another centre of higher top-level OHC is in Arabian Sea while OHC is relatively lower in Bay of Bengal [@huang2002eof].
+The map reproduces main features of ocean circulation, including the Subantarctic front (around 45--50$^\circ$S where a transition between blue and violet occurs) [@orsi1995acc; @giglio2016subantarctic], Agulhas Current near southern African coast and Agulhas Return Current emanating from it eastwards at 40$^\circ$S [@hood2024io]. It also shows a region of increased OHC between 12$^\circ$ and 26$^\circ$S, coinciding with the subtropical gyre [@phillips2024circulation]. The maps show decreased upper-level OHC between 5$^\circ$ and 10$^\circ$S, in particular, at the Seychelles-Chagos thermocline ridge (SCTR) [@hood2024io]. Another centre of higher top-level OHC is in the Arabian Sea while OHC is relatively lower in the Bay of Bengal [@huang2002eof].
 
-The differences between March and October are especially different in Arabian Sea. The western part of the basin and also at the Indian coast has a lower OHC in March compared to October. Similarly, in Bay of Bengal higher OHC appears in the central for October and western part in March. As expected, the heat content is relatively low due to weaker mixing during inter-monsoon [@dandapat2021mld]. The difference between March and October could also be explained by increased riverine freshwater influx as well as precipitation and cloudiness [@ali2018nio] in October compared to March [@sandeep2018freshwater], which causes a reduction in the OHC storage immediately at the plume area due to higher heat capcity of freshwater [@dandapat2020runoff] and also where freshwater is advected [@zhang2023bengal; @jaishree2023seasdyn] along the coastline.
+The differences between March and October are especially different in the Arabian Sea. The western part of the basin and also at the Indian coast has a lower OHC in March compared to October. Similarly, in Bay of Bengal higher OHC appears in the central for October and the western part in March. As expected, the heat content is relatively low due to weaker mixing during inter-monsoon [@dandapat2021mld]. The difference between March and October could also be explained by increased riverine freshwater influx as well as precipitation and cloudiness [@ali2018nio] in October compared to March [@sandeep2018freshwater], which causes a reduction in the OHC storage immediately at the plume area due to higher heat capacity of freshwater [@dandapat2020runoff] and also where freshwater is advected [@zhang2023bengal; @jaishree2023seasdyn] along the coastline.
 
-Similarly we show the standard deviation for March and October.
+Similarly, we show the standard deviation for March and October.
 ```{r stdevPlots, error = FALSE, fig.id=TRUE, fig.cap="Standard deviation field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
 stdev_median <- stats::median(c(Predictor$sd[Predictor$month == 3], Predictor$sd[Predictor$month == 10]), na.rm = TRUE)
 stdev_max <- base::max(c(Predictor$sd[Predictor$month == 3], Predictor$sd[Predictor$month == 10]), na.rm = TRUE)
@@ -430,10 +431,10 @@ plot_october <-
 gridExtra::grid.arrange(plot_march, plot_october, ncol=2)
 ```
 
-The standard deviation is higher in areas with low number of profiles; especially, if there are no profiles in the vicinity like during March in Great Australian Bight. Despite the number of profiles being larger in October than March, the standard deviations over the whole field remained similar. This can be explained by the distribution of those extra profiles--mostly in a close proximity to other profiles.
+The standard deviation is higher in areas with a low number of profiles; especially, if there are no profiles in the vicinity like during March in the Great Australian Bight. Despite the number of profiles being larger in October than in March, the standard deviations over the whole field remained similar. This can be explained by the distribution of those extra profiles--mostly in a close proximity to other profiles.
 
 We also further explore the resampled posterior standard deviation.
-```{r sterrPlots, error = FALSE, fig.id=TRUE, fig.cap="Resampled standard deviation of mean field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
+```{r sterrPlots, error = FALSE, fig.id=TRUE, fig.cap="Resampled standard deviation of the mean field for L1 in 2005: (left) March, (right) October", fig.align='center', fig.width=8, fig.height=4}
 
 mc_serr_median <- stats::median(c(Predictor$mean.mc_std_err[Predictor$month == 3], Predictor$mean.mc_std_err[Predictor$month == 10]), na.rm = TRUE)
 mc_serr_max <- base::max(c(Predictor$mean.mc_std_err[Predictor$month == 3], Predictor$mean.mc_std_err[Predictor$month == 10]), na.rm = TRUE)
@@ -511,7 +512,7 @@ plot_october <-
 gridExtra::grid.arrange(plot_march, plot_october, ncol=2)
 ```
 
-As one can see, both standard deviation and resampled standard error of mean are highest in the same areas. However, the magnitude is much lower.
+As one can see, both the standard deviation and resampled standard error of the mean are highest in the same areas. However, the magnitude is much lower.
 
 Finally, we evaluate the differences between synthetic observations and predictions at the locations of those observations. First, we calculate the predicted values at each location.
 ```{r error=TRUE}
@@ -626,11 +627,11 @@ plot_october <-
 gridExtra::grid.arrange(plot_march, plot_october, ncol=2)
 ```
 
-The differences show that there is no significant bias. The regions with larger differences are typically around zones of higher mesoscale activity, for instance, Agulhas and Agulhas Return current, Leeuwin Current near Western Australian coastline, as well as western Arabian Sea (Somali Current). There is a marked increase in differences in the Arabian Sea in October compared to March, owing to a higher number of eddies after southwest monsoon in this region [@trott2017eddies].
+The differences show that there is no significant bias. The regions with larger differences are typically around zones of higher mesoscale activity, for instance, Agulhas and Agulhas Return Current, Leeuwin Current near the Western Australian coastline, as well as western Arabian Sea (Somali Current). There is a marked increase in differences in the Arabian Sea in October compared to March, owing to a higher number of eddies after the southwest monsoon in this region [@trott2017eddies].
 
 ## Temporal evolution
 
-Next we would like to show how the field evolves temporally. The field-mean evolution of mean and standard deviation of the posterior solution is shown in the plots below.
+Next, we would like to show how the field evolves temporally. The field-mean evolution of mean and standard deviation of the posterior solution is shown in the plots below.
 
 ```{r temporalEval, error=TRUE, fig.id=TRUE, fig.cap="Area-averaged mean and standard deviation for the Indian Ocean in 2005", fig.align='center', fig.width=4, fig.height=3}
 meanFunc <- function(x) {
@@ -663,9 +664,9 @@ ggplot2::ggplot(summ, ggplot2::aes(x = x, y = y)) +
 
 ```
 
-The plots show that the mean over ocean peaks between March and June and reaches minimum in September to October, in line with the southern hemisphere (austral) seasonal cycle. The uncertainties are the highest between November and May due to a lower number of measurements.
+The plots show that the mean over ocean peaks between March and June and reaches a minimum in September to October, in line with the southern hemisphere (austral) seasonal cycle. The uncertainties are the highest between November and May due to a lower number of measurements.
 
-To show the temporal evolution across the Indian Ocean basin, we also plotted March and October values of top-level DOHC along a transect. We selected the TOGA/WOCE (Tropical Ocean Global Atmosphere/World Ocean Circulation Experiment) transect IX12, which runs from Gulf of Aden to Freemantle in Western Australia. This transect is frequently (12--15 times a year) conducted by the commercial fleet that deploy expendable bathythermographs (XBTs) along the route. The data has been collected since 1983 until now.
+To show the temporal evolution across the Indian Ocean basin, we also plotted March and October values of top-level DOHC along a transect. We selected the TOGA/WOCE (Tropical Ocean Global Atmosphere/World Ocean Circulation Experiment) transect IX12, which runs from the Gulf of Aden to Freemantle in Western Australia. This transect is frequently (12--15 times a year) conducted by the commercial fleet that deploys expendable bathythermographs (XBTs) along the route. The data has been collected since 1983 until now.
 
 We first define the locations of this transect and select some points for further exploration.
 ```{r}
@@ -793,7 +794,7 @@ for (i in 1:4) {
 }
 ```
 
-The plot below shows the predicted DOHC for the top layer in March and October (austral autumn and spring, respectively) along the transect shown in the previous plot. The line shows the mean field predictions while envelope -- the standard deviation. 
+The plot below shows the predicted DOHC for the top layer in March and October (austral autumn and spring, respectively) along the transect shown in the previous plot. The line shows the mean field predictions while the envelope -- the standard deviation. 
 ```{r transectPlot, error = FALSE, fig.id=TRUE, fig.cap="Timeseries for 2005 at selected points", fig.align='center', fig.width=6, fig.height=4}
 x_title <-  paste0("Latitude (", intToUtf8(176), "N)")
 
@@ -809,12 +810,12 @@ ggplot2::ggplot() +
   ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
 ```
 
-The figure shows an increase in DOHC northward from the southernmost point until 17$^\circ$S in the southern hemisphere. There the curve peaks for the first time and then rapidly decays until 12$^\circ$S. The curve has a local minimum between -13$^\circ$S and -5$^\circ$S, after which DOHC starts to increase again, peaking at 7$^\circ$N and leveling off slightly afterwards. The seasonal (autumn/spring) pattern shows that DOHC is higher in March than October in most places. Exception is the segment between 17$^\circ$S and 0$^\circ$, where curves match (descending limb) or where October values are higher (local minimum). 
+The figure shows an increase in DOHC northward from the southernmost point until 17$^\circ$S in the southern hemisphere. There the curve peaks for the first time and then rapidly decays until 12$^\circ$S. The curve has a local minimum between -13$^\circ$S and -5$^\circ$S, after which DOHC starts to increase again, peaking at 7$^\circ$N and levelling off slightly afterwards. The seasonal (autumn/spring) pattern shows that DOHC is higher in March than in October in most places. The exception is the segment between 17$^\circ$S and 0$^\circ$, where curves match (descending limb) or where October values are higher (local minimum). 
 The whole segment is known to have a persistent cooling, which has been present throughout the year for multiple decades as shown in other studies [@roxy2020warming; @duan2023storage]. 
-The minimum can be explained by the equatorial upwelling (associated with enhanced vertical advection) in so-called equatorial cold tongue (this particular region known as SCTR), which is caused by negative wind stress curl due to surface wind divergence [@chen2015equatorial] between equatorial westerlies and southeasterly trade wind [@mabarrok2023thermocline]. Wind stress is regulated by the Indian monsoon due to the change in wind direction (from easterlies in boreal summer to westerlies in boreal winter) [@yokoi2008sctr].
+The minimum can be explained by the equatorial upwelling (associated with enhanced vertical advection) in the so-called equatorial cold tongue (this particular region is known as SCTR), which is caused by negative wind stress curl due to surface wind divergence [@chen2015equatorial] between equatorial westerlies and southeasterly trade wind [@mabarrok2023thermocline]. Wind stress is regulated by the Indian monsoon due to the change in wind direction (from easterlies in boreal summer to westerlies in boreal winter) [@yokoi2008sctr].
 The segment where both curves match is shown by @mckenna2024sst to have a higher net heat flux in March while net advection brings more heat in October due to negative vertical advection in March (associated with the same process as for the "cold tongue") while the meridional heat advection is stronger in October.
-Elsewhere, March OHC has higher than October OHC. In southern hemisphere, it is expected due to increased insolation during austral summer and the lag for the ocean to heat up. However, we also observe higher OHC in northern hemisphere, where maximum values occur at the end of boreal winter. This segment has similar net heat flux values because it peaks twice during the year and both peaks are of similar magnitude [@mckenna2024sst]. However, advection contributes to more heat loss in October than March.
-The final (northernmost) segment lies in close proximity to land and is affected by coastal upwelling near Somali coast [@vic2014mesoscale; @chatterjee2019somali].
+Elsewhere, March OHC is higher than October OHC. In the southern hemisphere, it is expected due to increased insolation during the austral summer and the lag for the ocean to heat up. However, we also observe higher OHC in the northern hemisphere, where maximum values occur at the end of boreal winter. This segment has similar net heat flux values because it peaks twice during the year and both peaks are of similar magnitude [@mckenna2024sst]. However, advection contributes to more heat loss in October than in March.
+The final (northernmost) segment lies close to land and is affected by coastal upwelling near the Somali coast [@vic2014mesoscale; @chatterjee2019somali].
 
 The panel below shows the mean and standard deviation at the four sample locations along the transect shown on the map earlier. Compared to the field mean, we can observe that temporal evolution is spatially variable
 ```{r timeseriesPlots, error = FALSE, fig.id=TRUE, fig.cap="Timeseries for 2005 at selected points", fig.align='center', fig.width=6, fig.height=6}
@@ -831,14 +832,14 @@ ggplot2::ggplot(do.call(rbind, point_eval)) +
   ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
 ```
 
-The northernmost point (1) has the highest DOHC values on average. There is a pronounced seasonal cycle, which has a maximum plateau (within standard deviation) from March to September and more pronounced trough reaching minimum in November--December. The plateau coincides with increased insolation when the sun is in zenith over the northern hemisphere. However, it does not produce the typical biannual maximum. The area is subject to monsoon winds, which cause seasonal Somali Current reversal (southward during boreal summer) and creation of a small gyre (Great Whirl) [@lhegaret2018gyres]. The winds reverse from southwesterly (JJA) to northeasterly (DJF), causing enhanced boreal winter surface cooling in the northern Arabian Sea due to the reduction in latent heat flux when wind brings dry and cool continental air from Asia [@schott2009circulation]. This suggests that an interplay between insolation and wind-driven surface cooling is likely causing the seasonal changes in this location.
+The northernmost point (1) has the highest DOHC values on average. There is a pronounced seasonal cycle, which has a maximum plateau (within standard deviation) from March to September and a more pronounced trough reaching a minimum in November--December. The plateau coincides with increased insolation when the sun is in zenith over the northern hemisphere. However, it does not produce the typical biannual maximum. The area is subject to monsoon winds, which cause seasonal Somali Current reversal (southward during boreal summer) and the creation of a small gyre (Great Whirl) [@lhegaret2018gyres]. The winds reverse from southwesterly (JJA) to northeasterly (DJF), causing enhanced boreal winter surface cooling in the northern Arabian Sea due to the reduction in latent heat flux when the wind brings dry and cool continental air from Asia [@schott2009circulation]. This suggests that an interplay between insolation and wind-driven surface cooling is likely causing the seasonal changes in this location.
 The standard deviation envelope narrows slightly at the descending limb, likely due to a higher number of observations in the area during that time.
 
-Point 2 has a relatively even profile with lower average than at point 1. There is a peak in June that levels off over a couple of months until August. This could partly be caused by weaker equatorial upwelling as well as increased net heat flux as discussed earlier. This location is also near the South Equatorial Counter current, which is not present at this particular point during the boreal summer [@wu2020gyrestructure]. Thus, it is less affected by negative zonal heat advection when the top-layer OHC values peak. The standard deviation narrows near the peak, but is similar to point 1 elsewhere.
+Point 2 has a relatively even profile with a lower average than at point 1. There is a peak in June that levels off over a couple of months until August. This could partly be caused by weaker equatorial upwelling as well as increased net heat flux as discussed earlier. This location is also near the South Equatorial Counter current, which is not present at this particular point during the boreal summer [@wu2020gyrestructure]. Thus, it is less affected by negative zonal heat advection when the top-layer OHC values peak. The standard deviation narrows near the peak, but is similar to point 1 elsewhere.
 
-Point 3 are another relatively flat timeseries, which has a small peak in January, leveling off until April. Within a standard deviation, the rest of values are similar. South Equatorial current is present in the vicinity of point 3 and provides some heat advection. @mckenna2024sst shows that zonal and meridional advection dampens the heat loss due to the net negative heat flux during austral winter. The standard deviation is similar for all timesteps.
+Point 3 are another relatively flat timeseries, which has a small peak in January, levelling off until April. Within a standard deviation, the rest of the values are similar. South Equatorial current is present in the vicinity of point 3 and provides some heat advection. @mckenna2024sst shows that zonal and meridional advection dampens the heat loss due to the net negative heat flux during austral winter. The standard deviation is similar for all timesteps.
 
-The southernmost point (4) mostly has the lowest DOHC values on average, which can be related to less solar radiation at higher latitudes. There is also a prominent seasonal cycle with a maximum in February and minimum in November. The standard deviation is similar for all months and also of similar magnitude as point 3.
+The southernmost point (4) mostly has the lowest DOHC values on average, which can be related to less solar radiation at higher latitudes. There is also a prominent seasonal cycle with a maximum in February and a minimum in November. The standard deviation is similar for all months and also of similar magnitude as point 3.
 
 ## References {-}
 
