@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `plot_map_leaflet` to feature the same selection of basemap tiles as `mapview` and fix features not appearing - [PR #310](https://github.com/4DModeller/fdmr/pull/310)
 
 ### Added
-- Added ocean heat content mapping tutorial - [PR #321](https://github.com/4DModeller/fdmr/pull/321)
+- Added ocean heat content mapping tutorial - [PR #318](https://github.com/4DModeller/fdmr/pull/318)
 
 ## [0.2.0] - 2023-12-19
 
