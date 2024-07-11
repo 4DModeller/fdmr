@@ -102,7 +102,8 @@ plot_map_leaflet <- function(polygon_data = NULL,
                              wrapping = FALSE) {
   m <- leaflet::leaflet()
   m <- leaflet::addTiles(m)
-  m <- leaflet::addProviderTiles(m, leaflet::providers$Openstreetmap, group = "Satellite")
+  m <- leaflet::addProviderTiles(m, leaflet::providers$Esri.WorldImagery, group = "Satellite")
+  m <- leaflet::addProviderTiles(m, leaflet::providers$OpenTopoMap, group = "Topography")
   m <- leafem::addMouseCoordinates(m, native.crs = TRUE)
 
   # Store a vector of layers we add to the map,
@@ -161,7 +162,7 @@ plot_map_leaflet <- function(polygon_data = NULL,
 
   m <- leaflet::addLayersControl(m,
     position = "topright",
-    baseGroups = c("OSM", "Satellite"),
+    baseGroups = c("OSM", "Satellite", "Topography"),
     overlayGroups = layers,
     options = leaflet::layersControlOptions(collapsed = FALSE)
   )

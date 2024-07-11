@@ -35,6 +35,11 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
   default_colours <- rownames(brewer_palettes[brewer_palettes$cat == "seq", ])
 
   plot_choices <- c("Range", "Stdev", "AR(1)", "Boxplot", "Density", "DIC")
+  if (base::is.null(parsed_model_output[["fixed_mean"]])) {
+    map_choices <- c("Random effect fields")
+  } else {
+    map_choices <- c("Predicted mean fields", "Random effect fields")
+  }
 
   ui <- bslib::page_fluid(
     theme = bslib::bs_theme(bootswatch = "cosmo"),
@@ -56,7 +61,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
         shiny::fluidRow(
           shiny::column(
             4,
-            shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = c("Predicted mean fields", "Random effect fields"), selected = "Predicted mean fields"),
+            shiny::selectInput(inputId = "map_plot_type", label = "Plot type", choices = map_choices, selected = map_choices[1]),
             shiny::selectInput(inputId = "map_data_type", label = "Data type", choices = c("Poisson", "Gaussian"), selected = data_distribution),
           ),
           shiny::column(
