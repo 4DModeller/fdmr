@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   calving_tutorial: calving_tutorial.html
@@ -14,12 +14,12 @@ articles:
   inla_FAQ: inla_FAQ.html
   meshbuilder: meshbuilder.html
   modelbuilder: modelbuilder.html
+  ohc_tutorial: ohc_tutorial.html
   priors: priors.html
   simulation_gaussian_data: simulation_gaussian_data.html
   simulation_poisson_data: simulation_poisson_data.html
   tutorial_geophysics: tutorial_geophysics.html
-last_built: 2024-05-23T16:11Z
+last_built: 2024-07-11T11:34Z
 urls:
   reference: https://4dmodeller.github.io/fdmr/reference
   article: https://4dmodeller.github.io/fdmr/articles
-

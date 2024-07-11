@@ -5,37 +5,24 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="fdmr">
 <title>COVID-19 MCMC • fdmr</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="COVID-19 MCMC">
-<meta property="og:description" content="fdmr">
-<meta property="og:image" content="https://4dmodeller.github.io/fdmr/logo.png">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="COVID-19 MCMC">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">fdmr</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -43,55 +30,43 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-tutorials">Tutorials</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-tutorials">
-    <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
-    <a class="dropdown-item" href="../articles/getting_started.html">Installation</a>
-    <a class="dropdown-item" href="../articles/data_preprocessing.html">Data pre-processing</a>
-    <a class="dropdown-item" href="../articles/expected_data_structure.html">Expected data structure</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6>
-    <a class="dropdown-item" href="../articles/decision_tree.html">How to choose how to model</a>
-    <a class="dropdown-item" href="../articles/simulation_gaussian_data.html">Simulation Tutorial (Gaussian data)</a>
-    <a class="dropdown-item" href="../articles/simulation_poisson_data.html">Simulation Tutorial (Poisson data)</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Shiny apps</h6>
-    <a class="dropdown-item" href="../articles/meshbuilder.html">Mesh building</a>
-    <a class="dropdown-item" href="../articles/modelbuilder.html">Model builder</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6>
-    <a class="dropdown-item" href="../articles/covid.html">COVID-19</a>
-    <a class="dropdown-item" href="../articles/covid_mcmc.html">COVID-19 MCMC</a>
-    <a class="dropdown-item" href="../articles/covid_ST_mcmc.html">COVID-19 MCMC (Space-time)</a>
-    <a class="dropdown-item" href="../articles/hydro.html">Hydrology</a>
-    <a class="dropdown-item" href="../articles/priors.html">Priors exploration</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>FAQ</h6>
-    <a class="dropdown-item" href="../articles/inla_FAQ.html">INLA Crash FAQ</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
+<li><h6 class="dropdown-header" data-toc-skip>Getting started</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting_started.html">Installation</a></li>
+    <li><a class="dropdown-item" href="../articles/data_preprocessing.html">Data pre-processing</a></li>
+    <li><a class="dropdown-item" href="../articles/expected_data_structure.html">Expected data structure</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>End to end tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/decision_tree.html">How to choose how to model</a></li>
+    <li><a class="dropdown-item" href="../articles/simulation_gaussian_data.html">Simulation Tutorial (Gaussian data)</a></li>
+    <li><a class="dropdown-item" href="../articles/simulation_poisson_data.html">Simulation Tutorial (Poisson data)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Shiny apps</h6></li>
+    <li><a class="dropdown-item" href="../articles/meshbuilder.html">Mesh building</a></li>
+    <li><a class="dropdown-item" href="../articles/modelbuilder.html">Model builder</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>In depth tutorials</h6></li>
+    <li><a class="dropdown-item" href="../articles/covid.html">COVID-19</a></li>
+    <li><a class="dropdown-item" href="../articles/covid_mcmc.html">COVID-19 MCMC</a></li>
+    <li><a class="dropdown-item" href="../articles/covid_ST_mcmc.html">COVID-19 MCMC (Space-time)</a></li>
+    <li><a class="dropdown-item" href="../articles/hydro.html">Hydrology</a></li>
+    <li><a class="dropdown-item" href="../articles/priors.html">Priors exploration</a></li>
+    <li><a class="dropdown-item" href="../articles/ohc_tutorial.html">Ocean heat content mapping</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>FAQ</h6></li>
+    <li><a class="dropdown-item" href="../articles/inla_FAQ.html">INLA Crash FAQ</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://4dmodeller.github.io/4DM_Hackathon/">Hackathon</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://4dmodeller.github.io/4DM_Hackathon/">Hackathon</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/4DModeller/fdmr/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/4DModeller/fdmr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -103,7 +78,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>COVID-19 MCMC</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/HEAD/vignettes/covid_mcmc.Rmd" class="external-link"><code>vignettes/covid_mcmc.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/main/vignettes/covid_mcmc.Rmd" class="external-link"><code>vignettes/covid_mcmc.Rmd</code></a></small>
       <div class="d-none name"><code>covid_mcmc.Rmd</code></div>
     </div>
 
@@ -160,14 +135,29 @@ in the spatial data we want.</p>
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid_mcmc"</span>, filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>In this study, we use the areal unit modelling approach to fit the
 BHM and then make model inference using MCMC method. To do this, we need
-to construct a non-negative symmetric <span class="math inline">\(n
-\times n\)</span> neighbourhood or adjacency matrix <span class="math inline">\(\boldsymbol{W}\)</span> that accounts for the
-spatio-temporal autocorrelation structure, where <span class="math inline">\(n=6789\)</span> is the number of areal units. The
-neighbourhood matrix specifies the spatial closeness between pairs of
-areal units. The elements <span class="math inline">\(\{w_{ij}\}\)</span> in <span class="math inline">\(\boldsymbol{W}\)</span> can be either continuous
-or binary, and a larger value of <span class="math inline">\(w_{ij}\)</span> represents that MSOAs <span class="math inline">\((i,j)\)</span> are spatially closer to each other.
-Here we use the border sharing specification, so that <span class="math inline">\(w_{ij}=1\)</span> if MSOAs <span class="math inline">\((i,j)\)</span> share a common geographical border,
-and <span class="math inline">\(w_{ij}=0\)</span> otherwise.</p>
+to construct a non-negative symmetric
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n \times n</annotation></semantics></math>
+neighbourhood or adjacency matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐖</mi><annotation encoding="application/x-tex">\boldsymbol{W}</annotation></semantics></math>
+that accounts for the spatio-temporal autocorrelation structure, where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>6789</mn></mrow><annotation encoding="application/x-tex">n=6789</annotation></semantics></math>
+is the number of areal units. The neighbourhood matrix specifies the
+spatial closeness between pairs of areal units. The elements
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{w_{ij}\}</annotation></semantics></math>
+in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐖</mi><annotation encoding="application/x-tex">\boldsymbol{W}</annotation></semantics></math>
+can be either continuous or binary, and a larger value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">w_{ij}</annotation></semantics></math>
+represents that MSOAs
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(i,j)</annotation></semantics></math>
+are spatially closer to each other. Here we use the border sharing
+specification, so that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">w_{ij}=1</annotation></semantics></math>
+if MSOAs
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(i,j)</annotation></semantics></math>
+share a common geographical border, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">w_{ij}=0</annotation></semantics></math>
+otherwise.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">W_nb</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/poly2nb.html" class="external-link">poly2nb</a></span><span class="op">(</span><span class="va">sp_data</span>, row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/nb2mat.html" class="external-link">nb2mat</a></span><span class="op">(</span><span class="va">W_nb</span>, style <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span></span></code></pre></div>
@@ -178,40 +168,55 @@ and <span class="math inline">\(w_{ij}=0\)</span> otherwise.</p>
 <h2 id="model-specification">Model specification<a class="anchor" aria-label="anchor" href="#model-specification"></a>
 </h2>
 <p>We use a Bayesian hierarchical model to predict the spatial COVID-19
-infection rate at the MSOA level in England. Let <span class="math inline">\(Y_{i}\)</span> denote the total number of reported
-COVID cases for neighbourhood <span class="math inline">\(i=1,\ldots,
-n(=6789)\)</span> during the study period, and <span class="math inline">\(N_{i}\)</span> denote the (official) estimated
-population living in MSOA <span class="math inline">\(i\)</span>. <span class="math inline">\(Y_{i}\)</span> is assumed to have a Poisson
-distribution with parameters (<span class="math inline">\(N_{i}\)</span>, <span class="math inline">\(\theta_{i}\)</span>), where <span class="math inline">\(\theta_{i}\)</span> is the true unobserved
-COVID-19 infection rate in MSAO <span class="math inline">\(i\)</span>.
-We follow a standard path in modelling <span class="math inline">\(\theta_{i}\)</span> with a log link to the Poisson
-and start with a model where the linear predictor decomposes additively
-into a set of covariates and a Gaussian Markov Random Field process,
-which characterises the infection of the disease after the covariate
-effects have been accounted for. A general Bayesian hierarchical model
-commonly specified is given by</p>
-<p><span class="math display">\[\begin{align}
-\nonumber  Y_{i}\vert N_{i}, \theta_{i} &amp;\sim
-\text{Poisson}(N_{i}\theta_{i}),\ \  i=1,\ldots,n,\\
-log(\theta_{i}
-)&amp;=\boldsymbol{x_{i}^{\top}}\boldsymbol{\beta}+\phi_{i}.
-\end{align}\]</span></p>
-<p>The spatial random effects <span class="math inline">\(\{\phi_i\}\)</span> are included in the model to
-account for any residual spatio-temporal autocorrelation after adjusting
-for covariates <span class="math inline">\(\boldsymbol{x_{i}}\)</span>.
-Here we utilise the spatial modelling structure “BYM”, proposed by <span class="citation">Besag, York, and Mollié (<a href="#ref-besag1991bayesian">1991</a>)</span>, to model <span class="math inline">\(\{\phi_i\}\)</span>. It is given by</p>
-<p><span class="math display">\[\begin{align}
+infection rate at the MSOA level in England. Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">Y_{i}</annotation></semantics></math>
+denote the total number of reported COVID cases for neighbourhood
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>n</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>=</mo><mn>6789</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">i=1,\ldots, n(=6789)</annotation></semantics></math>
+during the study period, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>i</mi></msub><annotation encoding="application/x-tex">N_{i}</annotation></semantics></math>
+denote the (official) estimated population living in MSOA
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">Y_{i}</annotation></semantics></math>
+is assumed to have a Poisson distribution with parameters
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>i</mi></msub><annotation encoding="application/x-tex">N_{i}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_{i}</annotation></semantics></math>),
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_{i}</annotation></semantics></math>
+is the true unobserved COVID-19 infection rate in MSAO
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
+We follow a standard path in modelling
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_{i}</annotation></semantics></math>
+with a log link to the Poisson and start with a model where the linear
+predictor decomposes additively into a set of covariates and a Gaussian
+Markov Random Field process, which characterises the infection of the
+disease after the covariate effects have been accounted for. A general
+Bayesian hierarchical model commonly specified is given by</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">|</mo><msub><mi>N</mi><mi>i</mi></msub><mo>,</mo><msub><mi>θ</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mtext mathvariant="normal">Poisson</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mi>i</mi></msub><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="0.222em"></mspace><mspace width="0.222em"></mspace><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>n</mi><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mi>𝐱</mi><mi>𝐢</mi><mi mathvariant="bold">⊤</mi></msubsup><mi>𝛃</mi><mo>+</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+\nonumber  Y_{i}\vert N_{i}, \theta_{i} &amp;\sim \text{Poisson}(N_{i}\theta_{i}),\ \  i=1,\ldots,n,\\
+ log(\theta_{i} )&amp;=\boldsymbol{x_{i}^{\top}}\boldsymbol{\beta}+\phi_{i}. 
+\end{align}</annotation></semantics></math></p>
+<p>The spatial random effects
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{\phi_i\}</annotation></semantics></math>
+are included in the model to account for any residual spatio-temporal
+autocorrelation after adjusting for covariates
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐱</mi><mi>𝐢</mi></msub><annotation encoding="application/x-tex">\boldsymbol{x_{i}}</annotation></semantics></math>.
+Here we utilise the spatial modelling structure “BYM”, proposed by <span class="citation">Besag, York, and Mollié (<a href="#ref-besag1991bayesian">1991</a>)</span>, to model
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>ϕ</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{\phi_i\}</annotation></semantics></math>.
+It is given by</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>ϕ</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mi>ϕ</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo>+</mo><msubsup><mi>ϕ</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msubsup><mi>ϕ</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="false" form="postfix">|</mo><msubsup><mi>𝛟</mi><mrow><mo>−</mo><mi>i</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mtext mathvariant="normal">N</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msubsup><mi>ϕ</mi><mi>j</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mrow><mrow><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow></mfrac><mo>,</mo><mfrac><msubsup><mi>τ</mi><mn>1</mn><mn>2</mn></msubsup><mrow><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msubsup><mi>ϕ</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mtext mathvariant="normal">N</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msubsup><mi>τ</mi><mn>2</mn><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
 \nonumber \phi_i &amp;=\phi_i^{(1)}+\phi_i^{(2)}\\
-\phi_i^{(1)}\vert\boldsymbol\phi_{-i}^{(1)}&amp;\sim \text{N}\left(
-\frac{\sum_{j=1}^{n}w_{ij}\phi_j^{(1)}}{\sum_{j=1}^{n}w_{ij}},
-\frac{\tau_1^2}{\sum_{j=1}^{n}w_{ij}}\right)\\
+\phi_i^{(1)}\vert\boldsymbol\phi_{-i}^{(1)}&amp;\sim \text{N}\left( \frac{\sum_{j=1}^{n}w_{ij}\phi_j^{(1)}}{\sum_{j=1}^{n}w_{ij}}, \frac{\tau_1^2}{\sum_{j=1}^{n}w_{ij}}\right)\\
 \nonumber \phi_i^{(2)}&amp;\sim \text{N}(0, \tau_2^2),
-\end{align}\]</span></p>
-<p>where <span class="math inline">\(\phi_i\)</span> now consists of two
-components. <span class="math inline">\(\phi_i^{(1)}\)</span> is
-assigned the intrinsic CAR prior (Besag et al., 1991), and <span class="math inline">\(\phi_i^{(2)}\)</span> is a set of independent and
-identically normally distributed random effects, with mean zero and
-common variance <span class="math inline">\(\tau_2^2\)</span>.</p>
+\end{align}</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ϕ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\phi_i</annotation></semantics></math>
+now consists of two components.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>ϕ</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\phi_i^{(1)}</annotation></semantics></math>
+is assigned the intrinsic CAR prior (Besag et al., 1991), and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>ϕ</mi><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\phi_i^{(2)}</annotation></semantics></math>
+is a set of independent and identically normally distributed random
+effects, with mean zero and common variance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>τ</mi><mn>2</mn><mn>2</mn></msubsup><annotation encoding="application/x-tex">\tau_2^2</annotation></semantics></math>.</p>
 </div>
 <div class="section level2">
 <h2 id="define-the-model-formula">Define the model formula<a class="anchor" aria-label="anchor" href="#define-the-model-formula"></a>
@@ -467,13 +472,14 @@ coefficients estimates.</p>
 INLA-SPDE approaches can be affected by the choice of the spatial model,
 the inference method and the data characteristics. MCMC-BYM and INLA-BYM
 use different inference methods, with the latter being faster. In the
-MCMC-BYM approach, spatial correlation structure is captured by a <span class="math inline">\(n\times n\)</span> adjacency matrix. Specifically,
-if two locations are adjacent in geography, they are spatially
-correlated, leading to data smoothing between them. However, the
-INLA-SPDE approach uses the Matern model, where spatial correlation
-depends on the distance between two locations, rather than their
-geographic adjacency. Thus, even if two locations are not geographically
-adjacent, they can still exhibit correlation.</p>
+MCMC-BYM approach, spatial correlation structure is captured by a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n\times n</annotation></semantics></math>
+adjacency matrix. Specifically, if two locations are adjacent in
+geography, they are spatially correlated, leading to data smoothing
+between them. However, the INLA-SPDE approach uses the Matern model,
+where spatial correlation depends on the distance between two locations,
+rather than their geographic adjacency. Thus, even if two locations are
+not geographically adjacent, they can still exhibit correlation.</p>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-besag1991bayesian" class="csl-entry">
 Besag, Julian, Jeremy York, and Annie Mollié. 1991. <span>“Bayesian
@@ -487,7 +493,7 @@ Statistical Software</em> 55 (13): 1–24.
 </div>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -498,15 +504,15 @@ Statistical Software</em> 55 (13): 1–24.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
