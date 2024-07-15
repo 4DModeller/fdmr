@@ -1,6 +1,9 @@
 name: Draft PDF
-on: [push]
-branches: JOSS
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+    - JOSS
 
 jobs:
   paper:
