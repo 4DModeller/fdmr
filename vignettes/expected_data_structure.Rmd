@@ -18,6 +18,7 @@ In this tutorial, we will show the expected data structure for running the Bayes
 In the [COVID-19 tutorial](https://4dmodeller.github.io/fdmr/articles/covid.html), we aim to fit a Bayesian spatio-temporal model to predict the COVID-19 infection rates across mainland England over space and time, and investigate the impacts of socioeconomic, demographic and environmental factors on COVID-19 infection. We load the dataset `covid19_data` and the type of this object is a `data.frame`. 
 
 ```{r classcovidat}
+fdmr::retrieve_tutorial_data(dataset = "covid")
 covid19_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "covid19_data.rds")
 class(covid19_data)
 ```
