@@ -2,13 +2,19 @@
 #'
 #' @param dataset Name of dataset to retrieve
 #' @param force_update Force retrieval of metadata and dataset
+#' @param save Unpack the dataset to ~/fdmr/tutorial_data
 #'
 #' @return NULL
 #' @export
-retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
+retrieve_tutorial_data <- function(dataset, force_update = FALSE, save = FALSE) {
   dataset <- base::tolower(dataset)
 
-  download_cache_folder <- fs::path(fs::path_home(), "fdmr", "download_cache")
+  if (save){
+    download_cache_folder <- fs::path(fs::path_home(), "fdmr", "download_cache")
+  } else {
+    download_cache_folder <- fs::path(fs::path_temp(), "fdmr", "download_cache")
+    }
+
   if (!fs::dir_exists(download_cache_folder)) {
     fs::dir_create(download_cache_folder, recurse = TRUE)
   }
@@ -40,7 +46,12 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
     jsonlite::write_json(retrieval_info, path = file_metadata_file)
   }
 
-  extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
+  if (save){
+    extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
+  } else {
+    extract_path <- fs::path(fs::path_temp(), "fdmr", "tutorial_data", dataset)
+    }
+  
 
   if (!fs::dir_exists(extract_path)) {
     fs::dir_create(extract_path, recurse = TRUE)

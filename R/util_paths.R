@@ -2,11 +2,12 @@
 #'
 #' @param dataset Name of dataset
 #' @param filename Name of file
+#' @param temp Save in a temporary directory. Defaults to TRUE. 
 #'
 #' @return fs::path Full filepath
 #' @export
-get_tutorial_datapath <- function(dataset, filename) {
-  tutorial_datapath <- fs::path(get_tutorial_cache_datapath(), dataset)
+get_tutorial_datapath <- function(dataset, filename, temp) {
+  tutorial_datapath <- fs::path(get_tutorial_cache_datapath(temp), dataset)
 
   if (!fs::dir_exists(tutorial_datapath)) {
     stop("Unable to load data, the folder ", toString(tutorial_datapath), " does not exist. Have you run retrieve_tutorial_data?")
@@ -26,15 +27,16 @@ get_tutorial_datapath <- function(dataset, filename) {
 #'
 #' @param dataset Name of dataset
 #' @param filename Name of file
+#' @param temp Use the temporary directory
 #'
 #' @return loaded object
 #' @export
-load_tutorial_data <- function(dataset, filename) {
+load_tutorial_data <- function(dataset, filename, temp) {
   if (!tolower(fs::path_ext(filename)) == "rds") {
     stop("We can only load rds files.")
   }
 
-  fpath <- get_tutorial_datapath(dataset = dataset, filename = filename)
+  fpath <- get_tutorial_datapath(dataset = dataset, filename = filename, temp = temp)
   return(readRDS(fpath))
 }
 
@@ -63,29 +65,43 @@ clean_path <- function(path, check_exists = FALSE) {
 }
 
 #' Get path to tutorial data cache folder
+#' 
+#' @param temp Use the temporary directory
 #'
 #' @return fs::path
 #' @keywords internal
-get_tutorial_cache_datapath <- function() {
-  fs::path(fs::path_home(), "fdmr", "tutorial_data")
+get_tutorial_cache_datapath <- function(temp) {
+  if (temp){
+    fs::path(fs::path_temp(), "fdmr", "tutorial_data")
+  } else{
+    fs::path(fs::path_home(), "fdmr", "tutorial_data")
+  }
 }
 
 #' Get path to downloaded archive cache folder
+#' 
+#' @param temp Use temporary directory
 #'
 #' @return fs::path
 #' @keywords internal
-get_archive_cache_datapath <- function() {
-  fs::path(fs::path_home(), "fdmr", "download_cache")
+get_archive_cache_datapath <- function(temp) {
+  if (temp){
+    fs::path(fs::path_temp(), "fdmr", "download_cache")
+  } else{
+    fs::path(fs::path_home(), "fdmr", "download_cache")
+  }
 }
 
 
 #' Clear both tutorial data and downloaded archive caches
 #'
+#' @param temp Use temporary directory
+#'
 #' @return NULL
 #' @export
-clear_caches <- function() {
-  tut_path <- get_tutorial_cache_datapath()
-  cache_path <- get_archive_cache_datapath()
+clear_caches <- function(temp) {
+  tut_path <- get_tutorial_cache_datapath(temp)
+  cache_path <- get_archive_cache_datapath(temp)
   print(paste("Deleting ", tut_path, cache_path))
   fs::dir_delete(tut_path)
   fs::dir_delete(cache_path)
