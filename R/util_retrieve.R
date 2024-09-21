@@ -53,7 +53,7 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE, save = FALSE) 
 
   if (base::isTRUE(save) | base::is.character(save)){
     if (base::is.character(save)){
-      save_path <- check_path(save, check_exists = TRUE)
+      save_path <- check_path(save)
       extract_path <- fs::path(save_path, "fdmr", "tutorial_data", dataset)
     } else{
       extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
