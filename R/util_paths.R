@@ -2,12 +2,12 @@
 #'
 #' @param dataset Name of dataset
 #' @param filename Name of file
-#' @param temp Save in a temporary directory. Defaults to TRUE. 
+#' @param saved Specify the location where user unpacked the data.
 #'
 #' @return fs::path Full filepath
 #' @export
-get_tutorial_datapath <- function(dataset, filename, temp) {
-  tutorial_datapath <- fs::path(get_tutorial_cache_datapath(temp), dataset)
+get_tutorial_datapath <- function(dataset, filename, saved = FALSE) {
+  tutorial_datapath <- fs::path(get_tutorial_cache_datapath(saved), dataset)
 
   if (!fs::dir_exists(tutorial_datapath)) {
     stop("Unable to load data, the folder ", toString(tutorial_datapath), " does not exist. Have you run retrieve_tutorial_data?")
@@ -27,16 +27,16 @@ get_tutorial_datapath <- function(dataset, filename, temp) {
 #'
 #' @param dataset Name of dataset
 #' @param filename Name of file
-#' @param temp Use the temporary directory
+#' @param saved Specify the location where user unpacked the data
 #'
 #' @return loaded object
 #' @export
-load_tutorial_data <- function(dataset, filename, temp) {
+load_tutorial_data <- function(dataset, filename, saved = FALSE) {
   if (!tolower(fs::path_ext(filename)) == "rds") {
     stop("We can only load rds files.")
   }
 
-  fpath <- get_tutorial_datapath(dataset = dataset, filename = filename, temp = temp)
+  fpath <- get_tutorial_datapath(dataset = dataset, filename = filename, saved = saved)
   return(readRDS(fpath))
 }
 
@@ -64,44 +64,77 @@ clean_path <- function(path, check_exists = FALSE) {
   return(fpath)
 }
 
+
+#' Checks if a path exists and returns an absolute path
+#'
+#' @param path Path to check
+#'
+#' @return fs::path Expanded absolute path
+#' @keywords internal
+#' 
+check_path <- function(path) {
+  if (is.null(path) || nchar(path) == 0) {
+    stop("Invalid path of zero length given.")
+  }
+  
+  fpath <- fs::path_abs(fs::path_expand(path))
+  
+  if (!fs::file_exists(fpath)) {
+    stop(paste("The path", fpath, "does not exist."))
+  }
+  
+  return(fpath)
+}
+
+
 #' Get path to tutorial data cache folder
 #' 
-#' @param temp Use the temporary directory
+#' @param saved Specify the location where user unpacked the data
 #'
 #' @return fs::path
 #' @keywords internal
-get_tutorial_cache_datapath <- function(temp) {
-  if (temp){
+get_tutorial_cache_datapath <- function(saved) {
+  if (base::isTRUE(saved) | base::is.character(saved)){
+    if (base::is.character(saved)) {
+      save_path <- check_path(saved)
+      fs::path(save_path, "fdmr", "tutorial_data")
+    } else{
+      fs::path(fs::path_home(), "fdmr", "tutorial_data")
+    }
+  } else {
     fs::path(fs::path_temp(), "fdmr", "tutorial_data")
-  } else{
-    fs::path(fs::path_home(), "fdmr", "tutorial_data")
   }
 }
 
 #' Get path to downloaded archive cache folder
 #' 
-#' @param temp Use temporary directory
+#' @param saved Specify the location where user unpacked the data
 #'
 #' @return fs::path
 #' @keywords internal
-get_archive_cache_datapath <- function(temp) {
-  if (temp){
+get_archive_cache_datapath <- function(saved) {
+  if (base::isTRUE(saved) | base::is.character(saved)){
+    if (base::is.character(saved)) {
+      save_path <- check_path(saved)
+      fs::path(save_path, "fdmr", "download_cache")
+    } else{
+      fs::path(fs::path_home(), "fdmr", "download_cache")
+    }
+  } else {
     fs::path(fs::path_temp(), "fdmr", "download_cache")
-  } else{
-    fs::path(fs::path_home(), "fdmr", "download_cache")
   }
 }
 
 
 #' Clear both tutorial data and downloaded archive caches
 #'
-#' @param temp Use temporary directory
+#' @param saved Specify the location where user unpacked the data
 #'
 #' @return NULL
 #' @export
-clear_caches <- function(temp) {
-  tut_path <- get_tutorial_cache_datapath(temp)
-  cache_path <- get_archive_cache_datapath(temp)
+clear_caches <- function(saved = TRUE) {
+  tut_path <- get_tutorial_cache_datapath(saved)
+  cache_path <- get_archive_cache_datapath(saved)
   print(paste("Deleting ", tut_path, cache_path))
   fs::dir_delete(tut_path)
   fs::dir_delete(cache_path)

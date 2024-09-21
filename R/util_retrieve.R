@@ -1,16 +1,21 @@
-#' Retrieve a tutorial dataset and unpacks it to ~/fdmr/tutorial_data
+#' Retrieves a tutorial dataset and unpacks it to a place specified by the user (~/fdmr/tutorial_data)
 #'
 #' @param dataset Name of dataset to retrieve
 #' @param force_update Force retrieval of metadata and dataset
-#' @param save Unpack the dataset to ~/fdmr/tutorial_data
+#' @param save Unpack the dataset to where user specified (character), home directory (TRUE), session's temporary directory (FALSE: default).
 #'
 #' @return NULL
 #' @export
 retrieve_tutorial_data <- function(dataset, force_update = FALSE, save = FALSE) {
   dataset <- base::tolower(dataset)
 
-  if (save){
-    download_cache_folder <- fs::path(fs::path_home(), "fdmr", "download_cache")
+  if (base::isTRUE(save) | base::is.character(save)){
+    if (base::is.character(save)) {
+      save_path <- check_path(save)
+      download_cache_folder <- fs::path(save_path, "fdmr", "download_cache")
+    } else{
+      download_cache_folder <- fs::path(fs::path_home(), "fdmr", "download_cache")
+    }
   } else {
     download_cache_folder <- fs::path(fs::path_temp(), "fdmr", "download_cache")
     }
@@ -46,8 +51,13 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE, save = FALSE) 
     jsonlite::write_json(retrieval_info, path = file_metadata_file)
   }
 
-  if (save){
-    extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
+  if (base::isTRUE(save) | base::is.character(save)){
+    if (base::is.character(save)){
+      save_path <- check_path(save, check_exists = TRUE)
+      extract_path <- fs::path(save_path, "fdmr", "tutorial_data", dataset)
+    } else{
+      extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
+    }
   } else {
     extract_path <- fs::path(fs::path_temp(), "fdmr", "tutorial_data", dataset)
     }
@@ -83,4 +93,25 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE, save = FALSE) 
   } else {
     stop("Invalid dataset, please see available datasets at https://github.com/4DModeller/fdmr_data")
   }
+}
+
+#' Checks if a path exists and returns an absolute path
+#'
+#' @param path Path to check
+#'
+#' @return fs::path Expanded absolute path
+#' @keywords internal
+#' 
+check_path <- function(path) {
+  if (is.null(path) || nchar(path) == 0) {
+    stop("Invalid path of zero length given.")
+  }
+  
+  fpath <- fs::path_abs(fs::path_expand(path))
+  
+  if (!fs::file_exists(fpath)) {
+    stop(paste("The path", fpath, "does not exist."))
+  }
+  
+  return(fpath)
 }
