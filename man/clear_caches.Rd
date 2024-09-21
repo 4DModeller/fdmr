@@ -4,7 +4,10 @@
 \alias{clear_caches}
 \title{Clear both tutorial data and downloaded archive caches}
 \usage{
-clear_caches()
+clear_caches(saved = TRUE)
+}
+\arguments{
+\item{saved}{Specify the location where user unpacked the data}
 }
 \description{
 Clear both tutorial data and downloaded archive caches

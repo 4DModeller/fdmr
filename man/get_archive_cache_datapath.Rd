@@ -4,7 +4,10 @@
 \alias{get_archive_cache_datapath}
 \title{Get path to downloaded archive cache folder}
 \usage{
-get_archive_cache_datapath()
+get_archive_cache_datapath(saved)
+}
+\arguments{
+\item{saved}{Specify the location where user unpacked the data}
 }
 \value{
 fs::path
