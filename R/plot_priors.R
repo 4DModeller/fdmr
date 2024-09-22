@@ -1,10 +1,11 @@
 #' Plot line comparison for stdev etc
 #'
-#' @param data Parsed model output
+#' @param data List of parsed model outputs from "parse_model_output" (a list of lists)
 #' @param to_plot Type of data to plot, "Range for f" etc
+#' @param title Title of the plot, defaults to the value of "to_plot"
 #'
-#' @return ggplot2::ggplot
-plot_line_comparison <- function(data, to_plot, title) {
+#' @return ggplot2::ggplot of the selected hyperparameter posterior distribution
+plot_line_comparison <- function(data, to_plot, title = to_plot) {
   parsed_data <- purrr::map(data, function(x) as.data.frame(x$pars[[to_plot]]))
   single_df <- dplyr::bind_rows(parsed_data, .id = "Run")
   if (nrow(single_df) == 0) {
@@ -19,9 +20,9 @@ plot_line_comparison <- function(data, to_plot, title) {
 
 #' Create boxplots from priors run data
 #'
-#' @param data
+#' @param data A list of parsed model output from "parse_model_output" (a list of lists)
 #'
-#' @return graphics::boxplot
+#' @return graphics::boxplot of fitted values
 plot_priors_boxplot <- function(data) {
   # TODO - I'm sure this can be done in a nicer functional way
   fitted_mean_post <- purrr::map(data, function(x) x$fitted_mean_post)
@@ -34,10 +35,10 @@ plot_priors_boxplot <- function(data) {
 #' Plot density function
 #'
 #'
-#' @param data Parsed model outputs
-#' @param measurement_data Measurement data
+#' @param data List of parsed model outputs from "parse_model_output" (a list of lists)
+#' @param measurement_data Measurement data (can be numeric, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #'
-#' @return ggplot2::ggplot
+#' @return ggplot2::ggplot of measurement density by value
 plot_priors_density <- function(data, measurement_data) {
   # Can this be done in a cleaner way? Just create a dataframe from the lists?
   fitted_values <- unlist(purrr::map(data, function(x) x$fitted_mean_post))
@@ -56,9 +57,9 @@ plot_priors_density <- function(data, measurement_data) {
 
 #' Plot Deviance Information Criterion (DIC) values
 #'
-#' @param data
+#' @param data List of parsed model outputs from "parse_model_output" (a list of lists)
 #'
-#' @return ggplot2::ggplot
+#' @return ggplot2::ggplot with DIC values shown as points
 plot_dic <- function(data) {
   infocri <- base::cbind.data.frame(
     priors = unlist(purrr::map(seq(1, length(data)), function(x) paste("Run", x))),
