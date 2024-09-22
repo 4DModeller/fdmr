@@ -1,15 +1,15 @@
 #' Interactively set and see the result of different priors
 #'
-#' @param spatial_data Spatial data
-#' @param measurement_data Measurement data
-#' @param time_variable Time variable in measurement_data
-#' @param mesh INLA mesh
+#' @param spatial_data Spatial data (must be SpatialPoints or SpatialPointsDataFrame)
+#' @param measurement_data Measurement data (data.frame, SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)
+#' @param time_variable Time variable name in measurement_data
+#' @param mesh INLA/fmesher mesh
 #' @param data_distribution Data distribution, Poisson or Gaussian
-#' @param log_folder Folder to write out logs
+#' @param log_folder Folder to write out logs (character)
 #'
 #' @importFrom INLA f
 #'
-#' @return shiny::app
+#' @return shiny::app with model builder functionality
 #' @keywords internal
 model_builder_shiny <- function(spatial_data,
                                 measurement_data,
@@ -697,12 +697,12 @@ model_builder_shiny <- function(spatial_data,
 #' Interactively set and see the result of different priors
 #'
 #' @param spatial_data Spatial data
-#' @param measurement_data Measurement data
-#' @param time_variable Time variable in measurement_data
-#' @param mesh INLA mesh
-#' @param log_folder Folder to write logs to
+#' @param measurement_data Measurement data (data.frame, SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)
+#' @param time_variable Time variable name in measurement_data
+#' @param mesh INLA/fmesher mesh
+#' @param log_folder Folder to write logs to (character)
 #'
-#' @return shiny::app
+#' @return shiny::app with model builder functionality
 #' @export
 model_builder <- function(spatial_data, measurement_data, time_variable, mesh, data_distribution = "Poisson", log_folder = NULL) {
   shiny::runApp(model_builder_shiny(spatial_data = spatial_data, measurement_data = measurement_data, time_variable = time_variable, mesh = mesh, data_distribution = data_distribution, log_folder = log_folder))
