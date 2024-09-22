@@ -295,7 +295,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
   shiny::shinyApp(ui = ui, server = server)
 }
 
-#' Mesh building shiny app. Creates and visualises a mesh from some spatial data.
+#' Model viewing shiny app. Visualises INLA model output, plots the posterior distributions of model parameters and prediction statistics.
 #'
 #' @param model_output INLA model output
 #' @param mesh INLA mesh
