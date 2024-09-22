@@ -6,10 +6,10 @@
 #' The leaflet backend will work for most use cases and is recommended.
 #' For plotting of maps with UTM coordinates, the mapview backend is recommended.
 #'
-#' @param polygon_data Polygon data
-#' @param raster_data Raster datas
-#' @param domain Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend
-#' @param markers Markers to display on map. A named list with latitude, longitude and label names must be given.
+#' @param polygon_data Polygon data (SpatialPolygon or SpatialPolygonDataFrame)
+#' @param raster_data Raster data (RasterLayer or SpatialRaster)
+#' @param domain Domain data (numeric or factor) to be passed to leaflet::colorNumeric and leaflet::addLegend
+#' @param markers Markers to display on map. A named list or data.frame with latitude, longitude and label names must be given.
 #' @param palette Palette to be used for colours, defaults to viridis
 #' @param legend_title Title for legend
 #' @param add_scale_bar Add scale bar if TRUE
@@ -71,10 +71,10 @@ plot_map <- function(polygon_data = NULL,
 
 #' Create a simple Leaflet map from data
 #'
-#' @param polygon_data Polygon data
-#' @param raster_data Raster data
-#' @param domain Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend
-#' @param markers Markers to display on map. A named list with latitude, longitude and label names must be given.
+#' @param polygon_data Polygon data (SpatialPolygon or SpatialPolygonDataFrame)
+#' @param raster_data Raster data (RasterLayer or SpatialRaster)
+#' @param domain Domain data (numeric or factor) to be passed to leaflet::colorNumeric and leaflet::addLegend
+#' @param markers Markers to display on map. A named list or data.frame with latitude, longitude and label names must be given.
 #' @param palette Palette to be used for colours, defaults to viridis
 #' @param legend_title Title for legend
 #' @param add_scale_bar Add scale bar if TRUE
