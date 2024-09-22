@@ -36,7 +36,7 @@ plot_priors_boxplot <- function(data) {
 #'
 #'
 #' @param data List of parsed model outputs from "parse_model_output" (a list of lists)
-#' @param measurement_data Measurement data (can be numeric, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
+#' @param measurement_data Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #'
 #' @return ggplot2::ggplot of measurement density by value
 plot_priors_density <- function(data, measurement_data) {

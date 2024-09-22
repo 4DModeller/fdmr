@@ -1,7 +1,7 @@
 #' Parses inlabru::bru model output to create a list of model parameters
 #'
 #' @param model_output Output from running inlabru::bru
-#' @param measurement_data Measurement data (can be numeric, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
+#' @param measurement_data Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #'
 #' @return Creates a list of model outputs for the first timestep, including fitted mean and sd, mean of fixed effects, mean and sd of random effects, posterior hyperparameters, and DIC
 #' @keywords internal
@@ -34,7 +34,7 @@ parse_model_output_bru <- function(model_output, measurement_data) {
 #' Parse model output to create a list of model parameters
 #'
 #' @param model_output Output returned by model (currently only from running inlabru::bru)
-#' @param measurement_data Measurement data (can be numeric, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
+#' @param measurement_data Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #' @param model_type Type of model, we currently only support inlabru
 #'
 #' @return Creates a list of model outputs, including fitted mean and sd, mean of fixed effects, mean and sd of random effects, posterior hyperparameters, and DIC

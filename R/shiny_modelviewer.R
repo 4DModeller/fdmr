@@ -2,7 +2,7 @@
 #'
 #' @param model_output INLA/inlabru model output
 #' @param mesh INLA/fmesher mesh
-#' @param measurement_data Measurement data (can be numeric, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
+#' @param measurement_data Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #' @param data_distribution Type of data, Poisson or Gaussian
 #'
 #' @importFrom magrittr %>%
@@ -299,7 +299,7 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
 #'
 #' @param model_output INLA/inlabru model output
 #' @param mesh INLA/fmesher mesh used for the run
-#' @param measurement_data Measurement data used for the run (sp)
+#' @param measurement_data Measurement data used for the run (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #' @param data_distribution Type of data, Poisson or Gaussian (character)
 #'
 #' @return shiny::app with model viewer functionality
