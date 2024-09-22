@@ -3,8 +3,8 @@
 #' 2. A greater number of mesh triangles than observations
 #' 3. Isolated triangles in mesh
 #'
-#' @param mesh INLA mesh
-#' @param observations Observations data to be used woith model
+#' @param mesh INLA/fmesher mesh
+#' @param observations Observations data to be used with model (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #'
 #' @return list: Named list containing errors
 #' @export
