@@ -65,28 +65,6 @@ clean_path <- function(path, check_exists = FALSE) {
 }
 
 
-#' Checks if a path exists and returns an absolute path
-#'
-#' @param path Path to check
-#'
-#' @return fs::path Expanded absolute path
-#' @keywords internal
-#' 
-check_path <- function(path) {
-  if (is.null(path) || nchar(path) == 0) {
-    stop("Invalid path of zero length given.")
-  }
-  
-  fpath <- fs::path_abs(fs::path_expand(path))
-  
-  if (!fs::file_exists(fpath)) {
-    stop(paste("The path", fpath, "does not exist."))
-  }
-  
-  return(fpath)
-}
-
-
 #' Get path to tutorial data cache folder
 #' 
 #' @param saved Specify the location where user unpacked the data
