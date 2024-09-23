@@ -13,20 +13,20 @@ plot_mesh(
 )
 }
 \arguments{
-\item{mesh}{Mesh data}
+\item{mesh}{Mesh object from INLA or fmesher}
 
 \item{spatial_data}{Spatial data, either a SpatialPolygonsDataFrame, SpatialPointsDataFrame or an object
 that can be converted to a data.frame with longitude and latitude columns}
 
-\item{longitude_column}{Longitude column in spatial_data}
+\item{longitude_column}{Longitude column name in spatial_data}
 
-\item{latitude_column}{Latitude column in spatial_data name}
+\item{latitude_column}{Latitude column name in spatial_data}
 
 \item{markers}{Markers to display on top of mesh. A named list with latitude, longitude and label names must be given.
 Expects longitude name to be longitude, latitude name to be latitude, label name to be label.}
 }
 \value{
-leaflet::leaflet
+leaflet::leaflet with mesh and markers
 }
 \description{
 Plot a mesh on a Leaflet map
