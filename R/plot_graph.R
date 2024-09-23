@@ -82,7 +82,7 @@ plot_boxplot <- function(data, x, y, breaks, x_label, y_label) {
 
 #' Plot timeseries data
 #'
-#' @param data Data to plot (data.frame with x-axis a character convertible to Date)
+#' @param data Data to plot (data.frame with x-axis column a character convertible to Date)
 #' @param x Name of column to plot on x-axis
 #' @param y Name of column to plot on y-axis
 #' @param breaks Date break points, must be a sequence of dates
