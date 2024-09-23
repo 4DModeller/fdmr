@@ -1,9 +1,9 @@
 #' Plot a bar chart using ggplot2
 #'
-#' @param data Data to plot
-#' @param x x-axis data
+#' @param data Data to plot (all data types recognised by ggplot2::geom_bar() like data.frame)
+#' @param x x-axis data, must be a Date object
 #' @param y y-axis data
-#' @param breaks Break points
+#' @param breaks Break points, must be a sequence of dates
 #' @param x_label x-axis label
 #' @param y_label y-axis label
 #' @param fill Fill colour
@@ -47,10 +47,10 @@ plot_barchart <- function(data, x, y, breaks, x_label, y_label, fill = "pink", c
 
 #' Plot a boxplot using ggplot2
 #'
-#' @param data Data to plot
-#' @param x x-axis data
+#' @param data Data to plot (all data types recognised by ggplot2::geom_boxplot() like data.frame)
+#' @param x x-axis data, must be a Date object
 #' @param y y-axis data
-#' @param breaks Break points
+#' @param breaks Break points, must be a sequence of dates
 #' @param x_label x-axis label
 #' @param y_label y-axis label
 #'
@@ -82,10 +82,10 @@ plot_boxplot <- function(data, x, y, breaks, x_label, y_label) {
 
 #' Plot timeseries data
 #'
-#' @param data Data to plot
-#' @param x Name of column to plot on x-axis, should be datetime, will be converted to Dates using as.Date
+#' @param data Data to plot (data.frame with x-axis a character convertible to Date)
+#' @param x Name of column to plot on x-axis
 #' @param y Name of column to plot on y-axis
-#' @param breaks Date break points
+#' @param breaks Date break points, must be a sequence of dates
 #' @param x_label x-axis label
 #' @param y_label y-axis label
 #' @param title Figure title
@@ -93,8 +93,8 @@ plot_boxplot <- function(data, x, y, breaks, x_label, y_label) {
 #' @param line_colour Line colour
 #' @param horizontal_y y-intercept for horizontal line
 #' @param vertical_x x-intercept for vertical line
-#' @param x_lim Limits for x-axis continous scale, vector passed to scale_x_continuous
-#' @param y_lim Limits for y-axis continuous scale, vector passed to scale_y_continous
+#' @param x_lim Limits for x-axis continuous scale, vector passed to scale_x_continuous
+#' @param y_lim Limits for y-axis continuous scale, vector passed to scale_y_continuous
 #'
 #' @return ggplot
 #' @export
@@ -172,12 +172,12 @@ plot_timeseries <- function(data,
 
 #' Create a line plot with a confidence interval.
 #'
-#' @param data Data to plot
-#' @param x x-axis data
+#' @param data Data to plot (all data types recognised by ggplot2::geom_line() like data.frame)
+#' @param x x-axis data, must be a Date object
 #' @param y1 y1 line data - solid
 #' @param y2 y2 line data - dashed
 #' @param y3 y3 line data - dashed
-#' @param breaks Breaks vector
+#' @param breaks Breaks vector, must be a sequence of dates
 #' @param x_label x-axis label
 #' @param y_label y-axis label
 #' @param y1_colour Colour for y1
