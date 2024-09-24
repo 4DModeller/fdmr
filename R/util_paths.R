@@ -2,11 +2,12 @@
 #'
 #' @param dataset Name of dataset
 #' @param filename Name of file
+#' @param saved Specify the location where user unpacked the data.
 #'
 #' @return fs::path Full filepath
 #' @export
-get_tutorial_datapath <- function(dataset, filename) {
-  tutorial_datapath <- fs::path(get_tutorial_cache_datapath(), dataset)
+get_tutorial_datapath <- function(dataset, filename, saved = FALSE) {
+  tutorial_datapath <- fs::path(get_tutorial_cache_datapath(saved), dataset)
 
   if (!fs::dir_exists(tutorial_datapath)) {
     stop("Unable to load data, the folder ", toString(tutorial_datapath), " does not exist. Have you run retrieve_tutorial_data?")
@@ -26,15 +27,16 @@ get_tutorial_datapath <- function(dataset, filename) {
 #'
 #' @param dataset Name of dataset
 #' @param filename Name of file
+#' @param saved Specify the location where user unpacked the data
 #'
 #' @return loaded object
 #' @export
-load_tutorial_data <- function(dataset, filename) {
+load_tutorial_data <- function(dataset, filename, saved = FALSE) {
   if (!tolower(fs::path_ext(filename)) == "rds") {
     stop("We can only load rds files.")
   }
 
-  fpath <- get_tutorial_datapath(dataset = dataset, filename = filename)
+  fpath <- get_tutorial_datapath(dataset = dataset, filename = filename, saved = saved)
   return(readRDS(fpath))
 }
 
@@ -62,30 +64,55 @@ clean_path <- function(path, check_exists = FALSE) {
   return(fpath)
 }
 
+
 #' Get path to tutorial data cache folder
+#' 
+#' @param saved Specify the location where user unpacked the data
 #'
 #' @return fs::path
 #' @keywords internal
-get_tutorial_cache_datapath <- function() {
-  fs::path(fs::path_home(), "fdmr", "tutorial_data")
+get_tutorial_cache_datapath <- function(saved) {
+  if (base::isTRUE(saved) | base::is.character(saved)){
+    if (base::is.character(saved)) {
+      save_path <- check_path(saved)
+      fs::path(save_path, "fdmr", "tutorial_data")
+    } else{
+      fs::path(fs::path_home(), "fdmr", "tutorial_data")
+    }
+  } else {
+    fs::path(fs::path_temp(), "fdmr", "tutorial_data")
+  }
 }
 
 #' Get path to downloaded archive cache folder
+#' 
+#' @param saved Specify the location where user unpacked the data
 #'
 #' @return fs::path
 #' @keywords internal
-get_archive_cache_datapath <- function() {
-  fs::path(fs::path_home(), "fdmr", "download_cache")
+get_archive_cache_datapath <- function(saved) {
+  if (base::isTRUE(saved) | base::is.character(saved)){
+    if (base::is.character(saved)) {
+      save_path <- check_path(saved)
+      fs::path(save_path, "fdmr", "download_cache")
+    } else{
+      fs::path(fs::path_home(), "fdmr", "download_cache")
+    }
+  } else {
+    fs::path(fs::path_temp(), "fdmr", "download_cache")
+  }
 }
 
 
 #' Clear both tutorial data and downloaded archive caches
 #'
+#' @param saved Specify the location where user unpacked the data
+#'
 #' @return NULL
 #' @export
-clear_caches <- function() {
-  tut_path <- get_tutorial_cache_datapath()
-  cache_path <- get_archive_cache_datapath()
+clear_caches <- function(saved = TRUE) {
+  tut_path <- get_tutorial_cache_datapath(saved)
+  cache_path <- get_archive_cache_datapath(saved)
   print(paste("Deleting ", tut_path, cache_path))
   fs::dir_delete(tut_path)
   fs::dir_delete(cache_path)

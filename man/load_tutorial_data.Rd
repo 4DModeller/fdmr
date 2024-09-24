@@ -4,12 +4,14 @@
 \alias{load_tutorial_data}
 \title{Load data from the tutorial data store}
 \usage{
-load_tutorial_data(dataset, filename)
+load_tutorial_data(dataset, filename, saved = FALSE)
 }
 \arguments{
 \item{dataset}{Name of dataset}
 
 \item{filename}{Name of file}
+
+\item{saved}{Specify the location where user unpacked the data}
 }
 \value{
 loaded object
