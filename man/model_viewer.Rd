@@ -2,7 +2,7 @@
 % Please edit documentation in R/shiny_modelviewer.R
 \name{model_viewer}
 \alias{model_viewer}
-\title{Mesh building shiny app. Creates and visualises a mesh from some spatial data.}
+\title{Model viewing shiny app. Visualises INLA model output, plots the posterior distributions of model parameters and prediction statistics.}
 \usage{
 model_viewer(
   model_output,
@@ -24,5 +24,5 @@ model_viewer(
 shiny::app
 }
 \description{
-Mesh building shiny app. Creates and visualises a mesh from some spatial data.
+Model viewing shiny app. Visualises INLA model output, plots the posterior distributions of model parameters and prediction statistics.
 }
