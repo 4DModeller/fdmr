@@ -12,9 +12,9 @@
 mesh_checker(mesh, observations)
 }
 \arguments{
-\item{mesh}{INLA mesh}
+\item{mesh}{INLA/fmesher mesh}
 
-\item{observations}{Observations data to be used woith model}
+\item{observations}{Observations data to be used with model (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)}
 }
 \value{
 list: Named list containing errors

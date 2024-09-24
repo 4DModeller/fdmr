@@ -7,12 +7,12 @@
 mesh_to_spatial(mesh, crs)
 }
 \arguments{
-\item{mesh}{Mesh}
+\item{mesh}{Mesh object from INLA or fmesher (only R2 manifolds are valid)}
 
-\item{crs}{Coordinate Reference System as proj4string}
+\item{crs}{Coordinate Reference System as proj4string, does not support geocentric coordinates}
 }
 \value{
-SpatialPolygonsDataFrame
+SpatialPolygonsDataFrame with mesh triangles
 }
 \description{
 Convert an INLA mesh to a SpatialPolygonsDataFrame

@@ -16,16 +16,16 @@ model_builder(
 \arguments{
 \item{spatial_data}{Spatial data}
 
-\item{measurement_data}{Measurement data}
+\item{measurement_data}{Measurement data (data.frame, SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)}
 
-\item{time_variable}{Time variable in measurement_data}
+\item{time_variable}{Time variable name in measurement_data}
 
-\item{mesh}{INLA mesh}
+\item{mesh}{INLA/fmesher mesh}
 
-\item{log_folder}{Folder to write logs to}
+\item{log_folder}{Folder to write logs to (character)}
 }
 \value{
-shiny::app
+shiny::app with model builder functionality
 }
 \description{
 Interactively set and see the result of different priors

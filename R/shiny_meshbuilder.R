@@ -1,6 +1,6 @@
 #' Mesh building shiny app
 #'
-#' @param spatial_data Spatial data
+#' @param spatial_data Spatial data (must be a data.frame, SpatialPointsDataFrame or SpatialPolygonsDataFrame)
 #' @param obs_data Measurement data
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
@@ -11,7 +11,7 @@
 #'
 #' @importFrom magrittr %>%
 #'
-#' @return shiny::app
+#' @return shiny::app with meshbuilder functionality
 #' @keywords internal
 meshbuilder_shiny <- function(
     spatial_data,
@@ -270,7 +270,7 @@ meshbuilder_shiny <- function(
 
 #' Mesh building shiny app. Creates and visualises a mesh from some spatial data.
 #'
-#' @param spatial_data Spatial data
+#' @param spatial_data Spatial data (must be a data.frame, SpatialPointsDataFrame or SpatialPolygonsDataFrame)
 #' @param obs_data Measurement data
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
@@ -279,7 +279,7 @@ meshbuilder_shiny <- function(
 #' @param y_coord Name of the latitude column in the spatial data
 #' @param x_coord Name of the longitude column in the spatial data
 #'
-#' @return shiny::app
+#' @return shiny::app with meshbuilder functionality
 #' @export
 mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL, y_coord = "LAT", x_coord = "LONG") {
   shiny::runApp(meshbuilder_shiny(

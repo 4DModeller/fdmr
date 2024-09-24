@@ -7,10 +7,10 @@
 plot_priors_boxplot(data)
 }
 \arguments{
-\item{data}{}
+\item{data}{A list of parsed model output from "parse_model_output" (a list of lists)}
 }
 \value{
-graphics::boxplot
+graphics::boxplot of fitted values
 }
 \description{
 Create boxplots from priors run data

@@ -1,14 +1,14 @@
 #' Plot a mesh on a Leaflet map
 #'
-#' @param mesh Mesh data
+#' @param mesh Mesh object from INLA or fmesher
 #' @param spatial_data Spatial data, either a SpatialPolygonsDataFrame, SpatialPointsDataFrame or an object
 #' that can be converted to a data.frame with longitude and latitude columns
-#' @param longitude_column Longitude column in spatial_data
-#' @param latitude_column Latitude column in spatial_data name
+#' @param longitude_column Longitude column name in spatial_data
+#' @param latitude_column Latitude column name in spatial_data
 #' @param markers Markers to display on top of mesh. A named list with latitude, longitude and label names must be given.
 #' Expects longitude name to be longitude, latitude name to be latitude, label name to be label.
 #'
-#' @return leaflet::leaflet
+#' @return leaflet::leaflet with mesh and markers
 #' @export
 plot_mesh <- function(mesh, spatial_data = NULL, longitude_column = "LONG", latitude_column = "LAT", markers = NULL) {
   expected_crs <- "+proj=longlat +datum=WGS84"

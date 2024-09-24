@@ -1,13 +1,13 @@
 #' Parse inlabru model output
 #'
-#' @param model_output INLA model output
-#' @param mesh INLA mesh
-#' @param measurement_data Measurement data
+#' @param model_output INLA/inlabru model output
+#' @param mesh INLA/fmesher mesh
+#' @param measurement_data Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #' @param data_distribution Type of data, Poisson or Gaussian
 #'
 #' @importFrom magrittr %>%
 #'
-#' @return shiny::app
+#' @return shiny::app with model viewer functionality
 #' @keywords internal
 model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distribution) {
   busy_spinner <- get_busy_spinner()
@@ -297,12 +297,12 @@ model_viewer_shiny <- function(model_output, mesh, measurement_data, data_distri
 
 #' Model viewing shiny app. Visualises INLA model output, plots the posterior distributions of model parameters and prediction statistics.
 #'
-#' @param model_output INLA model output
-#' @param mesh INLA mesh
-#' @param measurement_data Measurement data
-#' @param data_distribution Type of data, Poisson or Gaussian
+#' @param model_output INLA/inlabru model output
+#' @param mesh INLA/fmesher mesh used for the run
+#' @param measurement_data Measurement data used for the run (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
+#' @param data_distribution Type of data, Poisson or Gaussian (character)
 #'
-#' @return shiny::app
+#' @return shiny::app with model viewer functionality
 #' @export
 model_viewer <- function(model_output, mesh, measurement_data, data_distribution = "Poisson") {
   shiny::runApp(model_viewer_shiny(model_output = model_output, mesh = mesh, measurement_data = measurement_data, data_distribution = data_distribution))

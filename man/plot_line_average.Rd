@@ -21,9 +21,9 @@ plot_line_average(
 )
 }
 \arguments{
-\item{data}{Data to plot}
+\item{data}{Data to plot (all data types recognised by ggplot2::geom_line() like data.frame)}
 
-\item{x}{x-axis data}
+\item{x}{x-axis data, must be a Date object}
 
 \item{y1}{y1 line data - solid}
 
@@ -31,7 +31,7 @@ plot_line_average(
 
 \item{y3}{y3 line data - dashed}
 
-\item{breaks}{Breaks vector}
+\item{breaks}{Breaks vector, must be a sequence of dates}
 
 \item{x_label}{x-axis label}
 

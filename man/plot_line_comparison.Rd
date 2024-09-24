@@ -4,15 +4,17 @@
 \alias{plot_line_comparison}
 \title{Plot line comparison for stdev etc}
 \usage{
-plot_line_comparison(data, to_plot, title)
+plot_line_comparison(data, to_plot, title = to_plot)
 }
 \arguments{
-\item{data}{Parsed model output}
+\item{data}{List of parsed model outputs from "parse_model_output" (a list of lists)}
 
 \item{to_plot}{Type of data to plot, "Range for f" etc}
+
+\item{title}{Title of the plot, defaults to the value of "to_plot"}
 }
 \value{
-ggplot2::ggplot
+ggplot2::ggplot of the selected hyperparameter posterior distribution
 }
 \description{
 Plot line comparison for stdev etc
