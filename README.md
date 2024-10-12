@@ -30,6 +30,7 @@ The easiest way to do this is to [install RStudio](https://posit.co/downloads/).
 Next start an R session and run
 
 ```R
+install.packages("INLA")
 install.packages("devtools")
 library(devtools)
 devtools::install_github("4DModeller/fdmr")
