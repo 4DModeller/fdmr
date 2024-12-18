@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Removed non-numeric/non-logical variable features from `shiny_modelbuilder` - [PR #341](https://github.com/4DModeller/fdmr/pull/341)
 - Updated documentation for all functions to reflect better the inputs and outputs - [PR #332](https://github.com/4DModeller/fdmr/pull/332)
 - Fixed an error in `model_viewer` description - [PR #331](https://github.com/4DModeller/fdmr/pull/331)
 - Added to `retrieve_tutorial_data` an option to save tutorial data at a user-specified location or in a temporary directory as default - [PR #330](https://github.com/4DModeller/fdmr/pull/330)
