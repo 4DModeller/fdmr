@@ -16,7 +16,7 @@ model_builder_shiny(
 \arguments{
 \item{spatial_data}{Spatial data (must be SpatialPoints or SpatialPointsDataFrame)}
 
-\item{measurement_data}{Measurement data (data.frame, SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)}
+\item{measurement_data}{Measurement data (SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)}
 
 \item{time_variable}{Time variable name in measurement_data}
 
