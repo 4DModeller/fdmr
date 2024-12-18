@@ -1,7 +1,7 @@
 #' Interactively set and see the result of different priors
 #'
 #' @param spatial_data Spatial data (must be SpatialPoints or SpatialPointsDataFrame)
-#' @param measurement_data Measurement data (SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)
+#' @param measurement_data Measurement data (data.frame, SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)
 #' @param time_variable Time variable name in measurement_data
 #' @param mesh INLA/fmesher mesh
 #' @param data_distribution Data distribution, Poisson or Gaussian
@@ -65,7 +65,7 @@ model_builder_shiny <- function(spatial_data,
   citation_control_group <- "Prior explanation text modified from https://www.paulamoraga.com/book-geospatial/sec-geostatisticaldataexamplest.html"
 
   initial_equation_val <- "formula <- model_var ~ 0 + Intercept(1)"
-  features <- names(measurement_data@data[base::sapply(measurement_data@data, is.numeric) | base::sapply(measurement_data@data, is.logical)])
+  features <- names(measurement_data)
   if (is.null(features)) {
     stop("We require the columns of measurement_data to have the names of the features to use in the model.")
   }
@@ -697,7 +697,7 @@ model_builder_shiny <- function(spatial_data,
 #' Interactively set and see the result of different priors
 #'
 #' @param spatial_data Spatial data
-#' @param measurement_data Measurement data (SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)
+#' @param measurement_data Measurement data (data.frame, SpatialPointsDataFrame, SpatialPolygonsDataFrame with a named time column and at least 1 named feature column with measurements)
 #' @param time_variable Time variable name in measurement_data
 #' @param mesh INLA/fmesher mesh
 #' @param log_folder Folder to write logs to (character)
