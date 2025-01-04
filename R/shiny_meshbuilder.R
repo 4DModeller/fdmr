@@ -55,10 +55,10 @@ meshbuilder_shiny <- function(
     stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
 
-  default_max_edge_min <- 0.01
-  default_max_edge_max <- 0.3
+  default_max_edge_min <- 0.9
+  default_max_edge_max <- 1.8
   default_offset_min <- 0.02
-  default_offset_max <- 0.2
+  default_offset_max <- 2
   default_cutoff <- 0.02
   # TODO - these defaults need changing?
   if (!is.null(max_edge)) {
@@ -234,7 +234,7 @@ meshbuilder_shiny <- function(
         spatial_data
       }
     })
-
+    
     output$map <- leaflet::renderLeaflet({
       map_tiles <- c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
       m <- mapview::mapview(mesh_spatial(), layer.name = "Mesh", col.regions = "#548C2F", map.types = map_tiles) + mapview::mapview(spatial(), layer.name = "Spatial")

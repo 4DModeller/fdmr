@@ -54,7 +54,7 @@ sp_data <- fdmr::load_tutorial_data(dataset = "covid", filename = "spatial_data.
 head(sp_data)
 ```
 
-The `sp_data` object is a `SpatialPolygonsDataFrame` containing 6789 features for areas of England. This object contains all the  contains all the values we
+The `sp_data` object is a `SpatialPolygonsDataFrame` containing 6789 features for areas of England. This object contains all the values we need to build a mesh.
 We can build a mesh by passing `sp_data` to the `mesh_builder` function.
 
 ```{r eval=FALSE}
