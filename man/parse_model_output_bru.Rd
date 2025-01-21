@@ -9,10 +9,10 @@ parse_model_output_bru(model_output, measurement_data)
 \arguments{
 \item{model_output}{Output from running inlabru::bru}
 
-\item{measurement_data}{Measurement data}
+\item{measurement_data}{Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)}
 }
 \value{
-list
+Creates a list of model outputs for the first timestep, including fitted mean and sd, mean of fixed effects, mean and sd of random effects, posterior hyperparameters, and DIC
 }
 \description{
 Parses inlabru::bru model output to create a list of model parameters

@@ -4,12 +4,14 @@
 \alias{get_tutorial_datapath}
 \title{Return the filepath for a tutorial data file.}
 \usage{
-get_tutorial_datapath(dataset, filename)
+get_tutorial_datapath(dataset, filename, saved = FALSE)
 }
 \arguments{
 \item{dataset}{Name of dataset}
 
 \item{filename}{Name of file}
+
+\item{saved}{Specify the location where user unpacked the data.}
 }
 \value{
 fs::path Full filepath

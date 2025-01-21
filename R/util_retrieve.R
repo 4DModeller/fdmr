@@ -1,14 +1,25 @@
-#' Retrieve a tutorial dataset and unpacks it to ~/fdmr/tutorial_data
+#' Retrieves a tutorial dataset and unpacks it to a place specified by the user (~/fdmr/tutorial_data)
 #'
 #' @param dataset Name of dataset to retrieve
 #' @param force_update Force retrieval of metadata and dataset
+#' @param save Unpack the dataset to where user specified (character), home directory (TRUE), session's temporary directory (FALSE: default).
 #'
 #' @return NULL
 #' @export
-retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
+retrieve_tutorial_data <- function(dataset, force_update = FALSE, save = FALSE) {
   dataset <- base::tolower(dataset)
 
-  download_cache_folder <- fs::path(fs::path_home(), "fdmr", "download_cache")
+  if (base::isTRUE(save) | base::is.character(save)){
+    if (base::is.character(save)) {
+      save_path <- clean_path(save, check_exists = TRUE)
+      download_cache_folder <- fs::path(save_path, "fdmr", "download_cache")
+    } else{
+      download_cache_folder <- fs::path(fs::path_home(), "fdmr", "download_cache")
+    }
+  } else {
+    download_cache_folder <- fs::path(fs::path_temp(), "fdmr", "download_cache")
+    }
+
   if (!fs::dir_exists(download_cache_folder)) {
     fs::dir_create(download_cache_folder, recurse = TRUE)
   }
@@ -40,7 +51,17 @@ retrieve_tutorial_data <- function(dataset, force_update = FALSE) {
     jsonlite::write_json(retrieval_info, path = file_metadata_file)
   }
 
-  extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
+  if (base::isTRUE(save) | base::is.character(save)){
+    if (base::is.character(save)){
+      save_path <- clean_path(save, check_exists = TRUE)
+      extract_path <- fs::path(save_path, "fdmr", "tutorial_data", dataset)
+    } else{
+      extract_path <- fs::path(fs::path_home(), "fdmr", "tutorial_data", dataset)
+    }
+  } else {
+    extract_path <- fs::path(fs::path_temp(), "fdmr", "tutorial_data", dataset)
+    }
+  
 
   if (!fs::dir_exists(extract_path)) {
     fs::dir_create(extract_path, recurse = TRUE)

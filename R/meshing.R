@@ -1,10 +1,10 @@
 # This function taken from https://groups.google.com/g/r-inla-discussion-group/c/z1n1exlZrKM/m/8vYNr2D8BwAJ
 #' Convert an INLA mesh to a SpatialPolygonsDataFrame
 #'
-#' @param mesh Mesh
-#' @param crs Coordinate Reference System as proj4string
+#' @param mesh Mesh object from INLA or fmesher (only R2 manifolds are valid)
+#' @param crs Coordinate Reference System as proj4string, does not support geocentric coordinates
 #'
-#' @return SpatialPolygonsDataFrame
+#' @return SpatialPolygonsDataFrame with mesh triangles
 #' @export
 mesh_to_spatial <- function(mesh, crs) {
   if (!is.character(crs)) {

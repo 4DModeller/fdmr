@@ -7,10 +7,10 @@
 plot_dic(data)
 }
 \arguments{
-\item{data}{}
+\item{data}{List of parsed model outputs from "parse_model_output" (a list of lists)}
 }
 \value{
-ggplot2::ggplot
+ggplot2::ggplot with DIC values shown as points
 }
 \description{
 Plot Deviance Information Criterion (DIC) values

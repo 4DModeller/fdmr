@@ -7,14 +7,14 @@
 parse_model_output(model_output, measurement_data, model_type = "inlabru")
 }
 \arguments{
-\item{model_output}{Data returned by model}
+\item{model_output}{Output returned by model (currently only from running inlabru::bru)}
 
-\item{measurement_data}{Measurement data}
+\item{measurement_data}{Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)}
 
-\item{model_type}{Type of model, we currently support inlabru}
+\item{model_type}{Type of model, we currently only support inlabru}
 }
 \value{
-list
+Creates a list of model outputs, including fitted mean and sd, mean of fixed effects, mean and sd of random effects, posterior hyperparameters, and DIC
 }
 \description{
 Parse model output to create a list of model parameters

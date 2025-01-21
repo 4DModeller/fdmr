@@ -1,9 +1,9 @@
 #' Parses inlabru::bru model output to create a list of model parameters
 #'
 #' @param model_output Output from running inlabru::bru
-#' @param measurement_data Measurement data
+#' @param measurement_data Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
 #'
-#' @return list
+#' @return Creates a list of model outputs for the first timestep, including fitted mean and sd, mean of fixed effects, mean and sd of random effects, posterior hyperparameters, and DIC
 #' @keywords internal
 parse_model_output_bru <- function(model_output, measurement_data) {
   fitted_mean_post <- model_output$summary.fitted.values$mean[seq_len(nrow(measurement_data))]
@@ -33,11 +33,11 @@ parse_model_output_bru <- function(model_output, measurement_data) {
 
 #' Parse model output to create a list of model parameters
 #'
-#' @param model_output Data returned by model
-#' @param measurement_data Measurement data
-#' @param model_type Type of model, we currently support inlabru
+#' @param model_output Output returned by model (currently only from running inlabru::bru)
+#' @param measurement_data Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)
+#' @param model_type Type of model, we currently only support inlabru
 #'
-#' @return list
+#' @return Creates a list of model outputs, including fitted mean and sd, mean of fixed effects, mean and sd of random effects, posterior hyperparameters, and DIC
 #' @export
 parse_model_output <- function(model_output, measurement_data, model_type = "inlabru") {
   if (model_type == "inlabru") {
@@ -48,13 +48,13 @@ parse_model_output <- function(model_output, measurement_data, model_type = "inl
 
 #' Create a prediction field from the parsed model output and the mesh
 #'
-#' @param mesh INLA mesh
-#' @param plot_type Type of plot to create, "predicted_mean_fields" etc
-#' @param data_dist Type of data, "poisson" etc
-#' @param var_a Data for variable a, required for "predicted_mean_fields" and "random_effect_fields"
-#' @param var_b Data for variable b, required for "predicted_mean_fields"
+#' @param mesh INLA/fmesher mesh
+#' @param plot_type Type of plot to create, "predicted_mean_fields" or "random_mean_fields"
+#' @param data_dist Type of data, "poisson" or "gaussian"
+#' @param var_a Data for variable a (numeric), required for "predicted_mean_fields" and "random_effect_fields"; normally, random effect field from "summary.random$f"
+#' @param var_b Data for variable b (numeric), required for "predicted_mean_fields"; normally, fixed effect from "summary.fixed"
 #'
-#' @return data.frame
+#' @return data.frame with mesh node latlong coordinates (x, y) and the selected field values at the mesh nodes (z)
 #' @export
 create_prediction_field <- function(mesh,
                                     plot_type = "predicted_mean_fields",

@@ -1,6 +1,6 @@
 #' Mesh building shiny app
 #'
-#' @param spatial_data Spatial data
+#' @param spatial_data Spatial data (must be a data.frame, SpatialPointsDataFrame or SpatialPolygonsDataFrame)
 #' @param obs_data Measurement data
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
@@ -11,7 +11,7 @@
 #'
 #' @importFrom magrittr %>%
 #'
-#' @return shiny::app
+#' @return shiny::app with meshbuilder functionality
 #' @keywords internal
 meshbuilder_shiny <- function(
     spatial_data,
@@ -55,10 +55,10 @@ meshbuilder_shiny <- function(
     stop("Cannot read latitude and longitude data from spatial data. Please ensure given names are correct.")
   }
 
-  default_max_edge_min <- 0.01
-  default_max_edge_max <- 0.3
+  default_max_edge_min <- 0.9
+  default_max_edge_max <- 1.8
   default_offset_min <- 0.02
-  default_offset_max <- 0.2
+  default_offset_max <- 2
   default_cutoff <- 0.02
   # TODO - these defaults need changing?
   if (!is.null(max_edge)) {
@@ -234,7 +234,7 @@ meshbuilder_shiny <- function(
         spatial_data
       }
     })
-
+    
     output$map <- leaflet::renderLeaflet({
       map_tiles <- c("OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap")
       m <- mapview::mapview(mesh_spatial(), layer.name = "Mesh", col.regions = "#548C2F", map.types = map_tiles) + mapview::mapview(spatial(), layer.name = "Spatial")
@@ -270,7 +270,7 @@ meshbuilder_shiny <- function(
 
 #' Mesh building shiny app. Creates and visualises a mesh from some spatial data.
 #'
-#' @param spatial_data Spatial data
+#' @param spatial_data Spatial data (must be a data.frame, SpatialPointsDataFrame or SpatialPolygonsDataFrame)
 #' @param obs_data Measurement data
 #' @param crs CRS as a proj4string
 #' @param offset Specifies the size of the inner and outer extensions around data locations, passed to fmesher::fm_mesh_2d_inla
@@ -279,7 +279,7 @@ meshbuilder_shiny <- function(
 #' @param y_coord Name of the latitude column in the spatial data
 #' @param x_coord Name of the longitude column in the spatial data
 #'
-#' @return shiny::app
+#' @return shiny::app with meshbuilder functionality
 #' @export
 mesh_builder <- function(spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, offset = NULL, cutoff = NULL, y_coord = "LAT", x_coord = "LONG") {
   shiny::runApp(meshbuilder_shiny(

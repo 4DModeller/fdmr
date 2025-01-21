@@ -4,7 +4,10 @@
 \alias{get_tutorial_cache_datapath}
 \title{Get path to tutorial data cache folder}
 \usage{
-get_tutorial_cache_datapath()
+get_tutorial_cache_datapath(saved)
+}
+\arguments{
+\item{saved}{Specify the location where user unpacked the data}
 }
 \value{
 fs::path

@@ -2,7 +2,7 @@
 % Please edit documentation in R/shiny_modelviewer.R
 \name{model_viewer}
 \alias{model_viewer}
-\title{Mesh building shiny app. Creates and visualises a mesh from some spatial data.}
+\title{Model viewing shiny app. Visualises INLA model output, plots the posterior distributions of model parameters and prediction statistics.}
 \usage{
 model_viewer(
   model_output,
@@ -12,17 +12,17 @@ model_viewer(
 )
 }
 \arguments{
-\item{model_output}{INLA model output}
+\item{model_output}{INLA/inlabru model output}
 
-\item{mesh}{INLA mesh}
+\item{mesh}{INLA/fmesher mesh used for the run}
 
-\item{measurement_data}{Measurement data}
+\item{measurement_data}{Measurement data used for the run (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)}
 
-\item{data_distribution}{Type of data, Poisson or Gaussian}
+\item{data_distribution}{Type of data, Poisson or Gaussian (character)}
 }
 \value{
-shiny::app
+shiny::app with model viewer functionality
 }
 \description{
-Mesh building shiny app. Creates and visualises a mesh from some spatial data.
+Model viewing shiny app. Visualises INLA model output, plots the posterior distributions of model parameters and prediction statistics.
 }

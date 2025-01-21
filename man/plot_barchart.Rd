@@ -16,13 +16,13 @@ plot_barchart(
 )
 }
 \arguments{
-\item{data}{Data to plot}
+\item{data}{Data to plot (all data types recognised by ggplot2::geom_bar() like data.frame)}
 
-\item{x}{x-axis data}
+\item{x}{x-axis data, must be a Date object}
 
 \item{y}{y-axis data}
 
-\item{breaks}{Break points}
+\item{breaks}{Break points, must be a sequence of dates}
 
 \item{x_label}{x-axis label}
 

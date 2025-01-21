@@ -13,18 +13,18 @@ create_prediction_field(
 )
 }
 \arguments{
-\item{mesh}{INLA mesh}
+\item{mesh}{INLA/fmesher mesh}
 
-\item{plot_type}{Type of plot to create, "predicted_mean_fields" etc}
+\item{plot_type}{Type of plot to create, "predicted_mean_fields" or "random_mean_fields"}
 
-\item{data_dist}{Type of data, "poisson" etc}
+\item{data_dist}{Type of data, "poisson" or "gaussian"}
 
-\item{var_a}{Data for variable a, required for "predicted_mean_fields" and "random_effect_fields"}
+\item{var_a}{Data for variable a (numeric), required for "predicted_mean_fields" and "random_effect_fields"; normally, random effect field from "summary.random$f"}
 
-\item{var_b}{Data for variable b, required for "predicted_mean_fields"}
+\item{var_b}{Data for variable b (numeric), required for "predicted_mean_fields"; normally, fixed effect from "summary.fixed"}
 }
 \value{
-data.frame
+data.frame with mesh node latlong coordinates (x, y) and the selected field values at the mesh nodes (z)
 }
 \description{
 Create a prediction field from the parsed model output and the mesh

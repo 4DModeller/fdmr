@@ -7,12 +7,12 @@
 plot_priors_density(data, measurement_data)
 }
 \arguments{
-\item{data}{Parsed model outputs}
+\item{data}{List of parsed model outputs from "parse_model_output" (a list of lists)}
 
-\item{measurement_data}{Measurement data}
+\item{measurement_data}{Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)}
 }
 \value{
-ggplot2::ggplot
+ggplot2::ggplot of measurement density by value
 }
 \description{
 Plot density function

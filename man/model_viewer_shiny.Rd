@@ -7,16 +7,16 @@
 model_viewer_shiny(model_output, mesh, measurement_data, data_distribution)
 }
 \arguments{
-\item{model_output}{INLA model output}
+\item{model_output}{INLA/inlabru model output}
 
-\item{mesh}{INLA mesh}
+\item{mesh}{INLA/fmesher mesh}
 
-\item{measurement_data}{Measurement data}
+\item{measurement_data}{Measurement data (can be data.frame, SpatialPoints/SpatialPointsDataFrame, or simple feature collection)}
 
 \item{data_distribution}{Type of data, Poisson or Gaussian}
 }
 \value{
-shiny::app
+shiny::app with model viewer functionality
 }
 \description{
 Parse inlabru model output

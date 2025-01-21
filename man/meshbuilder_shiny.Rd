@@ -17,7 +17,7 @@ meshbuilder_shiny(
 )
 }
 \arguments{
-\item{spatial_data}{Spatial data}
+\item{spatial_data}{Spatial data (must be a data.frame, SpatialPointsDataFrame or SpatialPolygonsDataFrame)}
 
 \item{obs_data}{Measurement data}
 
@@ -34,7 +34,7 @@ meshbuilder_shiny(
 \item{x_coord}{Name of the longitude column in the spatial data}
 }
 \value{
-shiny::app
+shiny::app with meshbuilder functionality
 }
 \description{
 Mesh building shiny app

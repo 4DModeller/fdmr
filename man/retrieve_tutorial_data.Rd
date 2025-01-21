@@ -2,15 +2,17 @@
 % Please edit documentation in R/util_retrieve.R
 \name{retrieve_tutorial_data}
 \alias{retrieve_tutorial_data}
-\title{Retrieve a tutorial dataset and unpacks it to ~/fdmr/tutorial_data}
+\title{Retrieves a tutorial dataset and unpacks it to a place specified by the user (~/fdmr/tutorial_data)}
 \usage{
-retrieve_tutorial_data(dataset, force_update = FALSE)
+retrieve_tutorial_data(dataset, force_update = FALSE, save = FALSE)
 }
 \arguments{
 \item{dataset}{Name of dataset to retrieve}
 
 \item{force_update}{Force retrieval of metadata and dataset}
+
+\item{save}{Unpack the dataset to where user specified (character), home directory (TRUE), session's temporary directory (FALSE: default).}
 }
 \description{
-Retrieve a tutorial dataset and unpacks it to ~/fdmr/tutorial_data
+Retrieves a tutorial dataset and unpacks it to a place specified by the user (~/fdmr/tutorial_data)
 }

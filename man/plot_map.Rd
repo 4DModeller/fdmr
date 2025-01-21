@@ -22,13 +22,13 @@ plot_map(
 )
 }
 \arguments{
-\item{polygon_data}{Polygon data}
+\item{polygon_data}{Polygon data (SpatialPolygon or SpatialPolygonDataFrame)}
 
-\item{raster_data}{Raster datas}
+\item{raster_data}{Raster data (RasterLayer or SpatialRaster)}
 
-\item{domain}{Domain data to be passed to leaflet::colorNumeric and leaflet::addLegend}
+\item{domain}{Domain data (numeric or factor) to be passed to leaflet::colorNumeric and leaflet::addLegend}
 
-\item{markers}{Markers to display on map. A named list with latitude, longitude and label names must be given.}
+\item{markers}{Markers to display on map. A named list or data.frame with latitude, longitude and label names must be given.}
 
 \item{palette}{Palette to be used for colours, defaults to viridis}
 

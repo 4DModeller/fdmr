@@ -20,13 +20,13 @@ plot_timeseries(
 )
 }
 \arguments{
-\item{data}{Data to plot}
+\item{data}{Data to plot (data.frame with x-axis column a character convertible to Date)}
 
-\item{x}{Name of column to plot on x-axis, should be datetime, will be converted to Dates using as.Date}
+\item{x}{Name of column to plot on x-axis}
 
 \item{y}{Name of column to plot on y-axis}
 
-\item{breaks}{Date break points}
+\item{breaks}{Date break points, must be a sequence of dates}
 
 \item{x_label}{x-axis label}
 
@@ -40,9 +40,9 @@ plot_timeseries(
 
 \item{vertical_x}{x-intercept for vertical line}
 
-\item{x_lim}{Limits for x-axis continous scale, vector passed to scale_x_continuous}
+\item{x_lim}{Limits for x-axis continuous scale, vector passed to scale_x_continuous}
 
-\item{y_lim}{Limits for y-axis continuous scale, vector passed to scale_y_continous}
+\item{y_lim}{Limits for y-axis continuous scale, vector passed to scale_y_continuous}
 
 \item{line_width}{Line width}
 }
