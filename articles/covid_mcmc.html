@@ -8,8 +8,8 @@
 <title>COVID-19 MCMC • fdmr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="COVID-19 MCMC">
 </head>
 <body>
@@ -78,7 +78,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>COVID-19 MCMC</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/main/vignettes/covid_mcmc.Rmd" class="external-link"><code>vignettes/covid_mcmc.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/0.2.1/vignettes/covid_mcmc.Rmd" class="external-link"><code>vignettes/covid_mcmc.Rmd</code></a></small>
       <div class="d-none name"><code>covid_mcmc.Rmd</code></div>
     </div>
 
@@ -123,7 +123,7 @@ this tutorial.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid_mcmc"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/covid_mcmc</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/RtmpJVxDAO/fdmr/tutorial_data/covid_mcmc</span></span></code></pre>
 <p>The COVID-19 data and the related covariate information are included
 in our tutorial data package. We’ll load in the data using the
 <code>load_tutorial_data</code> function.</p>
@@ -159,8 +159,11 @@ share a common geographical border, and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">w_{ij}=0</annotation></semantics></math>
 otherwise.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">W_nb</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/poly2nb.html" class="external-link">poly2nb</a></span><span class="op">(</span><span class="va">sp_data</span>, row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/nb2mat.html" class="external-link">nb2mat</a></span><span class="op">(</span><span class="va">W_nb</span>, style <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">W_nb</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/poly2nb.html" class="external-link">poly2nb</a></span><span class="op">(</span><span class="va">sp_data</span>, row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in spdep::poly2nb(sp_data, row.names = rownames(sp_data@data)): neighbour object has 3 sub-graphs;</span></span>
+<span><span class="co">## if this sub-graph count seems unexpected, try increasing the snap argument.</span></span></code></pre>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/nb2mat.html" class="external-link">nb2mat</a></span><span class="op">(</span><span class="va">W_nb</span>, style <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -225,7 +228,7 @@ effects, with mean zero and common variance
 defined, by including the response in the left-hand side and the fixed
 and random effects in the right-hand side. First, we consider the
 scenario of including no covariates.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">form</span> <span class="op">&lt;-</span> <span class="va">total.cases</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">population</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -234,7 +237,7 @@ scenario of including no covariates.</p>
 <p>Finally, we fit the spatial model using the function
 <code>S.CARbym()</code> of the package <code>CARBayes</code> developed
 by <span class="citation">Lee (<a href="#ref-lee2013carbayes">2013</a>)</span>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MCMC_model</span> <span class="op">&lt;-</span> <span class="fu">CARBayes</span><span class="fu">::</span><span class="fu">S.CARbym</span><span class="op">(</span></span>
 <span>  formula <span class="op">=</span> <span class="va">form</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">s_covid</span>,</span>
@@ -249,7 +252,7 @@ by <span class="citation">Lee (<a href="#ref-lee2013carbayes">2013</a>)</span>.<
 <p>For comparison purpose, we fit a separate BHM to the same dataset
 using the INLA approach. Likewise, it uses the BYM to model the spatial
 random effects.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">s_covid</span><span class="op">$</span><span class="va">ID</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">s_covid</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">total.cases</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">ID</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"bym"</span>,</span>
@@ -269,7 +272,7 @@ random effects.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Finally, we fit a BHM to the same dataset using the INLA-SPDE
 approach.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">[</span>, <span class="st">"LONG"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span></span>
 <span><span class="va">max_edge</span> <span class="op">&lt;-</span> <span class="va">initial_range</span> <span class="op">/</span> <span class="fl">8</span></span>
 <span></span>
@@ -300,6 +303,9 @@ approach.</p>
 <span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for 'f'</span></span>
+<span><span class="co">## failed. Perhaps you need to load the 'sp' package with 'library(sp)'?</span></span>
+<span><span class="co">## Attempting 'sp::coordinates'.</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="model-comparison">Model comparison<a class="anchor" aria-label="anchor" href="#model-comparison"></a>
@@ -308,33 +314,33 @@ approach.</p>
 for each model based on DIC and WAIC. The model fitted using the
 INLA-SPDE approach performs better than the other two models in terms of
 the lowest DIC and WAIC values.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  DIC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">modelfit</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">INLA_model</span><span class="op">$</span><span class="va">dic</span><span class="op">$</span><span class="va">dic</span>, <span class="va">inlabru_model</span><span class="op">$</span><span class="va">dic</span><span class="op">$</span><span class="va">dic</span><span class="op">)</span>,</span>
 <span>  WAIC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">modelfit</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">INLA_model</span><span class="op">$</span><span class="va">waic</span><span class="op">$</span><span class="va">waic</span>, <span class="va">inlabru_model</span><span class="op">$</span><span class="va">waic</span><span class="op">$</span><span class="va">waic</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'MCMC_model' not found</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error: object 'MCMC_model' not found</span></span></code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">modfit</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCMC"</span>, <span class="st">"INLA_BYM"</span>, <span class="st">"INLA_SPDE"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error: object 'modfit' not found</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modfit</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'modfit' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'modfit' not found</span></span></code></pre>
 <p>We compare the posterior COVID-19 infection rate estimates between
 the models. In general, all models provide similar posterior COVID-19
 infection rate estimates.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mcmc_fitted_prev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">psi</span>, <span class="fl">2</span>, <span class="va">mean</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'mean': object 'MCMC_model' not found</span></span></code></pre>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mcmc_lc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">beta</span>, <span class="fl">0.025</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">psi</span>, <span class="fl">2</span>, <span class="va">quantile</span>, <span class="fl">0.025</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'MCMC_model' not found</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error: object 'MCMC_model' not found</span></span></code></pre>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mcmc_uc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">beta</span>, <span class="fl">0.975</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">MCMC_model</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">psi</span>, <span class="fl">2</span>, <span class="va">quantile</span>, <span class="fl">0.975</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'MCMC_model' not found</span></span></code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error: object 'MCMC_model' not found</span></span></code></pre>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  <span class="st">"INLA_BYM"</span> <span class="op">=</span> <span class="va">INLA_model</span><span class="op">$</span><span class="va">summary.fitted.values</span><span class="op">$</span><span class="va">mean</span>,</span>
 <span>  <span class="st">"INLA_lc"</span> <span class="op">=</span> <span class="va">INLA_model</span><span class="op">$</span><span class="va">summary.fitted.values</span><span class="op">$</span><span class="va">`0.025quant`</span>,</span>
@@ -346,21 +352,21 @@ infection rate estimates.</p>
 <span>  <span class="st">"MCMC_lc"</span> <span class="op">=</span> <span class="va">mcmc_lc</span>,</span>
 <span>  <span class="st">"MCMC_uc"</span> <span class="op">=</span> <span class="va">mcmc_uc</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'mcmc_fitted_prev' not found</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error: object 'mcmc_fitted_prev' not found</span></span></code></pre>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/pairs.html" class="external-link">pairs</a></span><span class="op">(</span><span class="va">comb</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCMC"</span>, <span class="st">"INLA_SPDE"</span>, <span class="st">"INLA_BYM"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.3</span>, col <span class="op">=</span> <span class="st">"orange"</span>, lower.panel <span class="op">=</span> <span class="va">panel.smooth</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'comb' not found</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error: object 'comb' not found</span></span></code></pre>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html" class="external-link">boxplot</a></span><span class="op">(</span><span class="va">comb</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCMC"</span>, <span class="st">"INLA_SPDE"</span>, <span class="st">"INLA_BYM"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'comb' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'comb' not found</span></span></code></pre>
 <p>The spatial patterns of the infection rate estimates for each model
 are displayed below.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">est.rate.mcmc</span> <span class="op">&lt;-</span> <span class="va">mcmc_fitted_prev</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'mcmc_fitted_prev' not found</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error: object 'mcmc_fitted_prev' not found</span></span></code></pre>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">est.rate.mcmc</span></span>
 <span><span class="va">legend_values</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">est.rate.mcmc</span></span>
 <span></span>
@@ -373,7 +379,7 @@ are displayed below.</p>
 <span>  polygon_fill_opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error: 'plot_map_leaflet' is not an exported object from 'namespace:fdmr'</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">est.rate.inlabym</span> <span class="op">&lt;-</span> <span class="va">INLA_model</span><span class="op">$</span><span class="va">summary.fitted.values</span><span class="op">$</span><span class="va">mean</span></span>
 <span></span>
 <span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">est.rate.inlabym</span></span>
@@ -388,7 +394,7 @@ are displayed below.</p>
 <span>  polygon_fill_opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error: 'plot_map_leaflet' is not an exported object from 'namespace:fdmr'</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">est.rate.inlaspde</span> <span class="op">&lt;-</span> <span class="va">inlabru_model</span><span class="op">$</span><span class="va">summary.fitted.values</span><span class="op">$</span><span class="va">mean</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">s_covid</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">est.rate.inlaspde</span></span>
@@ -408,7 +414,7 @@ interest. We select several risk factors used in the <a href="https://4dmodeller
 tutorial</a>. The models described above are fitted and compared again
 after incorporating covariate information. First we fit the BHM using
 MCMC method.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">form</span> <span class="op">&lt;-</span> <span class="va">total.cases</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">population</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="va">IMD</span> <span class="op">+</span> <span class="va">perc.wb</span> <span class="op">+</span> <span class="va">perc.ba</span> <span class="op">+</span> <span class="va">age1</span> <span class="op">+</span> <span class="va">pm25</span></span>
 <span></span>
@@ -424,7 +430,7 @@ MCMC method.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error in loadNamespace(x): there is no package called 'CARBayes'</span></span></code></pre>
 <p>Next we fit the BHM using the INLA-BYM approach.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">total.cases</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">ID</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"bym"</span>,</span>
 <span>  graph <span class="op">=</span> <span class="va">w</span></span>
@@ -442,7 +448,7 @@ MCMC method.</p>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Next we fit the BHM using the INLA-SPDE approach.</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cmp</span> <span class="op">&lt;-</span> <span class="va">total.cases</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="fu">Intercept</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span>main <span class="op">=</span> <span class="va">coordinates</span>, model <span class="op">=</span> <span class="va">spde</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="va">IMD</span> <span class="op">+</span> <span class="va">perc.wb</span> <span class="op">+</span> <span class="va">perc.ba</span> <span class="op">+</span> <span class="va">age1</span> <span class="op">+</span> <span class="va">pm25</span></span>
 <span></span>
@@ -455,19 +461,22 @@ MCMC method.</p>
 <span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in handle_problems(e_input): The input evaluation 'coordinates' for 'f'</span></span>
+<span><span class="co">## failed. Perhaps you need to load the 'sp' package with 'library(sp)'?</span></span>
+<span><span class="co">## Attempting 'sp::coordinates'.</span></span></code></pre>
 <p>The regression coefficients of the selected covariates for all models
 are compared. In general, the models have similar regression
 coefficients estimates.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regr_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MCMC"</span> <span class="op">=</span> <span class="va">MCMC_model2</span><span class="op">$</span><span class="va">summary.results</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">MCMC_model2</span><span class="op">$</span><span class="va">summary.results</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span>, <span class="fl">1</span><span class="op">]</span>,</span>
 <span>  <span class="st">"INLA_BYM"</span> <span class="op">=</span> <span class="va">INLA_model2</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,</span>
 <span>  <span class="st">"INLA_SPDE"</span> <span class="op">=</span> <span class="va">inlabru_model2</span><span class="op">$</span><span class="va">summary.fixed</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'MCMC_model2' not found</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Error: object 'MCMC_model2' not found</span></span></code></pre>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regr_est</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'regr_est' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'regr_est' not found</span></span></code></pre>
 <p>The modelling performance and results of the MCMC-BYM, INLA-BYM and
 INLA-SPDE approaches can be affected by the choice of the spatial model,
 the inference method and the data characteristics. MCMC-BYM and INLA-BYM
@@ -504,7 +513,7 @@ Statistical Software</em> 55 (13): 1–24.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

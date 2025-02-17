@@ -8,8 +8,8 @@
 <title>COVID-19 MCMC (Space-time) • fdmr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="COVID-19 MCMC (Space-time)">
 </head>
 <body>
@@ -78,7 +78,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>COVID-19 MCMC (Space-time)</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/main/vignettes/covid_ST_mcmc.Rmd" class="external-link"><code>vignettes/covid_ST_mcmc.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/0.2.1/vignettes/covid_ST_mcmc.Rmd" class="external-link"><code>vignettes/covid_ST_mcmc.Rmd</code></a></small>
       <div class="d-none name"><code>covid_ST_mcmc.Rmd</code></div>
     </div>
 
@@ -124,18 +124,18 @@ this.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/covidst_mcmc</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidst_mcmc</span></span></code></pre>
 <p>The COVID-19 data and the related covariate information are included
 in our tutorial data package. We’ll load in the data using the
 <code>load_tutorial_data</code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">st_covid</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"st_covid.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>Next we’ll use the <code>load_tutorial_data</code> function to load
 in the spatial data we want.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>In this study, we use the areal unit modelling approach to fit the
 BHM and then make model inference using MCMC method. To do this, we need
 to construct a non-negative symmetric
@@ -163,10 +163,10 @@ share a common geographical border, and
 otherwise.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">W_nb</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/poly2nb.html" class="external-link">poly2nb</a></span><span class="op">(</span><span class="va">sp_data</span>, row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'sp_data' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'sp_data' not found</span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu">spdep</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/spdep/reference/nb2mat.html" class="external-link">nb2mat</a></span><span class="op">(</span><span class="va">W_nb</span>, style <span class="op">=</span> <span class="st">"B"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'W_nb' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'W_nb' not found</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -268,7 +268,7 @@ will be stored as missing (NA) values in the data frame.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">dat</span><span class="op">$</span><span class="va">rowid</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://edzer.github.io/sp/reference/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">st_covid</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">st_covid</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MSOA11CD"</span>,</span>
 <span>  <span class="st">"date"</span>,</span>
 <span>  <span class="st">"MSOA11NM"</span>,</span>
@@ -294,7 +294,7 @@ will be stored as missing (NA) values in the data frame.</p>
 <span>  <span class="st">"no2"</span></span>
 <span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://edzer.github.io/sp/reference/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">covars</span>,</span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">covars</span>,</span>
 <span>  all.x <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MSOA11CD"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -357,28 +357,28 @@ you don’t need to load in the files below.</p>
 </blockquote>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitted_vals</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"fitted_vals.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modfits</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"modfits.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod_sum</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"mod_sum.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>For comparison purpose, we also fit a separate BHM to the same
 dataset using the INLA-SPDE approach. The infection rates predicted by
 the INLA-SPDE approach is saved in the date frame named “inla_preds” and
 is provided in the tutorial data package. We’ll load that in now.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inla_preds</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"inla_preds.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>Then the predictions from the two models are merged into one data
 frame named “mergedat”.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mergedat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://edzer.github.io/sp/reference/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">inla_preds</span>,</span>
+<code class="sourceCode R"><span><span class="va">mergedat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">inla_preds</span>,</span>
 <span>  <span class="va">fitted_vals</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MSOA11CD"</span>, <span class="st">"date"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'merge': object 'inla_preds' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'inla_preds' not found</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="model-comparison">Model comparison<a class="anchor" aria-label="anchor" href="#model-comparison"></a>
@@ -388,57 +388,57 @@ MCMC approach performs better than the model using the INLA-SPDE
 approach in terms of the lower DIC and WAIC values.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inla_sum</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"INLAmodsum.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  DIC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">modfits</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">inla_sum</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>  WAIC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">modfits</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">inla_sum</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'modfits' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'modfits' not found</span></span></code></pre>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">modfit</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCMC"</span>, <span class="st">"INLA_SPDE"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Error: object 'modfit' not found</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modfit</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'modfit' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'modfit' not found</span></span></code></pre>
 <p>Now we compare the posterior COVID-19 infection rate estimates
 between the two models. In general, the two models provide similar
 posterior COVID-19 infection rate estimates.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mergedat</span><span class="op">$</span><span class="va">mcmc.fitted.prev</span>, <span class="va">mergedat</span><span class="op">$</span><span class="va">inla.fitted.prev</span>, xlab <span class="op">=</span> <span class="st">"MCMC"</span>, ylab <span class="op">=</span> <span class="st">"INLA_SPDE"</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.06</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.06</span><span class="op">)</span>, cex <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'plot': object 'mergedat' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'mergedat' not found</span></span></code></pre>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html" class="external-link">boxplot</a></span><span class="op">(</span><span class="va">mergedat</span><span class="op">$</span><span class="va">mcmc.fitted.prev</span>, <span class="va">mergedat</span><span class="op">$</span><span class="va">inla.fitted.prev</span>,</span>
 <span>  names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCMC"</span>, <span class="st">"INLA_SPDE"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'mergedat' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'mergedat' not found</span></span></code></pre>
 <p>The regression coefficients estimates of the selected covariates for
 both models are compared.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">summary_fixed</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"INLAfixed_sum.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename): Unable to load data, the folder /home/runner/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regr_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MCMC"</span> <span class="op">=</span> <span class="va">mod_sum</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">]</span>,</span>
 <span>  <span class="st">"INLA_SPDE"</span> <span class="op">=</span> <span class="va">summary_fixed</span><span class="op">$</span><span class="va">mean</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'mod_sum' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'mod_sum' not found</span></span></code></pre>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regr_est</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'regr_est' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'regr_est' not found</span></span></code></pre>
 <p>Finally, the spatial patterns of the average infection rate estimates
 over time for each model are displayed below.</p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mcmc_mean_rate</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">mergedat</span>, <span class="va">MSOA11CD</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
 <span>  mean.rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mcmc.fitted.prev</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'mergedat' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'mergedat' not found</span></span></code></pre>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">mcmc_mean_rate</span> <span class="op">&lt;-</span> <span class="va">mcmc_mean_rate</span><span class="op">$</span><span class="va">mean.rate</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'mcmc_mean_rate' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'mcmc_mean_rate' not found</span></span></code></pre>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">mcmc_mean_rate</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'sp_data' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'sp_data' not found</span></span></code></pre>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_map.html">plot_map</a></span><span class="op">(</span></span>
 <span>  polygon_data <span class="op">=</span> <span class="va">sp_data</span>,</span>
@@ -449,18 +449,18 @@ over time for each model are displayed below.</p>
 <span>  polygon_fill_opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  polygon_line_colour <span class="op">=</span> <span class="st">"transparent"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'sp_data' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'sp_data' not found</span></span></code></pre>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">INLA_mean_rate</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">mergedat</span>, <span class="va">MSOA11CD</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
 <span>  mean.rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">inla.fitted.prev</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'mergedat' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'mergedat' not found</span></span></code></pre>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">INLA_mean_rate</span> <span class="op">&lt;-</span> <span class="va">INLA_mean_rate</span><span class="op">$</span><span class="va">mean.rate</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'INLA_mean_rate' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'INLA_mean_rate' not found</span></span></code></pre>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">INLA_mean_rate</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'sp_data' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'sp_data' not found</span></span></code></pre>
 <div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_map.html">plot_map</a></span><span class="op">(</span></span>
 <span>  polygon_data <span class="op">=</span> <span class="va">sp_data</span>,</span>
@@ -471,7 +471,7 @@ over time for each model are displayed below.</p>
 <span>  polygon_fill_opacity <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  polygon_line_colour <span class="op">=</span> <span class="st">"transparent"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'sp_data' not found</span></span></code></pre>
+<pre><code><span><span class="co">## Error: object 'sp_data' not found</span></span></code></pre>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-lee2018spatio" class="csl-entry">
 Lee, Duncan, Alastair Rushworth, and Gary Napier. 2018.
@@ -492,7 +492,7 @@ of Statistical Software</em> 84: 1–39.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

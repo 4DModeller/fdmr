@@ -8,8 +8,8 @@
 <title>How to choose a model • fdmr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="How to choose a model">
 </head>
 <body>
@@ -78,7 +78,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>How to choose a model</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/main/vignettes/decision_tree.Rmd" class="external-link"><code>vignettes/decision_tree.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/0.2.1/vignettes/decision_tree.Rmd" class="external-link"><code>vignettes/decision_tree.Rmd</code></a></small>
       <div class="d-none name"><code>decision_tree.Rmd</code></div>
     </div>
 
@@ -92,12 +92,11 @@ and how to choose when to use them.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span> <span class="co"># for modeling later</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: Matrix</span></span></code></pre>
-<pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
-<pre><code><span><span class="co">## This is INLA_24.06.27 built 2024-06-27 02:36:04 UTC.</span></span>
+<pre><code><span><span class="co">## This is INLA_25.02.10 built 2025-02-09 19:59:04 UTC.</span></span>
 <span><span class="co">##  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">##  - List available models/likelihoods/etc with inla.list.models()</span></span>
 <span><span class="co">##  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span> <span class="co"># for true multivariate normal simulation</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span></span>
@@ -123,13 +122,13 @@ and how to choose when to use them.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   x y time      value</span></span>
-<span><span class="co">## 1 1 1    1  0.2674873</span></span>
-<span><span class="co">## 2 2 1    1 -1.4520246</span></span>
-<span><span class="co">## 3 3 1    1 -0.8696036</span></span>
-<span><span class="co">## 4 4 1    1 -0.7646515</span></span>
-<span><span class="co">## 5 5 1    1 -1.1159363</span></span>
-<span><span class="co">## 6 6 1    1 -1.2763059</span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<span><span class="co">## 1 1 1    1 -0.9571230</span></span>
+<span><span class="co">## 2 2 1    1 -0.7191022</span></span>
+<span><span class="co">## 3 3 1    1 -0.9821146</span></span>
+<span><span class="co">## 4 4 1    1 -0.2194682</span></span>
+<span><span class="co">## 5 5 1    1 -0.7907946</span></span>
+<span><span class="co">## 6 6 1    1 -1.2904907</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -164,16 +163,16 @@ constant climatic conditions with non-porous soil.</p>
 name. In the simulated data example, there are three columns
 <code>x</code>, <code>y</code>, and <code>time</code>. You can see below
 how these are written into the formula that is then passed to inla.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">formula</span> <span class="op">&lt;-</span> <span class="va">value</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span> <span class="op">+</span> <span class="va">y</span> <span class="op">+</span> <span class="va">time</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">df</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.376, Running = 0.186, Post = 0.019, Total = 0.582 </span></span>
+<span><span class="co">##     Pre = 0.407, Running = 0.268, Post = 0.0207, Total = 0.696 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">## (Intercept) -0.172 0.108     -0.385   -0.172      0.041 -0.172   0</span></span>
-<span><span class="co">## x           -0.007 0.011     -0.029   -0.007      0.014 -0.007   0</span></span>
+<span><span class="co">## (Intercept) -0.196 0.108     -0.409   -0.196      0.016 -0.196   0</span></span>
+<span><span class="co">## x           -0.003 0.011     -0.024   -0.003      0.018 -0.003   0</span></span>
 <span><span class="co">## y           -0.008 0.011     -0.029   -0.008      0.013 -0.008   0</span></span>
 <span><span class="co">## time        -0.013 0.011     -0.034   -0.013      0.008 -0.013   0</span></span>
 <span><span class="co">## </span></span>
@@ -183,7 +182,7 @@ how these are written into the formula that is then passed to inla.</p>
 <span><span class="co">##                                         0.975quant mode</span></span>
 <span><span class="co">## Precision for the Gaussian observations       1.11 1.02</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  -1445.67 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  -1445.86 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
@@ -215,7 +214,7 @@ population counts).</p>
 <p>Below we show a model that defines a formula where the <code>f</code>
 subroutine represents the unobserved variance occuring through time
 while <code>x</code> and <code>y</code> are fixed effects.gi</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define a formula for the model</span></span>
 <span><span class="co"># Load the INLA library</span></span>
 <span></span>
@@ -228,11 +227,11 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 <span><span class="co"># Print the summary of the INLA model</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.231, Running = 0.21, Post = 0.0154, Total = 0.456 </span></span>
+<span><span class="co">##     Pre = 0.252, Running = 0.328, Post = 0.0154, Total = 0.595 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">## (Intercept) -0.243 0.065     -0.370   -0.243     -0.116 -0.243   0</span></span>
-<span><span class="co">## x           -0.007 0.008     -0.023   -0.007      0.008 -0.007   0</span></span>
+<span><span class="co">## (Intercept) -0.267 0.065     -0.394   -0.267     -0.140 -0.267   0</span></span>
+<span><span class="co">## x           -0.003 0.008     -0.018   -0.003      0.012 -0.003   0</span></span>
 <span><span class="co">## y           -0.008 0.008     -0.023   -0.008      0.007 -0.008   0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Random effects:</span></span>
@@ -241,13 +240,13 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Model hyperparameters:</span></span>
 <span><span class="co">##                                         mean    sd 0.025quant 0.5quant</span></span>
-<span><span class="co">## Precision for the Gaussian observations 2.00 0.090      1.826     2.00</span></span>
-<span><span class="co">## Precision for time                      1.25 0.551      0.466     1.15</span></span>
+<span><span class="co">## Precision for the Gaussian observations 2.00 0.090      1.825     2.00</span></span>
+<span><span class="co">## Precision for time                      1.25 0.549      0.466     1.15</span></span>
 <span><span class="co">##                                         0.975quant  mode</span></span>
-<span><span class="co">## Precision for the Gaussian observations       2.18 1.994</span></span>
-<span><span class="co">## Precision for time                            2.59 0.965</span></span>
+<span><span class="co">## Precision for the Gaussian observations       2.18 1.992</span></span>
+<span><span class="co">## Precision for time                            2.58 0.967</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  -1136.98 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  -1137.35 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
@@ -259,7 +258,7 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 can be used to do data driven inversion, i.e., estimating processes that
 cannot be observed directly. For example,</p>
 <!-- TODO: come up with example -->
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.inlabru.org" class="external-link">inlabru</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: fmesher</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
@@ -267,42 +266,45 @@ cannot be observed directly. For example,</p>
 <pre><code><span><span class="co">## The following object is masked from 'package:MASS':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     shrimp</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Fit a simple model</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://inlabru-org.github.io/inlabru/reference/bru.html" class="external-link">bru</a></span><span class="op">(</span><span class="va">value</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu">observed</span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span>, model <span class="op">=</span> <span class="st">"linear"</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Print the model summary</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## inlabru version: 2.11.1</span></span>
-<span><span class="co">## INLA version: 24.06.27</span></span>
+<pre><code><span><span class="co">## inlabru version: 2.12.0</span></span>
+<span><span class="co">## INLA version: 25.02.10</span></span>
 <span><span class="co">## Components:</span></span>
-<span><span class="co">## observed: main = linear(x + y), group = exchangeable(1L), replicate = iid(1L)</span></span>
-<span><span class="co">## Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L)</span></span>
+<span><span class="co">## observed: main = linear(x + y), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
+<span><span class="co">## Intercept: main = linear(1), group = exchangeable(1L), replicate = iid(1L), NULL</span></span>
 <span><span class="co">## Likelihoods:</span></span>
 <span><span class="co">##   Family: 'gaussian'</span></span>
+<span><span class="co">##     Tag: ''</span></span>
 <span><span class="co">##     Data class: 'data.frame'</span></span>
+<span><span class="co">##     Response class: 'numeric'</span></span>
 <span><span class="co">##     Predictor: value ~ .</span></span>
+<span><span class="co">##     Used components: effects[observed, Intercept], latent[]</span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.233, Running = 0.194, Post = 0.0417, Total = 0.469 </span></span>
+<span><span class="co">##     Pre = 0.23, Running = 0.283, Post = 0.0323, Total = 0.546 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
-<span><span class="co">## observed  -0.008 0.008     -0.023   -0.008      0.007 -0.008   0</span></span>
-<span><span class="co">## Intercept -0.243 0.090     -0.420   -0.243     -0.066 -0.243   0</span></span>
+<span><span class="co">## observed  -0.005 0.008     -0.021   -0.005       0.01 -0.005   0</span></span>
+<span><span class="co">## Intercept -0.267 0.090     -0.444   -0.267      -0.09 -0.267   0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Model hyperparameters:</span></span>
 <span><span class="co">##                                         mean    sd 0.025quant 0.5quant</span></span>
-<span><span class="co">## Precision for the Gaussian observations 1.02 0.046      0.935     1.02</span></span>
+<span><span class="co">## Precision for the Gaussian observations 1.02 0.046      0.934     1.02</span></span>
 <span><span class="co">##                                         0.975quant mode</span></span>
 <span><span class="co">## Precision for the Gaussian observations       1.11 1.02</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Deviance Information Criterion (DIC) ...............: 2821.65</span></span>
+<span><span class="co">## Deviance Information Criterion (DIC) ...............: 2822.14</span></span>
 <span><span class="co">## Deviance Information Criterion (DIC, saturated) ....: 1005.41</span></span>
 <span><span class="co">## Effective number of parameters .....................: 2.99</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Watanabe-Akaike information criterion (WAIC) ...: 2821.89</span></span>
-<span><span class="co">## Effective number of parameters .................: 3.22</span></span>
+<span><span class="co">## Watanabe-Akaike information criterion (WAIC) ...: 2822.36</span></span>
+<span><span class="co">## Effective number of parameters .................: 3.19</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  -1435.14 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  -1435.38 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
@@ -319,7 +321,7 @@ cannot be observed directly. For example,</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

@@ -8,8 +8,8 @@
 <title>Mesh building • fdmr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Mesh building">
 </head>
 <body>
@@ -78,7 +78,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Mesh building</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/main/vignettes/meshbuilder.Rmd" class="external-link"><code>vignettes/meshbuilder.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/0.2.1/vignettes/meshbuilder.Rmd" class="external-link"><code>vignettes/meshbuilder.Rmd</code></a></small>
       <div class="d-none name"><code>meshbuilder.Rmd</code></div>
     </div>
 
@@ -100,7 +100,7 @@ the data using <code>read.csv</code></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"tibetan_lakes"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/tibetan_lakes</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/Rtmpz6orZd/fdmr/tutorial_data/tibetan_lakes</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lakes_data_filepath</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"tibetan_lakes"</span>, filename <span class="op">=</span> <span class="st">"example_lake_data.csv"</span><span class="op">)</span></span>
 <span><span class="va">lakes_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">lakes_data_filepath</span><span class="op">)</span></span></code></pre></div>
@@ -158,10 +158,11 @@ previously used in the COVID-19 tutorial.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/covid</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/Rtmpz6orZd/fdmr/tutorial_data/covid</span></span></code></pre>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
 <pre><code><span><span class="co">## An object of class "SpatialPolygonsDataFrame"</span></span>
 <span><span class="co">## Slot "data":</span></span>
 <span><span class="co">##    MSOA11CD OBJECTID                 MSOA11NM                MSOA11NMW  BNG_E</span></span>
@@ -500,10 +501,10 @@ previously used in the COVID-19 tutorial.</p>
 <span><span class="co">##                 ID["EPSG",9122]]]]</span></span></code></pre>
 <p>The <code>sp_data</code> object is a
 <code>SpatialPolygonsDataFrame</code> containing 6789 features for areas
-of England. This object contains all the contains all the values we We
-can build a mesh by passing <code>sp_data</code> to the
+of England. This object contains all the values we need to build a mesh.
+We can build a mesh by passing <code>sp_data</code> to the
 <code>mesh_builder</code> function.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -513,7 +514,7 @@ can build a mesh by passing <code>sp_data</code> to the
 mesh you can pass those values to the <code>mesh_builder</code>
 function. To see what parameters you can pass to the function you can
 use the <code>args</code> function.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/args.html" class="external-link">args</a></span><span class="op">(</span><span class="fu">fdmr</span><span class="fu">::</span><span class="va"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (spatial_data, obs_data = NULL, crs = NULL, max_edge = NULL, </span></span>
 <span><span class="co">##     offset = NULL, cutoff = NULL, y_coord = "LAT", x_coord = "LONG") </span></span>
@@ -524,7 +525,7 @@ initial range and max edge values from our data and pass them into the
 <code>mesh_builder</code> function. These values will then be used as
 values for the initial mesh that’s created but can be changed within the
 app.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">[</span>, <span class="st">"LONG"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span></span>
 <span><span class="va">max_edge</span> <span class="op">&lt;-</span> <span class="va">initial_range</span> <span class="op">/</span> <span class="fl">8</span></span>
 <span></span>
@@ -538,7 +539,7 @@ encounter long mesh build times try using the <code>meshbuilder</code>
 defaults of NULL values for <code>max_edge</code> etc.</p>
 </blockquote>
 <p>Now we’re ready to start the app.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/mesh_builder.html">mesh_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, max_edge <span class="op">=</span> <span class="va">max_edge_fin</span>, offset <span class="op">=</span> <span class="va">offset</span>, cutoff <span class="op">=</span> <span class="va">cutoff</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -558,7 +559,7 @@ used to created the mesh.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

@@ -8,8 +8,8 @@
 <title>Model builder • fdmr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Model builder">
 </head>
 <body>
@@ -82,7 +82,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Model builder</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/main/vignettes/modelbuilder.Rmd" class="external-link"><code>vignettes/modelbuilder.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/4DModeller/fdmr/blob/0.2.1/vignettes/modelbuilder.Rmd" class="external-link"><code>vignettes/modelbuilder.Rmd</code></a></small>
       <div class="d-none name"><code>modelbuilder.Rmd</code></div>
     </div>
 
@@ -94,15 +94,17 @@ this.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"priors"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /home/runner/fdmr/tutorial_data/priors</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/RtmpGiINd7/fdmr/tutorial_data/priors</span></span></code></pre>
 <p>Next we’ll use the <code>load_tutorial_data</code> function to load
 in the spatial data we want.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"priors"</span>, filename <span class="op">=</span> <span class="st">"spatial_dataBris.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>Now we make a map of the study region. load</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">mapp</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">mapp</span></span>
+<code class="sourceCode R"><span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">mapp</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></code></pre></div>
+<pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">$</span><span class="va">mapp</span></span>
 <span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_map.html">plot_map</a></span><span class="op">(</span>polygon_data <span class="op">=</span> <span class="va">sp_data</span>, domain <span class="op">=</span> <span class="va">domain</span>, add_scale_bar <span class="op">=</span> <span class="cn">TRUE</span>, polygon_fill_opacity <span class="op">=</span> <span class="fl">0.5</span>, palette <span class="op">=</span> <span class="st">"YlOrRd"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <div class="leaflet html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:768px;height:384px;"></div>
@@ -112,11 +114,11 @@ A map of the study region.
 </div>
 <p>The COVID-19 data in Bristol are included in our tutorial data
 package. We’ll load in the data using same process we used above</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"priors"</span>, filename <span class="op">=</span> <span class="st">"covid19_dataBris.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>Then the first 6 rows of the data set can be viewed using the
 following code</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##           UtlaName       date week  MSOA11CD cases Population  prevalence</span></span>
 <span><span class="co">## 3 Bristol, City of 2021-12-25    1 E02003014    89       8292 0.010733237</span></span>
@@ -139,7 +141,7 @@ following code</p>
 <code><a href="../reference/mesh_builder.html">fdmr::mesh_builder</a></code> Shiny app. Using the app I came up with
 a mesh with the following parameters, we’ll use this and pass it into
 the “Setting Priors Shiny app” below.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">initial_range</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">sp_data</span><span class="op">@</span><span class="va">data</span><span class="op">[</span>, <span class="st">"LONG"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">3</span></span>
 <span><span class="va">max_edge</span> <span class="op">&lt;-</span> <span class="va">initial_range</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span></span>
@@ -152,7 +154,7 @@ the “Setting Priors Shiny app” below.</p>
 <p>In order to fit the model, we also need to define a temporal index
 (must be an integer starting at 1) and the number of discrete time
 points we want to model.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">group_index</span> <span class="op">&lt;-</span> <span class="va">covid19_data</span><span class="op">$</span><span class="va">week</span></span>
 <span><span class="va">n_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">$</span><span class="va">week</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -164,7 +166,7 @@ function to fit the model which expects the coordinates of the data,
 thus we transform <code>covid19_data</code> data set to a <a href="https://www.rdocumentation.org/packages/sp/versions/2.0-0/topics/SpatialPointsDataFrame-class" class="external-link"><code>SpatialPointsDataFrame</code></a>
 using the <a href="https://www.rdocumentation.org/packages/sp/versions/2.0-0/topics/coordinates" class="external-link"><code>sp::coordinates</code></a>
 function.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">sp</span><span class="fu">::</span><span class="fu"><a href="https://edzer.github.io/sp/reference/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LONG"</span>, <span class="st">"LAT"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -222,7 +224,7 @@ want to model</li>
 <code>time_variable = week</code> - the name of the time variable in
 the data</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/model_builder.html">model_builder</a></span><span class="op">(</span>spatial_data <span class="op">=</span> <span class="va">sp_data</span>, measurement_data <span class="op">=</span> <span class="va">covid19_data</span>, mesh <span class="op">=</span> <span class="va">mesh</span>, time_variable <span class="op">=</span> <span class="st">"week"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -255,7 +257,7 @@ model output for each run</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
