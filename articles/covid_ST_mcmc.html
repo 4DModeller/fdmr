@@ -124,18 +124,18 @@ this.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidst_mcmc</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidst_mcmc</span></span></code></pre>
 <p>The COVID-19 data and the related covariate information are included
 in our tutorial data package. We’ll load in the data using the
 <code>load_tutorial_data</code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">st_covid</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"st_covid.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>Next we’ll use the <code>load_tutorial_data</code> function to load
 in the spatial data we want.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sp_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"spatial_data.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>In this study, we use the areal unit modelling approach to fit the
 BHM and then make model inference using MCMC method. To do this, we need
 to construct a non-negative symmetric
@@ -357,20 +357,20 @@ you don’t need to load in the files below.</p>
 </blockquote>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitted_vals</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"fitted_vals.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modfits</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"modfits.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mod_sum</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"mod_sum.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>For comparison purpose, we also fit a separate BHM to the same
 dataset using the INLA-SPDE approach. The infection rates predicted by
 the INLA-SPDE approach is saved in the date frame named “inla_preds” and
 is provided in the tutorial data package. We’ll load that in now.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inla_preds</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"inla_preds.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <p>Then the predictions from the two models are merged into one data
 frame named “mergedat”.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
@@ -388,7 +388,7 @@ MCMC approach performs better than the model using the INLA-SPDE
 approach in terms of the lower DIC and WAIC values.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">inla_sum</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"INLAmodsum.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  DIC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">modfits</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">inla_sum</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
@@ -416,7 +416,7 @@ posterior COVID-19 infection rate estimates.</p>
 both models are compared.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">summary_fixed</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covidST_mcmc"</span>, filename <span class="op">=</span> <span class="st">"INLAfixed_sum.rds"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/Rtmpcjr48r/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
+<pre><code><span><span class="co">## Error in get_tutorial_datapath(dataset = dataset, filename = filename, : Unable to load data, the folder /tmp/RtmpMIHc7L/fdmr/tutorial_data/covidST_mcmc does not exist. Have you run retrieve_tutorial_data?</span></span></code></pre>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regr_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind.data.frame</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MCMC"</span> <span class="op">=</span> <span class="va">mod_sum</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">]</span>,</span>

@@ -168,7 +168,7 @@ how these are written into the formula that is then passed to inla.</p>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">df</span>, family <span class="op">=</span> <span class="st">"gaussian"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.407, Running = 0.268, Post = 0.0207, Total = 0.696 </span></span>
+<span><span class="co">##     Pre = 0.383, Running = 0.242, Post = 0.0195, Total = 0.644 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## (Intercept) -0.196 0.108     -0.409   -0.196      0.016 -0.196   0</span></span>
@@ -227,7 +227,7 @@ while <code>x</code> and <code>y</code> are fixed effects.gi</p>
 <span><span class="co"># Print the summary of the INLA model</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.252, Running = 0.328, Post = 0.0154, Total = 0.595 </span></span>
+<span><span class="co">##     Pre = 0.237, Running = 0.319, Post = 0.0143, Total = 0.571 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##               mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## (Intercept) -0.267 0.065     -0.394   -0.267     -0.140 -0.267   0</span></span>
@@ -285,7 +285,7 @@ cannot be observed directly. For example,</p>
 <span><span class="co">##     Predictor: value ~ .</span></span>
 <span><span class="co">##     Used components: effects[observed, Intercept], latent[]</span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.23, Running = 0.283, Post = 0.0323, Total = 0.546 </span></span>
+<span><span class="co">##     Pre = 0.207, Running = 0.277, Post = 0.0306, Total = 0.515 </span></span>
 <span><span class="co">## Fixed effects:</span></span>
 <span><span class="co">##             mean    sd 0.025quant 0.5quant 0.975quant   mode kld</span></span>
 <span><span class="co">## observed  -0.005 0.008     -0.021   -0.005       0.01 -0.005   0</span></span>

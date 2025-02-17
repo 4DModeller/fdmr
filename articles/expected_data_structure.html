@@ -100,7 +100,7 @@ environmental factors on COVID-19 infection. We load the dataset
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /tmp/RtmpTCeQoE/fdmr/tutorial_data/covid</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/RtmpRTvfDc/fdmr/tutorial_data/covid</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covid19_data</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"covid"</span>, filename <span class="op">=</span> <span class="st">"covid19_data.rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">covid19_data</span><span class="op">)</span></span></code></pre></div>
@@ -161,7 +161,7 @@ which is obtained by using the following codes.</p>
 <span></span>
 <span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"hydro"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /tmp/RtmpTCeQoE/fdmr/tutorial_data/hydro</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/RtmpRTvfDc/fdmr/tutorial_data/hydro</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">norway_polygon_path</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/get_tutorial_datapath.html">get_tutorial_datapath</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"hydro"</span>, filename <span class="op">=</span> <span class="st">"Kvilldal_Catch_Boundary.geojson"</span><span class="op">)</span></span>
 <span><span class="va">norway_polygon</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="va">norway_polygon_path</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_zm.html" class="external-link">st_zm</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -290,7 +290,7 @@ the object type of it is a <code>data.frame</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/retrieve_tutorial_data.html">retrieve_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"priors"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Tutorial data extracted to  /tmp/RtmpTCeQoE/fdmr/tutorial_data/priors</span></span></code></pre>
+<span><span class="co">## Tutorial data extracted to  /tmp/RtmpRTvfDc/fdmr/tutorial_data/priors</span></span></code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covid19_data_bristol</span> <span class="op">&lt;-</span> <span class="fu">fdmr</span><span class="fu">::</span><span class="fu"><a href="../reference/load_tutorial_data.html">load_tutorial_data</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"priors"</span>, filename <span class="op">=</span> <span class="st">"covid19_dataBris.rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">covid19_data_bristol</span><span class="op">)</span></span></code></pre></div>
